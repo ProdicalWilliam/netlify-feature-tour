@@ -21,7 +21,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       text-align: center;
     }
-    input[type="text"], input[type="password"], input[type="email"] {
+    input[type="email"],
+    input[type="password"] {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -46,11 +47,11 @@
     }
     a { color: #007bff; text-decoration: none; }
   </style>
-  <!-- Load Firebase libraries using compat version -->
+  <!-- Load Firebase libraries (compat version) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script>
-    // Firebase configuration - replace with your valid config if needed
+    // Firebase configuration – ensure this is correct for your project
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -71,7 +72,8 @@
       const message = document.getElementById("message");
       try {
         await auth.signInWithEmailAndPassword(email, password);
-        // Redirect to index.html since that is your customization page
+        // For login, you might want to fetch the user's custom website name from your database.
+        // For simplicity, we redirect to index.html without a query parameter.
         window.location.href = "index.html";
       } catch (error) {
         message.textContent = error.message;
