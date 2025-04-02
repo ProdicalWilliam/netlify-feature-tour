@@ -11,7 +11,7 @@
       font-family: 'Roboto', sans-serif;
       height: 100%;
       overflow: hidden;
-      background: #222;
+      background: #2E0854; /* Midnight purple background */
       color: #eee;
     }
     /* Background container & media */
@@ -22,6 +22,7 @@
       height: 100%;
       z-index: 1;
       transition: filter 0.3s ease;
+      overflow: hidden;
     }
     #bg-image {
       width: 100%;
@@ -29,12 +30,15 @@
       background-size: cover;
       background-position: center;
     }
-    #bg-video {
+    #bg-video, #bg-iframe {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border: none;
+    }
+    #bg-video, #bg-iframe {
       display: none;
     }
     /* Background audio */
@@ -62,6 +66,12 @@
     .draggable {
       position: absolute;
       cursor: move;
+      resize: both;
+      overflow: auto;
+    }
+    /* Visual cue for selected assets */
+    .selected {
+      outline: 2px solid #ffc107;
     }
     /* Toggle sidebar button */
     #toggle-sidebar {
@@ -69,7 +79,7 @@
       top: 10px;
       left: 10px;
       z-index: 10;
-      background: #007bff;
+      background: #2E0854;
       color: #fff;
       padding: 8px 12px;
       border: none;
@@ -83,7 +93,7 @@
       left: -350px;
       width: 350px;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(46, 8, 84, 0.95);
       z-index: 9;
       padding: 20px;
       box-sizing: border-box;
@@ -100,35 +110,36 @@
     #sidebar label {
       display: block;
       margin: 10px 0 4px;
-      color: #ccc;
+      color: #ddd;
     }
     #sidebar input[type="text"],
     #sidebar input[type="number"],
-    #sidebar input[type="url"] {
+    #sidebar input[type="url"],
+    #sidebar input[type="color"] {
       width: 100%;
       padding: 6px;
       box-sizing: border-box;
       border: 1px solid #555;
       border-radius: 4px;
-      background: #333;
+      background: #3a0f70;
       color: #fff;
     }
     #sidebar button {
       margin-top: 10px;
       width: 100%;
       padding: 10px;
-      background: #28a745;
+      background: #2E0854;
       border: none;
       border-radius: 4px;
       color: #fff;
       cursor: pointer;
     }
     #sidebar button:hover {
-      background: #1e7e34;
+      background: #1f0633;
     }
-    /* Theme button */
-    #change-theme {
-      background: #ffc107;
+    /* Additional control buttons */
+    #undo, #redo, #delete, #generate-viewer {
+      background: #2E0854;
       margin-top: 10px;
     }
     /* Public welcome header */
@@ -152,7 +163,9 @@
   <!-- Background container -->
   <div id="bg-container">
     <div id="bg-image"></div>
-    <video id="bg-video" autoplay muted loop></video>
+    <video id="bg-video" autoplay muted loop playsinline></video>
+    <!-- Container for YouTube iframe if needed -->
+    <iframe id="bg-iframe" allow="autoplay; muted" allowfullscreen></iframe>
   </div>
   <!-- Background audio -->
   <audio id="bg-audio" loop></audio>
@@ -161,12 +174,12 @@
   <!-- Container for PNG images -->
   <div id="png-container"></div>
   
-  <!-- Toggle Sidebar Button -->
-  <button id="toggle-sidebar">☰</button>
+  <!-- Toggle Sidebar Button (only visible in editor mode) -->
+  <button id="toggle-sidebar" style="display:none;">☰</button>
   <!-- Hidden Sidebar -->
   <div id="sidebar">
     <h2>Customize</h2>
-    <label for="bg-url">Background Image/Video URL</label>
+    <label for="bg-url">Background Image/Video/YouTube URL</label>
     <input type="url" id="bg-url" placeholder="http://...">
     <label for="bg-audio-url">Background Audio URL</label>
     <input type="url" id="bg-audio-url" placeholder="http://...">
@@ -189,13 +202,21 @@
     
     <button id="save-settings">Save Changes</button>
     <button id="change-theme">Change Theme</button>
+    
+    <hr style="margin: 15px 0; border-color: #555;">
+    
+    <!-- New controls for undo/redo/delete/viewer link -->
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <button id="delete">Delete Selected</button>
+    <button id="generate-viewer">Generate Viewer Link</button>
   </div>
   
   <!-- Public welcome message -->
   <div id="welcome-message">Welcome!</div>
   
   <script>
-    // Your Firebase configuration – using your actual values:
+    // Firebase configuration – using your actual values:
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -209,51 +230,85 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    // Global variables
-    let currentUID = null; // UID of logged-in user (if any)
-    let viewUID = null;    // UID whose settings to load (from URL param or currentUID)
-    let isEditable = false; // Determines if editing is allowed
-
-    // Get query param "site"
+    // Global variables for editor and history
+    let currentUID = null; 
+    let viewUID = null;    
+    let isEditable = false; 
+    let undoStack = [];
+    let redoStack = [];
+    let selectedElement = null;
+    
+    // Helper: record an action and clear redo stack
+    function recordAction(action) {
+      undoStack.push(action);
+      redoStack = [];
+    }
+    
+    // Query param helper
     function getQueryParam(param) {
       const params = new URLSearchParams(window.location.search);
       return params.get(param);
     }
     
-    // Simple draggable function (for overlay text and PNG images)
+    // Make an element draggable and record move actions
     function makeDraggable(el) {
       let isDragging = false, startX, startY, origX, origY;
       el.addEventListener('mousedown', e => {
+        if(!isEditable) return;
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
         const rect = el.getBoundingClientRect();
         origX = rect.left;
         origY = rect.top;
-        e.preventDefault();
+        el.style.zIndex = parseInt(el.style.zIndex || 3) + 100;
+        e.stopPropagation();
       });
       document.addEventListener('mousemove', e => {
         if (isDragging) {
           const dx = e.clientX - startX;
           const dy = e.clientY - startY;
-          el.style.left = origX + dx + "px";
-          el.style.top = origY + dy + "px";
+          el.style.left = (origX + dx) + "px";
+          el.style.top = (origY + dy) + "px";
         }
       });
       document.addEventListener('mouseup', () => {
-        isDragging = false;
+        if (isDragging) {
+          isDragging = false;
+          const newLeft = parseInt(el.style.left);
+          const newTop = parseInt(el.style.top);
+          if(newLeft !== origX || newTop !== origY) {
+            recordAction({
+              type: "move",
+              element: el,
+              prev: { left: origX, top: origY },
+              next: { left: newLeft, top: newTop }
+            });
+          }
+        }
+      });
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        clearSelection();
+        selectedElement = el;
+        el.classList.add("selected");
       });
     }
     
-    // Make overlay text draggable
-    makeDraggable(document.getElementById("overlay-text"));
+    // Clear selection from all assets
+    function clearSelection() {
+      document.querySelectorAll(".draggable").forEach(el => {
+        el.classList.remove("selected");
+      });
+      selectedElement = null;
+    }
     
-    // Toggle sidebar visibility
+    // Toggle sidebar visibility (only for editor mode)
     document.getElementById("toggle-sidebar").addEventListener("click", () => {
       document.getElementById("sidebar").classList.toggle("open");
     });
     
-    // Add PNG image (draggable & resizable via CSS "resize" & "overflow:auto")
+    // Add PNG image (record creation action)
     document.getElementById("add-png").addEventListener("click", () => {
       const url = document.getElementById("png-url").value.trim();
       if(url && url.toLowerCase().endsWith(".png")) {
@@ -264,14 +319,78 @@
         img.style.top = "100px";
         img.style.width = "150px";
         img.style.height = "auto";
-        // Allow resizing via CSS (for demo purposes)
         img.style.resize = "both";
         img.style.overflow = "auto";
         makeDraggable(img);
         document.getElementById("png-container").appendChild(img);
+        recordAction({ type: "create", element: img });
       } else {
         alert("Please enter a valid PNG URL.");
       }
+    });
+    
+    // Delete button: remove the selected element and record deletion
+    document.getElementById("delete").addEventListener("click", () => {
+      if(selectedElement) {
+        const parent = selectedElement.parentNode;
+        const nextSibling = selectedElement.nextSibling;
+        recordAction({
+          type: "delete",
+          element: selectedElement,
+          parent: parent,
+          nextSibling: nextSibling
+        });
+        parent.removeChild(selectedElement);
+        selectedElement = null;
+      } else {
+        alert("No asset selected.");
+      }
+    });
+    
+    // Undo and Redo functionality
+    document.getElementById("undo").addEventListener("click", () => {
+      if(undoStack.length === 0) return;
+      const action = undoStack.pop();
+      if(action.type === "move") {
+        action.element.style.left = action.prev.left + "px";
+        action.element.style.top = action.prev.top + "px";
+      } else if(action.type === "create") {
+        action.element.parentNode.removeChild(action.element);
+      } else if(action.type === "delete") {
+        if(action.nextSibling) {
+          action.parent.insertBefore(action.element, action.nextSibling);
+        } else {
+          action.parent.appendChild(action.element);
+        }
+        makeDraggable(action.element);
+      }
+      redoStack.push(action);
+    });
+    
+    document.getElementById("redo").addEventListener("click", () => {
+      if(redoStack.length === 0) return;
+      const action = redoStack.pop();
+      if(action.type === "move") {
+        action.element.style.left = action.next.left + "px";
+        action.element.style.top = action.next.top + "px";
+      } else if(action.type === "create") {
+        document.getElementById("png-container").appendChild(action.element);
+        makeDraggable(action.element);
+      } else if(action.type === "delete") {
+        action.element.parentNode.removeChild(action.element);
+      }
+      undoStack.push(action);
+    });
+    
+    // Generate viewer link button: removes editor query parameters and copies link to clipboard
+    document.getElementById("generate-viewer").addEventListener("click", () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("editor");
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        alert("Viewer link copied to clipboard:\n" + url.toString());
+      }).catch(err => {
+        alert("Failed to copy link. Viewer link: " + url.toString());
+      });
     });
     
     // Save settings to Firestore (only if editing is allowed)
@@ -297,10 +416,10 @@
       }
     });
     
-    // Change theme (simple demo: toggle between dark and light)
+    // Change theme (toggle between dark and light but here using midnight purple)
     document.getElementById("change-theme").addEventListener("click", () => {
       if(document.body.style.background === "white"){
-        document.body.style.background = "#222";
+        document.body.style.background = "#2E0854";
         document.body.style.color = "#eee";
       } else {
         document.body.style.background = "white";
@@ -310,28 +429,39 @@
     
     // Apply settings to the page
     function applySettings(settings) {
-      // Background blur
       document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
-      // Background media
       if(settings.bgUrl) {
-        if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
+        // Check if it's a YouTube URL
+        if(/(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(settings.bgUrl)) {
+          let videoID = "";
+          const ytMatch = settings.bgUrl.match(/(?:youtu\.be\/|v=|watch\?v=)([^&]+)/);
+          if(ytMatch) videoID = ytMatch[1];
+          const iframeURL = "https://www.youtube.com/embed/" + videoID + 
+            "?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=1&playlist=" + videoID;
+          document.getElementById("bg-iframe").src = iframeURL;
+          document.getElementById("bg-iframe").style.display = "block";
+          document.getElementById("bg-video").style.display = "none";
+          document.getElementById("bg-image").style.backgroundImage = "";
+        }
+        // Check if URL is a video file
+        else if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
           const video = document.getElementById("bg-video");
           video.src = settings.bgUrl;
           video.style.display = "block";
           video.play();
           document.getElementById("bg-image").style.backgroundImage = "";
+          document.getElementById("bg-iframe").style.display = "none";
         } else {
           document.getElementById("bg-image").style.backgroundImage = "url(" + settings.bgUrl + ")";
           document.getElementById("bg-video").style.display = "none";
+          document.getElementById("bg-iframe").style.display = "none";
         }
       }
-      // Background audio
       if(settings.bgAudioUrl) {
         const audio = document.getElementById("bg-audio");
         audio.src = settings.bgAudioUrl;
         audio.play();
       }
-      // Overlay text
       const overlay = document.getElementById("overlay-text");
       overlay.textContent = settings.overlayContent;
       overlay.style.color = settings.overlayColor;
@@ -344,7 +474,6 @@
         const doc = await db.collection("userSettings").doc(uid).get();
         if(doc.exists) {
           const settings = doc.data();
-          // Populate sidebar fields
           document.getElementById("bg-url").value = settings.bgUrl || "";
           document.getElementById("bg-audio-url").value = settings.bgAudioUrl || "";
           document.getElementById("blur-level").value = settings.blurLevel || 0;
@@ -361,17 +490,14 @@
     // Load public user profile and settings by website name
     async function loadPublicSite(siteName) {
       try {
-        // Query the "users" collection where websiteName == siteName
         const querySnapshot = await db.collection("users").where("websiteName", "==", siteName).get();
         if(querySnapshot.empty) {
           document.getElementById("welcome-message").textContent = "Site not found.";
           return;
         }
-        // Assuming website names are unique; get the first document.
         const userDoc = querySnapshot.docs[0];
         viewUID = userDoc.id;
         document.getElementById("welcome-message").textContent = "Welcome to " + (userDoc.data().websiteName || siteName) + "!";
-        // In public view mode, editing is disabled.
         isEditable = false;
         loadSettingsForUID(viewUID);
       } catch (err) {
@@ -382,32 +508,44 @@
     // Main initialization: decide whether to load a public site or the logged-in user’s site.
     async function init() {
       const siteParam = getQueryParam("site");
-      // If a site parameter exists, we are in public view mode.
+      const editorParam = getQueryParam("editor");
       if(siteParam) {
         await loadPublicSite(siteParam);
       } else {
-        // No site param: check authentication.
-        auth.onAuthStateChanged(user => {
-          if(user) {
-            currentUID = user.uid;
-            viewUID = currentUID;
-            isEditable = true; // allow editing
-            // Optionally load the user's profile from "users" collection if stored.
-            db.collection("users").doc(currentUID).get().then(doc => {
-              if(doc.exists) {
-                document.getElementById("welcome-message").textContent = "Welcome to " + (doc.data().websiteName || "Your Site") + "!";
-              }
-            });
-            loadSettingsForUID(currentUID);
-          } else {
-            // Not logged in and no site param: show default view.
-            viewUID = "default";
-            isEditable = false;
-            document.getElementById("welcome-message").textContent = "Welcome!";
-          }
-        });
+        if(editorParam === "true") {
+          document.getElementById("toggle-sidebar").style.display = "block";
+          auth.onAuthStateChanged(user => {
+            if(user) {
+              currentUID = user.uid;
+              viewUID = currentUID;
+              isEditable = true;
+              db.collection("users").doc(currentUID).get().then(doc => {
+                if(doc.exists) {
+                  document.getElementById("welcome-message").textContent = "Welcome to " + (doc.data().websiteName || "Your Site") + "!";
+                }
+              });
+              loadSettingsForUID(currentUID);
+            } else {
+              isEditable = false;
+              document.getElementById("toggle-sidebar").style.display = "none";
+              viewUID = "default";
+              document.getElementById("welcome-message").textContent = "Welcome!";
+            }
+          });
+        } else {
+          isEditable = false;
+          document.getElementById("toggle-sidebar").style.display = "none";
+          viewUID = "default";
+          document.getElementById("welcome-message").textContent = "Welcome!";
+        }
       }
     }
+    
+    document.addEventListener('click', e => {
+      if(!e.target.classList.contains("draggable")) {
+        clearSelection();
+      }
+    });
     
     init();
   </script>
