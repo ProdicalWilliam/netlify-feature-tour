@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+    .register-container {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #28a745;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e7e34;
+    }
+    .message {
+      color: red;
+      margin: 10px 0;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Register</h1>
+    <div class="message" id="message"></div>
+    <input type="text" id="newUsername" placeholder="Username">
+    <input type="password" id="newPassword" placeholder="Password">
+    <input type="text" id="siteName" placeholder="Your Website Name">
+    <input type="text" id="inviteCode" placeholder="Invite Code">
+    <br>
+    <button onclick="register()">Register</button>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <script>
+    // Valid invite codes
+    const validInviteCodes = [
+      "nlHLPieEjenJ3HvG8l3C6PI0h4UDK6",
+      "JoaUme3qlssUXG5MMRr6zAJzuFK8XN",
+      "HsZGkrIisrop5zRbvuF5kVdPZfIRYs",
+      "FEM4rfBY9u21X7QSDOQkpKenwBSR5J",
+      "WknfnUCOi36HRsS04tfagSt9PdmBmJ",
+      "YbJUy0Z3oOrmPKbADl1qhCZgKM7nj0",
+      "0a8kcjKMHIWEsliQjf1tNC4YyjMb3J",
+      "FiBAW5PE76gEC3D4FooVEmucaZUUa9",
+      "I4Rl7RXZhW7Ay4qgicfusUb8ye6eDu",
+      "afH0uFjwuNlCdRyPcvWORPRD8Bj8SA",
+      "7XZh5aTMdzn50OruCW7lDeR6qp1kvA",
+      "l8LpbqyiTpMQVDaPXJSMKi40EcVDoz",
+      "GXwxHFaFMCM5i9Lc78kaTemcisuzMm",
+      "u2YQsucYEJksdntSJG9kWZrP67TUaF",
+      "zrZYRoH9ZUYCyX6JbekmHKiv1asTzu",
+      "dHEfKEPoYNqGMWCnMddkxZnOmjvWaZ",
+      "1fmBjq7xHo4yGhq605hvIbiskMJztG",
+      "XKbmTCiXdkMQP8YfzCDR7bvCpdzJiI",
+      "fLEMvwgpI8FrEYrsfoODWk7Z55yD6j",
+      "ClzLlK5VQjASgzh6lVfA2cBzEijeEM"
+    ];
+
+    function register() {
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value.trim();
+      const siteName = document.getElementById('siteName').value.trim();
+      const inviteCode = document.getElementById('inviteCode').value.trim();
+      const message = document.getElementById('message');
+
+      if (!username || !password || !siteName || !inviteCode) {
+        message.textContent = "Please fill in all fields.";
+        return;
+      }
+
+      if (!validInviteCodes.includes(inviteCode)) {
+        message.textContent = "Invalid invite code.";
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users') || '{}');
+
+      if (users[username]) {
+        message.textContent = "Username already exists.";
+        return;
+      }
+
+      // Save new user with their website name
+      users[username] = { password: password, siteName: siteName };
+      localStorage.setItem('users', JSON.stringify(users));
+      message.style.color = "green";
+      message.textContent = "Registration successful! Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

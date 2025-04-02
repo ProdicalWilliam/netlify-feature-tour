@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+    .login-container {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .message {
+      color: red;
+      margin: 10px 0;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Login</h1>
+    <div class="message" id="message"></div>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <br>
+    <button onclick="login()">Login</button>
+    <p>Don't have an account? <a href="register.html">Register</a></p>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const message = document.getElementById('message');
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+      if (users[username] && users[username].password === password) {
+        localStorage.setItem('currentUser', username);
+        window.location.href = 'index.html';
+      } else {
+        message.textContent = "Invalid username or password.";
+      }
+    }
+  </script>
+</body>
+</html>
