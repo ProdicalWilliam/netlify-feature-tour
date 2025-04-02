@@ -21,7 +21,9 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       text-align: center;
     }
-    input[type="text"], input[type="password"], input[type="email"] {
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -46,11 +48,13 @@
     }
     a { color: #007bff; text-decoration: none; }
   </style>
-  <!-- Load Firebase libraries using compat version -->
+  <!-- Load Firebase libraries (compat version) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <!-- Optional: if you want to store custom website names, load Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script>
-    // Firebase configuration - ensure this matches your Firebase Console
+    // Firebase configuration – ensure this is correct for your project
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -64,15 +68,33 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
     async function register() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+      const websiteName = document.getElementById("websiteName").value.trim();
       const message = document.getElementById("message");
+
+      if (!websiteName) {
+        message.textContent = "Please choose a website name.";
+        return;
+      }
+
       try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        // Redirect to index.html after successful registration
-        window.location.href = "index.html";
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const uid = userCredential.user.uid;
+        
+        // Save the custom website name to Firestore for the user
+        await db.collection("users").doc(uid).set({
+          websiteName: websiteName,
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Redirect to index.html with the custom website name as a query parameter.
+        // You can later use this parameter to load custom content.
+        window.location.href = "index.html?site=" + encodeURIComponent(websiteName);
       } catch (error) {
         message.textContent = error.message;
       }
@@ -85,6 +107,8 @@
     <div class="message" id="message"></div>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
+    <!-- New field for custom website name -->
+    <input type="text" id="websiteName" placeholder="Your website name">
     <button onclick="register()">Register</button>
     <p>Already have an account? <a href="login.html">Login</a></p>
   </div>
