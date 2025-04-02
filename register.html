@@ -31,14 +31,14 @@
     button {
       width: 100%;
       padding: 10px;
-      background: #28a745;
+      background: #007bff;
       border: none;
       color: #fff;
       border-radius: 4px;
       cursor: pointer;
     }
     button:hover {
-      background: #1e7e34;
+      background: #0056b3;
     }
     .message {
       color: red;
@@ -46,83 +46,33 @@
     }
     a { color: #007bff; text-decoration: none; }
   </style>
+  <!-- Load Firebase libraries using compat version -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script>
-    // TODO: Replace with your Firebase config
+    // Firebase configuration - ensure this matches your Firebase Console
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // … other config values
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.appspot.com",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
     };
+
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Valid invite codes:
-    const validInviteCodes = [
-      "nlHLPieEjenJ3HvG8l3C6PI0h4UDK6",
-      "JoaUme3qlssUXG5MMRr6zAJzuFK8XN",
-      "HsZGkrIisrop5zRbvuF5kVdPZfIRYs",
-      "FEM4rfBY9u21X7QSDOQkpKenwBSR5J",
-      "WknfnUCOi36HRsS04tfagSt9PdmBmJ",
-      "YbJUy0Z3oOrmPKbADl1qhCZgKM7nj0",
-      "0a8kcjKMHIWEsliQjf1tNC4YyjMb3J",
-      "FiBAW5PE76gEC3D4FooVEmucaZUUa9",
-      "I4Rl7RXZhW7Ay4qgicfusUb8ye6eDu",
-      "afH0uFjwuNlCdRyPcvWORPRD8Bj8SA",
-      "7XZh5aTMdzn50OruCW7lDeR6qp1kvA",
-      "l8LpbqyiTpMQVDaPXJSMKi40EcVDoz",
-      "GXwxHFaFMCM5i9Lc78kaTemcisuzMm",
-      "u2YQsucYEJksdntSJG9kWZrP67TUaF",
-      "zrZYRoH9ZUYCyX6JbekmHKiv1asTzu",
-      "dHEfKEPoYNqGMWCnMddkxZnOmjvWaZ",
-      "1fmBjq7xHo4yGhq605hvIbiskMJztG",
-      "XKbmTCiXdkMQP8YfzCDR7bvCpdzJiI",
-      "fLEMvwgpI8FrEYrsfoODWk7Z55yD6j",
-      "ClzLlK5VQjASgzh6lVfA2cBzEijeEM"
-    ];
 
     async function register() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      const siteName = document.getElementById("siteName").value.trim();
-      const inviteCode = document.getElementById("inviteCode").value.trim();
       const message = document.getElementById("message");
-
-      if (!email || !password || !siteName || !inviteCode) {
-        message.textContent = "Please fill in all fields.";
-        return;
-      }
-
-      if (!validInviteCodes.includes(inviteCode)) {
-        message.textContent = "Invalid invite code.";
-        return;
-      }
-
       try {
-        // Create user using Firebase Authentication
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        // Save additional data in Firestore
-        await db.collection("userSettings").doc(email).set({
-          siteName: siteName,
-          bgUrl: "",
-          blurLevel: 0,
-          overlayContent: "",
-          overlayColor: "#ffffff",
-          overlaySize: 2,
-          showCircles: false,
-          circleColor: "#ffffff",
-          circleSize: 50,
-          circleCount: 10
-        });
-        message.style.color = "green";
-        message.textContent = "Registration successful! Redirecting to login...";
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
+        await auth.createUserWithEmailAndPassword(email, password);
+        // Optionally, redirect the user after registration
+        window.location.href = "customize.html";
       } catch (error) {
         message.textContent = error.message;
       }
@@ -135,8 +85,6 @@
     <div class="message" id="message"></div>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <input type="text" id="siteName" placeholder="Your Website Name">
-    <input type="text" id="inviteCode" placeholder="Invite Code">
     <button onclick="register()">Register</button>
     <p>Already have an account? <a href="login.html">Login</a></p>
   </div>
