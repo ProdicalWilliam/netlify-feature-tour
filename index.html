@@ -14,9 +14,8 @@
       font-family: 'Roboto', sans-serif;
       height: 100%;
       overflow: hidden;
-      background: #2E0854; /* Midnight purple */
+      background: #2E0854; /* Default: midnight purple */
       color: #eee;
-      /* Custom cursor placeholder; updated via settings if provided */
       cursor: auto;
     }
     /* Background container & media */
@@ -46,8 +45,8 @@
       border: none;
     }
     /* Hide native video controls */
-    #bg-video::-webkit-media-controls { display:none !important; }
-    #bg-video::-moz-media-controls { display:none !important; }
+    #bg-video::-webkit-media-controls { display: none !important; }
+    #bg-video::-moz-media-controls { display: none !important; }
     /* Background audio element (hidden) */
     #bg-audio { display: none; }
     /* Draggable overlay text(s) */
@@ -58,7 +57,7 @@
       z-index: 3;
       cursor: move;
       padding: 5px 10px;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       border-radius: 5px;
     }
     /* Container for PNG images */
@@ -77,11 +76,10 @@
     .selected {
       outline: 2px solid #ffc107;
     }
-    /* First Sidebar (editor panel) */
+    /* Sidebar toggle buttons */
     #toggle-sidebar, #toggle-sidebar2 {
       position: fixed;
       top: 10px;
-      left: 10px;
       z-index: 10;
       background: #2E0854;
       color: #fff;
@@ -91,16 +89,15 @@
       cursor: pointer;
       margin-right: 5px;
     }
-    #toggle-sidebar2 {
-      left: auto;
-      right: 10px;
-    }
+    #toggle-sidebar { left: 10px; }
+    #toggle-sidebar2 { right: 10px; }
+    /* First Sidebar (Global & Editor Settings) */
     #sidebar, #sidebar2 {
       position: fixed;
       top: 0;
       width: 350px;
       height: 100%;
-      background: #1f0633; /* Darker midnight purple */
+      background: #1f0633;
       z-index: 9;
       padding: 20px;
       box-sizing: border-box;
@@ -159,7 +156,7 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 11;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       padding: 8px 12px;
       border-radius: 4px;
       color: #fff;
@@ -171,10 +168,10 @@
       border-radius: 4px;
       word-break: break-all;
     }
-    /* Blur overlay element that can be toggled, resized, and dragged */
+    /* Blur overlay element */
     #blur-overlay {
       position: absolute;
-      background: rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.6);
       border: 1px solid #ccc;
       z-index: 5;
       display: none;
@@ -183,7 +180,7 @@
     /* Discord info container */
     #discord-info {
       position: absolute;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       border: 1px solid #888;
       padding: 10px;
       border-radius: 5px;
@@ -215,7 +212,7 @@
   <div id="png-container"></div>
   <!-- Blur overlay element (can be toggled via second sidebar) -->
   <div id="blur-overlay">Blur Overlay</div>
-  <!-- Discord info container (populated from Discord lookup) -->
+  <!-- Discord info container -->
   <div id="discord-info"></div>
 
   <!-- Toggle buttons for sidebars -->
@@ -225,6 +222,9 @@
   <!-- First Sidebar (Global & Editor Settings) -->
   <div id="sidebar">
     <h2>Customize & Share</h2>
+    <label for="domain-name">Domain Name</label>
+    <input type="text" id="domain-name" placeholder="Enter unique domain name">
+    
     <label for="tab-title">Website Tab Name</label>
     <input type="text" id="tab-title" placeholder="Enter website title">
     
@@ -239,6 +239,13 @@
     
     <label for="blur-level">Blur Level (px)</label>
     <input type="number" id="blur-level" placeholder="0" value="0" min="0">
+    
+    <!-- New: Background Color Options -->
+    <label>Background Color</label>
+    <input type="radio" name="bg-color" id="bg-color-default" value="default" checked> Default (Midnight Purple)<br>
+    <input type="radio" name="bg-color" id="bg-color-black" value="black"> Black<br>
+    <input type="radio" name="bg-color" id="bg-color-custom" value="custom"> Custom:
+    <input type="color" id="custom-bg-color" value="#2E0854"><br>
     
     <label for="overlay-content">Overlay Text</label>
     <input type="text" id="overlay-content" placeholder="Your text here">
@@ -275,7 +282,7 @@
     <div id="viewer-link" style="display:none;"></div>
   </div>
 
-  <!-- Second Sidebar (Extra Options: Blur Overlay & Discord, etc.) -->
+  <!-- Second Sidebar (Extra Options: Blur Overlay, Discord, etc.) -->
   <div id="sidebar2">
     <h2>Extra Options</h2>
     <!-- Blur overlay controls -->
@@ -317,7 +324,7 @@
       window.location.href = "login.html";
     }
     
-    // Firebase configuration – replace with your actual values
+    // Firebase configuration – replace with your actual values:
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -331,7 +338,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    // Use query parameter "site" to load global settings (everyone sees the same site)
+    // Use query parameter "site" to load global settings (all users share the same site)
     const siteID = urlParams.get("site") || "defaultSite";
     
     // Global variables for editor and history
@@ -348,7 +355,6 @@
     auth.onAuthStateChanged(user => {
       if(user){
         currentUID = user.uid;
-        // For editor links, allow editing only if siteID equals currentUID
         if(isEditorLink && siteID === currentUID){
           isEditable = true;
           document.getElementById("toggle-sidebar").style.display = "block";
@@ -427,7 +433,7 @@
       document.getElementById("sidebar").classList.toggle("open");
     });
     
-    // Toggle second sidebar (extras)
+    // Toggle second sidebar
     document.getElementById("toggle-sidebar2").addEventListener("click", () => {
       if(!isEditable) return viewerAlert();
       document.getElementById("sidebar2").classList.toggle("open");
@@ -543,10 +549,31 @@
       }).catch(err => { alert("Failed to copy link. Viewer link: " + url.toString()); });
     });
     
-    // Save settings to Firestore (global updates)
+    // Save settings to Firestore with unique domain name check
     document.getElementById("save-settings").addEventListener("click", async () => {
       if(!isEditable) return viewerAlert();
+      const newDomain = document.getElementById("domain-name").value.trim();
+      if(!newDomain){
+        alert("Please enter a domain name.");
+        return;
+      }
+      // Check Firestore for duplicate domain names (except for current site)
+      try {
+        const querySnapshot = await db.collection("userSettings").where("domainName", "==", newDomain).get();
+        let duplicate = false;
+        querySnapshot.forEach(doc => {
+          if(doc.id !== siteID) duplicate = true;
+        });
+        if(duplicate){
+          alert("Domain name already in use. Please choose a different one.");
+          return;
+        }
+      } catch(err) {
+        console.error("Error checking domain name:", err);
+      }
+      
       const settings = {
+        domainName: newDomain,
         tabTitle: document.getElementById("tab-title").value.trim(),
         faviconUrl: document.getElementById("favicon-url").value.trim(),
         bgUrl: document.getElementById("bg-url").value.trim(),
@@ -562,15 +589,20 @@
           height: parseInt(document.getElementById("blur-overlay-height").value) || 150,
           opacity: parseFloat(document.getElementById("blur-overlay-opacity").value) || 0.6
         },
+        // Background color selection:
+        bgColor: (function(){
+          if(document.getElementById("bg-color-black").checked) return "black";
+          if(document.getElementById("bg-color-custom").checked) return document.getElementById("custom-bg-color").value;
+          return "default";
+        })(),
         discordInfo: {
           username: document.getElementById("discord-username").value.trim()
-          // Discord data (pfp, etc.) will be filled after lookup
         }
       };
       try {
         await db.collection("userSettings").doc(siteID).set(settings);
         applySettings(settings);
-        alert("Settings saved!");
+        alert("Settings saved and updated for everyone!");
       } catch(err) { console.error("Error saving settings:", err); }
     });
     
@@ -608,11 +640,10 @@
         alert("Please enter a Discord username.");
         return;
       }
-      // Simulate an API call to discordlookup.com
+      // Simulate API call to discordlookup.com
       fetch("https://discordlookup.com/api/lookup?user=" + encodeURIComponent(username))
         .then(response => response.json())
         .then(data => {
-          // Assume data returns an object with pfpUrl, username, and other info
           const discordContainer = document.getElementById("discord-info");
           discordContainer.innerHTML = `<img src="${data.pfpUrl}" alt="PFP" style="width:80px;height:80px;border-radius:50%;"><br>
                                         <strong>${data.username}</strong><br>
@@ -632,7 +663,7 @@
     
     // Apply settings to the page
     function applySettings(settings) {
-      // Update blur filter for background container
+      // Update background blur filter
       document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
       // Update tab title and favicon
       if(settings.tabTitle) { document.title = settings.tabTitle; }
@@ -640,6 +671,16 @@
       // Set custom cursor if provided
       if(settings.customCursor) {
         document.body.style.cursor = "url(" + settings.customCursor + "), auto";
+      }
+      // Apply background color option
+      if(settings.bgColor){
+        if(settings.bgColor === "black"){
+          document.body.style.background = "black";
+        } else if(settings.bgColor !== "default"){
+          document.body.style.background = settings.bgColor;
+        } else {
+          document.body.style.background = "#2E0854";
+        }
       }
       // Background media
       if(settings.bgUrl) {
@@ -680,7 +721,6 @@
       } else {
         document.getElementById("blur-overlay").style.display = "none";
       }
-      // (Discord info will be updated via the fetch-discord button)
     }
     
     // Load settings from Firestore for given siteID
@@ -689,6 +729,7 @@
         const doc = await db.collection("userSettings").doc(id).get();
         if(doc.exists){
           const settings = doc.data();
+          document.getElementById("domain-name").value = settings.domainName || "";
           document.getElementById("tab-title").value = settings.tabTitle || "";
           document.getElementById("favicon-url").value = settings.faviconUrl || "";
           document.getElementById("bg-url").value = settings.bgUrl || "";
@@ -705,6 +746,16 @@
             document.getElementById("blur-overlay-opacity").value = settings.blurOverlay.opacity || 0.6;
           }
           document.getElementById("discord-username").value = settings.discordInfo ? settings.discordInfo.username : "";
+          if(settings.bgColor){
+            if(settings.bgColor === "black"){
+              document.getElementById("bg-color-black").checked = true;
+            } else if(settings.bgColor !== "default"){
+              document.getElementById("bg-color-custom").checked = true;
+              document.getElementById("custom-bg-color").value = settings.bgColor;
+            } else {
+              document.getElementById("bg-color-default").checked = true;
+            }
+          }
           applySettings(settings);
         }
       } catch(err){ console.error("Error loading settings:", err); }
