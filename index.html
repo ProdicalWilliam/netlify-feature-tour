@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Customizable Background Page</title>
   <style>
-    /* Reset default margins and ensure full-page display */
+    /* Ensure full-page display */
     html, body {
       margin: 0;
       padding: 0;
@@ -12,20 +12,7 @@
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
-    /* Video background styling */
-    #bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      z-index: 1;
-      display: none; /* Hidden by default */
-      object-fit: cover;
-    }
-    /* Image background styling */
+    /* Background containers */
     #bg-image {
       position: fixed;
       top: 0;
@@ -36,77 +23,157 @@
       background-position: center;
       z-index: 1;
     }
-    /* Content overlay styling */
-    .content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      color: white;
-      padding-top: 50px;
+    #bg-video, #yt-iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      object-fit: cover;
+      display: none;
+      border: 0;
     }
-    /* Form container styling */
-    .customize-form {
-      background: rgba(0, 0, 0, 0.6);
-      display: inline-block;
+    /* Toggle button on the left */
+    #toggle-btn {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 3;
+      border-radius: 0 5px 5px 0;
+    }
+    /* Customization panel styling */
+    #custom-panel {
+      position: fixed;
+      top: 50%;
+      left: -320px;  /* Hidden off-canvas */
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 0 5px 5px 0;
+      z-index: 3;
+      transition: left 0.3s ease;
     }
-    input[type="text"] {
-      width: 300px;
+    #custom-panel.active {
+      left: 0;
+    }
+    #custom-panel h1 {
+      color: #fff;
+      font-size: 1.2em;
+    }
+    #custom-panel input[type="text"] {
+      width: 280px;
       padding: 8px;
-      margin: 5px 0;
+      margin: 10px 0;
       border: none;
       border-radius: 5px;
     }
-    button {
+    #custom-panel button {
       padding: 10px 20px;
       border: none;
-      background: #007bff;
-      color: white;
+      background: #28a745;
+      color: #fff;
       border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background: #0056b3;
+    #custom-panel button:hover {
+      background: #1e7e34;
     }
   </style>
 </head>
 <body>
-  <!-- Video background element -->
-  <video id="bg-video" autoplay muted loop></video>
-  <!-- Image background container -->
+  <!-- Background containers -->
   <div id="bg-image"></div>
+  <video id="bg-video" autoplay muted loop></video>
+  <iframe id="yt-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-  <div class="content">
-    <div class="customize-form">
-      <h1>Customize Background</h1>
-      <input type="text" id="bg-url" placeholder="Enter image or video URL">
-      <br>
-      <button onclick="setBackground()">Apply Background</button>
-    </div>
+  <!-- Toggle button -->
+  <button id="toggle-btn" onclick="togglePanel()">☰</button>
+
+  <!-- Customization panel -->
+  <div id="custom-panel">
+    <h1>Customize Background</h1>
+    <input type="text" id="bg-url" placeholder="Enter image, video, or YouTube URL">
+    <br>
+    <button onclick="setBackground()">Apply Background</button>
   </div>
 
   <script>
+    // Toggle the customization panel
+    function togglePanel() {
+      var panel = document.getElementById('custom-panel');
+      panel.classList.toggle('active');
+    }
+
+    // Helper to extract YouTube video ID from various URL formats
+    function extractYouTubeID(url) {
+      var videoId = null;
+      // For URLs like https://www.youtube.com/watch?v=VIDEOID
+      var match = url.match(/[?&]v=([^&#]+)/);
+      if (match && match[1]) {
+        videoId = match[1];
+      } else {
+        // For URLs like https://youtu.be/VIDEOID
+        match = url.match(/youtu\.be\/([^?&#]+)/);
+        if (match && match[1]) {
+          videoId = match[1];
+        }
+      }
+      return videoId;
+    }
+
     function setBackground() {
       var url = document.getElementById('bg-url').value.trim();
       if (!url) return;
 
-      // Define common video file extensions
+      // Define common video file extensions (direct video files)
       var videoExtensions = /\.(mp4|webm|ogg)(\?.*)?$/i;
 
-      var bgVideo = document.getElementById('bg-video');
+      // Elements
       var bgImage = document.getElementById('bg-image');
+      var bgVideo = document.getElementById('bg-video');
+      var ytIframe = document.getElementById('yt-iframe');
 
-      if (videoExtensions.test(url)) {
-        // It's a video URL: show video element and hide image background
+      // Hide all background elements first
+      bgImage.style.display = 'none';
+      bgVideo.style.display = 'none';
+      ytIframe.style.display = 'none';
+
+      // Reset sources
+      bgVideo.pause();
+      bgVideo.src = "";
+      ytIframe.src = "";
+      bgImage.style.backgroundImage = '';
+
+      // Check for YouTube URL
+      if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        var videoId = extractYouTubeID(url);
+        if (videoId) {
+          // YouTube embed URL with autoplay, mute, and loop
+          var embedUrl = "https://www.youtube.com/embed/" + videoId +
+            "?autoplay=1&mute=1&loop=1&playlist=" + videoId + "&controls=0&modestbranding=1";
+          ytIframe.src = embedUrl;
+          ytIframe.style.display = 'block';
+        } else {
+          alert("Invalid YouTube URL");
+        }
+      }
+      // Check if direct video link
+      else if (videoExtensions.test(url)) {
         bgVideo.src = url;
         bgVideo.style.display = 'block';
         bgVideo.play();
-        bgImage.style.backgroundImage = 'none';
-      } else {
-        // Otherwise, assume it's an image URL: set image background and hide video element
+      }
+      // Otherwise assume it's an image URL
+      else {
         bgImage.style.backgroundImage = 'url(' + url + ')';
-        bgVideo.style.display = 'none';
+        bgImage.style.display = 'block';
       }
     }
   </script>
