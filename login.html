@@ -2,56 +2,228 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>My Custom Website</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    html, body {
       margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      height: 100%;
+      overflow: hidden;
+      background: #222;
+      color: #eee;
     }
-    .login-container {
-      background: #fff;
-      padding: 25px 35px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      text-align: center;
-    }
-    input[type="email"],
-    input[type="password"] {
+    /* Background container & media */
+    #bg-container {
+      position: fixed;
+      top: 0; left: 0;
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      height: 100%;
+      z-index: 1;
+      transition: filter 0.3s ease;
+      overflow: hidden;
     }
-    button {
+    #bg-image {
       width: 100%;
-      padding: 10px;
-      background: #007bff;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+    #bg-video, #bg-iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       border: none;
+    }
+    #bg-video, #bg-iframe {
+      display: none;
+    }
+    /* Background audio */
+    #bg-audio {
+      display: none;
+    }
+    /* Draggable overlay text */
+    #overlay-text {
+      position: absolute;
+      top: 50px;
+      left: 50px;
+      z-index: 3;
+      cursor: move;
+      padding: 5px 10px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 5px;
+    }
+    /* Container for PNG images */
+    #png-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 4;
+    }
+    .draggable {
+      position: absolute;
+      cursor: move;
+      resize: both;
+      overflow: auto;
+    }
+    /* Visual cue for selected assets */
+    .selected {
+      outline: 2px solid #ffc107;
+    }
+    /* Toggle sidebar button */
+    #toggle-sidebar {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: #007bff;
       color: #fff;
+      padding: 8px 12px;
+      border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    button:hover {
-      background: #0056b3;
+    /* Hidden sidebar */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -350px;
+      width: 350px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: left 0.3s ease;
+      overflow-y: auto;
     }
-    .message {
-      color: red;
-      margin: 10px 0;
+    #sidebar.open {
+      left: 0;
     }
-    a { color: #007bff; text-decoration: none; }
+    #sidebar h2 {
+      margin-top: 0;
+      color: #fff;
+    }
+    #sidebar label {
+      display: block;
+      margin: 10px 0 4px;
+      color: #ccc;
+    }
+    #sidebar input[type="text"],
+    #sidebar input[type="number"],
+    #sidebar input[type="url"],
+    #sidebar input[type="color"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #333;
+      color: #fff;
+    }
+    #sidebar button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+    #sidebar button:hover {
+      background: #1e7e34;
+    }
+    /* Theme button */
+    #change-theme {
+      background: #ffc107;
+      margin-top: 10px;
+    }
+    /* Undo, Redo, Delete buttons */
+    #undo, #redo, #delete {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+    #undo, #redo {
+      background: #6c757d;
+    }
+    /* Public welcome header */
+    #welcome-message {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 12px;
+      border-radius: 4px;
+      color: #fff;
+    }
   </style>
-  <!-- Load Firebase libraries (compat version) -->
+  <!-- Firebase SDKs (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <!-- Background container -->
+  <div id="bg-container">
+    <div id="bg-image"></div>
+    <video id="bg-video" autoplay muted loop></video>
+    <!-- Container for YouTube iframe if needed -->
+    <iframe id="bg-iframe" allow="autoplay; muted" allowfullscreen></iframe>
+  </div>
+  <!-- Background audio -->
+  <audio id="bg-audio" loop></audio>
+  <!-- Draggable overlay text -->
+  <div id="overlay-text">Drag me around!</div>
+  <!-- Container for PNG images -->
+  <div id="png-container"></div>
+  
+  <!-- Toggle Sidebar Button (only visible in editor mode) -->
+  <button id="toggle-sidebar" style="display:none;">☰</button>
+  <!-- Hidden Sidebar -->
+  <div id="sidebar">
+    <h2>Customize</h2>
+    <label for="bg-url">Background Image/Video/YouTube URL</label>
+    <input type="url" id="bg-url" placeholder="http://...">
+    <label for="bg-audio-url">Background Audio URL</label>
+    <input type="url" id="bg-audio-url" placeholder="http://...">
+    <label for="blur-level">Blur Level (px)</label>
+    <input type="number" id="blur-level" placeholder="0" value="0" min="0">
+    <label for="overlay-content">Overlay Text</label>
+    <input type="text" id="overlay-content" placeholder="Your text here">
+    <label for="overlay-color">Overlay Text Color</label>
+    <input type="color" id="overlay-color" value="#ffffff">
+    <label for="overlay-size">Overlay Text Size (em)</label>
+    <input type="number" id="overlay-size" placeholder="2" value="2" step="0.1">
+    
+    <hr style="margin: 15px 0; border-color: #555;">
+    
+    <label for="png-url">Add PNG Image URL</label>
+    <input type="url" id="png-url" placeholder="http://...">
+    <button id="add-png">Add PNG</button>
+    
+    <hr style="margin: 15px 0; border-color: #555;">
+    
+    <button id="save-settings">Save Changes</button>
+    <button id="change-theme">Change Theme</button>
+    
+    <hr style="margin: 15px 0; border-color: #555;">
+    
+    <!-- New controls for undo/redo/delete -->
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <button id="delete">Delete Selected</button>
+  </div>
+  
+  <!-- Public welcome message -->
+  <div id="welcome-message">Welcome!</div>
+  
   <script>
-    // Firebase configuration – ensure this is correct for your project
+    // Firebase configuration – using your actual values:
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -61,34 +233,328 @@
       appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
       measurementId: "G-JDV0KHPD7F"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-
-    async function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message");
+    const db = firebase.firestore();
+    
+    // Global variables for editor and history
+    let currentUID = null; 
+    let viewUID = null;    
+    let isEditable = false; 
+    let undoStack = [];
+    let redoStack = [];
+    let selectedElement = null;
+    
+    // Helper: record an action and clear redo stack
+    function recordAction(action) {
+      undoStack.push(action);
+      redoStack = [];
+    }
+    
+    // Query param helper
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+    
+    // Make an element draggable and record move actions
+    function makeDraggable(el) {
+      let isDragging = false, startX, startY, origX, origY;
+      el.addEventListener('mousedown', e => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = el.getBoundingClientRect();
+        origX = rect.left;
+        origY = rect.top;
+        // Bring to front on drag start
+        el.style.zIndex = parseInt(el.style.zIndex || 3) + 100;
+        e.stopPropagation();
+      });
+      document.addEventListener('mousemove', e => {
+        if (isDragging) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          el.style.left = (origX + dx) + "px";
+          el.style.top = (origY + dy) + "px";
+        }
+      });
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          // Record move action if position changed
+          const newLeft = parseInt(el.style.left);
+          const newTop = parseInt(el.style.top);
+          if(newLeft !== origX || newTop !== origY) {
+            recordAction({
+              type: "move",
+              element: el,
+              prev: { left: origX, top: origY },
+              next: { left: newLeft, top: newTop }
+            });
+          }
+        }
+      });
+      // Add click event for selection
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        clearSelection();
+        selectedElement = el;
+        el.classList.add("selected");
+      });
+    }
+    
+    // Clear selection from all assets
+    function clearSelection() {
+      document.querySelectorAll(".draggable").forEach(el => {
+        el.classList.remove("selected");
+      });
+      selectedElement = null;
+    }
+    
+    // Toggle sidebar visibility (only for editor mode)
+    document.getElementById("toggle-sidebar").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("open");
+    });
+    
+    // Add PNG image (record creation action)
+    document.getElementById("add-png").addEventListener("click", () => {
+      const url = document.getElementById("png-url").value.trim();
+      if(url && url.toLowerCase().endsWith(".png")) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.classList.add("draggable");
+        img.style.left = "100px";
+        img.style.top = "100px";
+        img.style.width = "150px";
+        img.style.height = "auto";
+        img.style.resize = "both";
+        img.style.overflow = "auto";
+        makeDraggable(img);
+        document.getElementById("png-container").appendChild(img);
+        recordAction({ type: "create", element: img });
+      } else {
+        alert("Please enter a valid PNG URL.");
+      }
+    });
+    
+    // Delete button: remove the selected element and record deletion
+    document.getElementById("delete").addEventListener("click", () => {
+      if(selectedElement) {
+        const parent = selectedElement.parentNode;
+        const nextSibling = selectedElement.nextSibling;
+        recordAction({
+          type: "delete",
+          element: selectedElement,
+          parent: parent,
+          nextSibling: nextSibling
+        });
+        parent.removeChild(selectedElement);
+        selectedElement = null;
+      } else {
+        alert("No asset selected.");
+      }
+    });
+    
+    // Undo and Redo functionality
+    document.getElementById("undo").addEventListener("click", () => {
+      if(undoStack.length === 0) return;
+      const action = undoStack.pop();
+      if(action.type === "move") {
+        action.element.style.left = action.prev.left + "px";
+        action.element.style.top = action.prev.top + "px";
+      } else if(action.type === "create") {
+        action.element.parentNode.removeChild(action.element);
+      } else if(action.type === "delete") {
+        if(action.nextSibling) {
+          action.parent.insertBefore(action.element, action.nextSibling);
+        } else {
+          action.parent.appendChild(action.element);
+        }
+        makeDraggable(action.element); // reinitialize draggable
+      }
+      redoStack.push(action);
+    });
+    
+    document.getElementById("redo").addEventListener("click", () => {
+      if(redoStack.length === 0) return;
+      const action = redoStack.pop();
+      if(action.type === "move") {
+        action.element.style.left = action.next.left + "px";
+        action.element.style.top = action.next.top + "px";
+      } else if(action.type === "create") {
+        document.getElementById("png-container").appendChild(action.element);
+        makeDraggable(action.element);
+      } else if(action.type === "delete") {
+        action.element.parentNode.removeChild(action.element);
+      }
+      undoStack.push(action);
+    });
+    
+    // Save settings to Firestore (only if editing is allowed)
+    document.getElementById("save-settings").addEventListener("click", async () => {
+      if(!isEditable) {
+        alert("You are in view mode only.");
+        return;
+      }
+      const settings = {
+        bgUrl: document.getElementById("bg-url").value.trim(),
+        bgAudioUrl: document.getElementById("bg-audio-url").value.trim(),
+        blurLevel: parseInt(document.getElementById("blur-level").value) || 0,
+        overlayContent: document.getElementById("overlay-content").value,
+        overlayColor: document.getElementById("overlay-color").value,
+        overlaySize: parseFloat(document.getElementById("overlay-size").value) || 2
+      };
       try {
-        await auth.signInWithEmailAndPassword(email, password);
-        // For login, you might want to fetch the user's custom website name from your database.
-        // For simplicity, we redirect to index.html without a query parameter.
-        window.location.href = "index.html";
-      } catch (error) {
-        message.textContent = error.message;
+        await db.collection("userSettings").doc(viewUID).set(settings);
+        applySettings(settings);
+        alert("Settings saved!");
+      } catch (err) {
+        console.error("Error saving settings:", err);
+      }
+    });
+    
+    // Change theme (toggle between dark and light)
+    document.getElementById("change-theme").addEventListener("click", () => {
+      if(document.body.style.background === "white"){
+        document.body.style.background = "#222";
+        document.body.style.color = "#eee";
+      } else {
+        document.body.style.background = "white";
+        document.body.style.color = "black";
+      }
+    });
+    
+    // Apply settings to the page
+    function applySettings(settings) {
+      // Background blur
+      document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
+      // Background media handling: image, video, or YouTube
+      if(settings.bgUrl) {
+        // Check if it's a YouTube URL
+        if(/(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(settings.bgUrl)) {
+          let videoID = "";
+          const ytMatch = settings.bgUrl.match(/(?:youtu\.be\/|v=)([^&]+)/);
+          if(ytMatch) videoID = ytMatch[1];
+          const iframeURL = "https://www.youtube.com/embed/" + videoID + 
+            "?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=1&playlist=" + videoID;
+          document.getElementById("bg-iframe").src = iframeURL;
+          document.getElementById("bg-iframe").style.display = "block";
+          document.getElementById("bg-video").style.display = "none";
+          document.getElementById("bg-image").style.backgroundImage = "";
+        }
+        // Check if URL is a video file
+        else if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
+          const video = document.getElementById("bg-video");
+          video.src = settings.bgUrl;
+          video.style.display = "block";
+          video.play();
+          document.getElementById("bg-image").style.backgroundImage = "";
+          document.getElementById("bg-iframe").style.display = "none";
+        } else {
+          document.getElementById("bg-image").style.backgroundImage = "url(" + settings.bgUrl + ")";
+          document.getElementById("bg-video").style.display = "none";
+          document.getElementById("bg-iframe").style.display = "none";
+        }
+      }
+      // Background audio
+      if(settings.bgAudioUrl) {
+        const audio = document.getElementById("bg-audio");
+        audio.src = settings.bgAudioUrl;
+        audio.play();
+      }
+      // Overlay text
+      const overlay = document.getElementById("overlay-text");
+      overlay.textContent = settings.overlayContent;
+      overlay.style.color = settings.overlayColor;
+      overlay.style.fontSize = settings.overlaySize + "em";
+    }
+    
+    // Load settings from Firestore for a given UID
+    async function loadSettingsForUID(uid) {
+      try {
+        const doc = await db.collection("userSettings").doc(uid).get();
+        if(doc.exists) {
+          const settings = doc.data();
+          // Populate sidebar fields
+          document.getElementById("bg-url").value = settings.bgUrl || "";
+          document.getElementById("bg-audio-url").value = settings.bgAudioUrl || "";
+          document.getElementById("blur-level").value = settings.blurLevel || 0;
+          document.getElementById("overlay-content").value = settings.overlayContent || "";
+          document.getElementById("overlay-color").value = settings.overlayColor || "#ffffff";
+          document.getElementById("overlay-size").value = settings.overlaySize || 2;
+          applySettings(settings);
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
       }
     }
+    
+    // Load public user profile and settings by website name
+    async function loadPublicSite(siteName) {
+      try {
+        const querySnapshot = await db.collection("users").where("websiteName", "==", siteName).get();
+        if(querySnapshot.empty) {
+          document.getElementById("welcome-message").textContent = "Site not found.";
+          return;
+        }
+        const userDoc = querySnapshot.docs[0];
+        viewUID = userDoc.id;
+        document.getElementById("welcome-message").textContent = "Welcome to " + (userDoc.data().websiteName || siteName) + "!";
+        isEditable = false;
+        loadSettingsForUID(viewUID);
+      } catch (err) {
+        console.error("Error loading public site:", err);
+      }
+    }
+    
+    // Main initialization: decide whether to load a public site or the logged-in user’s site.
+    async function init() {
+      const siteParam = getQueryParam("site");
+      const editorParam = getQueryParam("editor");
+      if(siteParam) {
+        await loadPublicSite(siteParam);
+      } else {
+        // If editor mode is requested, check auth via Firebase (cookies)
+        if(editorParam === "true") {
+          document.getElementById("toggle-sidebar").style.display = "block";
+          auth.onAuthStateChanged(user => {
+            if(user) {
+              currentUID = user.uid;
+              viewUID = currentUID;
+              isEditable = true;
+              db.collection("users").doc(currentUID).get().then(doc => {
+                if(doc.exists) {
+                  document.getElementById("welcome-message").textContent = "Welcome to " + (doc.data().websiteName || "Your Site") + "!";
+                }
+              });
+              loadSettingsForUID(currentUID);
+            } else {
+              // Not authenticated, force view mode
+              isEditable = false;
+              document.getElementById("toggle-sidebar").style.display = "none";
+              viewUID = "default";
+              document.getElementById("welcome-message").textContent = "Welcome!";
+            }
+          });
+        } else {
+          // Regular view mode
+          isEditable = false;
+          document.getElementById("toggle-sidebar").style.display = "none";
+          viewUID = "default";
+          document.getElementById("welcome-message").textContent = "Welcome!";
+        }
+      }
+    }
+    
+    // Clear selection when clicking outside any draggable element
+    document.addEventListener('click', e => {
+      if(!e.target.classList.contains("draggable")) {
+        clearSelection();
+      }
+    });
+    
+    init();
   </script>
-</head>
-<body>
-  <div class="login-container">
-    <h1>Login</h1>
-    <div class="message" id="message"></div>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p>Don't have an account? <a href="register.html">Register</a></p>
-  </div>
 </body>
 </html>
