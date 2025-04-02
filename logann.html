@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logann</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+      color: #fff;
+    }
+    
+    /* Video background styles */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: blur(30px);
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    
+    #content {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Overlay for Logann's info */
+    .overlay {
+      position: relative;
+      background: rgba(20, 0, 30, 0.7);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      z-index: 3;
+      max-width: 320px;
+      margin: 0 auto;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      transform: translateY(50px);
+      opacity: 0;
+      transition: all 0.6s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .overlay.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .overlay:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .overlay h2 {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+      font-size: 2em;
+    }
+    
+    .overlay p {
+      margin: 0.5em 0;
+      color: white;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+      opacity: 0.9;
+    }
+    
+    .info-row {
+      margin: 8px 0;
+    }
+    
+    /* Discord avatar styling */
+    .avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.8);
+      margin-bottom: 1.5em;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.8s ease;
+    }
+    
+    .avatar.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    /* Money rain effect */
+    .money {
+      position: fixed;
+      font-size: 24px;
+      user-select: none;
+      z-index: 1;
+      animation-name: moneyFall;
+      animation-timing-function: linear;
+    }
+    
+    @keyframes moneyFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      80% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Back button */
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Back button -->
+  <a href="index.html" class="back-btn">← Back</a>
+  
+  <!-- Content container -->
+  <div id="content">
+    <div class="profile-container">
+      <img src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.webp?size=2048" alt="Discord Avatar" class="avatar">
+      <div class="overlay">
+        <h2>logann999</h2>
+        <div class="info-row">Member since June 2020</div>
+        <div class="info-row">Account age: 4+ years</div>
+        <div class="info-row">EST timezone</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Video element -->
+  <video id="video-bg" class="video-bg" autoplay loop playsinline preload="auto">
+    Your browser does not support the video tag.
+  </video>
+  
+  <script>
+    // Video element
+    const videoElement = document.getElementById('video-bg');
+    
+    // Set the video source
+    videoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357132466313498845/King_Von_-_Armed__Dangerous_Official_Video_1_1.mp4?ex=67ef179a&is=67edc61a&hm=b08247dc8d94169ce0d098757cf55222c4fd94233c16b4ffdcfc83a1b7791345";
+    
+    // Attempt to play the video
+    function attemptPlayback() {
+      videoElement.play().then(() => {
+        console.log("Video playback started.");
+        // Set playback rate to make video play faster
+        videoElement.playbackRate = 1.5; // 1.5x speed
+      }).catch(err => {
+        console.error("Playback error:", err);
+      });
+    }
+    
+    // Money rain effect
+    function createMoneyRain() {
+      const moneyEmojis = ['💰', '💵', '💸', '💲', '🤑', '💶', '💷'];
+      const body = document.querySelector('body');
+      
+      // Create money emoji every 200ms
+      setInterval(() => {
+        const money = document.createElement('div');
+        money.classList.add('money');
+        
+        // Random emoji from the array
+        money.innerText = moneyEmojis[Math.floor(Math.random() * moneyEmojis.length)];
+        
+        // Random horizontal position
+        money.style.left = Math.random() * 100 + 'vw';
+        
+        // Random animation duration between 5-10 seconds
+        const animationDuration = 5 + Math.random() * 5;
+        money.style.animationDuration = animationDuration + 's';
+        
+        // Remove money element after animation completes
+        setTimeout(() => {
+          money.remove();
+        }, animationDuration * 1000);
+        
+        body.appendChild(money);
+      }, 200);
+    }
+    
+    // Video event listeners
+    videoElement.addEventListener('canplay', attemptPlayback);
+    videoElement.addEventListener('error', (e) => {
+      console.error("Video error:", e);
+      videoElement.load();
+      attemptPlayback();
+    });
+    videoElement.addEventListener('stalled', attemptPlayback);
+    videoElement.addEventListener('ended', () => {
+      videoElement.currentTime = 0;
+      attemptPlayback();
+    });
+    
+    // Fallback: attempt playback on user interaction
+    document.addEventListener('click', attemptPlayback);
+    
+    // Initialize animations and effects once page is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      // Start money rain effect
+      createMoneyRain();
+      
+      // Fade in video
+      setTimeout(() => {
+        videoElement.style.opacity = "1";
+        
+        // Animate avatar and overlay
+        const avatar = document.querySelector('.avatar');
+        const overlay = document.querySelector('.overlay');
+        
+        if (avatar) avatar.classList.add('visible');
+        if (overlay) overlay.classList.add('visible');
+      }, 100);
+    });
+  </script>
+</body>
+</html>
