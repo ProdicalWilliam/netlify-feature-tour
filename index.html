@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Default title; will update if settings are saved -->
+  <!-- Default title; updated via settings -->
   <title>Your Website</title>
-  <!-- Favicon link that editors can update -->
+  <!-- Favicon element (editable) -->
   <link id="favicon" rel="icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
@@ -14,11 +14,12 @@
       font-family: 'Roboto', sans-serif;
       height: 100%;
       overflow: hidden;
-      background: #2E0854; /* Default: midnight purple */
+      /* Default background set via settings/extras */
+      background: #2E0854;
       color: #eee;
       cursor: auto;
     }
-    /* Background container & media */
+    /* Background container and media */
     #bg-container {
       position: fixed;
       top: 0;
@@ -47,9 +48,9 @@
     /* Hide native video controls */
     #bg-video::-webkit-media-controls { display: none !important; }
     #bg-video::-moz-media-controls { display: none !important; }
-    /* Background audio element (hidden) */
+    /* Background audio element */
     #bg-audio { display: none; }
-    /* Draggable overlay text(s) */
+    /* Draggable overlay text */
     .overlay-text {
       position: absolute;
       top: 50px;
@@ -57,7 +58,7 @@
       z-index: 3;
       cursor: move;
       padding: 5px 10px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.5);
       border-radius: 5px;
     }
     /* Container for PNG images */
@@ -91,25 +92,25 @@
     }
     #toggle-sidebar { left: 10px; }
     #toggle-sidebar2 { right: 10px; }
-    /* First Sidebar (Global & Editor Settings) */
+    /* Sidebars styling */
     #sidebar, #sidebar2 {
       position: fixed;
       top: 0;
       width: 350px;
       height: 100%;
       background: #1f0633;
-      z-index: 9;
+      color: #fff;
       padding: 20px;
       box-sizing: border-box;
       transition: transform 0.3s ease;
+      z-index: 9;
       overflow-y: auto;
-      border-right: 4px solid #555;
     }
-    /* First sidebar slides in from left */
+    /* Left sidebar slides from left */
     #sidebar { left: 0; transform: translateX(-100%); }
     #sidebar.open { transform: translateX(0); }
-    /* Second sidebar slides in from right */
-    #sidebar2 { right: 0; left: auto; transform: translateX(100%); }
+    /* Right sidebar slides from right */
+    #sidebar2 { right: 0; transform: translateX(100%); }
     #sidebar2.open { transform: translateX(0); }
     #sidebar h2, #sidebar2 h2 {
       margin-top: 0;
@@ -156,7 +157,7 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 11;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.5);
       padding: 8px 12px;
       border-radius: 4px;
       color: #fff;
@@ -171,7 +172,7 @@
     /* Blur overlay element */
     #blur-overlay {
       position: absolute;
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255,255,255,0.6);
       border: 1px solid #ccc;
       z-index: 5;
       display: none;
@@ -180,7 +181,7 @@
     /* Discord info container */
     #discord-info {
       position: absolute;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
       border: 1px solid #888;
       padding: 10px;
       border-radius: 5px;
@@ -195,35 +196,36 @@
   <!-- Background container -->
   <div id="bg-container">
     <div id="bg-image"></div>
-    <!-- MP4 video element for background -->
+    <!-- Background video element (MP4 or image fallback) -->
     <video id="bg-video" autoplay loop playsinline>
       <!-- Source set dynamically -->
     </video>
   </div>
-  <!-- Background audio element -->
+  <!-- Background audio -->
   <audio id="bg-audio" loop>
     <!-- Source set dynamically -->
   </audio>
-  <!-- Draggable overlay text container -->
+  <!-- Overlay text container -->
   <div id="overlay-container">
     <div class="overlay-text" data-index="0">Drag me around!</div>
   </div>
   <!-- Container for PNG images -->
   <div id="png-container"></div>
-  <!-- Blur overlay element (can be toggled via second sidebar) -->
+  <!-- Blur overlay element -->
   <div id="blur-overlay">Blur Overlay</div>
   <!-- Discord info container -->
   <div id="discord-info"></div>
-
-  <!-- Toggle buttons for sidebars -->
+  
+  <!-- Sidebar toggle buttons -->
   <button id="toggle-sidebar">Settings</button>
   <button id="toggle-sidebar2">Extras</button>
-
-  <!-- First Sidebar (Global & Editor Settings) -->
+  
+  <!-- First Sidebar (Settings) -->
   <div id="sidebar">
-    <h2>Customize & Share</h2>
+    <h2>Settings</h2>
+    <!-- New Domain Name Field -->
     <label for="domain-name">Domain Name</label>
-    <input type="text" id="domain-name" placeholder="Enter unique domain name">
+    <input type="text" id="domain-name" placeholder="Unique domain name">
     
     <label for="tab-title">Website Tab Name</label>
     <input type="text" id="tab-title" placeholder="Enter website title">
@@ -231,7 +233,7 @@
     <label for="favicon-url">Favicon URL</label>
     <input type="url" id="favicon-url" placeholder="http://...">
     
-    <label for="bg-url">Background MP4 URL</label>
+    <label for="bg-url">Background MP4 URL / Image URL</label>
     <input type="url" id="bg-url" placeholder="http://...">
     
     <label for="bg-audio-url">Background Audio MP4 URL</label>
@@ -239,13 +241,6 @@
     
     <label for="blur-level">Blur Level (px)</label>
     <input type="number" id="blur-level" placeholder="0" value="0" min="0">
-    
-    <!-- New: Background Color Options -->
-    <label>Background Color</label>
-    <input type="radio" name="bg-color" id="bg-color-default" value="default" checked> Default (Midnight Purple)<br>
-    <input type="radio" name="bg-color" id="bg-color-black" value="black"> Black<br>
-    <input type="radio" name="bg-color" id="bg-color-custom" value="custom"> Custom:
-    <input type="color" id="custom-bg-color" value="#2E0854"><br>
     
     <label for="overlay-content">Overlay Text</label>
     <input type="text" id="overlay-content" placeholder="Your text here">
@@ -269,6 +264,12 @@
     <label for="custom-cursor">Custom Cursor URL</label>
     <input type="url" id="custom-cursor" placeholder="http://...">
     
+    <!-- Background Color Options -->
+    <label>Background Color:</label>
+    <label><input type="radio" name="bg-color" value="#000000"> Black</label>
+    <label><input type="radio" name="bg-color" value="#2E0854" checked> Midnight Purple</label>
+    <label><input type="radio" name="bg-color" value="#ffffff"> White</label>
+    
     <button id="save-settings">Save Changes</button>
     <button id="change-theme">Change Theme</button>
     
@@ -281,10 +282,10 @@
     
     <div id="viewer-link" style="display:none;"></div>
   </div>
-
-  <!-- Second Sidebar (Extra Options: Blur Overlay, Discord, etc.) -->
+  
+  <!-- Second Sidebar (Extras) -->
   <div id="sidebar2">
-    <h2>Extra Options</h2>
+    <h2>Extras</h2>
     <!-- Blur overlay controls -->
     <label for="enable-blur">Enable Blur Overlay</label>
     <input type="checkbox" id="enable-blur">
@@ -320,11 +321,11 @@
     // --- Auto-redirect for editor links ---
     const urlParams = new URLSearchParams(window.location.search);
     const isEditorLink = urlParams.get("editor") === "true";
-    if(isEditorLink && !localStorage.getItem("loggedIn")) {
+    if(isEditorLink && !localStorage.getItem("loggedIn")){
       window.location.href = "login.html";
     }
     
-    // Firebase configuration – replace with your actual values:
+    // Firebase configuration – replace with your actual values
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -338,10 +339,10 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    // Use query parameter "site" to load global settings (all users share the same site)
+    // Global site identifier taken from URL parameter (everyone sees same site)
     const siteID = urlParams.get("site") || "defaultSite";
     
-    // Global variables for editor and history
+    // Global variables for editor mode and history
     let currentUID = null;
     let isEditable = false;
     let undoStack = [];
@@ -351,10 +352,11 @@
     // For viewer mode: override editable functions
     function viewerAlert() { alert("You're a viewer!"); }
     
-    // Determine mode after auth state is known
+    // Determine mode based on auth state
     auth.onAuthStateChanged(user => {
       if(user){
         currentUID = user.uid;
+        // For editor links, allow editing only if siteID equals the user’s UID
         if(isEditorLink && siteID === currentUID){
           isEditable = true;
           document.getElementById("toggle-sidebar").style.display = "block";
@@ -421,19 +423,19 @@
       });
     }
     
-    // Clear selection from all draggable elements
+    // Clear selection from draggable elements
     function clearSelection() {
       document.querySelectorAll(".draggable, .overlay-text").forEach(el => el.classList.remove("selected"));
       selectedElement = null;
     }
     
-    // Toggle first sidebar
+    // Toggle first sidebar (Settings)
     document.getElementById("toggle-sidebar").addEventListener("click", () => {
       if(!isEditable) return viewerAlert();
       document.getElementById("sidebar").classList.toggle("open");
     });
     
-    // Toggle second sidebar
+    // Toggle second sidebar (Extras)
     document.getElementById("toggle-sidebar2").addEventListener("click", () => {
       if(!isEditable) return viewerAlert();
       document.getElementById("sidebar2").classList.toggle("open");
@@ -506,8 +508,10 @@
       } else if(action.type==="create"){
         action.element.parentNode.removeChild(action.element);
       } else if(action.type==="delete"){
-        if(action.nextSibling) action.parent.insertBefore(action.element, action.nextSibling);
-        else action.parent.appendChild(action.element);
+        if(action.nextSibling)
+          action.parent.insertBefore(action.element, action.nextSibling);
+        else
+          action.parent.appendChild(action.element);
         makeDraggable(action.element);
       }
       redoStack.push(action);
@@ -539,7 +543,7 @@
     // Escape key clears selection
     document.addEventListener("keydown", e => { if(e.key==="Escape") clearSelection(); });
     
-    // Generate viewer link without editor params
+    // Generate viewer link without editor parameters
     document.getElementById("generate-viewer").addEventListener("click", () => {
       const url = new URL(window.location.href);
       url.searchParams.delete("editor");
@@ -549,31 +553,12 @@
       }).catch(err => { alert("Failed to copy link. Viewer link: " + url.toString()); });
     });
     
-    // Save settings to Firestore with unique domain name check
+    // Save settings to Firestore (global update for everyone using this siteID)
     document.getElementById("save-settings").addEventListener("click", async () => {
       if(!isEditable) return viewerAlert();
-      const newDomain = document.getElementById("domain-name").value.trim();
-      if(!newDomain){
-        alert("Please enter a domain name.");
-        return;
-      }
-      // Check Firestore for duplicate domain names (except for current site)
-      try {
-        const querySnapshot = await db.collection("userSettings").where("domainName", "==", newDomain).get();
-        let duplicate = false;
-        querySnapshot.forEach(doc => {
-          if(doc.id !== siteID) duplicate = true;
-        });
-        if(duplicate){
-          alert("Domain name already in use. Please choose a different one.");
-          return;
-        }
-      } catch(err) {
-        console.error("Error checking domain name:", err);
-      }
-      
+      // Prepare settings object from fields
       const settings = {
-        domainName: newDomain,
+        domainName: document.getElementById("domain-name").value.trim(),
         tabTitle: document.getElementById("tab-title").value.trim(),
         faviconUrl: document.getElementById("favicon-url").value.trim(),
         bgUrl: document.getElementById("bg-url").value.trim(),
@@ -583,30 +568,50 @@
         overlayColor: document.getElementById("overlay-color").value,
         overlaySize: parseFloat(document.getElementById("overlay-size").value) || 2,
         customCursor: document.getElementById("custom-cursor").value.trim(),
+        // Extra options
+        backgroundColor: document.querySelector('input[name="bg-color"]:checked').value,
         blurOverlay: {
           enabled: document.getElementById("enable-blur").checked,
           width: parseInt(document.getElementById("blur-overlay-width").value) || 300,
           height: parseInt(document.getElementById("blur-overlay-height").value) || 150,
           opacity: parseFloat(document.getElementById("blur-overlay-opacity").value) || 0.6
         },
-        // Background color selection:
-        bgColor: (function(){
-          if(document.getElementById("bg-color-black").checked) return "black";
-          if(document.getElementById("bg-color-custom").checked) return document.getElementById("custom-bg-color").value;
-          return "default";
-        })(),
         discordInfo: {
           username: document.getElementById("discord-username").value.trim()
+          // Additional Discord data will be added after lookup
         }
       };
+      
+      // Check for unique domain name (query Firestore)
+      if(settings.domainName){
+        try {
+          const querySnapshot = await db.collection("userSettings")
+            .where("domainName", "==", settings.domainName)
+            .get();
+          let duplicateFound = false;
+          querySnapshot.forEach(doc => {
+            if(doc.id !== siteID){ duplicateFound = true; }
+          });
+          if(duplicateFound){
+            alert("Domain name already in use. Please choose another.");
+            return;
+          }
+        } catch(err){
+          console.error("Error checking domain uniqueness:", err);
+        }
+      }
+      
+      // Save settings to Firestore document for this siteID
       try {
         await db.collection("userSettings").doc(siteID).set(settings);
         applySettings(settings);
-        alert("Settings saved and updated for everyone!");
-      } catch(err) { console.error("Error saving settings:", err); }
+        alert("Settings saved!");
+      } catch(err){
+        console.error("Error saving settings:", err);
+      }
     });
     
-    // Change theme (toggle midnight purple / light)
+    // Change theme (toggle between midnight purple and light mode)
     document.getElementById("change-theme").addEventListener("click", () => {
       if(document.body.style.background==="white"){
         document.body.style.background="#2E0854";
@@ -617,7 +622,7 @@
       }
     });
     
-    // Update blur overlay from second sidebar settings
+    // Update blur overlay based on Extras sidebar settings
     document.getElementById("update-blur-overlay").addEventListener("click", () => {
       const overlay = document.getElementById("blur-overlay");
       const enabled = document.getElementById("enable-blur").checked;
@@ -640,10 +645,11 @@
         alert("Please enter a Discord username.");
         return;
       }
-      // Simulate API call to discordlookup.com
+      // Simulated API call to discordlookup.com
       fetch("https://discordlookup.com/api/lookup?user=" + encodeURIComponent(username))
         .then(response => response.json())
         .then(data => {
+          // Assume data contains { pfpUrl, username, info }
           const discordContainer = document.getElementById("discord-info");
           discordContainer.innerHTML = `<img src="${data.pfpUrl}" alt="PFP" style="width:80px;height:80px;border-radius:50%;"><br>
                                         <strong>${data.username}</strong><br>
@@ -651,7 +657,10 @@
           discordContainer.style.display = "block";
           makeDraggable(discordContainer);
         })
-        .catch(err => { console.error(err); alert("Failed to fetch Discord info."); });
+        .catch(err => {
+          console.error(err);
+          alert("Failed to fetch Discord info.");
+        });
     });
     
     // Delete Discord info overlay
@@ -661,9 +670,9 @@
       discordContainer.innerHTML = "";
     });
     
-    // Apply settings to the page
+    // Apply settings to page elements
     function applySettings(settings) {
-      // Update background blur filter
+      // Set background blur filter
       document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
       // Update tab title and favicon
       if(settings.tabTitle) { document.title = settings.tabTitle; }
@@ -672,17 +681,11 @@
       if(settings.customCursor) {
         document.body.style.cursor = "url(" + settings.customCursor + "), auto";
       }
-      // Apply background color option
-      if(settings.bgColor){
-        if(settings.bgColor === "black"){
-          document.body.style.background = "black";
-        } else if(settings.bgColor !== "default"){
-          document.body.style.background = settings.bgColor;
-        } else {
-          document.body.style.background = "#2E0854";
-        }
+      // Set background color from Extras option
+      if(settings.backgroundColor) {
+        document.body.style.background = settings.backgroundColor;
       }
-      // Background media
+      // Load background media
       if(settings.bgUrl) {
         if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)){
           const video = document.getElementById("bg-video");
@@ -703,14 +706,14 @@
           audio.play().catch(err => console.error(err));
         }
       }
-      // Update first overlay text
+      // Update first overlay text element
       const overlays = document.querySelectorAll(".overlay-text");
       if(overlays.length > 0){
         overlays[0].textContent = settings.overlayContent;
         overlays[0].style.color = settings.overlayColor;
         overlays[0].style.fontSize = settings.overlaySize + "em";
       }
-      // Update blur overlay element if enabled
+      // Update blur overlay if enabled
       if(settings.blurOverlay && settings.blurOverlay.enabled){
         const overlay = document.getElementById("blur-overlay");
         overlay.style.width = settings.blurOverlay.width + "px";
@@ -721,9 +724,10 @@
       } else {
         document.getElementById("blur-overlay").style.display = "none";
       }
+      // Discord info is fetched via button (not auto-applied)
     }
     
-    // Load settings from Firestore for given siteID
+    // Load settings from Firestore for the given siteID
     async function loadSettingsForSite(id) {
       try {
         const doc = await db.collection("userSettings").doc(id).get();
@@ -739,6 +743,9 @@
           document.getElementById("overlay-color").value = settings.overlayColor || "#ffffff";
           document.getElementById("overlay-size").value = settings.overlaySize || 2;
           document.getElementById("custom-cursor").value = settings.customCursor || "";
+          if(settings.backgroundColor){
+            document.querySelector('input[name="bg-color"][value="'+settings.backgroundColor+'"]').checked = true;
+          }
           if(settings.blurOverlay){
             document.getElementById("enable-blur").checked = settings.blurOverlay.enabled;
             document.getElementById("blur-overlay-width").value = settings.blurOverlay.width || 300;
@@ -746,22 +753,14 @@
             document.getElementById("blur-overlay-opacity").value = settings.blurOverlay.opacity || 0.6;
           }
           document.getElementById("discord-username").value = settings.discordInfo ? settings.discordInfo.username : "";
-          if(settings.bgColor){
-            if(settings.bgColor === "black"){
-              document.getElementById("bg-color-black").checked = true;
-            } else if(settings.bgColor !== "default"){
-              document.getElementById("bg-color-custom").checked = true;
-              document.getElementById("custom-bg-color").value = settings.bgColor;
-            } else {
-              document.getElementById("bg-color-default").checked = true;
-            }
-          }
           applySettings(settings);
         }
-      } catch(err){ console.error("Error loading settings:", err); }
+      } catch(err){
+        console.error("Error loading settings:", err);
+      }
     }
     
-    // For viewers, delay heavy asset loading
+    // For viewers, delay heavy asset loading for faster initial load
     window.addEventListener("load", () => {
       if(!isEditable){
         setTimeout(() => {
