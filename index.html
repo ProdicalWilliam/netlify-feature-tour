@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Dazes.org Shell</title>
   <style>
-    /* Global styles: gradient background with animation */
+    /* Global styles: animated diagonal gradient background */
     html, body {
       margin: 0;
       padding: 0;
@@ -18,7 +18,7 @@
       0%   { background-position: 0% 0%; }
       100% { background-position: 100% 100%; }
     }
-    /* Video background styles with increased blur */
+    /* Video background styles with strong blur */
     .video-bg {
       position: fixed;
       top: 0;
@@ -28,41 +28,75 @@
       object-fit: cover;
       z-index: 1;
       filter: blur(40px);
+      /* Hide by default */
+      display: none;
+    }
+    /* Hide any textual content */
+    #content {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <!-- Video element for the background -->
+  <!-- An empty content container -->
+  <div id="content"></div>
+
+  <!-- Video element for Logann's video background -->
   <video id="logann-video" class="video-bg" autoplay loop muted playsinline preload="auto"></video>
 
   <script>
-    // Get the video element
-    const video = document.getElementById('logann-video');
-    // Set the video source
-    video.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
+    // List of valid names
+    const names = [
+      "William",
+      "Brayden",
+      "Vaani",
+      "Maddie",
+      "Bambi",
+      "Logann",
+      "Mikey",
+      "Proxy"
+    ];
 
-    // Start playback when the video can play
-    video.addEventListener('canplay', () => {
-      video.play().catch(err => console.error("Playback error:", err));
+    // Get the video element and set its source
+    const videoElement = document.getElementById('logann-video');
+    videoElement.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
+
+    // Router: Show the video element only when the URL hash is "Logann"
+    function route() {
+      const hash = window.location.hash.substring(1).trim();
+      if (hash === "Logann") {
+        videoElement.style.display = "block";
+        // Try playing the video in case it hasn't started
+        videoElement.play().catch(err => console.error("Playback error:", err));
+      } else {
+        videoElement.style.display = "none";
+      }
+    }
+
+    // Listen for changes to the hash and on page load
+    window.addEventListener("hashchange", route);
+    window.addEventListener("DOMContentLoaded", route);
+
+    // Improved error handling and recovery for the video element
+    videoElement.addEventListener('canplay', () => {
+      videoElement.play().catch(err => console.error("Playback error:", err));
     });
 
-    // In case the video ends, reset time and play again
-    video.addEventListener('ended', () => {
-      video.currentTime = 0;
-      video.play();
+    videoElement.addEventListener('error', (e) => {
+      console.error('Video error:', e);
+      videoElement.load();
+      videoElement.play().catch(err => console.error("Playback error after reload:", err));
     });
 
-    // On error, try to recover by reloading and playing the video
-    video.addEventListener('error', (e) => {
-      console.error('Video encountered an error:', e);
-      video.load();
-      video.play();
-    });
-
-    // On stalled events, attempt to resume playback
-    video.addEventListener('stalled', (e) => {
+    videoElement.addEventListener('stalled', (e) => {
       console.warn('Video stalled, attempting to resume playback.', e);
-      video.play();
+      videoElement.play().catch(err => console.error("Playback error on stalled:", err));
+    });
+
+    // In case the video unexpectedly ends, reset the playback time and play again
+    videoElement.addEventListener('ended', () => {
+      videoElement.currentTime = 0;
+      videoElement.play().catch(err => console.error("Playback error on ended:", err));
     });
   </script>
 </body>
