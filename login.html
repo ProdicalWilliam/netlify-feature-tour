@@ -46,19 +46,22 @@
     }
     a { color: #007bff; text-decoration: none; }
   </style>
+  <!-- Load Firebase libraries using compat version -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script>
-    // TODO: Replace with your Firebase config
+    // Firebase configuration - replace with your valid config details if needed
     const firebaseConfig = {
-     apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
-     authDomain: "github-1ec60.firebaseapp.com",
-     projectId: "github-1ec60",
-     storageBucket: "github-1ec60.appspot.com", // Fix: ".app" to ".com"
-     messagingSenderId: "370562737308",
-     appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
-     measurementId: "G-JDV0KHPD7F"
-};
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.appspot.com",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -68,6 +71,7 @@
       const message = document.getElementById("message");
       try {
         await auth.signInWithEmailAndPassword(email, password);
+        // Redirect to your custom page after login
         window.location.href = "customize.html";
       } catch (error) {
         message.textContent = error.message;
