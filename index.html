@@ -2,656 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Default title; updated via settings -->
-  <title>Your Website</title>
-  <!-- Favicon element (editable) -->
-  <link id="favicon" rel="icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <title>Dazes.org</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto', sans-serif;
-      height: 100%;
-      overflow: hidden;
-      /* Default background set to black */
-      background: #000000;
-      color: #eee;
-      cursor: auto;
-    }
-    /* Background container and media */
-    #bg-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      transition: filter 0.3s ease;
-      overflow: hidden;
-    }
-    #bg-image {
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-    }
-    #bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border: none;
-    }
-    /* Hide native video controls */
-    #bg-video::-webkit-media-controls { display: none !important; }
-    #bg-video::-moz-media-controls { display: none !important; }
-    /* Background audio element */
-    #bg-audio { display: none; }
-    /* Draggable overlay text */
-    .overlay-text {
-      position: absolute;
-      top: 50px;
-      left: 50px;
-      z-index: 3;
-      cursor: move;
-      padding: 5px 10px;
-      background: rgba(0,0,0,0.5);
-      border-radius: 5px;
-    }
-    /* Container for PNG images */
-    #png-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 4;
-    }
-    .draggable {
-      position: absolute;
-      cursor: move;
-      resize: both;
-      overflow: auto;
-    }
-    .selected {
-      outline: 2px solid #ffc107;
-    }
-    /* Settings sidebar toggle button */
-    #toggle-sidebar {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      background: #000000;
-      color: #fff;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    /* Settings sidebar styling */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 350px;
-      height: 100%;
-      background: #1f0633;
-      color: #fff;
-      padding: 20px;
-      box-sizing: border-box;
-      transition: transform 0.3s ease;
-      z-index: 9;
-      overflow-y: auto;
-      transform: translateX(-100%);
-    }
-    #sidebar.open {
-      transform: translateX(0);
-    }
-    #sidebar h2 {
-      margin-top: 0;
-      color: #fff;
-    }
-    #sidebar label {
-      display: block;
-      margin: 10px 0 4px;
-      color: #ccc;
-    }
-    #sidebar input[type="text"],
-    #sidebar input[type="number"],
-    #sidebar input[type="url"],
-    #sidebar input[type="color"] {
-      width: 100%;
-      padding: 6px;
-      box-sizing: border-box;
-      border: 1px solid #555;
-      border-radius: 4px;
-      background: #3a0f70;
-      color: #fff;
-    }
-    #sidebar button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-      background: #000000;
-      border: none;
-      border-radius: 4px;
-      color: #fff;
-      cursor: pointer;
-    }
-    #sidebar button:hover {
-      background: #1f0633;
-    }
-    /* Welcome header and viewer link styling */
-    #welcome-message {
-      position: fixed;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 11;
-      background: rgba(0,0,0,0.5);
-      padding: 8px 12px;
-      border-radius: 4px;
-      color: #fff;
-    }
-    #viewer-link {
-      margin-top: 10px;
-      padding: 8px;
-      background: #3a0f70;
-      border-radius: 4px;
-      word-break: break-all;
-    }
+    body { font-family: Arial, sans-serif; padding: 2rem; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 0.5rem 0; }
+    a { text-decoration: none; color: #0077cc; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <!-- Background container -->
-  <div id="bg-container">
-    <div id="bg-image"></div>
-    <!-- Background video element -->
-    <video id="bg-video" autoplay loop playsinline>
-      <!-- Source set dynamically -->
-    </video>
-  </div>
-  <!-- Background audio element -->
-  <audio id="bg-audio" loop>
-    <!-- Source set dynamically -->
-  </audio>
-  <!-- Overlay text container -->
-  <div id="overlay-container">
-    <div class="overlay-text" data-index="0">Drag me around!</div>
-  </div>
-  <!-- Container for PNG images -->
-  <div id="png-container"></div>
-  
-  <!-- Settings sidebar toggle button -->
-  <button id="toggle-sidebar">Settings</button>
-  
-  <!-- Single Settings Sidebar -->
-  <div id="sidebar">
-    <h2>Settings</h2>
-    <!-- Domain Name Field -->
-    <label for="domain-name">Domain Name</label>
-    <input type="text" id="domain-name" placeholder="Unique domain name (e.g., jesus)">
-    
-    <label for="tab-title">Website Tab Name</label>
-    <input type="text" id="tab-title" placeholder="Enter website title">
-    
-    <label for="favicon-url">Favicon URL</label>
-    <input type="url" id="favicon-url" placeholder="http://...">
-    
-    <label for="bg-url">Background MP4 URL / Image URL</label>
-    <input type="url" id="bg-url" placeholder="http://...">
-    
-    <label for="bg-audio-url">Background Audio MP4 URL</label>
-    <input type="url" id="bg-audio-url" placeholder="http://...">
-    
-    <label for="blur-level">Blur Level (px)</label>
-    <input type="number" id="blur-level" placeholder="0" value="0" min="0">
-    
-    <label for="overlay-content">Overlay Text</label>
-    <input type="text" id="overlay-content" placeholder="Your text here">
-    
-    <label for="overlay-color">Overlay Text Color</label>
-    <input type="color" id="overlay-color" value="#ffffff">
-    
-    <label for="overlay-size">Overlay Text Size (em)</label>
-    <input type="number" id="overlay-size" placeholder="2" value="2" step="0.1">
-    
-    <button id="add-overlay">Add New Overlay Text</button>
-    
-    <hr style="margin: 15px 0; border-color: #555;">
-    
-    <label for="png-url">Add PNG Image URL</label>
-    <input type="url" id="png-url" placeholder="http://...">
-    <button id="add-png">Add PNG</button>
-    
-    <hr style="margin: 15px 0; border-color: #555;">
-    
-    <label for="custom-cursor">Custom Cursor URL</label>
-    <input type="url" id="custom-cursor" placeholder="http://...">
-    
-    <!-- Background Color Options -->
-    <label>Background Color:</label>
-    <label><input type="radio" name="bg-color" value="#000000" checked> Black</label>
-    <label><input type="radio" name="bg-color" value="#2E0854"> Midnight Purple</label>
-    <label><input type="radio" name="bg-color" value="#ffffff"> White</label>
-    
-    <hr style="margin: 15px 0; border-color: #555;">
-    
-    <button id="save-settings">Save Changes</button>
-    <button id="generate-viewer">Generate Viewer Link</button>
-    
-    <hr style="margin: 15px 0; border-color: #555;">
-    
-    <button id="undo">Undo</button>
-    <button id="redo">Redo</button>
-    <button id="delete">Delete Selected</button>
-    
-    <div id="viewer-link" style="display:none;"></div>
-  </div>
-  
-  <!-- Welcome header -->
-  <div id="welcome-message">Welcome!</div>
-  
+  <div id="content"></div>
   <script>
-    // --- Auto-redirect for editor links if necessary ---
-    const urlParams = new URLSearchParams(window.location.search);
-    const isEditorLink = urlParams.get("editor") === "true";
-    if(isEditorLink && !localStorage.getItem("loggedIn")){
-      window.location.href = "login.html";
-    }
-    
-    // Firebase configuration – replace with your actual values
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
-      authDomain: "github-1ec60.firebaseapp.com",
-      projectId: "github-1ec60",
-      storageBucket: "github-1ec60.appspot.com",
-      messagingSenderId: "370562737308",
-      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
-      measurementId: "G-JDV0KHPD7F"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
-    // Global site identifier from URL (?site=) or default value.
-    const siteID = urlParams.get("site") || "defaultSite";
-    
-    // Global variables for editor mode and undo/redo
-    let currentUID = null;
-    let isEditable = false;
-    let undoStack = [];
-    let redoStack = [];
-    let selectedElement = null;
-    
-    // For viewer mode: override editable functions
-    function viewerAlert() { alert("You're a viewer!"); }
-    
-    // Determine mode based on auth state
-    auth.onAuthStateChanged(user => {
-      if(user){
-        currentUID = user.uid;
-        // For editor links, allow editing only if siteID equals currentUID
-        if(isEditorLink && siteID === currentUID){
-          isEditable = true;
-          document.getElementById("toggle-sidebar").style.display = "block";
-          loadSettingsForSite(siteID);
-        } else if(!isEditorLink){
-          isEditable = false;
-          loadSettingsForSite(siteID);
-          document.getElementById("toggle-sidebar").style.display = "none";
-        } else {
-          isEditable = false;
-          loadSettingsForSite(siteID);
-          document.getElementById("toggle-sidebar").style.display = "none";
-        }
-      } else {
-        isEditable = false;
-        loadSettingsForSite(siteID);
-        document.getElementById("toggle-sidebar").style.display = "none";
-      }
-    });
-    
-    // Record action for undo/redo
-    function recordAction(action) {
-      undoStack.push(action);
-      redoStack = [];
-    }
-    
-    // Make element draggable
-    function makeDraggable(el) {
-      let isDragging = false, startX, startY, origX, origY;
-      el.addEventListener('mousedown', e => {
-        if(!isEditable) return;
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        const rect = el.getBoundingClientRect();
-        origX = rect.left;
-        origY = rect.top;
-        el.style.zIndex = parseInt(el.style.zIndex || 3) + 100;
-        e.stopPropagation();
+    // List of hardcoded names.
+    const names = [
+      "William",
+      "Brayden",
+      "Vaani",
+      "Maddie",
+      "Bambi",
+      "Logann",
+      "Mikey",
+      "Proxy"
+    ];
+
+    // Get the current path (removing any trailing slash).
+    const path = window.location.pathname.replace(/\/$/, "");
+
+    // Reference to the content div.
+    const contentDiv = document.getElementById("content");
+
+    // Function to display the main page with links.
+    function displayMainPage() {
+      let html = "<h1>Welcome to Dazes.org</h1>";
+      html += "<p>Select a name below:</p>";
+      html += "<ul>";
+      names.forEach(name => {
+        html += `<li><a href="/${name}">${name}</a></li>`;
       });
-      document.addEventListener('mousemove', e => {
-        if(isDragging){
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-          el.style.left = (origX + dx) + "px";
-          el.style.top = (origY + dy) + "px";
-        }
-      });
-      document.addEventListener('mouseup', () => {
-        if(isDragging){
-          isDragging = false;
-          const newLeft = parseInt(el.style.left);
-          const newTop = parseInt(el.style.top);
-          if(newLeft !== origX || newTop !== origY){
-            recordAction({ type:"move", element: el, prev:{ left: origX, top: origY }, next:{ left: newLeft, top: newTop } });
-          }
-        }
-      });
-      el.addEventListener('click', e => {
-        e.stopPropagation();
-        clearSelection();
-        selectedElement = el;
-        el.classList.add("selected");
-      });
+      html += "</ul>";
+      contentDiv.innerHTML = html;
     }
-    
-    // Clear selection from draggable elements
-    function clearSelection() {
-      document.querySelectorAll(".draggable, .overlay-text").forEach(el => el.classList.remove("selected"));
-      selectedElement = null;
+
+    // Function to display the greeting page for a name.
+    function displayNamePage(name) {
+      contentDiv.innerHTML = `<h1>Hello ${name}!</h1><p>Welcome to ${name}'s page on Dazes.org.</p><p><a href="/">Back to main page</a></p>`;
     }
-    
-    // Toggle settings sidebar
-    document.getElementById("toggle-sidebar").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      document.getElementById("sidebar").classList.toggle("open");
-    });
-    
-    // Add PNG image
-    document.getElementById("add-png").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      const url = document.getElementById("png-url").value.trim();
-      if(url && url.toLowerCase().endsWith(".png")){
-        const img = document.createElement("img");
-        img.src = url;
-        img.classList.add("draggable");
-        img.style.left = "100px";
-        img.style.top = "100px";
-        img.style.width = "150px";
-        img.style.height = "auto";
-        makeDraggable(img);
-        document.getElementById("png-container").appendChild(img);
-        recordAction({ type:"create", element: img });
+
+    // Function to display a custom 404 message.
+    function displayNotFound() {
+      contentDiv.innerHTML = `<h1>404</h1><p>dazes.org could not find this link? Did you input it correctly?</p><p><a href="/">Back to main page</a></p>`;
+    }
+
+    // Check the URL path.
+    if (path === "" || path === "/index.html") {
+      // Show the main page.
+      displayMainPage();
+    } else {
+      // Remove the leading "/" and decode the URI.
+      const nameFromUrl = decodeURIComponent(path.substring(1));
+      // Check if the name exists in our hardcoded list.
+      if (names.includes(nameFromUrl)) {
+        displayNamePage(nameFromUrl);
       } else {
-        alert("Please enter a valid PNG URL.");
-      }
-    });
-    
-    // Add new overlay text element
-    document.getElementById("add-overlay").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      const container = document.getElementById("overlay-container");
-      const newOverlay = document.createElement("div");
-      newOverlay.className = "overlay-text";
-      newOverlay.textContent = "New Overlay Text";
-      newOverlay.style.left = "60px";
-      newOverlay.style.top = "60px";
-      newOverlay.style.fontSize = document.getElementById("overlay-size").value + "em";
-      newOverlay.style.color = document.getElementById("overlay-color").value;
-      newOverlay.style.background = "rgba(0,0,0,0.5)";
-      makeDraggable(newOverlay);
-      container.appendChild(newOverlay);
-      recordAction({ type:"create", element: newOverlay });
-    });
-    
-    // Delete selected element
-    document.getElementById("delete").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      if(selectedElement){
-        const parent = selectedElement.parentNode;
-        const nextSibling = selectedElement.nextSibling;
-        recordAction({ type:"delete", element: selectedElement, parent: parent, nextSibling: nextSibling });
-        parent.removeChild(selectedElement);
-        selectedElement = null;
-      } else {
-        alert("No asset selected.");
-      }
-    });
-    
-    // Undo/Redo functionality
-    document.getElementById("undo").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      if(undoStack.length === 0) return;
-      const action = undoStack.pop();
-      if(action.type==="move"){
-        action.element.style.left = action.prev.left + "px";
-        action.element.style.top = action.prev.top + "px";
-      } else if(action.type==="create"){
-        action.element.parentNode.removeChild(action.element);
-      } else if(action.type==="delete"){
-        if(action.nextSibling)
-          action.parent.insertBefore(action.element, action.nextSibling);
-        else
-          action.parent.appendChild(action.element);
-        makeDraggable(action.element);
-      }
-      redoStack.push(action);
-    });
-    
-    document.getElementById("redo").addEventListener("click", () => {
-      if(!isEditable) return viewerAlert();
-      if(redoStack.length === 0) return;
-      const action = redoStack.pop();
-      if(action.type==="move"){
-        action.element.style.left = action.next.left + "px";
-        action.element.style.top = action.next.top + "px";
-      } else if(action.type==="create"){
-        document.getElementById("png-container").appendChild(action.element);
-        makeDraggable(action.element);
-      } else if(action.type==="delete"){
-        action.element.parentNode.removeChild(action.element);
-      }
-      undoStack.push(action);
-    });
-    
-    // Clear selection on click outside draggable elements
-    document.addEventListener('click', e => {
-      if(!e.target.classList.contains("draggable") && !e.target.classList.contains("overlay-text")){
-        clearSelection();
-      }
-    });
-    
-    // Escape key clears selection
-    document.addEventListener("keydown", e => { if(e.key==="Escape") clearSelection(); });
-    
-    // Generate viewer link based on domain name
-    document.getElementById("generate-viewer").addEventListener("click", () => {
-      const domain = document.getElementById("domain-name").value.trim();
-      if(!domain){
-        alert("Please set a Domain Name first.");
-        return;
-      }
-      const viewerURL = "https://dazes.org/" + domain + "/";
-      navigator.clipboard.writeText(viewerURL).then(() => {
-        document.getElementById("viewer-link").style.display = "block";
-        document.getElementById("viewer-link").textContent = "Viewer Link (copied): " + viewerURL;
-      }).catch(err => { alert("Failed to copy viewer link: " + viewerURL); });
-    });
-    
-    // Save settings to Firestore (global update for everyone using this siteID)
-    document.getElementById("save-settings").addEventListener("click", async () => {
-      if(!isEditable) return viewerAlert();
-      // Prepare settings object from fields
-      const settings = {
-        domainName: document.getElementById("domain-name").value.trim(),
-        tabTitle: document.getElementById("tab-title").value.trim(),
-        faviconUrl: document.getElementById("favicon-url").value.trim(),
-        bgUrl: document.getElementById("bg-url").value.trim(),
-        bgAudioUrl: document.getElementById("bg-audio-url").value.trim(),
-        blurLevel: parseInt(document.getElementById("blur-level").value) || 0,
-        overlayContent: document.getElementById("overlay-content").value,
-        overlayColor: document.getElementById("overlay-color").value,
-        overlaySize: parseFloat(document.getElementById("overlay-size").value) || 2,
-        customCursor: document.getElementById("custom-cursor").value.trim(),
-        backgroundColor: document.querySelector('input[name="bg-color"]:checked').value,
-        // Extra options
-        blurOverlay: {
-          enabled: document.getElementById("enable-blur").checked,
-          width: parseInt(document.getElementById("blur-overlay-width").value) || 300,
-          height: parseInt(document.getElementById("blur-overlay-height").value) || 150,
-          opacity: parseFloat(document.getElementById("blur-overlay-opacity").value) || 0.6
-        },
-        discordInfo: {
-          username: document.getElementById("discord-username").value.trim()
-          // Additional Discord data would be filled after lookup
-        }
-      };
-      
-      // Check for unique domain name
-      if(settings.domainName){
-        try {
-          const querySnapshot = await db.collection("userSettings")
-            .where("domainName", "==", settings.domainName)
-            .get();
-          let duplicateFound = false;
-          querySnapshot.forEach(doc => {
-            if(doc.id !== siteID){ duplicateFound = true; }
-          });
-          if(duplicateFound){
-            alert("Domain name already in use. Please choose another.");
-            return;
-          }
-        } catch(err){
-          console.error("Error checking domain uniqueness:", err);
-        }
-      }
-      
-      // Save settings to Firestore document for this siteID
-      try {
-        await db.collection("userSettings").doc(siteID).set(settings);
-        applySettings(settings);
-        alert("Settings saved!");
-      } catch(err){
-        console.error("Error saving settings:", err);
-      }
-    });
-    
-    // Change theme (toggle between black and light mode)
-    document.getElementById("change-theme").addEventListener("click", () => {
-      if(document.body.style.background==="white"){
-        document.body.style.background="#000000";
-        document.body.style.color="#eee";
-      } else {
-        document.body.style.background="white";
-        document.body.style.color="black";
-      }
-    });
-    
-    // Apply settings to page elements
-    function applySettings(settings) {
-      // Set background blur filter
-      document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
-      // Update tab title and favicon
-      if(settings.tabTitle) { document.title = settings.tabTitle; }
-      if(settings.faviconUrl) { document.getElementById("favicon").href = settings.faviconUrl; }
-      // Set custom cursor if provided
-      if(settings.customCursor) {
-        document.body.style.cursor = "url(" + settings.customCursor + "), auto";
-      }
-      // Set background color from Extras option
-      if(settings.backgroundColor) {
-        document.body.style.background = settings.backgroundColor;
-      }
-      // Load background media
-      if(settings.bgUrl) {
-        if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)){
-          const video = document.getElementById("bg-video");
-          video.src = settings.bgUrl;
-          video.style.display = "block";
-          video.play().catch(err => console.error(err));
-          video.addEventListener("pause", () => { setTimeout(() => { if(video.paused) video.play(); }, 50); });
-          document.getElementById("bg-image").style.backgroundImage = "";
-        } else {
-          document.getElementById("bg-image").style.backgroundImage = "url(" + settings.bgUrl + ")";
-          document.getElementById("bg-video").style.display = "none";
-        }
-      }
-      if(settings.bgAudioUrl) {
-        const audio = document.getElementById("bg-audio");
-        if(/\.(mp4|mp3|webm|ogg)(\?.*)?$/i.test(settings.bgAudioUrl)){
-          audio.src = settings.bgAudioUrl;
-          audio.play().catch(err => console.error(err));
-        }
-      }
-      // Update first overlay text element
-      const overlays = document.querySelectorAll(".overlay-text");
-      if(overlays.length > 0){
-        overlays[0].textContent = settings.overlayContent;
-        overlays[0].style.color = settings.overlayColor;
-        overlays[0].style.fontSize = settings.overlaySize + "em";
-      }
-      // Update blur overlay if enabled
-      if(settings.blurOverlay && settings.blurOverlay.enabled){
-        const overlay = document.getElementById("blur-overlay");
-        overlay.style.width = settings.blurOverlay.width + "px";
-        overlay.style.height = settings.blurOverlay.height + "px";
-        overlay.style.opacity = settings.blurOverlay.opacity;
-        overlay.style.display = "block";
-        makeDraggable(overlay);
-      } else {
-        document.getElementById("blur-overlay").style.display = "none";
+        displayNotFound();
       }
     }
-    
-    // Load settings from Firestore for the given siteID
-    async function loadSettingsForSite(id) {
-      try {
-        const doc = await db.collection("userSettings").doc(id).get();
-        if(doc.exists){
-          const settings = doc.data();
-          document.getElementById("domain-name").value = settings.domainName || "";
-          document.getElementById("tab-title").value = settings.tabTitle || "";
-          document.getElementById("favicon-url").value = settings.faviconUrl || "";
-          document.getElementById("bg-url").value = settings.bgUrl || "";
-          document.getElementById("bg-audio-url").value = settings.bgAudioUrl || "";
-          document.getElementById("blur-level").value = settings.blurLevel || 0;
-          document.getElementById("overlay-content").value = settings.overlayContent || "";
-          document.getElementById("overlay-color").value = settings.overlayColor || "#ffffff";
-          document.getElementById("overlay-size").value = settings.overlaySize || 2;
-          document.getElementById("custom-cursor").value = settings.customCursor || "";
-          if(settings.backgroundColor){
-            document.querySelector('input[name="bg-color"][value="'+settings.backgroundColor+'"]').checked = true;
-          }
-          if(settings.blurOverlay){
-            document.getElementById("enable-blur").checked = settings.blurOverlay.enabled;
-            document.getElementById("blur-overlay-width").value = settings.blurOverlay.width || 300;
-            document.getElementById("blur-overlay-height").value = settings.blurOverlay.height || 150;
-            document.getElementById("blur-overlay-opacity").value = settings.blurOverlay.opacity || 0.6;
-          }
-          document.getElementById("discord-username").value = settings.discordInfo ? settings.discordInfo.username : "";
-          applySettings(settings);
-        }
-      } catch(err){
-        console.error("Error loading settings:", err);
-      }
-    }
-    
-    // For viewers, delay heavy asset loading for faster initial load
-    window.addEventListener("load", () => {
-      if(!isEditable){
-        setTimeout(() => {
-          const bgUrl = document.getElementById("bg-url").value.trim();
-          if(bgUrl && /\.(mp4|webm|ogg)/i.test(bgUrl)){
-            applySettings({ bgUrl: bgUrl, blurLevel: document.getElementById("blur-level").value });
-          }
-        }, 500);
-      }
-    });
   </script>
 </body>
 </html>
