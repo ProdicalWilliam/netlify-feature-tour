@@ -2,19 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dazes.org</title>
+  <title>Dazes.org Shell</title>
   <style>
+    /* Global styles for the shell can go here */
     body { font-family: Arial, sans-serif; padding: 2rem; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin: 0.5rem 0; }
-    a { text-decoration: none; color: #0077cc; }
-    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
+  <!-- This container will receive the HTML from home.html or name.html -->
   <div id="content"></div>
   <script>
-    // List of hardcoded names.
+    // Hardcoded valid names.
     const names = [
       "William",
       "Brayden",
@@ -28,43 +26,46 @@
 
     const contentDiv = document.getElementById("content");
 
-    // Display the main page with links.
-    function displayMainPage() {
-      let html = "<h1>Welcome to Dazes.org</h1>";
-      html += "<p>Select a name below:</p>";
-      html += "<ul>";
-      names.forEach(name => {
-        // Use hash routing so the link goes to "#Name"
-        html += `<li><a href="#${name}">${name}</a></li>`;
-      });
-      html += "</ul>";
-      contentDiv.innerHTML = html;
-    }
-
-    // Display the greeting page for a name.
-    function displayNamePage(name) {
-      contentDiv.innerHTML = `<h1>Hello ${name}!</h1>
-        <p>Welcome to ${name}'s page on Dazes.org.</p>
-        <p><a href="#">Back to main page</a></p>`;
+    // A simple function to load an external HTML file.
+    function loadPage(url, callback) {
+      fetch(url)
+        .then(response => response.text())
+        .then(html => callback(html))
+        .catch(err => {
+          contentDiv.innerHTML = "<h1>Error loading page.</h1>";
+        });
     }
 
     // Router function.
     function route() {
-      // Get the hash value (without the '#' character).
       const hash = window.location.hash.substring(1).trim();
-      
-      // If no hash or the hash doesn't match any name, show the main page.
-      if (!hash || !names.includes(hash)) {
-        displayMainPage();
+      if (!hash) {
+        // No hash present: load home.html
+        loadPage("home.html", function(html) {
+          contentDiv.innerHTML = html;
+        });
       } else {
-        displayNamePage(hash);
+        // If a hash exists, check if it's a valid name.
+        if (names.includes(hash)) {
+          loadPage("name.html", function(html) {
+            // Replace the placeholder with the actual name.
+            html = html.replace(/{{NAME}}/g, hash);
+            contentDiv.innerHTML = html;
+          });
+        } else {
+          // If hash does not match, display a simple 404 message.
+          contentDiv.innerHTML = `
+            <h1>404</h1>
+            <p>Name not found.</p>
+            <p><a href="#">Back to home</a></p>
+          `;
+        }
       }
     }
 
-    // Listen for hash changes (when the URL changes after clicking a link).
+    // Listen for changes to the hash.
     window.addEventListener("hashchange", route);
-
-    // Ensure the correct page is shown on initial load.
+    // Run the router on initial load.
     window.addEventListener("DOMContentLoaded", route);
   </script>
 </body>
