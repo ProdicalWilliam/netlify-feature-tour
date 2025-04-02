@@ -4,8 +4,40 @@
   <meta charset="UTF-8">
   <title>Dazes.org Shell</title>
   <style>
-    /* Global styles for the shell can go here */
-    body { font-family: Arial, sans-serif; padding: 2rem; }
+    /* Global styles for the shell */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      /* Animated diagonal gradient background */
+      background: linear-gradient(45deg, black, white);
+      background-size: 200% 200%;
+      animation: gradientAnimation 10s linear infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes gradientAnimation {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    /* Ensure the main content is above any background video */
+    #content {
+      position: relative;
+      z-index: 1;
+      padding: 2rem;
+    }
+    /* Style for the Logann video background if needed */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: blur(8px);
+    }
   </style>
 </head>
 <body>
@@ -36,9 +68,36 @@
         });
     }
 
+    // Function to add Logann's video background.
+    function addLogannVideo() {
+      // Check if it's already added.
+      if (!document.getElementById('logann-video')) {
+        const video = document.createElement("video");
+        video.id = 'logann-video';
+        video.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.className = "video-bg";
+        document.body.prepend(video);
+      }
+    }
+
+    // Function to remove Logann's video background.
+    function removeLogannVideo() {
+      const video = document.getElementById('logann-video');
+      if (video) {
+        video.remove();
+      }
+    }
+
     // Router function.
     function route() {
       const hash = window.location.hash.substring(1).trim();
+      // Remove any video background if present by default.
+      removeLogannVideo();
+
       if (!hash) {
         // No hash present: load home.html
         loadPage("home.html", function(html) {
@@ -51,6 +110,10 @@
             // Replace the placeholder with the actual name.
             html = html.replace(/{{NAME}}/g, hash);
             contentDiv.innerHTML = html;
+            // Special case: if the name is "Logann", add the video background.
+            if (hash === "Logann") {
+              addLogannVideo();
+            }
           });
         } else {
           // If hash does not match, display a simple 404 message.
