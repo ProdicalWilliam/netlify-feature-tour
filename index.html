@@ -2,13 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Test Page</title>
+  <title>Customizable Background Page</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    /* Reset default margins and ensure full-page display */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    /* Video background styling */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: 1;
+      display: none; /* Hidden by default */
+      object-fit: cover;
+    }
+    /* Image background styling */
+    #bg-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+    }
+    /* Content overlay styling */
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: white;
+      padding-top: 50px;
+    }
+    /* Form container styling */
+    .customize-form {
+      background: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input[type="text"] {
+      width: 300px;
+      padding: 8px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
-  <h1>Hello, World!</h1>
-  <p>This is a test page hosted on GitHub Pages.</p>
+  <!-- Video background element -->
+  <video id="bg-video" autoplay muted loop></video>
+  <!-- Image background container -->
+  <div id="bg-image"></div>
+
+  <div class="content">
+    <div class="customize-form">
+      <h1>Customize Background</h1>
+      <input type="text" id="bg-url" placeholder="Enter image or video URL">
+      <br>
+      <button onclick="setBackground()">Apply Background</button>
+    </div>
+  </div>
+
+  <script>
+    function setBackground() {
+      var url = document.getElementById('bg-url').value.trim();
+      if (!url) return;
+
+      // Define common video file extensions
+      var videoExtensions = /\.(mp4|webm|ogg)(\?.*)?$/i;
+
+      var bgVideo = document.getElementById('bg-video');
+      var bgImage = document.getElementById('bg-image');
+
+      if (videoExtensions.test(url)) {
+        // It's a video URL: show video element and hide image background
+        bgVideo.src = url;
+        bgVideo.style.display = 'block';
+        bgVideo.play();
+        bgImage.style.backgroundImage = 'none';
+      } else {
+        // Otherwise, assume it's an image URL: set image background and hide video element
+        bgImage.style.backgroundImage = 'url(' + url + ')';
+        bgVideo.style.display = 'none';
+      }
+    }
+  </script>
 </body>
 </html>
