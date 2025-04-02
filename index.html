@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title> </title>
+  <title>Dazes.org</title>
   <style>
-    /* Global styles for non-Logann pages: animated diagonal gradient background */
     html, body {
       margin: 0;
       padding: 0;
@@ -20,226 +19,58 @@
       0%   { background-position: 0% 0%; }
       100% { background-position: 100% 100%; }
     }
-    /* Content container for greetings */
-    #content {
-      position: relative;
-      z-index: 2;
-      padding: 2rem;
-      text-align: center;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    /* Video background styles */
-    .video-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      /* Default blur (will be adjusted for Logann) */
-      filter: blur(40px);
-      display: none; /* Hidden by default */
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-    /* Overlay for Logann's info */
-    .overlay {
-      position: relative;
-      background: rgba(20, 0, 30, 0.7); /* darker midnight purple, semi-transparent */
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 30px;
-      border-radius: 20px; /* More rounded corners */
-      text-align: center;
-      z-index: 3;
-      max-width: 320px;
-      margin: 0 auto;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); /* Subtle glow */
-      transform: translateY(50px);
-      opacity: 0;
-      transition: all 0.6s ease;
+    .container {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 2rem;
+      text-align: center;
     }
-    .overlay.visible {
-      transform: translateY(0);
-      opacity: 1;
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
-    .overlay:hover {
-      transform: translateY(-10px); /* Hover up effect */
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); /* Enhanced glow on hover */
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .name-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 800px;
     }
-    .overlay h2 {
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.7); /* Text glow */
-      font-size: 2em;
+    .name-card {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
     }
-    .overlay p {
-      margin: 0.5em 0;
-      color: white;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Text glow */
-      opacity: 0.9;
+    .name-card:hover {
+      transform: translateY(-10px);
+      background: rgba(0,0,0,0.5);
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
     }
-    .info-row {
-      margin: 8px 0;
-    }
-    /* Discord avatar styling */
-    .avatar {
-      width: 128px;
-      height: 128px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.8);
-      margin-bottom: 1.5em;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Avatar glow */
-      transform: translateY(30px);
-      opacity: 0;
-      transition: all 0.8s ease;
-    }
-    .avatar.visible {
-      transform: translateY(0);
-      opacity: 1;
-    }
-    /* Animation for page elements */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <!-- Content container -->
-  <div id="content"></div>
-  
-  <!-- Video element (used for Logann page) -->
-  <video id="logann-video" class="video-bg" autoplay loop playsinline preload="auto">
-    Your browser does not support the video tag.
-  </video>
-
-  <script>
-    // List of valid names
-    const names = ["William", "Brayden", "Vaani", "Maddie", "Bambi", "Logann", "Mikey", "Proxy"];
-    
-    const contentDiv = document.getElementById("content");
-    const videoElement = document.getElementById("logann-video");
-
-    // Function to display the main page
-    function loadHome() {
-      // Restore gradient background
-      document.documentElement.style.background = "";
-      document.body.style.background = "";
-      contentDiv.innerHTML = "<h1>Welcome to Dazes.org</h1><p>This is the main page.</p>";
-      videoElement.style.display = "none";
-    }
-
-    // Function to display a greeting for a valid name
-    function loadName(name) {
-      if (name === "Logann") {
-        // Remove gradient background
-        document.documentElement.style.background = "#000"; 
-        document.body.style.background = "#000";
-        // Show the video with reduced blur
-        videoElement.style.filter = "blur(30px)";
-        videoElement.style.display = "block";
-        // Set the video source to the Discord CDN direct link
-        videoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357132466313498845/King_Von_-_Armed__Dangerous_Official_Video_1_1.mp4?ex=67ef179a&is=67edc61a&hm=b08247dc8d94169ce0d098757cf55222c4fd94233c16b4ffdcfc83a1b7791345";
-        attemptPlayback();
-        
-        // Create simpler profile display with animation
-        contentDiv.innerHTML = `
-          <div class="profile-container">
-            <img src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.webp?size=2048" alt="Discord Avatar" class="avatar">
-            <div class="overlay">
-              <h2>logann999</h2>
-              <div class="info-row">Member since June 2020</div>
-              <div class="info-row">Account age: 4+ years</div>
-              <div class="info-row">EST timezone</div>
-            </div>
-          </div>
-        `;
-        
-        // Trigger animations after a brief delay
-        setTimeout(() => {
-          const avatar = document.querySelector('.avatar');
-          const overlay = document.querySelector('.overlay');
-          
-          // Make video visible with smooth fade
-          videoElement.style.opacity = "1";
-          
-          // Make avatar visible with animation
-          if (avatar) avatar.classList.add('visible');
-          
-          // Make overlay visible with animation
-          if (overlay) overlay.classList.add('visible');
-        }, 100);
-      } else {
-        // For other valid names, restore gradient background
-        document.documentElement.style.background = "";
-        document.body.style.background = "";
-        contentDiv.innerHTML = "<h1>Hello, " + name + "!</h1>";
-        videoElement.style.display = "none";
-      }
-    }
-
-    // Function to display a 404 message
-    function load404() {
-      document.documentElement.style.background = "";
-      document.body.style.background = "";
-      contentDiv.innerHTML = "<h1>404</h1><p>Name not found.</p><p><a href='#'>Back to home</a></p>";
-      videoElement.style.display = "none";
-    }
-
-    // Router: determine what to load based on the URL hash
-    function route() {
-      const hash = window.location.hash.substring(1).trim();
-      if (!hash) {
-        loadHome();
-      } else if (names.includes(hash)) {
-        loadName(hash);
-      } else {
-        load404();
-      }
-    }
-
-    // Attempt to play the video
-    function attemptPlayback() {
-      videoElement.play().then(() => {
-        console.log("Video playback started.");
-      }).catch(err => {
-        console.error("Playback error:", err);
-      });
-    }
-
-    // Video event listeners for improved playback handling
-    videoElement.addEventListener('canplay', attemptPlayback);
-    videoElement.addEventListener('error', (e) => {
-      console.error("Video error:", e);
-      videoElement.load();
-      attemptPlayback();
-    });
-    videoElement.addEventListener('stalled', attemptPlayback);
-    videoElement.addEventListener('ended', () => {
-      videoElement.currentTime = 0;
-      attemptPlayback();
-    });
-
-    // Fallback: attempt playback on user interaction (helps overcome autoplay restrictions)
-    document.addEventListener('click', attemptPlayback);
-
-    // Listen for hash changes and on initial load
-    window.addEventListener("hashchange", route);
-    window.addEventListener("DOMContentLoaded", route);
-  </script>
+  <div class="container">
+    <h1>Welcome to Dazes.org</h1>
+    <div class="name-grid">
+      <div class="name-card"><a href="william.html">William</a></div>
+      <div class="name-card"><a href="brayden.html">Brayden</a></div>
+      <div class="name-card"><a href="vaani.html">Vaani</a></div>
+      <div class="name-card"><a href="maddie.html">Maddie</a></div>
+      <div class="name-card"><a href="bambi.html">Bambi</a></div>
+      <div class="name-card"><a href="logann.html">Logann</a></div>
+      <div class="name-card"><a href="mikey.html">Mikey</a></div>
+      <div class="name-card"><a href="proxy.html">Proxy</a></div>
+    </div>
+  </div>
 </body>
 </html>
