@@ -28,49 +28,41 @@
       object-fit: cover;
       z-index: 1;
       filter: blur(40px);
-      /* Hide by default */
-      display: none;
-    }
-    /* Hide any textual content */
-    #content {
+      /* Hidden by default */
       display: none;
     }
   </style>
 </head>
 <body>
-  <!-- An empty content container -->
-  <div id="content"></div>
-
   <!-- Video element for Logann's video background -->
-  <video id="logann-video" class="video-bg" autoplay loop muted playsinline preload="auto"></video>
+  <video id="logann-video" class="video-bg" autoplay loop playsinline preload="auto">
+    <!-- No muted attribute so it remains unmuted -->
+  </video>
 
   <script>
-    // List of valid names
-    const names = [
-      "William",
-      "Brayden",
-      "Vaani",
-      "Maddie",
-      "Bambi",
-      "Logann",
-      "Mikey",
-      "Proxy"
-    ];
-
-    // Get the video element and set its source
     const videoElement = document.getElementById('logann-video');
+
+    // Set the video source URL
     videoElement.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
 
-    // Router: Show the video element only when the URL hash is "Logann"
+    // Router: Only show the video when URL hash is "Logann"
     function route() {
       const hash = window.location.hash.substring(1).trim();
       if (hash === "Logann") {
         videoElement.style.display = "block";
-        // Try playing the video in case it hasn't started
-        videoElement.play().catch(err => console.error("Playback error:", err));
+        attemptPlayback();
       } else {
         videoElement.style.display = "none";
       }
+    }
+
+    // Attempt to play the video
+    function attemptPlayback() {
+      videoElement.play().then(() => {
+        console.log("Video is playing unmuted.");
+      }).catch(err => {
+        console.error("Autoplay failed, waiting for user interaction to resume playback:", err);
+      });
     }
 
     // Listen for changes to the hash and on page load
@@ -78,25 +70,28 @@
     window.addEventListener("DOMContentLoaded", route);
 
     // Improved error handling and recovery for the video element
-    videoElement.addEventListener('canplay', () => {
-      videoElement.play().catch(err => console.error("Playback error:", err));
-    });
+    videoElement.addEventListener('canplay', attemptPlayback);
 
     videoElement.addEventListener('error', (e) => {
-      console.error('Video error:', e);
+      console.error('Video error encountered:', e);
       videoElement.load();
-      videoElement.play().catch(err => console.error("Playback error after reload:", err));
+      attemptPlayback();
     });
 
     videoElement.addEventListener('stalled', (e) => {
       console.warn('Video stalled, attempting to resume playback.', e);
-      videoElement.play().catch(err => console.error("Playback error on stalled:", err));
+      attemptPlayback();
     });
 
-    // In case the video unexpectedly ends, reset the playback time and play again
     videoElement.addEventListener('ended', () => {
+      // In case the video ends, reset time and play again
       videoElement.currentTime = 0;
-      videoElement.play().catch(err => console.error("Playback error on ended:", err));
+      attemptPlayback();
+    });
+
+    // Listen for a click on the document to try resuming playback if autoplay is blocked
+    document.addEventListener('click', () => {
+      attemptPlayback();
     });
   </script>
 </body>
