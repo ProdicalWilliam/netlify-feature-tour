@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - <span id="site-name">My Website</span></title>
+  <title>Dashboard - Customize Your Site</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Reset and Base Styles */
     html, body {
       margin: 0;
       padding: 0;
+      font-family: 'Roboto', sans-serif;
       height: 100%;
       overflow: hidden;
-      font-family: Arial, sans-serif;
     }
-    /* Background container with blur */
+    /* Fullscreen background container */
     #bg-container {
       position: fixed;
       top: 0;
@@ -20,7 +20,6 @@
       width: 100%;
       height: 100%;
       z-index: 1;
-      filter: blur(0px);
       transition: filter 0.3s ease;
     }
     #bg-image {
@@ -29,7 +28,7 @@
       background-size: cover;
       background-position: center;
     }
-    #bg-video, #yt-iframe {
+    #bg-video {
       position: absolute;
       top: 0;
       left: 0;
@@ -37,9 +36,15 @@
       height: 100%;
       object-fit: cover;
       display: none;
-      border: 0;
     }
-    /* Circles overlay (for cool assets) */
+    #overlay-text {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
     #circles-overlay {
       position: absolute;
       top: 0;
@@ -49,63 +54,52 @@
       pointer-events: none;
       z-index: 2;
     }
-    /* Overlay text */
-    #overlay-text {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2em;
-      color: #fff;
-      text-shadow: 2px 2px 4px #000;
-      z-index: 3;
-    }
-    /* Sidebar (hidden until hover) */
+    /* Sidebar styling */
     #sidebar-container {
       position: fixed;
       top: 0;
       left: 0;
       height: 100%;
-      width: 40px;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 4;
+      width: 50px;
+      background: rgba(0,0,0,0.7);
+      z-index: 5;
       transition: width 0.3s ease;
       overflow: hidden;
     }
     #sidebar-container:hover {
-      width: 320px;
+      width: 350px;
     }
     #custom-panel {
-      padding: 10px;
+      padding: 15px;
       color: #fff;
     }
     #custom-panel h1 {
-      font-size: 1.2em;
+      font-size: 1.4em;
       margin-top: 0;
     }
     #custom-panel input[type="text"],
     #custom-panel input[type="number"],
     #custom-panel input[type="color"] {
       width: 100%;
-      padding: 5px;
-      margin: 5px 0;
+      padding: 6px;
+      margin: 8px 0;
       border: none;
       border-radius: 4px;
     }
     #custom-panel button {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       background: #28a745;
       border: none;
       border-radius: 4px;
       color: #fff;
       cursor: pointer;
-      margin-top: 5px;
+      margin-top: 8px;
     }
     #custom-panel button:hover {
       background: #1e7e34;
     }
-    /* Logout Button */
+    /* Logout button */
     #logout-btn {
       position: fixed;
       top: 10px;
@@ -116,175 +110,71 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 5;
-    }
-    /* Audio player styling */
-    #bg-audio {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      z-index: 5;
+      z-index: 6;
     }
   </style>
-</head>
-<body>
-  <!-- Background Container -->
-  <div id="bg-container">
-    <div id="bg-image"></div>
-    <video id="bg-video" autoplay muted loop></video>
-    <iframe id="yt-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    <div id="circles-overlay"></div>
-  </div>
-  <!-- Overlay Text -->
-  <div id="overlay-text"></div>
-  <!-- Sidebar for Customizations -->
-  <div id="sidebar-container">
-    <div id="custom-panel">
-      <h1>Customize</h1>
-      <!-- Background Options -->
-      <input type="text" id="bg-url" placeholder="Image, video, or YouTube URL">
-      <!-- Audio Options -->
-      <input type="text" id="audio-url" placeholder="Audio MP3 URL">
-      <!-- Overlay Text Options -->
-      <input type="text" id="overlay-content" placeholder="Overlay Text">
-      <input type="color" id="overlay-color" value="#ffffff">
-      <input type="number" id="overlay-size" placeholder="Text Size (em)" value="2" step="0.1">
-      <!-- Blur Options -->
-      <input type="number" id="blur-level" placeholder="Blur Level (px)" value="0" min="0">
-      <!-- Circles Overlay Options -->
-      <label>
-        <input type="checkbox" id="toggle-circles"> Show Circles
-      </label>
-      <input type="color" id="circle-color" value="#ffffff">
-      <input type="number" id="circle-size" placeholder="Circle Size (px)" value="50">
-      <input type="number" id="circle-count" placeholder="Number of Circles" value="10">
-      <button onclick="applyCustomizations()">Apply Changes</button>
-    </div>
-  </div>
-  <!-- Audio Element -->
-  <audio id="bg-audio" controls loop></audio>
-  <!-- Logout Button -->
-  <button id="logout-btn" onclick="logout()">Logout</button>
-
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script>
-    // Ensure user is logged in
-    if (!localStorage.getItem('currentUser')) {
-      window.location.href = 'login.html';
-    }
-    const currentUser = localStorage.getItem('currentUser');
-    // Set URL hash to simulate a unique sub-page
-    window.location.hash = currentUser;
+    // TODO: Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      // … other config values
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // Set website name from user profile (saved during registration)
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const siteName = users[currentUser] && users[currentUser].siteName ? users[currentUser].siteName : "My Website";
-    document.title = siteName;
-    document.getElementById('site-name').textContent = siteName;
-
-    // Utility: Extract YouTube video ID
-    function extractYouTubeID(url) {
-      let videoId = null;
-      let match = url.match(/[?&]v=([^&#]+)/);
-      if (match && match[1]) {
-        videoId = match[1];
+    // Check if user is logged in; if not, redirect to login.html
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // Use the user's email as key – or you could store a separate username in Firestore
+        window.currentUser = user.email;
+        loadSettings();
       } else {
-        match = url.match(/youtu\.be\/([^?&#]+)/);
-        if (match && match[1]) {
-          videoId = match[1];
-        }
+        window.location.href = "login.html";
       }
-      return videoId;
-    }
+    });
 
-    function applyCustomizations() {
-      // Gather customization options
-      const bgUrl = document.getElementById('bg-url').value.trim();
-      const audioUrl = document.getElementById('audio-url').value.trim();
-      const overlayContent = document.getElementById('overlay-content').value;
-      const overlayColor = document.getElementById('overlay-color').value;
-      const overlaySize = document.getElementById('overlay-size').value;
-      const blurLevel = document.getElementById('blur-level').value;
-      const showCircles = document.getElementById('toggle-circles').checked;
-      const circleColor = document.getElementById('circle-color').value;
-      const circleSize = parseInt(document.getElementById('circle-size').value);
-      const circleCount = parseInt(document.getElementById('circle-count').value);
-
-      // Save settings for persistence
-      const settings = { bgUrl, audioUrl, overlayContent, overlayColor, overlaySize, blurLevel, showCircles, circleColor, circleSize, circleCount };
-      localStorage.setItem('userSettings_' + currentUser, JSON.stringify(settings));
-
-      // Apply background media
-      applyBackground(bgUrl);
-      // Apply audio
-      applyAudio(audioUrl);
-      // Apply overlay text
-      const overlayText = document.getElementById('overlay-text');
-      overlayText.textContent = overlayContent;
-      overlayText.style.color = overlayColor;
-      overlayText.style.fontSize = overlaySize + "em";
+    function applyCustomizations(settings) {
       // Apply blur effect
-      document.getElementById('bg-container').style.filter = "blur(" + blurLevel + "px)";
-      // Generate circles overlay if enabled
-      if (showCircles) {
-        generateCircles(circleCount, circleSize, circleColor);
-      } else {
-        document.getElementById('circles-overlay').innerHTML = "";
-      }
-    }
-
-    function applyBackground(url) {
-      const bgImage = document.getElementById('bg-image');
-      const bgVideo = document.getElementById('bg-video');
-      const ytIframe = document.getElementById('yt-iframe');
-      // Reset all background elements
-      bgImage.style.display = 'none';
-      bgVideo.style.display = 'none';
-      ytIframe.style.display = 'none';
-      bgVideo.pause();
-      bgVideo.src = "";
-      ytIframe.src = "";
-      bgImage.style.backgroundImage = '';
-
-      if (url) {
-        // Check for YouTube URL
-        if (url.includes("youtube.com") || url.includes("youtu.be")) {
-          const videoId = extractYouTubeID(url);
-          if (videoId) {
-            const embedUrl = "https://www.youtube.com/embed/" + videoId +
-              "?autoplay=1&mute=1&loop=1&playlist=" + videoId + "&controls=0&modestbranding=1";
-            ytIframe.src = embedUrl;
-            ytIframe.style.display = 'block';
-          } else {
-            alert("Invalid YouTube URL");
-          }
-        } else if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
-          bgVideo.src = url;
-          bgVideo.style.display = 'block';
-          bgVideo.play();
+      document.getElementById("bg-container").style.filter = "blur(" + (settings.blurLevel || 0) + "px)";
+      // Overlay text
+      const overlay = document.getElementById("overlay-text");
+      overlay.textContent = settings.overlayContent || "";
+      overlay.style.color = settings.overlayColor || "#ffffff";
+      overlay.style.fontSize = (settings.overlaySize || 2) + "em";
+      // Background media
+      if (settings.bgUrl) {
+        if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
+          const video = document.getElementById("bg-video");
+          video.src = settings.bgUrl;
+          video.style.display = "block";
+          video.play();
+          document.getElementById("bg-image").style.backgroundImage = "";
         } else {
-          bgImage.style.backgroundImage = 'url(' + url + ')';
-          bgImage.style.display = 'block';
+          document.getElementById("bg-image").style.backgroundImage = "url(" + settings.bgUrl + ")";
+          document.getElementById("bg-video").style.display = "none";
         }
       }
-    }
-
-    function applyAudio(url) {
-      const audio = document.getElementById('bg-audio');
-      if (url) {
-        audio.src = url;
-        audio.style.display = 'block';
-        audio.play().catch(err => console.log("Audio play error:", err));
+      // Circles overlay
+      if (settings.showCircles) {
+        generateCircles(settings.circleCount, settings.circleSize, settings.circleColor);
       } else {
-        audio.pause();
-        audio.src = "";
-        audio.style.display = 'none';
+        document.getElementById("circles-overlay").innerHTML = "";
       }
     }
 
-    // Generate random circles overlay
     function generateCircles(count, size, color) {
       const overlay = document.getElementById('circles-overlay');
-      overlay.innerHTML = ""; // Clear previous circles
+      overlay.innerHTML = "";
+      count = count || 10;
+      size = size || 50;
+      color = color || "#ffffff";
       for (let i = 0; i < count; i++) {
         const circle = document.createElement('div');
         circle.style.position = "absolute";
@@ -299,31 +189,79 @@
       }
     }
 
-    // Load saved settings if available
-    function loadSettings() {
-      const settingsStr = localStorage.getItem('userSettings_' + currentUser);
-      if (settingsStr) {
-        const settings = JSON.parse(settingsStr);
-        document.getElementById('bg-url').value = settings.bgUrl || "";
-        document.getElementById('audio-url').value = settings.audioUrl || "";
-        document.getElementById('overlay-content').value = settings.overlayContent || "";
-        document.getElementById('overlay-color').value = settings.overlayColor || "#ffffff";
-        document.getElementById('overlay-size').value = settings.overlaySize || "2";
-        document.getElementById('blur-level').value = settings.blurLevel || "0";
-        document.getElementById('toggle-circles').checked = settings.showCircles || false;
-        document.getElementById('circle-color').value = settings.circleColor || "#ffffff";
-        document.getElementById('circle-size').value = settings.circleSize || "50";
-        document.getElementById('circle-count').value = settings.circleCount || "10";
-        applyCustomizations();
+    async function saveSettings() {
+      // Gather all customization values
+      const settings = {
+        bgUrl: document.getElementById("bg-url").value.trim(),
+        blurLevel: document.getElementById("blur-level").value,
+        overlayContent: document.getElementById("overlay-content").value,
+        overlayColor: document.getElementById("overlay-color").value,
+        overlaySize: document.getElementById("overlay-size").value,
+        showCircles: document.getElementById("toggle-circles").checked,
+        circleColor: document.getElementById("circle-color").value,
+        circleSize: parseInt(document.getElementById("circle-size").value),
+        circleCount: parseInt(document.getElementById("circle-count").value)
+      };
+      try {
+        await db.collection("userSettings").doc(window.currentUser).set(settings);
+        applyCustomizations(settings);
+        alert("Settings saved!");
+      } catch (error) {
+        console.error("Error saving settings:", error);
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const doc = await db.collection("userSettings").doc(window.currentUser).get();
+        if (doc.exists) {
+          const settings = doc.data();
+          // Populate form fields with saved settings
+          document.getElementById("bg-url").value = settings.bgUrl || "";
+          document.getElementById("blur-level").value = settings.blurLevel || 0;
+          document.getElementById("overlay-content").value = settings.overlayContent || "";
+          document.getElementById("overlay-color").value = settings.overlayColor || "#ffffff";
+          document.getElementById("overlay-size").value = settings.overlaySize || 2;
+          document.getElementById("toggle-circles").checked = settings.showCircles || false;
+          document.getElementById("circle-color").value = settings.circleColor || "#ffffff";
+          document.getElementById("circle-size").value = settings.circleSize || 50;
+          document.getElementById("circle-count").value = settings.circleCount || 10;
+          applyCustomizations(settings);
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
       }
     }
 
     function logout() {
-      localStorage.removeItem('currentUser');
-      window.location.href = 'login.html';
+      auth.signOut();
     }
-
-    loadSettings();
   </script>
+</head>
+<body>
+  <div id="bg-container">
+    <div id="bg-image"></div>
+    <video id="bg-video" autoplay muted loop></video>
+    <div id="circles-overlay"></div>
+  </div>
+  <div id="overlay-text"></div>
+  <div id="sidebar-container">
+    <div id="custom-panel">
+      <h1>Customize</h1>
+      <input type="text" id="bg-url" placeholder="Background Image or Direct Video URL">
+      <input type="number" id="blur-level" placeholder="Blur Level (px)" value="0" min="0">
+      <input type="text" id="overlay-content" placeholder="Overlay Text">
+      <input type="color" id="overlay-color" value="#ffffff">
+      <input type="number" id="overlay-size" placeholder="Text Size (em)" value="2" step="0.1">
+      <label>
+        <input type="checkbox" id="toggle-circles"> Show Circles
+      </label>
+      <input type="color" id="circle-color" value="#ffffff">
+      <input type="number" id="circle-size" placeholder="Circle Size (px)" value="50">
+      <input type="number" id="circle-count" placeholder="Circle Count" value="10">
+      <button onclick="saveSettings()">Save Changes</button>
+    </div>
+  </div>
+  <button id="logout-btn" onclick="logout()">Logout</button>
 </body>
 </html>
