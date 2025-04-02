@@ -3,35 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
     body {
+      font-family: 'Roboto', sans-serif;
+      background: #f2f2f2;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #f2f2f2;
-      font-family: Arial, sans-serif;
+      margin: 0;
     }
     .login-container {
       background: #fff;
-      padding: 20px 30px;
+      padding: 25px 35px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       text-align: center;
     }
-    input[type="text"], input[type="password"] {
+    input[type="text"], input[type="password"], input[type="email"] {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
     button {
-      padding: 10px 20px;
-      border: none;
+      width: 100%;
+      padding: 10px;
       background: #007bff;
+      border: none;
       color: #fff;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
     button:hover {
@@ -41,37 +44,42 @@
       color: red;
       margin: 10px 0;
     }
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
+    a { color: #007bff; text-decoration: none; }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script>
+    // TODO: Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      // … other config values
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    async function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = "customize.html";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="login-container">
     <h1>Login</h1>
     <div class="message" id="message"></div>
-    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <br>
     <button onclick="login()">Login</button>
     <p>Don't have an account? <a href="register.html">Register</a></p>
   </div>
-
-  <script>
-    function login() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const message = document.getElementById('message');
-      const users = JSON.parse(localStorage.getItem('users') || '{}');
-
-      if (users[username] && users[username].password === password) {
-        localStorage.setItem('currentUser', username);
-        window.location.href = 'index.html';
-      } else {
-        message.textContent = "Invalid username or password.";
-      }
-    }
-  </script>
 </body>
 </html>
