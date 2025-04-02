@@ -51,7 +51,7 @@
     // Router function.
     function route() {
       // Get the hash value (without the '#' character).
-      const hash = window.location.hash.substring(1);
+      const hash = window.location.hash.substring(1).trim();
       
       // If no hash or the hash doesn't match any name, show the main page.
       if (!hash || !names.includes(hash)) {
@@ -64,8 +64,8 @@
     // Listen for hash changes (when the URL changes after clicking a link).
     window.addEventListener("hashchange", route);
 
-    // Call the router on initial load.
-    route();
+    // Ensure the correct page is shown on initial load.
+    window.addEventListener("DOMContentLoaded", route);
   </script>
 </body>
 </html>
