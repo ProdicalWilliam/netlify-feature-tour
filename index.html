@@ -13,10 +13,19 @@
       background: linear-gradient(45deg, black, white);
       background-size: 200% 200%;
       animation: gradientAnimation 10s linear infinite;
+      font-family: Arial, sans-serif;
+      color: #fff;
     }
     @keyframes gradientAnimation {
       0%   { background-position: 0% 0%; }
       100% { background-position: 100% 100%; }
+    }
+    /* Content container for greetings */
+    #content {
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+      text-align: center;
     }
     /* Video background styles with strong blur */
     .video-bg {
@@ -28,27 +37,37 @@
       object-fit: cover;
       z-index: 1;
       filter: blur(40px);
-      /* Hidden by default */
-      display: none;
+      display: none; /* Hidden by default */
     }
   </style>
 </head>
 <body>
+  <!-- Content container -->
+  <div id="content"></div>
+  
   <!-- Video element for Logann's video background -->
   <video id="logann-video" class="video-bg" autoplay loop playsinline preload="auto">
-    <!-- No muted attribute so it remains unmuted -->
+    Your browser does not support the video tag.
   </video>
 
   <script>
-    const videoElement = document.getElementById('logann-video');
+    // List of valid names
+    const names = ["William", "Brayden", "Vaani", "Maddie", "Bambi", "Logann", "Mikey", "Proxy"];
+    
+    const contentDiv = document.getElementById("content");
+    const videoElement = document.getElementById("logann-video");
 
-    // Set the video source URL
-    videoElement.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
+    // Function to display the main page
+    function loadHome() {
+      contentDiv.innerHTML = "<h1>Welcome to Dazes.org</h1><p>This is the main page.</p>";
+      videoElement.style.display = "none";
+    }
 
-    // Router: Only show the video when URL hash is "Logann"
-    function route() {
-      const hash = window.location.hash.substring(1).trim();
-      if (hash === "Logann") {
+    // Function to display a greeting for a valid name
+    function loadName(name) {
+      contentDiv.innerHTML = "<h1>Hello, " + name + "!</h1>";
+      // For "Logann", show the video background and attempt playback
+      if (name === "Logann") {
         videoElement.style.display = "block";
         attemptPlayback();
       } else {
@@ -56,43 +75,55 @@
       }
     }
 
-    // Attempt to play the video
+    // Function to display a 404 message
+    function load404() {
+      contentDiv.innerHTML = "<h1>404</h1><p>Name not found.</p><p><a href='#'>Back to home</a></p>";
+      videoElement.style.display = "none";
+    }
+
+    // Router function to determine what to load based on the URL hash
+    function route() {
+      const hash = window.location.hash.substring(1).trim();
+      if (!hash) {
+        loadHome();
+      } else if (names.includes(hash)) {
+        loadName(hash);
+      } else {
+        load404();
+      }
+    }
+
+    // Function to attempt video playback
     function attemptPlayback() {
       videoElement.play().then(() => {
-        console.log("Video is playing unmuted.");
+        console.log("Video playback started.");
       }).catch(err => {
-        console.error("Autoplay failed, waiting for user interaction to resume playback:", err);
+        console.error("Playback error:", err);
       });
     }
 
-    // Listen for changes to the hash and on page load
-    window.addEventListener("hashchange", route);
-    window.addEventListener("DOMContentLoaded", route);
-
-    // Improved error handling and recovery for the video element
+    // Video event listeners for improved playback handling
     videoElement.addEventListener('canplay', attemptPlayback);
-
     videoElement.addEventListener('error', (e) => {
-      console.error('Video error encountered:', e);
+      console.error("Video error:", e);
       videoElement.load();
       attemptPlayback();
     });
-
-    videoElement.addEventListener('stalled', (e) => {
-      console.warn('Video stalled, attempting to resume playback.', e);
-      attemptPlayback();
-    });
-
+    videoElement.addEventListener('stalled', attemptPlayback);
     videoElement.addEventListener('ended', () => {
-      // In case the video ends, reset time and play again
       videoElement.currentTime = 0;
       attemptPlayback();
     });
 
-    // Listen for a click on the document to try resuming playback if autoplay is blocked
-    document.addEventListener('click', () => {
-      attemptPlayback();
-    });
+    // Fallback: attempt playback on user interaction (helps overcome browser autoplay restrictions)
+    document.addEventListener('click', attemptPlayback);
+
+    // Listen for hash changes and initial load
+    window.addEventListener("hashchange", route);
+    window.addEventListener("DOMContentLoaded", route);
+
+    // Set the video source URL (for "Logann")
+    videoElement.src = "https://download1526.mediafire.com/9br456bxuyagQRRpFtUJhgstxbXFxMcVt1rGoB1hrhpFm8tSV8Qx9BTRBfNn3ga7qL56cJoVhHul8ZSdSfIK3QRNaWT36tDLmCWC54gRi7jXslg9A6UuslCuCz9rHZKTkDPP9GPXIq3iIwuPYOhrF1h1484J6aSldiIHnudkZZpVrms/2sjht3exunyp321/King+Von+-+Armed+%26+Dangerous+%28Official+Video%29.mp4";
   </script>
 </body>
 </html>
