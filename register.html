@@ -71,8 +71,8 @@
       const message = document.getElementById("message");
       try {
         await auth.createUserWithEmailAndPassword(email, password);
-        // Optionally, redirect the user after registration
-        window.location.href = "customize.html";
+        // Redirect to index.html after successful registration
+        window.location.href = "index.html";
       } catch (error) {
         message.textContent = error.message;
       }
