@@ -56,12 +56,10 @@
 
     // Check the URL path.
     if (path === "" || path === "/index.html") {
-      // Show the main page.
       displayMainPage();
     } else {
       // Remove the leading "/" and decode the URI.
       const nameFromUrl = decodeURIComponent(path.substring(1));
-      // Check if the name exists in our hardcoded list.
       if (names.includes(nameFromUrl)) {
         displayNamePage(nameFromUrl);
       } else {
