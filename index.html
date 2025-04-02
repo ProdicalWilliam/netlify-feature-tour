@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dazes.org Shell</title>
+  <title> </title>
   <style>
-    /* Global styles: animated diagonal gradient background for non-Logann pages */
+    /* Global styles for non-Logann pages: animated diagonal gradient background */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      background: linear-gradient(45deg, black, white);
+      background: linear-gradient(45deg, #222, #fff);
       background-size: 200% 200%;
       animation: gradientAnimation 10s linear infinite;
       font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
       padding: 2rem;
       text-align: center;
     }
-    /* Video element styles – will only show on Logann page */
+    /* Video background styles */
     .video-bg {
       position: fixed;
       top: 0;
@@ -36,8 +36,38 @@
       height: 100%;
       object-fit: cover;
       z-index: 1;
+      /* Default blur (will be adjusted for Logann) */
       filter: blur(40px);
       display: none; /* Hidden by default */
+    }
+    /* Overlay for Logann’s info */
+    .overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 0, 30, 0.6); /* dark midnight purple, semi-transparent */
+      border: 2px solid rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 3;
+      max-width: 90%;
+    }
+    .overlay h2 {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    .overlay p {
+      margin: 0.3em 0;
+    }
+    /* Discord avatar styling */
+    .avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.8);
+      margin-bottom: 1em;
     }
   </style>
 </head>
@@ -45,7 +75,7 @@
   <!-- Content container -->
   <div id="content"></div>
   
-  <!-- Video element for Logann's page -->
+  <!-- Video element (used for Logann page) -->
   <video id="logann-video" class="video-bg" autoplay loop playsinline preload="auto">
     Your browser does not support the video tag.
   </video>
@@ -59,7 +89,7 @@
 
     // Function to display the main page
     function loadHome() {
-      // Restore default gradient background
+      // Restore gradient background
       document.documentElement.style.background = "";
       document.body.style.background = "";
       contentDiv.innerHTML = "<h1>Welcome to Dazes.org</h1><p>This is the main page.</p>";
@@ -69,16 +99,28 @@
     // Function to display a greeting for a valid name
     function loadName(name) {
       if (name === "Logann") {
-        // Remove gradient background for Logann's page
-        document.documentElement.style.background = "none";
-        document.body.style.background = "none";
-        contentDiv.innerHTML = "<h1>Hello, " + name + "!</h1>";
+        // Remove gradient background
+        document.documentElement.style.background = "#000"; 
+        document.body.style.background = "#000";
+        // Show the video with reduced blur
+        videoElement.style.filter = "blur(30px)";
         videoElement.style.display = "block";
         // Set the video source to the Discord CDN direct link
         videoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357132466313498845/King_Von_-_Armed__Dangerous_Official_Video_1_1.mp4?ex=67ef179a&is=67edc61a&hm=b08247dc8d94169ce0d098757cf55222c4fd94233c16b4ffdcfc83a1b7791345";
         attemptPlayback();
+        // Display Logann’s overlay with account info and Discord avatar
+        contentDiv.innerHTML = `
+          <div class="overlay">
+            <img src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.webp?size=2048" alt="Discord Avatar" class="avatar">
+            <h2>logann999</h2>
+            <p><strong>Account Creation Date:</strong> 6/26/2020, 9:57:33 AM</p>
+            <p><strong>Account Age:</strong> 4 years, 9 months, 7 days, 23 hours, 8 minutes, 6 seconds</p>
+            <p><strong>Banner Color:</strong> #000000</p>
+            <p><strong>Timezones:</strong> EST</p>
+          </div>
+        `;
       } else {
-        // Restore gradient background for other names
+        // For other valid names, restore gradient background
         document.documentElement.style.background = "";
         document.body.style.background = "";
         contentDiv.innerHTML = "<h1>Hello, " + name + "!</h1>";
@@ -94,7 +136,7 @@
       videoElement.style.display = "none";
     }
 
-    // Router function to determine what to load based on the URL hash
+    // Router: determine what to load based on the URL hash
     function route() {
       const hash = window.location.hash.substring(1).trim();
       if (!hash) {
@@ -128,10 +170,10 @@
       attemptPlayback();
     });
 
-    // Fallback: attempt playback on user interaction (to help overcome autoplay restrictions)
+    // Fallback: attempt playback on user interaction (helps overcome autoplay restrictions)
     document.addEventListener('click', attemptPlayback);
 
-    // Listen for hash changes and initial load
+    // Listen for hash changes and on initial load
     window.addEventListener("hashchange", route);
     window.addEventListener("DOMContentLoaded", route);
   </script>
