@@ -112,43 +112,71 @@
       cursor: pointer;
       z-index: 6;
     }
+    /* Welcome message styling */
+    #welcome-message {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: #fff;
+      z-index: 6;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      font-size: 1.2em;
+    }
   </style>
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (compat version) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script>
-    // TODO: Replace with your Firebase config
+    // Your Firebase configuration
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // … other config values
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.appspot.com",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Check if user is logged in; if not, redirect to login.html
+    // Listen for authentication state changes.
     auth.onAuthStateChanged(user => {
       if (user) {
-        // Use the user's email as key – or you could store a separate username in Firestore
-        window.currentUser = user.email;
+        // Store the user's UID for later use.
+        window.currentUser = user.uid;
+        loadUserProfile();
         loadSettings();
       } else {
         window.location.href = "login.html";
       }
     });
 
+    // Load the custom website name from Firestore "users" collection.
+    async function loadUserProfile() {
+      try {
+        const doc = await db.collection("users").doc(window.currentUser).get();
+        if (doc.exists) {
+          const profile = doc.data();
+          document.getElementById("welcome-message").textContent = "Welcome to " + (profile.websiteName || "Your Site") + "!";
+        }
+      } catch (error) {
+        console.error("Error loading user profile:", error);
+      }
+    }
+
     function applyCustomizations(settings) {
-      // Apply blur effect
+      // Apply blur effect.
       document.getElementById("bg-container").style.filter = "blur(" + (settings.blurLevel || 0) + "px)";
-      // Overlay text
+      // Overlay text.
       const overlay = document.getElementById("overlay-text");
       overlay.textContent = settings.overlayContent || "";
       overlay.style.color = settings.overlayColor || "#ffffff";
       overlay.style.fontSize = (settings.overlaySize || 2) + "em";
-      // Background media
+      // Background media.
       if (settings.bgUrl) {
         if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
           const video = document.getElementById("bg-video");
@@ -161,7 +189,7 @@
           document.getElementById("bg-video").style.display = "none";
         }
       }
-      // Circles overlay
+      // Circles overlay.
       if (settings.showCircles) {
         generateCircles(settings.circleCount, settings.circleSize, settings.circleColor);
       } else {
@@ -190,7 +218,7 @@
     }
 
     async function saveSettings() {
-      // Gather all customization values
+      // Gather all customization values.
       const settings = {
         bgUrl: document.getElementById("bg-url").value.trim(),
         blurLevel: document.getElementById("blur-level").value,
@@ -216,7 +244,7 @@
         const doc = await db.collection("userSettings").doc(window.currentUser).get();
         if (doc.exists) {
           const settings = doc.data();
-          // Populate form fields with saved settings
+          // Populate form fields with saved settings.
           document.getElementById("bg-url").value = settings.bgUrl || "";
           document.getElementById("blur-level").value = settings.blurLevel || 0;
           document.getElementById("overlay-content").value = settings.overlayContent || "";
@@ -248,7 +276,7 @@
   <div id="sidebar-container">
     <div id="custom-panel">
       <h1>Customize</h1>
-      <input type="text" id="bg-url" placeholder="Background Image or Direct Video URL">
+      <input type="text" id="bg-url" placeholder="Background Image or Video URL">
       <input type="number" id="blur-level" placeholder="Blur Level (px)" value="0" min="0">
       <input type="text" id="overlay-content" placeholder="Overlay Text">
       <input type="color" id="overlay-color" value="#ffffff">
@@ -263,5 +291,6 @@
     </div>
   </div>
   <button id="logout-btn" onclick="logout()">Logout</button>
+  <div id="welcome-message"></div>
 </body>
 </html>
