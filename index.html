@@ -40,7 +40,7 @@
       object-fit: cover;
       border: none;
     }
-    /* Make sure YouTube iframe sits behind content */
+    /* Ensure YouTube iframe/video sits behind content */
     #bg-iframe {
       z-index: 0;
     }
@@ -51,8 +51,8 @@
     #bg-audio {
       display: none;
     }
-    /* Draggable overlay text */
-    #overlay-text {
+    /* Draggable overlay text(s) */
+    .overlay-text {
       position: absolute;
       top: 50px;
       left: 50px;
@@ -97,12 +97,13 @@
       left: -350px;
       width: 350px;
       height: 100%;
-      background: rgba(46, 8, 84, 0.95);
+      background: #1f0633; /* Darker, more readable midnight purple */
       z-index: 9;
       padding: 20px;
       box-sizing: border-box;
       transition: left 0.3s ease;
       overflow-y: auto;
+      border-right: 4px solid #555;
     }
     #sidebar.open {
       left: 0;
@@ -114,7 +115,7 @@
     #sidebar label {
       display: block;
       margin: 10px 0 4px;
-      color: #ddd;
+      color: #ccc;
     }
     #sidebar input[type="text"],
     #sidebar input[type="number"],
@@ -169,33 +170,44 @@
   <!-- Background container -->
   <div id="bg-container">
     <div id="bg-image"></div>
-    <video id="bg-video" autoplay muted loop playsinline></video>
-    <iframe id="bg-iframe" allow="autoplay; muted" allowfullscreen></iframe>
+    <video id="bg-video" autoplay loop playsinline></video>
+    <!-- The YouTube iframe now uses additional parameters to minimize UI elements.
+         Note: Blocking ads is not officially supported. -->
+    <iframe id="bg-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
   </div>
   <!-- Background audio -->
   <audio id="bg-audio" loop></audio>
-  <!-- Draggable overlay text -->
-  <div id="overlay-text">Drag me around!</div>
+  <!-- Draggable overlay text container (holds one or more overlay texts) -->
+  <div id="overlay-container">
+    <div class="overlay-text" data-index="0">Drag me around!</div>
+  </div>
   <!-- Container for PNG images -->
   <div id="png-container"></div>
 
-  <!-- Toggle Sidebar Button -->
+  <!-- Toggle Sidebar Button (only shown for editors) -->
   <button id="toggle-sidebar">☰</button>
   <!-- Sidebar Editor Panel -->
   <div id="sidebar">
     <h2>Customize & Share</h2>
     <label for="bg-url">Background Image/Video/YouTube URL</label>
     <input type="url" id="bg-url" placeholder="http://...">
+    
     <label for="bg-audio-url">Background Audio URL</label>
     <input type="url" id="bg-audio-url" placeholder="http://...">
+    
     <label for="blur-level">Blur Level (px)</label>
     <input type="number" id="blur-level" placeholder="0" value="0" min="0">
+    
     <label for="overlay-content">Overlay Text</label>
     <input type="text" id="overlay-content" placeholder="Your text here">
+    
     <label for="overlay-color">Overlay Text Color</label>
     <input type="color" id="overlay-color" value="#ffffff">
+    
     <label for="overlay-size">Overlay Text Size (em)</label>
     <input type="number" id="overlay-size" placeholder="2" value="2" step="0.1">
+    
+    <button id="add-overlay">Add New Overlay Text</button>
     
     <hr style="margin: 15px 0; border-color: #555;">
     
@@ -244,17 +256,23 @@
     let redoStack = [];
     let selectedElement = null;
 
-    // If not logged in, redirect to login.html
+    // For viewer mode: override editable functions
+    function viewerAlert() {
+      alert("You're a viewer!");
+    }
+
+    // If not logged in, redirect to login.html (or, for demo, set isEditable false)
     auth.onAuthStateChanged(user => {
       if (!user) {
-        window.location.href = "login.html";
+        // For viewers, we want faster load and disable sidebar features
+        isEditable = false;
+        viewUID = "viewer";
+        document.getElementById("toggle-sidebar").style.display = "none";
       } else {
         currentUID = user.uid;
         viewUID = currentUID;
         isEditable = true;
-        // Show the sidebar toggle
         document.getElementById("toggle-sidebar").style.display = "block";
-        // Load user profile details (if any)
         db.collection("users").doc(currentUID).get().then(doc => {
           if (doc.exists) {
             document.getElementById("welcome-message").textContent = "Welcome to " + (doc.data().websiteName || "Your Site") + "!";
@@ -323,19 +341,21 @@
 
     // Clear selection from all assets
     function clearSelection() {
-      document.querySelectorAll(".draggable").forEach(el => {
+      document.querySelectorAll(".draggable, .overlay-text").forEach(el => {
         el.classList.remove("selected");
       });
       selectedElement = null;
     }
 
-    // Toggle sidebar visibility
+    // Toggle sidebar visibility (only if editor)
     document.getElementById("toggle-sidebar").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
       document.getElementById("sidebar").classList.toggle("open");
     });
 
     // Add PNG image (record creation action)
     document.getElementById("add-png").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
       const url = document.getElementById("png-url").value.trim();
       if(url && url.toLowerCase().endsWith(".png")) {
         const img = document.createElement("img");
@@ -345,8 +365,6 @@
         img.style.top = "100px";
         img.style.width = "150px";
         img.style.height = "auto";
-        img.style.resize = "both";
-        img.style.overflow = "auto";
         makeDraggable(img);
         document.getElementById("png-container").appendChild(img);
         recordAction({ type: "create", element: img });
@@ -355,8 +373,26 @@
       }
     });
 
+    // Add new overlay text element
+    document.getElementById("add-overlay").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
+      const container = document.getElementById("overlay-container");
+      const newOverlay = document.createElement("div");
+      newOverlay.className = "overlay-text";
+      newOverlay.textContent = "New Overlay Text";
+      newOverlay.style.left = "60px";
+      newOverlay.style.top = "60px";
+      newOverlay.style.fontSize = document.getElementById("overlay-size").value + "em";
+      newOverlay.style.color = document.getElementById("overlay-color").value;
+      newOverlay.style.background = "rgba(0, 0, 0, 0.5)";
+      makeDraggable(newOverlay);
+      container.appendChild(newOverlay);
+      recordAction({ type: "create", element: newOverlay });
+    });
+
     // Delete button: remove the selected element and record deletion
     document.getElementById("delete").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
       if(selectedElement) {
         const parent = selectedElement.parentNode;
         const nextSibling = selectedElement.nextSibling;
@@ -375,6 +411,7 @@
 
     // Undo and Redo functionality
     document.getElementById("undo").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
       if(undoStack.length === 0) return;
       const action = undoStack.pop();
       if(action.type === "move") {
@@ -394,6 +431,7 @@
     });
 
     document.getElementById("redo").addEventListener("click", () => {
+      if(!isEditable) return viewerAlert();
       if(redoStack.length === 0) return;
       const action = redoStack.pop();
       if(action.type === "move") {
@@ -408,14 +446,27 @@
       undoStack.push(action);
     });
 
-    // Generate viewer link button: creates a shareable link (removes editor mode from URL)
+    // Clear selection when clicking outside any draggable element
+    document.addEventListener('click', e => {
+      if(!e.target.classList.contains("draggable") && !e.target.classList.contains("overlay-text")) {
+        clearSelection();
+      }
+    });
+
+    // Pressing Escape unfocuses any moving/resizing object
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        clearSelection();
+      }
+    });
+
+    // Generate viewer link button: creates a shareable link (editor options removed)
     document.getElementById("generate-viewer").addEventListener("click", () => {
       const url = new URL(window.location.href);
-      // Remove any query parameters that enable editor mode
       url.searchParams.delete("editor");
       navigator.clipboard.writeText(url.toString()).then(() => {
         document.getElementById("viewer-link").style.display = "block";
-        document.getElementById("viewer-link").textContent = "Viewer Link (copied to clipboard): " + url.toString();
+        document.getElementById("viewer-link").textContent = "Viewer Link (copied): " + url.toString();
       }).catch(err => {
         alert("Failed to copy link. Viewer link: " + url.toString());
       });
@@ -423,10 +474,7 @@
 
     // Save settings to Firestore (only if editing is allowed)
     document.getElementById("save-settings").addEventListener("click", async () => {
-      if(!isEditable) {
-        alert("You are in view mode only.");
-        return;
-      }
+      if(!isEditable) return viewerAlert();
       const settings = {
         bgUrl: document.getElementById("bg-url").value.trim(),
         bgAudioUrl: document.getElementById("bg-audio-url").value.trim(),
@@ -455,17 +503,22 @@
       }
     });
 
-    // Apply settings to the page, including handling YouTube background
+    // Apply settings to the page, including handling YouTube background.
     function applySettings(settings) {
       document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
       if(settings.bgUrl) {
-        // Check for YouTube URL and embed with UI removed
+        // Check for YouTube URL and embed with reduced UI and loop.
         if(/(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(settings.bgUrl)) {
           let videoID = "";
           const ytMatch = settings.bgUrl.match(/(?:youtu\.be\/|v=|watch\?v=)([^&]+)/);
           if(ytMatch) videoID = ytMatch[1];
+          // The embed parameters include:
+          // - controls=0, modestbranding=1, rel=0 to reduce UI
+          // - autoplay=1, loop=1 to autoplay and loop
+          // - playlist parameter to allow looping
+          // - mute removed in attempt to load unmuted (though browsers may override)
           const iframeURL = "https://www.youtube.com/embed/" + videoID +
-            "?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&mute=1&playlist=" + videoID;
+            "?controls=0&modestbranding=1&rel=0&autoplay=1&loop=1&playlist=" + videoID + "&iv_load_policy=3";
           document.getElementById("bg-iframe").src = iframeURL;
           document.getElementById("bg-iframe").style.display = "block";
           document.getElementById("bg-video").style.display = "none";
@@ -490,10 +543,13 @@
         audio.src = settings.bgAudioUrl;
         audio.play();
       }
-      const overlay = document.getElementById("overlay-text");
-      overlay.textContent = settings.overlayContent;
-      overlay.style.color = settings.overlayColor;
-      overlay.style.fontSize = settings.overlaySize + "em";
+      // Update the first overlay text as an example; additional overlays can be edited by dragging.
+      const overlays = document.querySelectorAll(".overlay-text");
+      if(overlays.length > 0) {
+        overlays[0].textContent = settings.overlayContent;
+        overlays[0].style.color = settings.overlayColor;
+        overlays[0].style.fontSize = settings.overlaySize + "em";
+      }
     }
 
     // Load settings from Firestore for a given UID
@@ -515,10 +571,16 @@
       }
     }
 
-    // Clear selection when clicking outside any draggable element
-    document.addEventListener('click', e => {
-      if(!e.target.classList.contains("draggable")) {
-        clearSelection();
+    // For viewers, delay loading heavy assets (like YouTube iframe) for faster perceived load.
+    window.addEventListener("load", () => {
+      if(!isEditable) {
+        setTimeout(() => {
+          // If a bg URL is set and it's YouTube, then load it now.
+          const bgUrl = document.getElementById("bg-url").value.trim();
+          if(bgUrl && /(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(bgUrl)) {
+            applySettings({ bgUrl: bgUrl, blurLevel: document.getElementById("blur-level").value });
+          }
+        }, 500);
       }
     });
   </script>
