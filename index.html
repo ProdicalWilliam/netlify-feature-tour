@@ -26,46 +26,46 @@
       "Proxy"
     ];
 
-    // Get the current path (removing any trailing slash).
-    const path = window.location.pathname.replace(/\/$/, "");
-
-    // Reference to the content div.
     const contentDiv = document.getElementById("content");
 
-    // Function to display the main page with links.
+    // Display the main page with links.
     function displayMainPage() {
       let html = "<h1>Welcome to Dazes.org</h1>";
       html += "<p>Select a name below:</p>";
       html += "<ul>";
       names.forEach(name => {
-        html += `<li><a href="/${name}">${name}</a></li>`;
+        // Use hash routing so the link goes to "#Name"
+        html += `<li><a href="#${name}">${name}</a></li>`;
       });
       html += "</ul>";
       contentDiv.innerHTML = html;
     }
 
-    // Function to display the greeting page for a name.
+    // Display the greeting page for a name.
     function displayNamePage(name) {
-      contentDiv.innerHTML = `<h1>Hello ${name}!</h1><p>Welcome to ${name}'s page on Dazes.org.</p><p><a href="/">Back to main page</a></p>`;
+      contentDiv.innerHTML = `<h1>Hello ${name}!</h1>
+        <p>Welcome to ${name}'s page on Dazes.org.</p>
+        <p><a href="#">Back to main page</a></p>`;
     }
 
-    // Function to display a custom 404 message.
-    function displayNotFound() {
-      contentDiv.innerHTML = `<h1>404</h1><p>dazes.org could not find this link? Did you input it correctly?</p><p><a href="/">Back to main page</a></p>`;
-    }
-
-    // Check the URL path.
-    if (path === "" || path === "/index.html") {
-      displayMainPage();
-    } else {
-      // Remove the leading "/" and decode the URI.
-      const nameFromUrl = decodeURIComponent(path.substring(1));
-      if (names.includes(nameFromUrl)) {
-        displayNamePage(nameFromUrl);
+    // Router function.
+    function route() {
+      // Get the hash value (without the '#' character).
+      const hash = window.location.hash.substring(1);
+      
+      // If no hash or the hash doesn't match any name, show the main page.
+      if (!hash || !names.includes(hash)) {
+        displayMainPage();
       } else {
-        displayNotFound();
+        displayNamePage(hash);
       }
     }
+
+    // Listen for hash changes (when the URL changes after clicking a link).
+    window.addEventListener("hashchange", route);
+
+    // Call the router on initial load.
+    route();
   </script>
 </body>
 </html>
