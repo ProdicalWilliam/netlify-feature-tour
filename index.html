@@ -31,7 +31,7 @@
       background-size: cover;
       background-position: center;
     }
-    #bg-video, #bg-iframe {
+    #bg-video {
       position: absolute;
       top: 0;
       left: 0;
@@ -40,13 +40,10 @@
       object-fit: cover;
       border: none;
     }
-    /* Ensure YouTube iframe/video sits behind content */
-    #bg-iframe {
-      z-index: 0;
-    }
-    #bg-video {
-      z-index: 0;
-    }
+    /* Hide video controls */
+    #bg-video::-webkit-media-controls { display:none !important; }
+    #bg-video::-moz-media-controls { display:none !important; }
+    
     /* Background audio */
     #bg-audio {
       display: none;
@@ -170,13 +167,15 @@
   <!-- Background container -->
   <div id="bg-container">
     <div id="bg-image"></div>
-    <video id="bg-video" autoplay loop playsinline></video>
-    <!-- The YouTube iframe now uses additional parameters to minimize UI elements.
-         Note: Blocking ads is not officially supported. -->
-    <iframe id="bg-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <!-- The MP4 video element -->
+    <video id="bg-video" autoplay loop playsinline muted>
+      <!-- Source will be set dynamically -->
+    </video>
   </div>
-  <!-- Background audio -->
-  <audio id="bg-audio" loop></audio>
+  <!-- Background audio (also using an MP4 if needed) -->
+  <audio id="bg-audio" loop>
+    <!-- Source will be set dynamically -->
+  </audio>
   <!-- Draggable overlay text container (holds one or more overlay texts) -->
   <div id="overlay-container">
     <div class="overlay-text" data-index="0">Drag me around!</div>
@@ -189,10 +188,10 @@
   <!-- Sidebar Editor Panel -->
   <div id="sidebar">
     <h2>Customize & Share</h2>
-    <label for="bg-url">Background Image/Video/YouTube URL</label>
+    <label for="bg-url">Background MP4 URL</label>
     <input type="url" id="bg-url" placeholder="http://...">
     
-    <label for="bg-audio-url">Background Audio URL</label>
+    <label for="bg-audio-url">Background Audio MP4 URL</label>
     <input type="url" id="bg-audio-url" placeholder="http://...">
     
     <label for="blur-level">Blur Level (px)</label>
@@ -248,10 +247,13 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Determine the "site" id from the query parameter (for viewer vs editor separation)
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteID = urlParams.get("site") || null;
+
     // Global variables for editor and history
     let currentUID = null;
-    let viewUID = null;
-    let isEditable = false;
+    let isEditable = false; // editable only if logged in AND siteID matches currentUID (or meets your criteria)
     let undoStack = [];
     let redoStack = [];
     let selectedElement = null;
@@ -261,24 +263,33 @@
       alert("You're a viewer!");
     }
 
-    // If not logged in, redirect to login.html (or, for demo, set isEditable false)
+    // Determine mode after auth state is known
     auth.onAuthStateChanged(user => {
-      if (!user) {
-        // For viewers, we want faster load and disable sidebar features
-        isEditable = false;
-        viewUID = "viewer";
-        document.getElementById("toggle-sidebar").style.display = "none";
-      } else {
+      if (user) {
         currentUID = user.uid;
-        viewUID = currentUID;
-        isEditable = true;
-        document.getElementById("toggle-sidebar").style.display = "block";
-        db.collection("users").doc(currentUID).get().then(doc => {
-          if (doc.exists) {
-            document.getElementById("welcome-message").textContent = "Welcome to " + (doc.data().websiteName || "Your Site") + "!";
-          }
-        });
-        loadSettingsForUID(currentUID);
+        // If a siteID is provided and matches the user's UID, allow editing.
+        // Otherwise, disable editing (so viewer sees only their designated content)
+        if (siteID && siteID === currentUID) {
+          isEditable = true;
+          document.getElementById("toggle-sidebar").style.display = "block";
+          loadSettingsForSite(siteID);
+        } else if (!siteID) {
+          // No site parameter: default to user's own site.
+          isEditable = true;
+          loadSettingsForSite(currentUID);
+        } else {
+          // Site parameter provided but does not match current user's UID.
+          isEditable = false;
+          loadSettingsForSite(siteID);
+          document.getElementById("toggle-sidebar").style.display = "none";
+        }
+      } else {
+        // Not logged in: viewer mode using the siteID if provided.
+        isEditable = false;
+        if (siteID) {
+          loadSettingsForSite(siteID);
+        }
+        document.getElementById("toggle-sidebar").style.display = "none";
       }
     });
 
@@ -286,12 +297,6 @@
     function recordAction(action) {
       undoStack.push(action);
       redoStack = [];
-    }
-
-    // Query parameter helper
-    function getQueryParam(param) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(param);
     }
 
     // Make an element draggable and record move actions
@@ -463,6 +468,7 @@
     // Generate viewer link button: creates a shareable link (editor options removed)
     document.getElementById("generate-viewer").addEventListener("click", () => {
       const url = new URL(window.location.href);
+      // Remove any editor-specific parameters.
       url.searchParams.delete("editor");
       navigator.clipboard.writeText(url.toString()).then(() => {
         document.getElementById("viewer-link").style.display = "block";
@@ -483,8 +489,10 @@
         overlayColor: document.getElementById("overlay-color").value,
         overlaySize: parseFloat(document.getElementById("overlay-size").value) || 2
       };
+      // Save using the siteID (or currentUID if siteID is not provided)
+      const saveID = siteID || currentUID;
       try {
-        await db.collection("userSettings").doc(viewUID).set(settings);
+        await db.collection("userSettings").doc(saveID).set(settings);
         applySettings(settings);
         alert("Settings saved!");
       } catch (err) {
@@ -503,43 +511,33 @@
       }
     });
 
-    // Apply settings to the page, including handling YouTube background.
+    // Apply settings to the page, including handling background MP4 video and audio.
     function applySettings(settings) {
       document.getElementById("bg-container").style.filter = "blur(" + settings.blurLevel + "px)";
       if(settings.bgUrl) {
-        // Check for YouTube URL and embed with reduced UI and loop.
-        if(/(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(settings.bgUrl)) {
-          let videoID = "";
-          const ytMatch = settings.bgUrl.match(/(?:youtu\.be\/|v=|watch\?v=)([^&]+)/);
-          if(ytMatch) videoID = ytMatch[1];
-          // The embed parameters include:
-          // - controls=0, modestbranding=1, rel=0 to reduce UI
-          // - autoplay=1, loop=1 to autoplay and loop
-          // - playlist parameter to allow looping
-          // - mute removed in attempt to load unmuted (though browsers may override)
-          const iframeURL = "https://www.youtube.com/embed/" + videoID +
-            "?controls=0&modestbranding=1&rel=0&autoplay=1&loop=1&playlist=" + videoID + "&iv_load_policy=3";
-          document.getElementById("bg-iframe").src = iframeURL;
-          document.getElementById("bg-iframe").style.display = "block";
-          document.getElementById("bg-video").style.display = "none";
-          document.getElementById("bg-image").style.backgroundImage = "";
-        }
-        // Check if it's a direct video file
-        else if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
+        // If it's an MP4 file (from Mediafire or elsewhere), load it as the video source.
+        if(/\.(mp4|webm|ogg)(\?.*)?$/i.test(settings.bgUrl)) {
           const video = document.getElementById("bg-video");
           video.src = settings.bgUrl;
           video.style.display = "block";
           video.play();
+          // Prevent pausing: if video is paused, play it immediately.
+          video.addEventListener("pause", () => {
+            setTimeout(() => {
+              if(video.paused) video.play();
+            }, 50);
+          });
+          // Hide any background image.
           document.getElementById("bg-image").style.backgroundImage = "";
-          document.getElementById("bg-iframe").style.display = "none";
         } else {
+          // Otherwise, assume it is an image.
           document.getElementById("bg-image").style.backgroundImage = "url(" + settings.bgUrl + ")";
           document.getElementById("bg-video").style.display = "none";
-          document.getElementById("bg-iframe").style.display = "none";
         }
       }
       if(settings.bgAudioUrl) {
         const audio = document.getElementById("bg-audio");
+        // If the URL is an MP4, the browser will play the audio track.
         audio.src = settings.bgAudioUrl;
         audio.play();
       }
@@ -552,10 +550,10 @@
       }
     }
 
-    // Load settings from Firestore for a given UID
-    async function loadSettingsForUID(uid) {
+    // Load settings from Firestore for a given siteID
+    async function loadSettingsForSite(id) {
       try {
-        const doc = await db.collection("userSettings").doc(uid).get();
+        const doc = await db.collection("userSettings").doc(id).get();
         if(doc.exists) {
           const settings = doc.data();
           document.getElementById("bg-url").value = settings.bgUrl || "";
@@ -571,13 +569,12 @@
       }
     }
 
-    // For viewers, delay loading heavy assets (like YouTube iframe) for faster perceived load.
+    // For viewers, delay loading heavy assets (like the video) for faster perceived load.
     window.addEventListener("load", () => {
       if(!isEditable) {
         setTimeout(() => {
-          // If a bg URL is set and it's YouTube, then load it now.
           const bgUrl = document.getElementById("bg-url").value.trim();
-          if(bgUrl && /(youtu\.be\/|youtube\.com\/watch\?v=)/i.test(bgUrl)) {
+          if(bgUrl && /\.(mp4|webm|ogg)/i.test(bgUrl)) {
             applySettings({ bgUrl: bgUrl, blurLevel: document.getElementById("blur-level").value });
           }
         }, 500);
