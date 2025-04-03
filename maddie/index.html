@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Spotify</title>
-  <!-- Font: Roboto or choose another "cool" font -->
+  <title>Maddie's Spotify-Style Login</title>
+  <!-- Font: Montserrat for a cleaner look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome CDN for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
         integrity="sha512-dO4wKQ9rj5mDIFkN27xKVJZvhwkX+F9ogWdZw5EiN+KJJxD3SWyoZxum7VDa3WjUIpFRL7YqZcZz8+1K+4C6sA==" 
@@ -17,7 +17,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Roboto', Arial, sans-serif; /* Using the "cool" font */
+      font-family: 'Montserrat', Arial, sans-serif;
     }
     html, body {
       width: 100%;
@@ -150,7 +150,7 @@
     .remember-me {
       display: flex;
       align-items: center;
-      justify-content: space-between; /* So they don't overlap */
+      justify-content: space-between;
       margin-bottom: 1em;
       opacity: 0;
       animation: slideUp 1s ease forwards;
@@ -174,6 +174,7 @@
     .forgot-pass:hover {
       text-decoration: underline;
     }
+    /* Dazes button now has no animation */
     .btn-login {
       width: 100%;
       background-color: #1ed760;
@@ -184,9 +185,8 @@
       font-size: 1em;
       font-weight: bold;
       cursor: pointer;
-      opacity: 0;
-      animation: popIn 0.8s ease forwards;
-      animation-delay: 1s;
+      /* Remove the pop-in animation for dazes button */
+      opacity: 1;
     }
     .btn-login:hover {
       background-color: #1fdf64;
@@ -218,7 +218,8 @@
     /* ----------------------- */
     #black-page {
       background-color: rgba(0,0,0,0.9);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(5px);
+      /* Removed extra blur so that the background image has ~35% blur effect */
       width: 100%;
       height: 100%;
       display: flex;
@@ -249,7 +250,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center / cover;
+      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
+      filter: blur(5px); /* Apply background blur */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -263,6 +265,7 @@
       display: flex;
       align-items: center;
       gap: 20px;
+      filter: none; /* Ensure the final container is sharp over the blurred background */
     }
     /* Discord widget container */
     #discord-container {
@@ -272,7 +275,7 @@
       border: 1px solid #fff;
       border-radius: 8px;
       animation: popIn 1s ease forwards;
-      animation-delay: 0.7s;
+      animation-delay: 0s; /* No delay so that animation plays immediately */
     }
     /* Info panel (hidden by default) */
     #info-container {
@@ -286,15 +289,37 @@
       flex-direction: column;
       align-items: center;
       box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      position: relative;
     }
-    #info-container img.avatar {
+    /* Banner behind avatar container */
+    .avatar-banner {
+      width: 100%;
+      height: 100px;
+      background: url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center/cover;
+      border-top-left-radius: 13px;
+      border-top-right-radius: 13px;
+      position: relative;
+    }
+    /* Avatar positioned to overlap banner */
+    #avatar-container {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 128px;
       height: 128px;
-      border-radius: 50%;
       border: 3px solid #fff;
-      margin-bottom: 15px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #000;
+    }
+    #avatar-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     #info-container h2 {
+      margin-top: 100px; /* leave space for the overlapping avatar */
       margin-bottom: 10px;
       font-size: 1.4em;
       color: #1ed760;
@@ -305,13 +330,12 @@
       text-align: center;
       line-height: 1.5;
     }
-    /* Discord banner preview */
-    #info-container .banner-preview {
-      width:100%;
-      height:100px;
-      background:url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center/cover;
-      border-radius:8px;
-      margin:10px 0;
+    /* Unicode text for bio */
+    .unicode-text {
+      font-size: 0.9em;
+      margin: 8px 0;
+      text-align: center;
+      line-height: 1.4;
     }
     /* Additional link to advertise the server */
     .advertise-link {
@@ -321,28 +345,37 @@
     }
     /* Toggle button(s) for switching views */
     .toggle-btn {
-      background: rgba(255, 255, 255, 0.8);
+      background: #C71585; /* Dark pink */
       border: none;
       border-radius: 50%;
       width: 40px;
       height: 40px;
       cursor: pointer;
-      position: absolute;
-      right: -50px;
-      top: 50%;
-      transform: translateY(-50%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2em;
-      color: #000;
+      color: #fff;
       transition: background 0.3s ease, transform 0.3s ease;
     }
     .toggle-btn:hover {
-      background: rgba(255, 255, 255, 1);
-      transform: translateY(-50%) scale(1.05);
+      background: #b10e70;
+      transform: scale(1.05);
     }
-    /* "Go back home" button styling */
+    /* Position toggle buttons on opposite sides */
+    #show-info-btn {
+      position: absolute;
+      left: -50px; /* For Discord widget, place on left */
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #show-widget-btn {
+      position: absolute;
+      right: -50px; /* For info card, place on right */
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    /* "Go back home" button styling on info panel only */
     .go-home-btn {
       margin-top: 10px;
       padding: 0.6em 1.2em;
@@ -422,8 +455,8 @@
         </label>
         <a href="#" class="forgot-pass">Forgot your password?</a>
       </div>
-      <!-- Dazes Button -->
-      <button class="btn-login pop-in" id="dazes-btn">Dazes</button>
+      <!-- Dazes Button (static, no animation) -->
+      <button class="btn-login" id="dazes-btn">Dazes</button>
       <div class="signup">
         Don't have an account? <a href="#">Sign up for Spotify</a>
       </div>
@@ -431,15 +464,12 @@
     <div class="copyright slide-up">© 2025 Spotify AB William</div>
   </div>
 
-  <!-- 2) Black Wine Page -->
+  <!-- 2) Black Wine Page (Back-to-home button removed) -->
   <div id="black-page" class="hidden">
     <div class="black-container">
-      <!-- Forced Wine Glass Image with direct link -->
+      <!-- Wine Glass Image -->
       <img src="https://media.discordapp.net/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&=&format=webp&quality=lossless&width=365&height=365" 
            alt="Wine Glass" id="cup-image">
-      <br>
-      <!-- Go back to home button -->
-      <button class="go-home-btn" id="back-home-from-black">Go Back to Home</button>
     </div>
   </div>
 
@@ -452,23 +482,27 @@
       <!-- Discord Widget Container -->
       <div id="discord-container">
         <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-        <!-- Toggle button to show info panel -->
+        <!-- Toggle button to show info panel (placed on left side) -->
         <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
       </div>
       <!-- Info Panel (initially hidden) -->
       <div id="info-container">
-        <img class="avatar" src="https://cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07?size=1024" alt="Avatar">
+        <!-- Banner & Avatar container -->
+        <div class="avatar-banner"></div>
+        <div id="avatar-container">
+          <img src="https://cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07?size=1024" alt="Avatar">
+        </div>
         <h2>iluvmads</h2>
-        <!-- Updated to simpler text -->
+        <!-- Updated bio info -->
         <p><strong>Account Created:</strong> 2021</p>
         <p><strong>Account Age:</strong> 3 years</p>
-        <!-- Use the Discord banner as a background image in a small preview -->
-        <div class="banner-preview"></div>
+        <!-- Custom Unicode art added -->
+        <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚　 ✩₊˚.   ☾      ⋆      ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
         <!-- Advertise the Discord server -->
         <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
-        <!-- Button to go back to widget view -->
-        <button class="toggle-btn" id="show-widget-btn" title="Show Widget" style="position: static; margin-top: 10px;"><i class="fas fa-arrow-left"></i></button>
-        <!-- Go back to home button on final page -->
+        <!-- Toggle button to go back to Discord widget (placed on right side) -->
+        <button class="toggle-btn" id="show-widget-btn" title="Show Widget"><i class="fas fa-arrow-left"></i></button>
+        <!-- "Go back home" button on info panel -->
         <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
     </div>
@@ -489,8 +523,7 @@
       const showInfoBtn = document.getElementById('show-info-btn');
       const showWidgetBtn = document.getElementById('show-widget-btn');
 
-      // "Go back home" buttons
-      const backHomeFromBlack = document.getElementById('back-home-from-black');
+      // "Go back home" button on info panel
       const backHomeFromInfo = document.getElementById('back-home-from-info');
 
       // Function to show a page with fade-in
@@ -510,34 +543,21 @@
 
       // When "Dazes" is clicked:
       dazesBtn.addEventListener('click', () => {
-        // Start audio playback on user interaction
         audioElement.play().catch(err => {
           console.error("Audio playback failed:", err);
         });
-        // Fade out login page, show black page
         hidePage(spotifyPage);
         setTimeout(() => {
           showPage(blackPage);
         }, 500);
       });
 
-      // When the wine glass is clicked => go to cozy page
+      // When the wine glass is clicked, transition to cozy page
       cupImage.addEventListener('click', () => {
         hidePage(blackPage);
         setTimeout(() => {
           showPage(cozyPage);
           startBrainRain();
-        }, 500);
-      });
-
-      // Go back to Home from black page
-      backHomeFromBlack.addEventListener('click', () => {
-        hidePage(blackPage);
-        setTimeout(() => {
-          // Show the Spotify login page
-          spotifyPage.classList.remove('hidden');
-          spotifyPage.style.opacity = 1;
-          spotifyPage.style.pointerEvents = 'all';
         }, 500);
       });
 
@@ -552,7 +572,7 @@
         discordContainer.style.display = 'block';
       });
 
-      // Go back home from info container
+      // Go back home from info panel
       backHomeFromInfo.addEventListener('click', () => {
         hidePage(cozyPage);
         setTimeout(() => {
@@ -569,7 +589,6 @@
           createBrain(container);
         }, 500);
       }
-
       function createBrain(container) {
         const brain = document.createElement('div');
         brain.classList.add('brain');
