@@ -52,6 +52,7 @@
       background: rgba(20, 0, 30, 0.7);
       border: 2px solid rgba(255, 255, 255, 0.2);
       padding: 30px;
+      padding-top: 80px; /* Added space for avatar */
       border-radius: 20px;
       text-align: center;
       z-index: 3;
@@ -62,6 +63,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin-top: 40px; /* Added space for avatar to sit above */
     }
     
     .overlay.visible {
@@ -90,18 +92,41 @@
       letter-spacing: 0.5px;
     }
     
+    /* Website link styling */
+    .website-link {
+      margin-top: 15px;
+      color: #bb86fc;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
+    }
+    
+    .website-link:hover {
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    }
+    
     /* Discord avatar styling */
     .avatar {
       width: 128px;
       height: 128px;
       border-radius: 50%;
       border: 3px solid rgba(255, 255, 255, 0.8);
-      margin-bottom: -64px; /* Half height to center it on the box border */
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
       opacity: 0;
       transition: all 0.8s ease;
-      position: relative;
+      position: absolute;
+      top: 0;
       z-index: 4;
+      cursor: pointer;
+    }
+    
+    .avatar:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     
     .avatar.visible {
@@ -208,6 +233,7 @@
         <div class="info-row">Member since June 2020</div>
         <div class="info-row">Account age: 4+ years</div>
         <div class="info-row">EST timezone</div>
+        <a href="https://dazes.org/#logann" class="website-link" target="_blank">dazes.org/#logann</a>
       </div>
     </div>
   </div>
