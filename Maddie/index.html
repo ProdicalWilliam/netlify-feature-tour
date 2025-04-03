@@ -1,1 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Spotify</title>
+  <style>
+    /* Global Resets */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; 
+      background: #000;
+    }
+    .hidden {
+      display: none;
+    }
 
+    /* --- 1) Spotify-Style Login Page --- */
+    #spotify-page {
+      background-color: #000; 
+      width: 100%; 
+      height: 100%;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .login-container {
+      background-color: #000; 
+      color: #fff; 
+      width: 360px;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+    }
+    .login-container h1 {
+      font-size: 2em; 
+      margin-bottom: 1em;
+      text-align: center;
+    }
+    .btn-social {
+      width: 100%; 
+      border: 1px solid #fff; 
+      border-radius: 25px;
+      background-color: #000; 
+      color: #fff; 
+      text-align: center; 
+      padding: 0.8em; 
+      margin-bottom: 0.8em; 
+      cursor: default; /* Non-clickable */
+    }
+    /* Make them look “disabled” by changing cursor, but keep the style similar */
+    .btn-social:hover {
+      background-color: #111; 
+    }
+    .or-container {
+      display: flex; 
+      align-items: center; 
+      width: 100%; 
+      margin: 1em 0;
+    }
+    .or-line {
+      flex: 1; 
+      height: 1px; 
+      background-color: #3e3e3e;
+    }
+    .or-text {
+      margin: 0 1em; 
+      font-size: 0.9em; 
+      color: #b3b3b3;
+    }
+    .input-field {
+      width: 100%; 
+      margin-bottom: 1em;
+    }
+    .input-field label {
+      display: block; 
+      font-size: 0.9em; 
+      margin-bottom: 0.4em;
+      color: #b3b3b3;
+    }
+    .input-field input {
+      width: 100%; 
+      padding: 0.8em; 
+      border-radius: 4px; 
+      border: 1px solid #3e3e3e; 
+      background-color: #121212; 
+      color: #fff; 
+      font-size: 1em;
+    }
+    .remember-me {
+      display: flex; 
+      align-items: center; 
+      margin-bottom: 1em;
+    }
+    .remember-me input {
+      margin-right: 0.5em;
+    }
+    .forgot-pass {
+      margin-left: auto; 
+      font-size: 0.9em;
+      color: #b3b3b3; 
+      text-decoration: none;
+    }
+    .forgot-pass:hover {
+      text-decoration: underline;
+    }
+    .btn-login {
+      width: 100%; 
+      background-color: #1ed760; 
+      color: #000; 
+      padding: 0.8em; 
+      border: none; 
+      border-radius: 25px; 
+      font-size: 1em; 
+      font-weight: bold; 
+      cursor: pointer;
+    }
+    .btn-login:hover {
+      background-color: #1fdf64;
+    }
+    .signup {
+      margin-top: 1em; 
+      font-size: 0.9em;
+      color: #b3b3b3;
+    }
+    .signup a {
+      color: #fff; 
+      text-decoration: underline;
+    }
+
+    /* --- 2) Black Page with Cup --- */
+    #black-page {
+      background-color: #000; 
+      width: 100%; 
+      height: 100%;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+    .black-container {
+      position: relative;
+    }
+    .black-container img {
+      max-width: 200px;
+      cursor: pointer;
+    }
+
+    /* --- 3) Cozy Orange Page --- */
+    #cozy-page {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center / cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .cozy-overlay {
+      background: rgba(255, 140, 0, 0.7); /* Cozy orange with transparency */
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
+    .cozy-overlay img {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      margin-bottom: 1em;
+      border: 3px solid #fff;
+    }
+    .cozy-overlay h2 {
+      margin-bottom: 1em;
+      font-size: 2em;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .cozy-overlay p {
+      font-size: 1em;
+      margin: 0.5em 0;
+    }
+
+    /* --- Brain Emoji Rain --- */
+    #brain-rain {
+      pointer-events: none;
+      position: absolute;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .brain {
+      position: absolute;
+      top: -50px;
+      font-size: 2rem;
+      animation: brainFall linear infinite;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+    @keyframes brainFall {
+      0% { 
+        transform: translateY(-50px);
+        opacity: 1;
+      }
+      90% { 
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(110vh); 
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Autoplaying Audio -->
+  <audio id="bg-audio" autoplay loop>
+    <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357194666516414515/FREE_Splurge_Type_Beat_Law__Order.mp3?ex=67ef5187&is=67ee0007&hm=77c8d6a9fa2a3ab860b1dde2b17659d104634344ee49ffa2f62cab238418854f" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- 1) Spotify-Style Login Screen -->
+  <div id="spotify-page">
+    <div class="login-container">
+      <h1>Log in to Spotify</h1>
+
+      <!-- Social Buttons (non-functional) -->
+      <button class="btn-social">Continue with Google</button>
+      <button class="btn-social">Continue with Facebook</button>
+      <button class="btn-social">Continue with Apple</button>
+      <button class="btn-social">Continue with phone number</button>
+
+      <div class="or-container">
+        <div class="or-line"></div>
+        <div class="or-text">or</div>
+        <div class="or-line"></div>
+      </div>
+
+      <!-- Email/Password Fields -->
+      <div class="input-field">
+        <label for="email-username">Email or username</label>
+        <input type="text" id="email-username" placeholder="Email or username" disabled>
+      </div>
+      <div class="input-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password" disabled>
+      </div>
+
+      <!-- Remember me + Forgot password row -->
+      <div class="remember-me" style="width:100%;">
+        <label>
+          <input type="checkbox" disabled> Remember me
+        </label>
+        <a href="#" class="forgot-pass">Forgot your password?</a>
+      </div>
+
+      <!-- Dazes Button (replaces "Log in") -->
+      <button class="btn-login" id="dazes-btn">Dazes</button>
+
+      <!-- Sign Up -->
+      <div class="signup">
+        Don't have an account? <a href="#">Sign up for Spotify</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2) Black Page with Cup -->
+  <div id="black-page" class="hidden">
+    <div class="black-container">
+      <!-- Replace with your desired cup image -->
+      <img 
+        src="https://cdn.discordapp.com/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&format=webp&quality=lossless&width=365&height=365" 
+        alt="Cup" 
+        id="cup-image"
+      >
+    </div>
+  </div>
+
+  <!-- 3) Cozy Orange Page (final) -->
+  <div id="cozy-page" class="hidden">
+    <!-- Brain Rain Container -->
+    <div id="brain-rain"></div>
+
+    <!-- Overlay with Avatar, etc. -->
+    <div class="cozy-overlay">
+      <img 
+        src="https://images-ext-1.discordapp.net/external/BwoJ9B4E060z4oi_5xnJvFCLuJZdBcGt76w6XlOrvcE/%3Fsize%3D512/https/cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07.png?format=webp&quality=lossless&width=207&height=207" 
+        alt="Avatar"
+      >
+      <h2>Welcome to the Cozy Page</h2>
+      <p>Enjoy the vibe!</p>
+    </div>
+  </div>
+
+  <script>
+    const spotifyPage = document.getElementById('spotify-page');
+    const blackPage = document.getElementById('black-page');
+    const cozyPage = document.getElementById('cozy-page');
+    const dazesBtn = document.getElementById('dazes-btn');
+    const cupImage = document.getElementById('cup-image');
+
+    // 1) Click "Dazes" -> Go to black page
+    dazesBtn.addEventListener('click', () => {
+      spotifyPage.classList.add('hidden');
+      blackPage.classList.remove('hidden');
+    });
+
+    // 2) Click Cup -> Go to cozy orange page
+    cupImage.addEventListener('click', () => {
+      blackPage.classList.add('hidden');
+      cozyPage.classList.remove('hidden');
+      startBrainRain();
+    });
+
+    // --- Brain Emoji Rain Logic ---
+    function startBrainRain() {
+      const container = document.getElementById('brain-rain');
+      const totalBrains = 30; // Adjust the number of falling emojis
+      for (let i = 0; i < totalBrains; i++) {
+        createBrain(container);
+      }
+      // Repeatedly create more brains every few seconds if desired
+      setInterval(() => {
+        for (let i = 0; i < totalBrains / 2; i++) {
+          createBrain(container);
+        }
+      }, 3000);
+    }
+
+    function createBrain(container) {
+      const brain = document.createElement('div');
+      brain.classList.add('brain');
+      brain.textContent = '🧠';
+      // Random horizontal start
+      brain.style.left = Math.random() * 100 + 'vw';
+      // Random delay & duration
+      const fallDuration = 4 + Math.random() * 3; // 4-7 seconds
+      brain.style.animationDuration = fallDuration + 's';
+      container.appendChild(brain);
+
+      // Remove from DOM once the animation ends to avoid infinite nodes
+      setTimeout(() => {
+        container.removeChild(brain);
+      }, fallDuration * 1000);
+    }
+  </script>
+</body>
+</html>
