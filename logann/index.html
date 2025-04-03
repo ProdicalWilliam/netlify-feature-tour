@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logann's Page - Midnight Ascent to Neon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+      position: relative;
+    }
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+    .profile-page {
+      position: relative;
+      min-height: 100vh;
+      display: block;
+    }
+    .home-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      z-index: 20;
+      transition: transform 0.3s ease;
+    }
+    .home-link:hover {
+      transform: translateY(-3px);
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+    /* Video background styling */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: blur(10px);
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    /* Profile container styling */
+    .profile-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: opacity 0.6s ease;
+      z-index: 5;
+    }
+    .hidden {
+      display: none;
+    }
+    .avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      transition: all 0.8s ease;
+      margin-bottom: 15px;
+    }
+    .avatar.visible {
+      opacity: 1;
+    }
+    .overlay {
+      background: rgba(20, 0, 30, 0.7);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      opacity: 0;
+      transition: all 0.6s ease;
+    }
+    .overlay.visible {
+      opacity: 1;
+    }
+    .overlay:hover {
+      transform: translateY(-10px);
+    }
+    .overlay h2 {
+      margin: 0.5em 0;
+      font-size: 2em;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .info-row {
+      margin: 8px 0;
+      font-weight: 300;
+      font-size: 1.1em;
+    }
+    .view-counter {
+      margin-top: 10px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #ffeb3b;
+    }
+    /* Intro circle styling */
+    .intro-circle {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(128, 0, 255, 0.7) 0%, rgba(60, 0, 120, 0.7) 70%, rgba(40, 0, 80, 0) 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5);
+      cursor: pointer;
+      animation: circleEntry 1.5s ease-out forwards, circlePulse 2s infinite 1.5s;
+      opacity: 0;
+      transform: translateY(-100vh);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .intro-circle::after {
+      content: "CLICK";
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: white;
+      text-shadow: 0 0 10px white;
+    }
+    @keyframes circleEntry {
+      0% { transform: translateY(-100vh); opacity: 0; }
+      70% { transform: translateY(20px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes circlePulse {
+      0% { box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5); transform: scale(1); }
+      50% { box-shadow: 0 0 60px 25px rgba(128, 0, 255, 0.6); transform: scale(1.05); }
+      100% { box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5); transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <video id="logann-video-bg" class="video-bg" autoplay loop muted playsinline preload="auto">
+    Your browser does not support the video tag.
+  </video>
+  <section id="logann" class="profile-page">
+    <a href="/" class="home-link">← Home</a>
+    <div class="content">
+      <div id="logann-intro-circle" class="intro-circle"></div>
+      <div id="logann-profile-container" class="profile-container hidden">
+        <img src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.webp?size=2048" alt="Discord Avatar" class="avatar" id="logann-avatar">
+        <div class="overlay" id="logann-overlay">
+          <h2>logann999</h2>
+          <div class="info-row">Member since June 2020</div>
+          <div class="info-row">Account age: 4+ years</div>
+          <div class="info-row">EST timezone</div>
+          <div class="info-row view-counter">Views: <span id="logann-view-count">0</span></div>
+          <a href="https://dazes.org" class="website-link">dazes.org</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const logannIntroCircle = document.getElementById('logann-intro-circle');
+      const logannProfileContainer = document.getElementById('logann-profile-container');
+      const logannAvatar = document.getElementById('logann-avatar');
+      const logannOverlay = document.getElementById('logann-overlay');
+      const logannVideoElement = document.getElementById('logann-video-bg');
+      const logannViewCount = document.getElementById('logann-view-count');
+      
+      // Initialize view counter
+      let viewCount = parseInt(localStorage.getItem('logannViewCount') || '0');
+      viewCount++;
+      localStorage.setItem('logannViewCount', viewCount.toString());
+      logannViewCount.textContent = viewCount.toString();
+      
+      // Set video source and preload
+      logannVideoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357132466313498845/King_Von_-_Armed__Dangerous_Official_Video_1_1.mp4?ex=67ef179a&is=67edc61a&hm=b08247dc8d94169ce0d098757cf55222c4fd94233c16b4ffdcfc83a1b7791345";
+      logannVideoElement.preload = "auto";
+      
+      // Intro circle click: reveal profile
+      logannIntroCircle.addEventListener('click', () => {
+        logannIntroCircle.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
+        logannIntroCircle.style.transform = "scale(1.5)";
+        logannIntroCircle.style.opacity = "0";
+        setTimeout(() => {
+          logannIntroCircle.classList.add('hidden');
+          logannProfileContainer.classList.remove('hidden');
+          attemptLogannPlayback();
+          startLogannEffects();
+        }, 500);
+      });
+      
+      function attemptLogannPlayback() {
+        logannVideoElement.play().then(() => {
+          logannVideoElement.playbackRate = 1.0;
+          logannVideoElement.style.opacity = "1";
+          logannVideoElement.muted = false;
+        }).catch(err => {
+          console.error("Playback error:", err);
+        });
+      }
+      
+      function startLogannEffects() {
+        setTimeout(() => {
+          logannAvatar.classList.add('visible');
+          logannOverlay.classList.add('visible');
+        }, 300);
+      }
+      
+      // Auto-trigger intro if URL hash is "#logann" (optional)
+      if (window.location.hash === '#logann') {
+        setTimeout(() => {
+          logannIntroCircle.click();
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
