@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Maddie's Spotify-Style Login</title>
+  <!-- Font: Roboto or choose another "cool" font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome CDN for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
         integrity="sha512-dO4wKQ9rj5mDIFkN27xKVJZvhwkX+F9ogWdZw5EiN+KJJxD3SWyoZxum7VDa3WjUIpFRL7YqZcZz8+1K+4C6sA==" 
@@ -13,7 +17,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', Arial, sans-serif; /* Using the "cool" font */
     }
     html, body {
       width: 100%;
@@ -146,16 +150,23 @@
     .remember-me {
       display: flex;
       align-items: center;
+      justify-content: space-between; /* So they don't overlap */
       margin-bottom: 1em;
       opacity: 0;
       animation: slideUp 1s ease forwards;
       animation-delay: 0.8s;
+      width: 100%;
+    }
+    .remember-me label {
+      display: flex;
+      align-items: center;
+      font-size: 0.9em;
+      color: #b3b3b3;
     }
     .remember-me input {
       margin-right: 0.5em;
     }
     .forgot-pass {
-      margin-left: auto;
       font-size: 0.9em;
       color: #b3b3b3;
       text-decoration: none;
@@ -265,14 +276,16 @@
     }
     /* Info panel (hidden by default) */
     #info-container {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid #1ed760;
       border-radius: 15px;
       padding: 20px;
       color: #fff;
-      width: 300px;
+      width: 340px;
       display: none;
       flex-direction: column;
       align-items: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
     #info-container img.avatar {
       width: 128px;
@@ -283,11 +296,28 @@
     }
     #info-container h2 {
       margin-bottom: 10px;
+      font-size: 1.4em;
+      color: #1ed760;
     }
     #info-container p {
-      font-size: 0.9em;
-      margin: 5px 0;
+      font-size: 1em;
+      margin: 8px 0;
       text-align: center;
+      line-height: 1.5;
+    }
+    /* Discord banner preview */
+    #info-container .banner-preview {
+      width:100%;
+      height:100px;
+      background:url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center/cover;
+      border-radius:8px;
+      margin:10px 0;
+    }
+    /* Additional link to advertise the server */
+    .advertise-link {
+      margin-top: 10px;
+      text-decoration: underline;
+      color: #1ed760;
     }
     /* Toggle button(s) for switching views */
     .toggle-btn {
@@ -306,10 +336,26 @@
       justify-content: center;
       font-size: 1.2em;
       color: #000;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.3s ease;
     }
     .toggle-btn:hover {
       background: rgba(255, 255, 255, 1);
+      transform: translateY(-50%) scale(1.05);
+    }
+    /* "Go back home" button styling */
+    .go-home-btn {
+      margin-top: 10px;
+      padding: 0.6em 1.2em;
+      border-radius: 25px;
+      border: 1px solid #1ed760;
+      background: transparent;
+      color: #1ed760;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .go-home-btn:hover {
+      background: #1ed760;
+      color: #000;
     }
 
     /* ----------------------- */
@@ -391,6 +437,9 @@
       <!-- Forced Wine Glass Image with direct link -->
       <img src="https://media.discordapp.net/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&=&format=webp&quality=lossless&width=365&height=365" 
            alt="Wine Glass" id="cup-image">
+      <br>
+      <!-- Go back to home button -->
+      <button class="go-home-btn" id="back-home-from-black">Go Back to Home</button>
     </div>
   </div>
 
@@ -410,12 +459,17 @@
       <div id="info-container">
         <img class="avatar" src="https://cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07?size=1024" alt="Avatar">
         <h2>iluvmads</h2>
-        <p><strong>Account Created:</strong> 6/10/2021, 10:09:43 PM</p>
-        <p><strong>Account Age:</strong> 3 years, 9 months, 23 days, 15 hours, 17 minutes, 57 seconds</p>
+        <!-- Updated to simpler text -->
+        <p><strong>Account Created:</strong> 2021</p>
+        <p><strong>Account Age:</strong> 3 years</p>
         <!-- Use the Discord banner as a background image in a small preview -->
-        <div style="width:100%; height:100px; background:url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center/cover; border-radius:8px; margin:10px 0;"></div>
+        <div class="banner-preview"></div>
+        <!-- Advertise the Discord server -->
+        <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
         <!-- Button to go back to widget view -->
         <button class="toggle-btn" id="show-widget-btn" title="Show Widget" style="position: static; margin-top: 10px;"><i class="fas fa-arrow-left"></i></button>
+        <!-- Go back to home button on final page -->
+        <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
     </div>
   </div>
@@ -428,18 +482,30 @@
       const dazesBtn = document.getElementById('dazes-btn');
       const cupImage = document.getElementById('cup-image');
       const audioElement = document.getElementById('bg-audio');
-      
+
       // For final page view toggling
       const discordContainer = document.getElementById('discord-container');
       const infoContainer = document.getElementById('info-container');
       const showInfoBtn = document.getElementById('show-info-btn');
       const showWidgetBtn = document.getElementById('show-widget-btn');
 
+      // "Go back home" buttons
+      const backHomeFromBlack = document.getElementById('back-home-from-black');
+      const backHomeFromInfo = document.getElementById('back-home-from-info');
+
       // Function to show a page with fade-in
       function showPage(page) {
         page.classList.remove('hidden');
         page.style.opacity = 1;
         page.style.pointerEvents = 'all';
+      }
+      // Function to hide a page with fade-out
+      function hidePage(page) {
+        page.style.opacity = 0;
+        page.style.pointerEvents = 'none';
+        setTimeout(() => {
+          page.classList.add('hidden');
+        }, 500);
       }
 
       // When "Dazes" is clicked:
@@ -448,21 +514,30 @@
         audioElement.play().catch(err => {
           console.error("Audio playback failed:", err);
         });
-        // Fade out login page
-        spotifyPage.style.opacity = 0;
+        // Fade out login page, show black page
+        hidePage(spotifyPage);
         setTimeout(() => {
-          spotifyPage.style.display = 'none';
           showPage(blackPage);
         }, 500);
       });
 
-      // When the wine glass is clicked:
+      // When the wine glass is clicked => go to cozy page
       cupImage.addEventListener('click', () => {
-        blackPage.style.opacity = 0;
+        hidePage(blackPage);
         setTimeout(() => {
-          blackPage.style.display = 'none';
           showPage(cozyPage);
           startBrainRain();
+        }, 500);
+      });
+
+      // Go back to Home from black page
+      backHomeFromBlack.addEventListener('click', () => {
+        hidePage(blackPage);
+        setTimeout(() => {
+          // Show the Spotify login page
+          spotifyPage.classList.remove('hidden');
+          spotifyPage.style.opacity = 1;
+          spotifyPage.style.pointerEvents = 'all';
         }, 500);
       });
 
@@ -475,6 +550,16 @@
       showWidgetBtn.addEventListener('click', () => {
         infoContainer.style.display = 'none';
         discordContainer.style.display = 'block';
+      });
+
+      // Go back home from info container
+      backHomeFromInfo.addEventListener('click', () => {
+        hidePage(cozyPage);
+        setTimeout(() => {
+          spotifyPage.classList.remove('hidden');
+          spotifyPage.style.opacity = 1;
+          spotifyPage.style.pointerEvents = 'all';
+        }, 500);
       });
 
       // --- Brain Emoji Rain: spawn continuously every 500ms ---
