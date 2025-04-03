@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Maddie's Spotify-Style Login</title>
+  <title>Maddie's Spotify</title>
   <!-- Font: Montserrat for a cleaner look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,7 +139,7 @@
       text-decoration: none;
     }
     .forgot-pass:hover { text-decoration: underline; }
-    /* Dazes Button now fades in */
+    /* Dazes Button fades in */
     .btn-login {
       width: 100%;
       background-color: #1ed760;
@@ -210,16 +210,16 @@
       left: 0;
       width: 100%;
       height: 100%;
+      /* Original background image remains */
       background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.5s ease;
-      /* Center final container */
       display: flex;
       justify-content: center;
       align-items: center;
     }
-    /* Pseudo-element for background blur – applies only to the background image */
+    /* Pseudo-element for background blur (only affects background image) */
     #cozy-page::before {
       content: "";
       position: absolute;
@@ -229,7 +229,7 @@
       z-index: -1;
       opacity: 0.5;
     }
-    /* Final container for widget & info panel */
+    /* Final container (widgets and info panel) is centered and remains sharp */
     .final-container {
       position: relative;
       z-index: 1;
@@ -317,9 +317,12 @@
       color: #1ed760;
     }
     
-    /* Toggle Buttons (dark blue) */
+    /* Toggle Buttons updated: semi-transparent green with glow, same position on both sides */
     .toggle-btn {
-      background: #00008B;
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 255, 0, 0.6);
       border: none;
       border-radius: 50%;
       width: 40px;
@@ -330,15 +333,17 @@
       justify-content: center;
       font-size: 1.2em;
       color: #fff;
-      transition: background 0.3s ease, transform 0.3s ease;
-      margin: 10px;
+      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 10px rgba(0,255,0,0.8);
     }
     .toggle-btn:hover {
-      background: #000066;
+      background: rgba(0, 255, 0, 0.8);
       transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0,255,0,1);
     }
-    /* Place swap buttons inside their containers */
-    #show-info-btn, #show-widget-btn { align-self: center; }
+    /* Both toggle buttons share the same absolute positioning */
+    #show-info-btn,
+    #show-widget-btn { /* Already positioned above */ }
     
     /* "Go Back Home" button on info panel */
     .go-home-btn {
@@ -434,7 +439,7 @@
     <div class="final-container">
       <div id="discord-container">
         <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-        <!-- Button to switch to info panel -->
+        <!-- Toggle button to switch to info panel (positioned at bottom-right) -->
         <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
       </div>
       <div id="info-container">
@@ -447,7 +452,7 @@
         <p><strong>Account Age:</strong> 3 years</p>
         <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚　 ✩₊˚.   ☾      ⋆      ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
         <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
-        <!-- Button to switch back to widget -->
+        <!-- Toggle button to switch back to widget (same position as above) -->
         <button class="toggle-btn" id="show-widget-btn" title="Show Widget"><i class="fas fa-arrow-left"></i></button>
         <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
