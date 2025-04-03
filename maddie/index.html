@@ -202,7 +202,7 @@
     }
     
     /* ----------------------- */
-    /* 3) Cozy Final Page with Discord Widget & Info Panel */
+    /* 3) Cozy Final Page with Info Panel */
     /* ----------------------- */
     #cozy-page {
       position: absolute;
@@ -210,8 +210,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      /* Original background image remains */
-      background: url('https://images-ext-1.discordapp.net/external/EjaMS11_ZNYvotw90A833F-bepz38HI-7Zd52Y75IZ4/%3Fsize%3D4096/https/cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55.png?quality=lossless&format=webp&width=621&height=248') no-repeat center center/cover;
+      /* Updated background image */
+      background: url('https://media.discordapp.net/attachments/1342976939488710727/1357225396570951700/IMG_4995.jpg?ex=67ef6e26&is=67ee1ca6&hm=89c7d973bdd438530cc0c3ebbe69f5999e8a4a3518e1e197ce4e404c18e1321a&=&format=webp&width=622&height=349') no-repeat center center/cover;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.5s ease;
@@ -219,54 +219,52 @@
       justify-content: center;
       align-items: center;
     }
-    /* Pseudo-element for background blur (50px blur, full opacity) */
-    #cozy-page::before {
-      content: "";
+    /* Rain Container covering cozy page */
+    #rain-container {
+      pointer-events: none;
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      filter: blur(50px);
-      z-index: -1;
-      opacity: 1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      overflow: hidden;
     }
-    /* Final container (widgets and info panel) remains sharp and centered */
-    .final-container {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+    /* Raindrop styles */
+    .raindrop {
+      position: absolute;
+      top: -10px;
+      width: 2px;
+      height: 15px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      animation: drop 0.8s linear infinite;
     }
-    /* Discord widget container */
-    #discord-container { position: relative; }
-    .discord-widget {
-      border: 1px solid #fff;
-      border-radius: 8px;
-      animation: popIn 1s ease forwards;
-      box-shadow: 0 0 20px 5px rgba(255,255,255,0.8);
+    @keyframes drop {
+      0% { transform: translateY(0); opacity: 0.8; }
+      80% { opacity: 0.8; }
+      100% { transform: translateY(110vh); opacity: 0; }
     }
-    
-    /* Info Panel with smooth animation and strong green glow */
+    /* Info Panel (updated glow to orange) */
     #info-container {
       background: rgba(0, 0, 0, 0.85);
-      border: 2px solid #1ed760;
+      border: 2px solid #ffa500;
       border-radius: 15px;
       padding: 20px;
       color: #fff;
       width: 340px;
-      display: none;
+      display: flex;
       flex-direction: column;
       align-items: center;
-      /* Strong green glow */
-      box-shadow: 0 0 30px 10px rgba(0,255,0,0.9);
+      /* Orange glow */
+      box-shadow: 0 0 30px 10px rgba(255,165,0,0.9);
       position: relative;
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.5s ease;
+      z-index: 3;
     }
     #info-container.show {
-      display: flex;
       opacity: 1;
       transform: translateY(0);
     }
@@ -299,7 +297,7 @@
       margin-top: 100px;
       margin-bottom: 10px;
       font-size: 1.4em;
-      color: #1ed760;
+      color: #ffa500;
     }
     #info-container p {
       font-size: 1em;
@@ -316,83 +314,31 @@
     .advertise-link {
       margin-top: 10px;
       text-decoration: underline;
-      color: #1ed760;
+      color: #ffa500;
     }
-    
-    /* Toggle Buttons updated:
-       - #show-info-btn is in the Discord widget (top-right)
-       - #show-widget-btn is now positioned at the top-left of the info panel */
-    #show-info-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+    /* Online status indicator */
+    #discord-status {
+      margin-top: 10px;
+      font-size: 0.9em;
+      padding: 5px 10px;
+      border: 1px solid #ffa500;
+      border-radius: 15px;
+      color: #ffa500;
     }
-    #show-widget-btn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-    }
-    .toggle-btn {
-      background: rgba(0, 255, 0, 0.6);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2em;
-      color: #fff;
-      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 0 10px rgba(0,255,0,0.8);
-    }
-    .toggle-btn:hover {
-      background: rgba(0, 255, 0, 0.8);
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(0,255,0,1);
-    }
-    
-    /* "Go Back Home" button on info panel */
+    /* Toggle Button to go back to home */
     .go-home-btn {
       margin-top: 10px;
       padding: 0.6em 1.2em;
       border-radius: 25px;
-      border: 1px solid #1ed760;
+      border: 1px solid #ffa500;
       background: transparent;
-      color: #1ed760;
+      color: #ffa500;
       cursor: pointer;
       transition: background 0.3s ease;
     }
     .go-home-btn:hover {
-      background: #1ed760;
+      background: #ffa500;
       color: #000;
-    }
-    
-    /* ----------------------- */
-    /* Brain Emoji Rain */
-    /* ----------------------- */
-    #brain-rain {
-      pointer-events: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 5;
-    }
-    .brain {
-      position: absolute;
-      top: -50px;
-      font-size: 2rem;
-      animation: brainFall linear infinite;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-    }
-    @keyframes brainFall {
-      0% { transform: translateY(-50px); opacity: 1; }
-      100% { transform: translateY(110vh); opacity: 0; }
     }
   </style>
 </head>
@@ -441,15 +387,12 @@
     </div>
   </div>
   
-  <!-- 3) Cozy Final Page with Discord Widget & Info Panel -->
+  <!-- 3) Cozy Final Page with Info Panel -->
   <div id="cozy-page" class="hidden">
-    <div id="brain-rain"></div>
+    <!-- Rain effect container -->
+    <div id="rain-container"></div>
     <div class="final-container">
-      <div id="discord-container">
-        <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-        <!-- Toggle button inside Discord container (top-right) -->
-        <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
-      </div>
+      <!-- Info Panel only -->
       <div id="info-container">
         <div class="avatar-banner"></div>
         <div id="avatar-container">
@@ -458,10 +401,10 @@
         <h2>iluvmads</h2>
         <p><strong>Account Created:</strong> 2021</p>
         <p><strong>Account Age:</strong> 3 years</p>
-        <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚　 ✩₊˚.   ☾      ⋆      ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
+        <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚ ✩₊˚.   ☾ ⋆ ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
         <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
-        <!-- Toggle button inside info panel (top-left) -->
-        <button class="toggle-btn" id="show-widget-btn" title="Show Widget"><i class="fas fa-arrow-left"></i></button>
+        <!-- Discord online status indicator -->
+        <p id="discord-status">Discord Status: Checking...</p>
         <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
     </div>
@@ -475,11 +418,9 @@
       const dazesBtn = document.getElementById('dazes-btn');
       const cupImage = document.getElementById('cup-image');
       const audioElement = document.getElementById('bg-audio');
-      const discordContainer = document.getElementById('discord-container');
       const infoContainer = document.getElementById('info-container');
-      const showInfoBtn = document.getElementById('show-info-btn');
-      const showWidgetBtn = document.getElementById('show-widget-btn');
       const backHomeFromInfo = document.getElementById('back-home-from-info');
+      const discordStatus = document.getElementById('discord-status');
       
       function showPage(page) {
         page.classList.remove('hidden');
@@ -500,17 +441,14 @@
       
       cupImage.addEventListener('click', () => {
         hidePage(blackPage);
-        setTimeout(() => { showPage(cozyPage); startBrainRain(); }, 500);
-      });
-      
-      showInfoBtn.addEventListener('click', () => {
-        discordContainer.style.display = 'none';
-        infoContainer.classList.add('show');
-      });
-      
-      showWidgetBtn.addEventListener('click', () => {
-        infoContainer.classList.remove('show');
-        discordContainer.style.display = 'block';
+        setTimeout(() => { 
+          showPage(cozyPage); 
+          startRain();
+          // Show the info panel with a slight delay
+          setTimeout(() => { infoContainer.classList.add('show'); }, 500);
+          // Start updating Discord status simulation
+          updateDiscordStatus();
+        }, 500);
       });
       
       backHomeFromInfo.addEventListener('click', () => {
@@ -522,20 +460,38 @@
         }, 500);
       });
       
-      function startBrainRain() {
-        const container = document.getElementById('brain-rain');
-        setInterval(() => { createBrain(container); }, 500);
+      // ------------------
+      // Rain Effect
+      // ------------------
+      function startRain() {
+        const rainContainer = document.getElementById('rain-container');
+        // Create raindrops continuously
+        setInterval(() => { createRaindrop(rainContainer); }, 100);
       }
       
-      function createBrain(container) {
-        const brain = document.createElement('div');
-        brain.classList.add('brain');
-        brain.textContent = '🧠';
-        brain.style.left = Math.random() * 100 + 'vw';
-        const fallDuration = 4 + Math.random() * 3;
-        brain.style.animationDuration = fallDuration + 's';
-        container.appendChild(brain);
-        setTimeout(() => { container.removeChild(brain); }, fallDuration * 1000);
+      function createRaindrop(container) {
+        const drop = document.createElement('div');
+        drop.classList.add('raindrop');
+        // Random horizontal position
+        drop.style.left = Math.random() * 100 + 'vw';
+        // Random animation duration between 0.7s and 1.2s for variety
+        drop.style.animationDuration = (0.7 + Math.random() * 0.5) + 's';
+        container.appendChild(drop);
+        // Remove drop after animation completes
+        setTimeout(() => { drop.remove(); }, parseFloat(drop.style.animationDuration) * 1000);
+      }
+      
+      // ------------------
+      // Simulated Discord Online Status Updater
+      // ------------------
+      function updateDiscordStatus() {
+        // Simulate an API call by randomly setting online/offline every 5 seconds
+        setInterval(() => {
+          const isOnline = Math.random() > 0.3; // 70% chance online
+          discordStatus.textContent = "Discord Status: " + (isOnline ? "Online" : "Offline");
+          discordStatus.style.color = isOnline ? "#32cd32" : "#ff4500";
+          discordStatus.style.borderColor = isOnline ? "#32cd32" : "#ff4500";
+        }, 5000);
       }
     });
   </script>
