@@ -13,10 +13,12 @@
       padding: 0;
       height: 100%;
       font-family: 'Montserrat', sans-serif;
-      background: #ffccff; /* Light pink background */
-      color: #fff;
+      background: url('https://i.pinimg.com/originals/7c/2a/90/7c2a9051c8a66e5b2863001300a878a4.gif');
+      background-size: cover;
+      background-position: center;
       overflow-x: hidden;
       position: relative;
+      color: #fff;
     }
     a { color: #fff; text-decoration: none; }
     .profile-page {
@@ -49,19 +51,6 @@
       text-align: center;
       overflow: hidden;
     }
-    /* Background Video & Audio */
-    .video-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      filter: blur(10px);
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
     /* Profile Container Styling */
     .profile-container {
       position: relative;
@@ -91,7 +80,7 @@
       transform: translateY(-10px);
     }
     .overlay {
-      background: rgba(255, 105, 180, 0.8); /* Hot pink overlay */
+      background: rgba(255, 105, 180, 0.8);
       border: 2px solid rgba(255, 255, 255, 0.2);
       padding: 30px;
       border-radius: 20px;
@@ -126,14 +115,14 @@
       font-weight: bold;
       color: #ffeb3b;
     }
-    /* Minimal Intro Overlay (4 elements only) */
+    /* Intro Overlay */
     .intro-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #ffccff;
+      background: rgba(255, 204, 255, 0.95);
       z-index: 30;
       display: flex;
       flex-direction: column;
@@ -157,27 +146,43 @@
     .intro-button:hover {
       transform: translateY(-5px);
     }
+    /* Emoji Rain */
+    .emoji-rain {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 15;
+    }
+    .emoji {
+      position: absolute;
+      top: -50px;
+      font-size: 24px;
+      opacity: 1;
+      animation: rain 5s linear infinite;
+    }
+    @keyframes rain {
+      0% { top: -50px; opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 110vh; opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <!-- Background Video & Audio -->
-  <video id="vaani-video-bg" class="video-bg" autoplay loop muted playsinline preload="auto">
-    <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357172272963780749/ssstik.io_1743645283173_online-video-cutter.com.mp4?ex=67ef3cac&is=67edeb2c&hm=05cc24a867f4193419c3b1fd9268b0e17562dd3911a5d252c06ae6c3c131f8da&" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+  <!-- Audio -->
   <audio id="vaani-audio" autoplay loop>
-    <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357172272963780749/ssstik.io_1743645283173_online-video-cutter.com.mp4?ex=67ef3cac&is=67edeb2c&hm=05cc24a867f4193419c3b1fd9268b0e17562dd3911a5d252c06ae6c3c131f8da&" type="audio/mp4">
+    <source src="https://cdn.discordapp.com/attachments/1342976939488710727/1357180375155085392/Addison_Rae_-_Diet_Pepsi_Official_Video.mp4?ex=67ef4438&is=67edf2b8&hm=86b23d9740554fda6b89a3fd3501e86cbb30fe11f948e98250fd8d31f3c7c2ef&" type="audio/mp4">
   </audio>
 
-  <!-- Minimal Intro Overlay -->
+  <!-- Emoji Rain Container -->
+  <div class="emoji-rain" id="emoji-rain"></div>
+
+  <!-- Intro Overlay with Hello Kitty Plush -->
   <div id="intro-overlay" class="intro-overlay">
-    <!-- 1. The Guy Image -->
-    <img src="https://static.wikia.nocookie.net/hellokitty/images/0/05/Sanrio_Characters_Dear_Daniel_Image008.png/revision/latest?cb=20170522214217" alt="Guy">
-    <!-- 2. The Girl Image (you can swap this with another link if desired) -->
-    <img src="https://pngimg.com/d/hello_kitty_PNG20.png" alt="Girl">
-    <!-- 3. The Pink House Image -->
-    <img src="https://png.pngtree.com/png-clipart/20230914/original/pngtree-pink-house-vector-png-image_11244446.png" alt="Pink House">
-    <!-- 4. A "Click to Enter" Button -->
+    <img src="https://pngimg.com/d/hello_kitty_PNG16.png" alt="Hello Kitty Plush">
     <button id="intro-button" class="intro-button">Click to Enter</button>
   </div>
 
@@ -199,6 +204,27 @@
   </section>
 
   <script>
+    // Function to create emoji rain effect
+    function spawnEmojis() {
+      const container = document.getElementById('emoji-rain');
+      const emojis = ['🩷', '🌸', '🌷', '🎀'];
+      const numEmojis = 30; // Adjust number of emojis as needed
+
+      for (let i = 0; i < numEmojis; i++) {
+        const emojiEl = document.createElement('span');
+        emojiEl.classList.add('emoji');
+        emojiEl.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        // Set a random horizontal position (0% to 100% width)
+        emojiEl.style.left = Math.random() * 100 + 'vw';
+        // Add a random animation delay for staggered effect
+        emojiEl.style.animationDelay = Math.random() * 5 + 's';
+        // Optionally randomize the animation duration slightly
+        emojiEl.style.animationDuration = (4 + Math.random() * 2) + 's';
+        container.appendChild(emojiEl);
+      }
+    }
+    spawnEmojis();
+
     // When the "Click to Enter" button is pressed, fade out the intro overlay and show main content
     document.getElementById('intro-button').addEventListener('click', () => {
       const introOverlay = document.getElementById('intro-overlay');
@@ -207,7 +233,6 @@
       setTimeout(() => {
         introOverlay.style.display = 'none';
         document.getElementById('vaani').classList.remove('hidden');
-        document.getElementById('vaani-video-bg').style.opacity = '1';
         // Demo view counter update (client-side)
         let viewCount = parseInt(localStorage.getItem('vaaniViewCount') || '0');
         viewCount++;
