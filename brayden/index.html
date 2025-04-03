@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Brayden’s Page</title>
+  <title>Brayden's Page - Midnight Ascent to Neon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
@@ -16,35 +16,31 @@
       background: #000;
       color: #fff;
       overflow-x: hidden;
+      position: relative;
     }
     a {
       color: #fff;
       text-decoration: none;
     }
-    
-    /* Profile page container */
     .profile-page {
       position: relative;
       min-height: 100vh;
       display: block;
     }
-    
     .home-link {
       position: absolute;
       top: 20px;
       left: 20px;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       padding: 10px 15px;
       border-radius: 50px;
       font-weight: 600;
-      z-index: 10;
-      transition: background 0.3s ease;
+      z-index: 20;
+      transition: transform 0.3s ease;
     }
-    
     .home-link:hover {
-      background: rgba(0,0,0,0.8);
+      transform: translateY(-3px);
     }
-    
     .content {
       position: relative;
       z-index: 2;
@@ -56,50 +52,59 @@
       text-align: center;
       overflow: hidden;
     }
-    
-    /* Brayden interactive elements */
+    /* Brayden background using the provided GIF */
+    .profile-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://cdn.discordapp.com/attachments/1261103952293003297/1357153384582353106/ezgif-8e3f696cac0c5b.gif?ex=67ef2b15&is=67edd995&hm=497cb808a3b13616db194d3515ad75c05d17a445d87bc2e7f078315d1de9c31a') no-repeat center center/cover;
+      z-index: 0;
+      filter: blur(5px);
+    }
+    /* Interactive container */
     .interactive-container {
       position: relative;
       width: 100%;
       height: 300px;
       margin-bottom: 20px;
     }
-    
-    /* Draggable key styling */
+    /* Draggable key using new asset */
     .draggable-key {
       position: absolute;
       width: 60px;
       height: 60px;
-      background: gold;
-      border-radius: 50%;
+      background: transparent;
       left: 30px;
       top: 85px;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+      background-image: url('https://static.vecteezy.com/system/resources/previews/027/050/096/non_2x/key-game-assets-3d-illustrations-png.png');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
-    
-    /* Lock target styling */
+    /* Lock target using new asset */
     .lock-target {
       position: absolute;
       width: 70px;
       height: 70px;
-      border: 3px dashed #fff;
-      border-radius: 10px;
+      background: transparent;
       right: 30px;
       top: 85px;
+      background-image: url('https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-cartoon-lock-png-image_6564340.png');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
-    
-    /* Table background styling (decorative) */
+    /* Table background decorative element */
     .table-background {
       position: absolute;
       width: 100%;
       height: 100%;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       top: 0;
       left: 0;
       z-index: -1;
     }
-    
     /* Profile container and overlay styling */
     .profile-container {
       position: relative;
@@ -107,27 +112,24 @@
       flex-direction: column;
       align-items: center;
       transition: opacity 0.5s ease;
+      z-index: 5;
     }
-    
     .hidden {
       display: none;
     }
-    
     .avatar {
       width: 128px;
       height: 128px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.8);
-      box-shadow: 0 0 15px rgba(255,255,255,0.6);
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
       opacity: 0;
-      transition: opacity 0.8s ease;
+      transition: all 0.8s ease;
       margin-bottom: 15px;
     }
-    
     .avatar.visible {
       opacity: 1;
     }
-    
     .overlay {
       background: rgba(20, 0, 30, 0.7);
       border: 2px solid rgba(255, 255, 255, 0.2);
@@ -137,79 +139,49 @@
       max-width: 320px;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
       opacity: 0;
-      transition: opacity 0.6s ease;
+      transition: all 0.6s ease;
     }
-    
     .overlay.visible {
       opacity: 1;
     }
-    
+    .overlay:hover {
+      transform: translateY(-10px);
+    }
     .overlay h2 {
       margin: 0.5em 0;
       font-size: 2em;
       font-weight: 600;
       letter-spacing: 1px;
     }
-    
     .info-row {
       margin: 8px 0;
       font-weight: 300;
       font-size: 1.1em;
     }
-    
     .view-counter {
       margin-top: 10px;
       font-size: 1em;
-      color: #ccc;
+      font-weight: bold;
+      color: #ffeb3b;
     }
-    
-    /* Profile background (could be a video, image, or animated background) */
-    .profile-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://via.placeholder.com/1920x1080/000/333?text=Background') no-repeat center center/cover;
-      opacity: 0;
-      transition: opacity 1s ease;
-      z-index: 0;
-    }
-    
-    /* Floating BAMBI text styling */
+    /* Animated BAMBI text effect (falling behind info card) */
     .bambi-text {
-      position: fixed;
+      position: absolute;
       font-size: 2.5rem;
       font-weight: bold;
       color: #bb86fc;
       text-shadow: 0 0 10px rgba(187, 134, 252, 0.8);
+      z-index: 4;
       pointer-events: none;
-      z-index: 5;
-    }
-    
-    /* Water drop styling */
-    .water-drop {
-      position: fixed;
-      font-size: 24px;
-      user-select: none;
-      z-index: 3;
-      top: -30px;
-      animation-name: waterFall;
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-    }
-    
-    @keyframes waterFall {
-      0% { transform: translateY(0); opacity: 1; }
-      80% { opacity: 0.8; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+      opacity: 0.5;
+      left: 50%;
     }
   </style>
 </head>
 <body>
-  <!-- Brayden's Page -->
+  <div class="profile-background"></div>
   <section id="brayden" class="profile-page">
-    <a href="#home" class="home-link" onclick="showHome()">← Home</a>
+    <a href="/" class="home-link">← Home</a>
     <div class="content">
       <!-- Interactive lock and key elements -->
       <div id="brayden-interactive" class="interactive-container">
@@ -218,7 +190,7 @@
         <div id="brayden-table" class="table-background"></div>
       </div>
       
-      <!-- Profile that appears after unlocking -->
+      <!-- Profile revealed after unlocking -->
       <div id="brayden-profile-container" class="profile-container hidden">
         <img src="https://cdn.discordapp.com/avatars/226217786572144643/a1a1c0e162d1eb1a946b0c2d3afbc8b7?size=1024" alt="Discord Avatar" class="avatar" id="brayden-avatar">
         <div class="overlay" id="brayden-overlay">
@@ -228,47 +200,37 @@
           <div class="info-row">EST timezone</div>
           <div class="info-row view-counter">Views: <span id="brayden-view-count">0</span></div>
         </div>
+        <!-- Animated BAMBI text falling behind the info card -->
+        <div id="bambi-text" class="bambi-text">BAMBI 💚</div>
       </div>
     </div>
     
-    <!-- Background element -->
-    <div id="brayden-background" class="profile-background"></div>
-    
-    <!-- Audio element -->
-    <audio id="brayden-audio" loop preload="auto">
-      <source src="https://jumpshare.com/s/dFVU2T28LNOMltBub0Yj" type="audio/mpeg">
+    <!-- Audio element set to autoplay unmuted -->
+    <audio id="brayden-audio" autoplay loop>
+      <source src="https://screenapp.io/app/#/shared/ATuvkTaC9b" type="audio/mpeg">
     </audio>
   </section>
   
   <script>
-    // Simple home button function (adjust as needed)
-    function showHome() {
-      // For a standalone page, you might redirect to your main site:
-      window.location.href = "index.html";
-    }
-    
-    // Brayden's page functionality
     document.addEventListener('DOMContentLoaded', function() {
+      // Element references
       const braydenInteractive = document.getElementById('brayden-interactive');
       const braydenKey = document.getElementById('brayden-key');
       const braydenLock = document.getElementById('brayden-lock');
       const braydenProfileContainer = document.getElementById('brayden-profile-container');
       const braydenAvatar = document.getElementById('brayden-avatar');
       const braydenOverlay = document.getElementById('brayden-overlay');
-      const braydenBackground = document.getElementById('brayden-background');
       const braydenAudio = document.getElementById('brayden-audio');
       const braydenViewCount = document.getElementById('brayden-view-count');
+      const bambiText = document.getElementById('bambi-text');
       
-      // Initialize view counter from localStorage
+      // Initialize view counter
       let viewCount = parseInt(localStorage.getItem('braydenViewCount') || '0');
       viewCount++;
       localStorage.setItem('braydenViewCount', viewCount.toString());
       braydenViewCount.textContent = viewCount.toString();
       
-      // Add highlight effect to lock (optional, using CSS class or inline style)
-      braydenLock.style.boxShadow = "0 0 15px rgba(255,255,255,0.8)";
-      
-      // Draggable key setup
+      // Draggable key functionality
       let isDragging = false;
       let offsetX, offsetY;
       let unlocked = false;
@@ -322,7 +284,6 @@
         document.removeEventListener('mousemove', drag);
         document.removeEventListener('mouseup', endDrag);
         if (!unlocked) {
-          // Return key to original position
           braydenKey.style.transition = 'left 0.5s ease, top 0.5s ease';
           braydenKey.style.left = '30px';
           braydenKey.style.top = '85px';
@@ -364,10 +325,12 @@
         document.removeEventListener('mouseup', endDrag);
         document.removeEventListener('touchmove', dragTouch);
         document.removeEventListener('touchend', endDragTouch);
-        // Snap key to lock center
+        
+        // Snap key to center of lock
         braydenKey.style.transition = 'all 0.5s ease';
         braydenKey.style.left = (braydenLock.offsetLeft + (braydenLock.offsetWidth / 2) - (braydenKey.offsetWidth / 2)) + 'px';
         braydenKey.style.top = (braydenLock.offsetTop + (braydenLock.offsetHeight / 2) - (braydenKey.offsetHeight / 2)) + 'px';
+        
         setTimeout(() => {
           // Flash effect
           const flash = document.createElement('div');
@@ -378,7 +341,7 @@
           flash.style.height = '100%';
           flash.style.backgroundColor = 'white';
           flash.style.opacity = '0';
-          flash.style.zIndex = '15';
+          flash.style.zIndex = '10';
           flash.style.transition = 'opacity 0.5s ease';
           document.body.appendChild(flash);
           setTimeout(() => { flash.style.opacity = '1'; }, 10);
@@ -391,123 +354,38 @@
               braydenAvatar.classList.add('visible');
               braydenOverlay.classList.add('visible');
             }, 100);
-            braydenBackground.style.opacity = '1';
-            createBambiLoveText();
-            createWaterDrops();
-            attemptPlayAudio();
             setTimeout(() => { flash.remove(); }, 500);
           }, 600);
         }, 500);
       }
       
-      // Floating BAMBI text effect
-      function createBambiLoveText() {
-        const text = document.createElement('div');
-        text.classList.add('bambi-text');
-        text.innerHTML = 'BAMBI <span style="font-size: 0.8em;">💚</span>';
-        text.style.top = '50%';
-        text.style.left = '50%';
-        text.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(text);
-        setTimeout(() => {
-          text.style.transition = 'opacity 2s ease, transform 20s linear';
-          text.style.opacity = '0.3';
-          let angle = 0;
-          const rotationInterval = setInterval(() => {
-            if (document.getElementById('brayden').classList.contains('active') || true) {
-              angle += 0.05;
-              text.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${0.8 + Math.sin(angle / 10) * 0.1})`;
-            } else {
-              clearInterval(rotationInterval);
-              text.remove();
-            }
-          }, 50);
-        }, 100);
-      }
-      
-      // Falling water drops effect
-      function createWaterDrops() {
-        const createDrop = () => {
-          if (document.getElementById('brayden')) {
-            const drop = document.createElement('div');
-            drop.classList.add('water-drop');
-            drop.innerText = '💧';
-            drop.style.left = Math.random() * 100 + 'vw';
-            const animationDuration = 6 + Math.random() * 6;
-            drop.style.animationDuration = animationDuration + 's';
-            setTimeout(() => { drop.remove(); }, animationDuration * 1000);
-            document.body.appendChild(drop);
-            let rotation = 0;
-            const rotateInterval = setInterval(() => {
-              if (document.getElementById('brayden')) {
-                rotation += 2;
-                drop.style.transform = `rotate(${rotation}deg)`;
-              } else {
-                clearInterval(rotateInterval);
-              }
-            }, 50);
+      // Animate the BAMBI text (falling and rotating behind the info card)
+      function animateBambiText() {
+        let posY = -50;
+        let angle = 0;
+        function animate() {
+          posY += 1; // Adjust speed as needed
+          angle += 1; // Adjust rotation speed
+          bambiText.style.top = posY + 'px';
+          bambiText.style.transform = 'translate(-50%, 0) rotate(' + angle + 'deg)';
+          // Continue animation until a set point (or loop)
+          if (posY < braydenOverlay.getBoundingClientRect().bottom) {
+            requestAnimationFrame(animate);
           }
-        };
-        const dropInterval = setInterval(() => {
-          if (document.getElementById('brayden')) {
-            createDrop();
-          }
-        }, 300);
-        window.addEventListener('hashchange', function() {
-          if (window.location.hash !== '#brayden') {
-            clearInterval(dropInterval);
-            document.querySelectorAll('.water-drop').forEach(el => el.remove());
-          }
-        });
-      }
-      
-      // Attempt to play audio (may require user interaction)
-      function attemptPlayAudio() {
-        braydenAudio.volume = 0.3;
-        braydenAudio.play().then(() => {
-          console.log("Audio playing successfully");
-        }).catch(err => {
-          console.error("Audio playback error:", err);
-          const playButton = document.createElement('button');
-          playButton.textContent = '🔊 Play Music';
-          playButton.style.position = 'fixed';
-          playButton.style.bottom = '20px';
-          playButton.style.right = '20px';
-          playButton.style.padding = '10px 15px';
-          playButton.style.backgroundColor = 'rgba(0,0,0,0.7)';
-          playButton.style.color = 'white';
-          playButton.style.border = 'none';
-          playButton.style.borderRadius = '30px';
-          playButton.style.cursor = 'pointer';
-          playButton.style.zIndex = '20';
-          playButton.addEventListener('click', () => {
-            braydenAudio.play();
-            playButton.style.display = 'none';
-          });
-          document.body.appendChild(playButton);
-        });
-      }
-      
-      // Cleanup function when leaving Brayden’s page (if needed)
-      function cleanupBraydenPage() {
-        if (braydenAudio) {
-          braydenAudio.pause();
-          braydenAudio.currentTime = 0;
         }
-        document.querySelectorAll('.water-drop').forEach(el => el.remove());
-        document.querySelectorAll('.bambi-text').forEach(el => el.remove());
+        requestAnimationFrame(animate);
       }
       
-      // Clean up on hash change for home navigation
-      const homeLinks = document.querySelectorAll('.home-link');
-      homeLinks.forEach(link => {
-        link.addEventListener('click', cleanupBraydenPage);
-      });
+      // Start the BAMBI text animation after profile reveal
+      setTimeout(() => {
+        animateBambiText();
+      }, 1200);
       
-      window.addEventListener('hashchange', () => {
-        if (window.location.hash !== '#brayden') {
-          cleanupBraydenPage();
-        }
+      // Ensure audio plays unmuted
+      braydenAudio.muted = false;
+      braydenAudio.volume = 0.3;
+      braydenAudio.play().catch(err => {
+        console.error("Audio playback error:", err);
       });
     });
   </script>
