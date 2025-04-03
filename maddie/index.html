@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Maddie</title>
+  <title>Maddie's Spotify-Style Login</title>
   <!-- Font: Montserrat for a cleaner look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,29 +205,31 @@
     /* 3) Cozy Final Page with Discord Widget & Info Panel */
     /* ----------------------- */
     #cozy-page {
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      /* Keep original background image */
       background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.5s ease;
+      /* Center final container */
       display: flex;
       justify-content: center;
       align-items: center;
     }
-    /* Pseudo-element for background blur (applied only to the background) */
+    /* Pseudo-element for background blur – applies only to the background image */
     #cozy-page::before {
       content: "";
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      filter: blur(10px);
-      /* Adjust this value as needed for your desired blur intensity */
+      filter: blur(50px);
       z-index: -1;
+      opacity: 0.5;
     }
-    /* Center final container (Discord widget, info box, and toggle buttons) */
+    /* Final container for widget & info panel */
     .final-container {
       position: relative;
       z-index: 1;
@@ -315,7 +317,7 @@
       color: #1ed760;
     }
     
-    /* Toggle Buttons (now dark blue) */
+    /* Toggle Buttons (dark blue) */
     .toggle-btn {
       background: #00008B;
       border: none;
@@ -335,7 +337,7 @@
       background: #000066;
       transform: scale(1.05);
     }
-    /* Place the swap button for widget/info within their containers */
+    /* Place swap buttons inside their containers */
     #show-info-btn, #show-widget-btn { align-self: center; }
     
     /* "Go Back Home" button on info panel */
