@@ -8,15 +8,15 @@
   <style>
     /* Global Resets */
     * {
-      margin: 0; 
-      padding: 0; 
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden; 
+      overflow: hidden;
       background: #000;
     }
     .hidden {
@@ -25,10 +25,10 @@
 
     /* --- 1) Spotify-Style Login Page --- */
     #spotify-page {
-      background-color: #000; 
-      width: 100%; 
+      background-color: #000;
+      width: 100%;
       height: 100%;
-      display: flex; 
+      display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -36,112 +36,112 @@
       color: #fff;
     }
     .login-container {
-      background-color: #000; 
-      color: #fff; 
+      background-color: #000;
+      color: #fff;
       width: 360px;
-      display: flex; 
-      flex-direction: column; 
+      display: flex;
+      flex-direction: column;
       align-items: center;
       padding-bottom: 50px;
     }
     .login-container h1 {
-      font-size: 2em; 
+      font-size: 2em;
       margin-bottom: 1em;
       text-align: center;
     }
     .btn-social {
-      width: 100%; 
-      border: 1px solid #fff; 
+      width: 100%;
+      border: 1px solid #fff;
       border-radius: 25px;
-      background-color: #000; 
-      color: #fff; 
-      text-align: center; 
-      padding: 0.8em; 
-      margin-bottom: 0.8em; 
-      cursor: default; /* Non-clickable */
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding: 0.8em;
+      margin-bottom: 0.8em;
+      cursor: default;
     }
     .btn-social i {
       margin-right: 8px;
     }
     .btn-social:hover {
-      background-color: #111; 
+      background-color: #111;
     }
     .or-container {
-      display: flex; 
-      align-items: center; 
-      width: 100%; 
+      display: flex;
+      align-items: center;
+      width: 100%;
       margin: 1em 0;
     }
     .or-line {
-      flex: 1; 
-      height: 1px; 
+      flex: 1;
+      height: 1px;
       background-color: #3e3e3e;
     }
     .or-text {
-      margin: 0 1em; 
-      font-size: 0.9em; 
+      margin: 0 1em;
+      font-size: 0.9em;
       color: #b3b3b3;
     }
     .input-field {
-      width: 100%; 
+      width: 100%;
       margin-bottom: 1em;
     }
     .input-field label {
-      display: block; 
-      font-size: 0.9em; 
+      display: block;
+      font-size: 0.9em;
       margin-bottom: 0.4em;
       color: #b3b3b3;
     }
     .input-field input {
-      width: 100%; 
-      padding: 0.8em; 
-      border-radius: 4px; 
-      border: 1px solid #3e3e3e; 
-      background-color: #121212; 
-      color: #fff; 
+      width: 100%;
+      padding: 0.8em;
+      border-radius: 4px;
+      border: 1px solid #3e3e3e;
+      background-color: #121212;
+      color: #fff;
       font-size: 1em;
     }
     .remember-me {
-      display: flex; 
-      align-items: center; 
+      display: flex;
+      align-items: center;
       margin-bottom: 1em;
     }
     .remember-me input {
       margin-right: 0.5em;
     }
     .forgot-pass {
-      margin-left: auto; 
+      margin-left: auto;
       font-size: 0.9em;
-      color: #b3b3b3; 
+      color: #b3b3b3;
       text-decoration: none;
     }
     .forgot-pass:hover {
       text-decoration: underline;
     }
     .btn-login {
-      width: 100%; 
-      background-color: #1ed760; 
-      color: #000; 
-      padding: 0.8em; 
-      border: none; 
-      border-radius: 25px; 
-      font-size: 1em; 
-      font-weight: bold; 
+      width: 100%;
+      background-color: #1ed760;
+      color: #000;
+      padding: 0.8em;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: bold;
       cursor: pointer;
     }
     .btn-login:hover {
       background-color: #1fdf64;
     }
     .signup {
-      margin-top: 1em; 
+      margin-top: 1em;
       font-size: 0.9em;
       color: #b3b3b3;
     }
     .signup a {
-      color: #fff; 
+      color: #fff;
       text-decoration: underline;
     }
-    /* Copyright (only on this page) */
+    /* Copyright notice on the login page */
     .copyright {
       position: absolute;
       bottom: 10px;
@@ -151,11 +151,11 @@
 
     /* --- 2) Black Page with Wine Glass --- */
     #black-page {
-      background-color: #000; 
-      width: 100%; 
+      background-color: #000;
+      width: 100%;
       height: 100%;
-      display: flex; 
-      align-items: center; 
+      display: flex;
+      align-items: center;
       justify-content: center;
     }
     .black-container {
@@ -166,7 +166,7 @@
       cursor: pointer;
     }
 
-    /* --- 3) Cozy Orange Page (final) --- */
+    /* --- 3) Cozy Orange Final Page --- */
     #cozy-page {
       position: relative;
       width: 100%;
@@ -177,38 +177,27 @@
       justify-content: center;
       overflow: hidden;
     }
+    /* A semi-transparent cozy overlay (if needed) */
     .cozy-overlay {
-      background: rgba(255, 140, 0, 0.7); /* Cozy orange with transparency */
+      background: rgba(255, 140, 0, 0.7);
       border-radius: 20px;
-      padding: 30px;
+      padding: 20px;
       text-align: center;
       color: #fff;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     }
-    .cozy-overlay img {
-      width: 128px;
-      height: 128px;
-      border-radius: 50%;
-      margin-bottom: 1em;
-      border: 3px solid #fff;
-    }
-    .cozy-overlay h2 {
-      margin-bottom: 1em;
-      font-size: 2em;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-    .cozy-overlay p {
-      font-size: 1em;
-      margin: 0.5em 0;
+    /* Discord widget styling adjustments (if needed) */
+    .discord-widget {
+      border: none;
     }
 
     /* --- Brain Emoji Rain --- */
     #brain-rain {
       pointer-events: none;
       position: absolute;
-      top: 0; 
+      top: 0;
       left: 0;
-      width: 100%; 
+      width: 100%;
       height: 100%;
       overflow: hidden;
       z-index: 5;
@@ -230,7 +219,7 @@
         opacity: 1;
       }
       100% { 
-        transform: translateY(110vh); 
+        transform: translateY(110vh);
         opacity: 0;
       }
     }
@@ -238,8 +227,8 @@
 </head>
 <body>
 
-  <!-- Autoplaying Audio -->
-  <audio id="bg-audio" autoplay loop>
+  <!-- Audio Element (no autoplay) -->
+  <audio id="bg-audio" loop>
     <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357194666516414515/FREE_Splurge_Type_Beat_Law__Order.mp3?ex=67ef5187&is=67ee0007&hm=77c8d6a9fa2a3ab860b1dde2b17659d104634344ee49ffa2f62cab238418854f" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
@@ -287,7 +276,7 @@
         Don't have an account? <a href="#">Sign up for Spotify</a>
       </div>
     </div>
-    <!-- Copyright notice (only on this page) -->
+    <!-- Copyright notice (only on the login page) -->
     <div class="copyright">
       © 2025 Spotify AB William
     </div>
@@ -298,45 +287,46 @@
     <div class="black-container">
       <!-- Wine Glass Image (clickable) -->
       <img 
-        src="https://cdn.discordapp.com/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&format=webp&quality=lossless&width=365&height=365" 
+        src="https://cdn.discordapp.com/attachments/1341103952293003297/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&format=webp&quality=lossless&width=365&height=365" 
         alt="Wine Glass" 
         id="cup-image"
       >
     </div>
   </div>
 
-  <!-- 3) Cozy Orange Page (final) -->
+  <!-- 3) Cozy Orange Final Page with Discord Widget -->
   <div id="cozy-page" class="hidden">
-    <!-- Brain Rain Container -->
+    <!-- Brain Emoji Rain Container -->
     <div id="brain-rain"></div>
-
-    <!-- Overlay with Avatar, etc. -->
+    <!-- Embedded Discord Widget -->
     <div class="cozy-overlay">
-      <img 
-        src="https://images-ext-1.discordapp.net/external/BwoJ9B4E060z4oi_5xnJvFCLuJZdBcGt76w6XlOrvcE/%3Fsize%3D512/https/cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07.png?format=webp&quality=lossless&width=207&height=207" 
-        alt="Avatar"
-      >
-      <h2>Welcome to the Cozy Page</h2>
-      <p>Enjoy the vibe!</p>
+      <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
     </div>
   </div>
 
   <script>
-    // Ensure DOM is loaded
+    // Wait for the DOM to load
     document.addEventListener("DOMContentLoaded", function() {
       const spotifyPage = document.getElementById('spotify-page');
       const blackPage = document.getElementById('black-page');
       const cozyPage = document.getElementById('cozy-page');
       const dazesBtn = document.getElementById('dazes-btn');
       const cupImage = document.getElementById('cup-image');
+      const audioElement = document.getElementById('bg-audio');
 
-      // 1) Click "Dazes" -> Go to black page with wine glass
+      // When the user clicks the "Dazes" button:
+      // Start audio playback and transition to the wine page.
       dazesBtn.addEventListener('click', () => {
+        // Start the audio (user interaction enables playback)
+        audioElement.play().catch(err => {
+          console.error("Audio playback failed:", err);
+        });
+        // Transition to black page (wine glass)
         spotifyPage.classList.add('hidden');
         blackPage.classList.remove('hidden');
       });
 
-      // 2) Click Wine Glass -> Go to cozy orange page
+      // When the user clicks the wine glass, transition to final cozy page
       cupImage.addEventListener('click', () => {
         blackPage.classList.add('hidden');
         cozyPage.classList.remove('hidden');
@@ -346,11 +336,11 @@
       // --- Brain Emoji Rain Logic ---
       function startBrainRain() {
         const container = document.getElementById('brain-rain');
-        const totalBrains = 30; // Adjust the number of falling emojis
+        const totalBrains = 30; // Number of emojis to start with
         for (let i = 0; i < totalBrains; i++) {
           createBrain(container);
         }
-        // Repeatedly create more brains every few seconds if desired
+        // Optionally, continue creating brains at intervals
         setInterval(() => {
           for (let i = 0; i < totalBrains / 2; i++) {
             createBrain(container);
@@ -362,14 +352,13 @@
         const brain = document.createElement('div');
         brain.classList.add('brain');
         brain.textContent = '🧠';
-        // Random horizontal start
+        // Random horizontal start position
         brain.style.left = Math.random() * 100 + 'vw';
-        // Random delay & duration
-        const fallDuration = 4 + Math.random() * 3; // 4-7 seconds
+        // Random animation duration (4-7 seconds)
+        const fallDuration = 4 + Math.random() * 3;
         brain.style.animationDuration = fallDuration + 's';
         container.appendChild(brain);
-
-        // Remove from DOM once the animation ends to avoid infinite nodes
+        // Remove the emoji after its animation completes
         setTimeout(() => {
           container.removeChild(brain);
         }, fallDuration * 1000);
