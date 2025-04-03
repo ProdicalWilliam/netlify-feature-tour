@@ -126,7 +126,7 @@
       font-weight: bold;
       color: #ffeb3b;
     }
-    /* Intro Overlay Styles */
+    /* Minimal Intro Overlay (4 elements only) */
     .intro-overlay {
       position: fixed;
       top: 0;
@@ -136,53 +136,26 @@
       background: #ffccff;
       z-index: 30;
       display: flex;
-      align-items: center;
-      justify-content: center;
       flex-direction: column;
-    }
-    .house-container {
-      position: relative;
-      display: flex;
       align-items: center;
       justify-content: center;
+      gap: 20px;
     }
-    .play-house {
-      width: 200px;
+    .intro-overlay img {
+      max-width: 200px;
+    }
+    .intro-button {
+      background: #ff69b4;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      color: #fff;
+      border-radius: 5px;
       cursor: pointer;
-      transition: transform 0.5s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    .play-house:hover {
-      transform: scale(1.1);
-    }
-    .draggable-kitty {
-      position: absolute;
-      width: 80px;
-      cursor: grab;
-      transition: opacity 0.5s ease;
-    }
-    .draggable-kitty.hidden {
-      opacity: 0;
-    }
-    .kitty-left {
-      left: -100px;
-      top: 50%;
-    }
-    .kitty-right {
-      right: -100px;
-      top: 50%;
-    }
-    /* Falling Hello Kitty Images */
-    .falling-kitty {
-      position: fixed;
-      top: -100px;
-      width: 50px;
-      opacity: 0.8;
-      animation: fall linear infinite;
-      z-index: 15;
-    }
-    @keyframes fall {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(110vh); }
+    .intro-button:hover {
+      transform: translateY(-5px);
     }
   </style>
 </head>
@@ -196,19 +169,16 @@
     <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357172272963780749/ssstik.io_1743645283173_online-video-cutter.com.mp4?ex=67ef3cac&is=67edeb2c&hm=05cc24a867f4193419c3b1fd9268b0e17562dd3911a5d252c06ae6c3c131f8da&" type="audio/mp4">
   </audio>
 
-  <!-- Intro Overlay with Play House and Draggable Hello Kitties -->
+  <!-- Minimal Intro Overlay -->
   <div id="intro-overlay" class="intro-overlay">
-    <!-- Load Animation Images -->
-    <img src="https://static.wikia.nocookie.net/hellokitty/images/4/47/Sanrio_Characters_Dear_Daniel_Image009.png/revision/latest/scale-to-width-down/250?cb=20170522214217" alt="Load Animation" style="width:100px; margin-bottom:10px;">
-    <img src="https://pngimg.com/d/hello_kitty_PNG20.png" alt="Load Animation" style="width:100px; margin-bottom:20px;">
-    
-    <div class="house-container">
-      <!-- Draggable Hello Kitty Elements -->
-      <img id="draggable-kitty-left" class="draggable-kitty kitty-left" src="https://pngimg.com/d/hello_kitty_PNG22.png" alt="Hello Kitty">
-      <img id="draggable-kitty-right" class="draggable-kitty kitty-right" src="https://pngimg.com/d/hello_kitty_PNG12.png" alt="Hello Kitty">
-      <!-- Play House Image in the Middle -->
-      <img id="play-house" class="play-house" src="https://png.pngtree.com/png-clipart/20230914/original/pngtree-pink-house-vector-png-image_11244446.png" alt="Pink House">
-    </div>
+    <!-- 1. The Guy Image -->
+    <img src="https://static.wikia.nocookie.net/hellokitty/images/0/05/Sanrio_Characters_Dear_Daniel_Image008.png/revision/latest?cb=20170522214217" alt="Guy">
+    <!-- 2. The Girl Image (you can swap this with another link if desired) -->
+    <img src="https://pngimg.com/d/hello_kitty_PNG20.png" alt="Girl">
+    <!-- 3. The Pink House Image -->
+    <img src="https://png.pngtree.com/png-clipart/20230914/original/pngtree-pink-house-vector-png-image_11244446.png" alt="Pink House">
+    <!-- 4. A "Click to Enter" Button -->
+    <button id="intro-button" class="intro-button">Click to Enter</button>
   </div>
 
   <!-- Main Content -->
@@ -228,100 +198,26 @@
     </div>
   </section>
 
-  <!-- Falling Hello Kitty Images (Spawned via JavaScript) -->
   <script>
-    // Spawn falling Hello Kitty images at random positions and intervals
-    function spawnFallingKitty() {
-      const kittyImages = [
-        'https://pngimg.com/d/hello_kitty_PNG22.png',
-        'https://pngimg.com/d/hello_kitty_PNG12.png',
-        'https://pngfre.com/wp-content/uploads/hello-kitty-43-266x300.png'
-      ];
-      const kitty = document.createElement('img');
-      kitty.src = kittyImages[Math.floor(Math.random() * kittyImages.length)];
-      kitty.className = 'falling-kitty';
-      kitty.style.left = Math.random() * 100 + 'vw';
-      kitty.style.animationDuration = (5 + Math.random() * 5) + 's';
-      document.body.appendChild(kitty);
-      setTimeout(() => { kitty.remove(); }, 10000);
-    }
-    setInterval(spawnFallingKitty, 1000);
-
-    // Intro Overlay Interactions: Drag and Drop to Reveal the Page
-    const introOverlay = document.getElementById('intro-overlay');
-    const playHouse = document.getElementById('play-house');
-    const kittyLeft = document.getElementById('draggable-kitty-left');
-    const kittyRight = document.getElementById('draggable-kitty-right');
-    const vaaniSection = document.getElementById('vaani');
-
-    function enableDrag(draggable) {
-      draggable.addEventListener('mousedown', startDrag);
-      draggable.addEventListener('touchstart', startDrag);
-    }
-    function startDrag(e) {
-      e.preventDefault();
-      const draggie = e.target;
-      let offsetX = (e.clientX || e.touches[0].clientX) - draggie.getBoundingClientRect().left;
-      let offsetY = (e.clientY || e.touches[0].clientY) - draggie.getBoundingClientRect().top;
-      
-      function dragMove(e) {
-        const clientX = e.clientX || e.touches[0].clientX;
-        const clientY = e.clientY || e.touches[0].clientY;
-        draggie.style.left = (clientX - offsetX) + 'px';
-        draggie.style.top = (clientY - offsetY) + 'px';
-        checkDrop(draggie);
-      }
-      function endDrag() {
-        document.removeEventListener('mousemove', dragMove);
-        document.removeEventListener('touchmove', dragMove);
-        document.removeEventListener('mouseup', endDrag);
-        document.removeEventListener('touchend', endDrag);
-      }
-      document.addEventListener('mousemove', dragMove);
-      document.addEventListener('touchmove', dragMove);
-      document.addEventListener('mouseup', endDrag);
-      document.addEventListener('touchend', endDrag);
-    }
-    function checkDrop(draggie) {
-      const houseRect = playHouse.getBoundingClientRect();
-      const kittyRect = draggie.getBoundingClientRect();
-      if (
-        kittyRect.left < houseRect.right &&
-        kittyRect.right > houseRect.left &&
-        kittyRect.top < houseRect.bottom &&
-        kittyRect.bottom > houseRect.top
-      ) {
-        // Fade out the kitty
-        draggie.style.transition = 'opacity 0.5s ease';
-        draggie.style.opacity = '0';
-        setTimeout(() => {
-          draggie.classList.add('hidden');
-          // When both kitties are hidden, hide the intro overlay
-          if (kittyLeft.classList.contains('hidden') && kittyRight.classList.contains('hidden')) {
-            hideIntroOverlay();
-          }
-        }, 500);
-      }
-    }
-    function hideIntroOverlay() {
+    // When the "Click to Enter" button is pressed, fade out the intro overlay and show main content
+    document.getElementById('intro-button').addEventListener('click', () => {
+      const introOverlay = document.getElementById('intro-overlay');
       introOverlay.style.transition = 'opacity 1s ease';
       introOverlay.style.opacity = '0';
       setTimeout(() => {
         introOverlay.style.display = 'none';
-        vaaniSection.classList.remove('hidden');
+        document.getElementById('vaani').classList.remove('hidden');
         document.getElementById('vaani-video-bg').style.opacity = '1';
-        // Update view counter (client-side demo)
+        // Demo view counter update (client-side)
         let viewCount = parseInt(localStorage.getItem('vaaniViewCount') || '0');
         viewCount++;
         localStorage.setItem('vaaniViewCount', viewCount.toString());
         document.getElementById('vaani-view-count').textContent = viewCount;
-        // Reveal profile container animations
+        // Reveal profile animations
         document.getElementById('vaani-avatar').classList.add('visible');
         document.getElementById('vaani-overlay').classList.add('visible');
       }, 1000);
-    }
-    enableDrag(kittyLeft);
-    enableDrag(kittyRight);
+    });
   </script>
 </body>
 </html>
