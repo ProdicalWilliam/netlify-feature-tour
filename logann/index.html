@@ -86,11 +86,13 @@
       transition: all 0.8s ease;
       margin-bottom: 15px;
     }
-    .avatar.visible {
+    .avatar.visible, .avatar:hover {
       opacity: 1;
+      transform: translateY(-10px);
     }
+    /* Purple neon overlay styling */
     .overlay {
-      background: rgba(20, 0, 30, 0.7);
+      background: rgba(128, 0, 128, 0.7);
       border: 2px solid rgba(255, 255, 255, 0.2);
       padding: 30px;
       border-radius: 20px;
@@ -111,6 +113,7 @@
       font-size: 2em;
       font-weight: 600;
       letter-spacing: 1px;
+      color: #ff00ff;
     }
     .info-row {
       margin: 8px 0;
@@ -171,12 +174,10 @@
       <div id="logann-profile-container" class="profile-container hidden">
         <img src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.webp?size=2048" alt="Discord Avatar" class="avatar" id="logann-avatar">
         <div class="overlay" id="logann-overlay">
-          <h2>logann999</h2>
-          <div class="info-row">Member since June 2020</div>
-          <div class="info-row">Account age: 4+ years</div>
-          <div class="info-row">EST timezone</div>
+          <!-- Simplified profile info -->
+          <h2>Prod. William #1337</h2>
+          <div class="info-row">goat</div>
           <div class="info-row view-counter">Views: <span id="logann-view-count">0</span></div>
-          <a href="https://dazes.org" class="website-link">dazes.org</a>
         </div>
       </div>
     </div>
@@ -197,17 +198,17 @@
       localStorage.setItem('logannViewCount', viewCount.toString());
       logannViewCount.textContent = viewCount.toString();
       
-      // Set video source and preload
-      logannVideoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357132466313498845/King_Von_-_Armed__Dangerous_Official_Video_1_1.mp4?ex=67ef179a&is=67edc61a&hm=b08247dc8d94169ce0d098757cf55222c4fd94233c16b4ffdcfc83a1b7791345";
+      // Set video source and preload (Juice WRLD video and audio)
+      logannVideoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357163210058367056/Juice_WRLD_-_Armed__Dangerous_Official_Music_Video.mp4?ex=67ef343c&is=67ede2bc&hm=a0d44a48a63789ee2c372927fa33bd2470f0e9b649c40c9235916cede86d72ab&";
       logannVideoElement.preload = "auto";
       
-      // Intro circle click: reveal profile
+      // Intro circle click: reveal profile and remove circle from DOM
       logannIntroCircle.addEventListener('click', () => {
         logannIntroCircle.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
         logannIntroCircle.style.transform = "scale(1.5)";
         logannIntroCircle.style.opacity = "0";
         setTimeout(() => {
-          logannIntroCircle.classList.add('hidden');
+          logannIntroCircle.remove();  // Remove the click button so it doesn't remain visible
           logannProfileContainer.classList.remove('hidden');
           attemptLogannPlayback();
           startLogannEffects();
