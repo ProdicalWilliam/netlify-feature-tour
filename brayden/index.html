@@ -127,8 +127,9 @@
       transition: all 0.8s ease;
       margin-bottom: 15px;
     }
-    .avatar.visible {
+    .avatar.visible, .avatar:hover {
       opacity: 1;
+      transform: translateY(-10px);
     }
     .overlay {
       background: rgba(20, 0, 30, 0.7);
@@ -164,7 +165,7 @@
       font-weight: bold;
       color: #ffeb3b;
     }
-    /* Animated BAMBI text effect (falling behind info card) */
+    /* Animated BAMBI text effect (falling and rotating behind the info card) */
     .bambi-text {
       position: absolute;
       font-size: 2.5rem;
@@ -175,6 +176,8 @@
       pointer-events: none;
       opacity: 0.5;
       left: 50%;
+      /* Added blur to simulate a 20% blur effect */
+      filter: blur(3px);
     }
   </style>
 </head>
@@ -205,9 +208,9 @@
       </div>
     </div>
     
-    <!-- Audio element set to autoplay unmuted -->
+    <!-- Audio element set to autoplay unmuted using the provided Discord link -->
     <audio id="brayden-audio" autoplay loop>
-      <source src="https://screenapp.io/app/#/shared/ATuvkTaC9b" type="audio/mpeg">
+      <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357164177172598834/Aura_Farming_from_Solo_Leveling.mp3?ex=67ef3522&is=67ede3a2&hm=113ca0de1c0dbc865747ac70946245f32f2e5bc652630fd2d5ded5dd3d955311&" type="audio/mpeg">
     </audio>
   </section>
   
