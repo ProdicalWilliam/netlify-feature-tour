@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brayden’s Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+    
+    /* Profile page container */
+    .profile-page {
+      position: relative;
+      min-height: 100vh;
+      display: block;
+    }
+    
+    .home-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.5);
+      padding: 10px 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      z-index: 10;
+      transition: background 0.3s ease;
+    }
+    
+    .home-link:hover {
+      background: rgba(0,0,0,0.8);
+    }
+    
+    .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    /* Brayden interactive elements */
+    .interactive-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+    
+    /* Draggable key styling */
+    .draggable-key {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: gold;
+      border-radius: 50%;
+      left: 30px;
+      top: 85px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+    
+    /* Lock target styling */
+    .lock-target {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border: 3px dashed #fff;
+      border-radius: 10px;
+      right: 30px;
+      top: 85px;
+    }
+    
+    /* Table background styling (decorative) */
+    .table-background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.05);
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    
+    /* Profile container and overlay styling */
+    .profile-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: opacity 0.5s ease;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(255,255,255,0.6);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      margin-bottom: 15px;
+    }
+    
+    .avatar.visible {
+      opacity: 1;
+    }
+    
+    .overlay {
+      background: rgba(20, 0, 30, 0.7);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    
+    .overlay.visible {
+      opacity: 1;
+    }
+    
+    .overlay h2 {
+      margin: 0.5em 0;
+      font-size: 2em;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    .info-row {
+      margin: 8px 0;
+      font-weight: 300;
+      font-size: 1.1em;
+    }
+    
+    .view-counter {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #ccc;
+    }
+    
+    /* Profile background (could be a video, image, or animated background) */
+    .profile-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://via.placeholder.com/1920x1080/000/333?text=Background') no-repeat center center/cover;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 0;
+    }
+    
+    /* Floating BAMBI text styling */
+    .bambi-text {
+      position: fixed;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #bb86fc;
+      text-shadow: 0 0 10px rgba(187, 134, 252, 0.8);
+      pointer-events: none;
+      z-index: 5;
+    }
+    
+    /* Water drop styling */
+    .water-drop {
+      position: fixed;
+      font-size: 24px;
+      user-select: none;
+      z-index: 3;
+      top: -30px;
+      animation-name: waterFall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    
+    @keyframes waterFall {
+      0% { transform: translateY(0); opacity: 1; }
+      80% { opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Brayden's Page -->
+  <section id="brayden" class="profile-page">
+    <a href="#home" class="home-link" onclick="showHome()">← Home</a>
+    <div class="content">
+      <!-- Interactive lock and key elements -->
+      <div id="brayden-interactive" class="interactive-container">
+        <div id="brayden-key" class="draggable-key"></div>
+        <div id="brayden-lock" class="lock-target"></div>
+        <div id="brayden-table" class="table-background"></div>
+      </div>
+      
+      <!-- Profile that appears after unlocking -->
+      <div id="brayden-profile-container" class="profile-container hidden">
+        <img src="https://cdn.discordapp.com/avatars/226217786572144643/a1a1c0e162d1eb1a946b0c2d3afbc8b7?size=1024" alt="Discord Avatar" class="avatar" id="brayden-avatar">
+        <div class="overlay" id="brayden-overlay">
+          <h2>lostunhinged</h2>
+          <div class="info-row">Member since September 2016</div>
+          <div class="info-row">Account age: 8+ years</div>
+          <div class="info-row">EST timezone</div>
+          <div class="info-row view-counter">Views: <span id="brayden-view-count">0</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Background element -->
+    <div id="brayden-background" class="profile-background"></div>
+    
+    <!-- Audio element -->
+    <audio id="brayden-audio" loop preload="auto">
+      <source src="https://jumpshare.com/s/dFVU2T28LNOMltBub0Yj" type="audio/mpeg">
+    </audio>
+  </section>
+  
+  <script>
+    // Simple home button function (adjust as needed)
+    function showHome() {
+      // For a standalone page, you might redirect to your main site:
+      window.location.href = "index.html";
+    }
+    
+    // Brayden's page functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const braydenInteractive = document.getElementById('brayden-interactive');
+      const braydenKey = document.getElementById('brayden-key');
+      const braydenLock = document.getElementById('brayden-lock');
+      const braydenProfileContainer = document.getElementById('brayden-profile-container');
+      const braydenAvatar = document.getElementById('brayden-avatar');
+      const braydenOverlay = document.getElementById('brayden-overlay');
+      const braydenBackground = document.getElementById('brayden-background');
+      const braydenAudio = document.getElementById('brayden-audio');
+      const braydenViewCount = document.getElementById('brayden-view-count');
+      
+      // Initialize view counter from localStorage
+      let viewCount = parseInt(localStorage.getItem('braydenViewCount') || '0');
+      viewCount++;
+      localStorage.setItem('braydenViewCount', viewCount.toString());
+      braydenViewCount.textContent = viewCount.toString();
+      
+      // Add highlight effect to lock (optional, using CSS class or inline style)
+      braydenLock.style.boxShadow = "0 0 15px rgba(255,255,255,0.8)";
+      
+      // Draggable key setup
+      let isDragging = false;
+      let offsetX, offsetY;
+      let unlocked = false;
+      
+      braydenKey.addEventListener('mousedown', startDrag);
+      braydenKey.addEventListener('touchstart', startDragTouch);
+      
+      function startDrag(e) {
+        if (unlocked) return;
+        isDragging = true;
+        offsetX = e.clientX - braydenKey.getBoundingClientRect().left;
+        offsetY = e.clientY - braydenKey.getBoundingClientRect().top;
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        e.preventDefault();
+      }
+      
+      function startDragTouch(e) {
+        if (unlocked) return;
+        isDragging = true;
+        const touch = e.touches[0];
+        offsetX = touch.clientX - braydenKey.getBoundingClientRect().left;
+        offsetY = touch.clientY - braydenKey.getBoundingClientRect().top;
+        document.addEventListener('touchmove', dragTouch);
+        document.addEventListener('touchend', endDragTouch);
+        e.preventDefault();
+      }
+      
+      function drag(e) {
+        if (!isDragging) return;
+        const left = e.clientX - offsetX;
+        const top = e.clientY - offsetY;
+        braydenKey.style.left = left + 'px';
+        braydenKey.style.top = top + 'px';
+        checkCollision();
+      }
+      
+      function dragTouch(e) {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const left = touch.clientX - offsetX;
+        const top = touch.clientY - offsetY;
+        braydenKey.style.left = left + 'px';
+        braydenKey.style.top = top + 'px';
+        checkCollision();
+        e.preventDefault();
+      }
+      
+      function endDrag() {
+        isDragging = false;
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('mouseup', endDrag);
+        if (!unlocked) {
+          // Return key to original position
+          braydenKey.style.transition = 'left 0.5s ease, top 0.5s ease';
+          braydenKey.style.left = '30px';
+          braydenKey.style.top = '85px';
+          setTimeout(() => { braydenKey.style.transition = ''; }, 500);
+        }
+      }
+      
+      function endDragTouch() {
+        isDragging = false;
+        document.removeEventListener('touchmove', dragTouch);
+        document.removeEventListener('touchend', endDragTouch);
+        if (!unlocked) {
+          braydenKey.style.transition = 'left 0.5s ease, top 0.5s ease';
+          braydenKey.style.left = '30px';
+          braydenKey.style.top = '85px';
+          setTimeout(() => { braydenKey.style.transition = ''; }, 500);
+        }
+      }
+      
+      function checkCollision() {
+        if (unlocked) return;
+        const keyRect = braydenKey.getBoundingClientRect();
+        const lockRect = braydenLock.getBoundingClientRect();
+        if (
+          keyRect.right > lockRect.left &&
+          keyRect.left < lockRect.right &&
+          keyRect.bottom > lockRect.top &&
+          keyRect.top < lockRect.bottom
+        ) {
+          unlockAnimation();
+        }
+      }
+      
+      function unlockAnimation() {
+        if (unlocked) return;
+        unlocked = true;
+        isDragging = false;
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchmove', dragTouch);
+        document.removeEventListener('touchend', endDragTouch);
+        // Snap key to lock center
+        braydenKey.style.transition = 'all 0.5s ease';
+        braydenKey.style.left = (braydenLock.offsetLeft + (braydenLock.offsetWidth / 2) - (braydenKey.offsetWidth / 2)) + 'px';
+        braydenKey.style.top = (braydenLock.offsetTop + (braydenLock.offsetHeight / 2) - (braydenKey.offsetHeight / 2)) + 'px';
+        setTimeout(() => {
+          // Flash effect
+          const flash = document.createElement('div');
+          flash.style.position = 'fixed';
+          flash.style.top = '0';
+          flash.style.left = '0';
+          flash.style.width = '100%';
+          flash.style.height = '100%';
+          flash.style.backgroundColor = 'white';
+          flash.style.opacity = '0';
+          flash.style.zIndex = '15';
+          flash.style.transition = 'opacity 0.5s ease';
+          document.body.appendChild(flash);
+          setTimeout(() => { flash.style.opacity = '1'; }, 10);
+          setTimeout(() => {
+            flash.style.opacity = '0';
+            braydenInteractive.style.opacity = '0';
+            setTimeout(() => { braydenInteractive.style.display = 'none'; }, 500);
+            braydenProfileContainer.classList.remove('hidden');
+            setTimeout(() => {
+              braydenAvatar.classList.add('visible');
+              braydenOverlay.classList.add('visible');
+            }, 100);
+            braydenBackground.style.opacity = '1';
+            createBambiLoveText();
+            createWaterDrops();
+            attemptPlayAudio();
+            setTimeout(() => { flash.remove(); }, 500);
+          }, 600);
+        }, 500);
+      }
+      
+      // Floating BAMBI text effect
+      function createBambiLoveText() {
+        const text = document.createElement('div');
+        text.classList.add('bambi-text');
+        text.innerHTML = 'BAMBI <span style="font-size: 0.8em;">💚</span>';
+        text.style.top = '50%';
+        text.style.left = '50%';
+        text.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(text);
+        setTimeout(() => {
+          text.style.transition = 'opacity 2s ease, transform 20s linear';
+          text.style.opacity = '0.3';
+          let angle = 0;
+          const rotationInterval = setInterval(() => {
+            if (document.getElementById('brayden').classList.contains('active') || true) {
+              angle += 0.05;
+              text.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${0.8 + Math.sin(angle / 10) * 0.1})`;
+            } else {
+              clearInterval(rotationInterval);
+              text.remove();
+            }
+          }, 50);
+        }, 100);
+      }
+      
+      // Falling water drops effect
+      function createWaterDrops() {
+        const createDrop = () => {
+          if (document.getElementById('brayden')) {
+            const drop = document.createElement('div');
+            drop.classList.add('water-drop');
+            drop.innerText = '💧';
+            drop.style.left = Math.random() * 100 + 'vw';
+            const animationDuration = 6 + Math.random() * 6;
+            drop.style.animationDuration = animationDuration + 's';
+            setTimeout(() => { drop.remove(); }, animationDuration * 1000);
+            document.body.appendChild(drop);
+            let rotation = 0;
+            const rotateInterval = setInterval(() => {
+              if (document.getElementById('brayden')) {
+                rotation += 2;
+                drop.style.transform = `rotate(${rotation}deg)`;
+              } else {
+                clearInterval(rotateInterval);
+              }
+            }, 50);
+          }
+        };
+        const dropInterval = setInterval(() => {
+          if (document.getElementById('brayden')) {
+            createDrop();
+          }
+        }, 300);
+        window.addEventListener('hashchange', function() {
+          if (window.location.hash !== '#brayden') {
+            clearInterval(dropInterval);
+            document.querySelectorAll('.water-drop').forEach(el => el.remove());
+          }
+        });
+      }
+      
+      // Attempt to play audio (may require user interaction)
+      function attemptPlayAudio() {
+        braydenAudio.volume = 0.3;
+        braydenAudio.play().then(() => {
+          console.log("Audio playing successfully");
+        }).catch(err => {
+          console.error("Audio playback error:", err);
+          const playButton = document.createElement('button');
+          playButton.textContent = '🔊 Play Music';
+          playButton.style.position = 'fixed';
+          playButton.style.bottom = '20px';
+          playButton.style.right = '20px';
+          playButton.style.padding = '10px 15px';
+          playButton.style.backgroundColor = 'rgba(0,0,0,0.7)';
+          playButton.style.color = 'white';
+          playButton.style.border = 'none';
+          playButton.style.borderRadius = '30px';
+          playButton.style.cursor = 'pointer';
+          playButton.style.zIndex = '20';
+          playButton.addEventListener('click', () => {
+            braydenAudio.play();
+            playButton.style.display = 'none';
+          });
+          document.body.appendChild(playButton);
+        });
+      }
+      
+      // Cleanup function when leaving Brayden’s page (if needed)
+      function cleanupBraydenPage() {
+        if (braydenAudio) {
+          braydenAudio.pause();
+          braydenAudio.currentTime = 0;
+        }
+        document.querySelectorAll('.water-drop').forEach(el => el.remove());
+        document.querySelectorAll('.bambi-text').forEach(el => el.remove());
+      }
+      
+      // Clean up on hash change for home navigation
+      const homeLinks = document.querySelectorAll('.home-link');
+      homeLinks.forEach(link => {
+        link.addEventListener('click', cleanupBraydenPage);
+      });
+      
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash !== '#brayden') {
+          cleanupBraydenPage();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
