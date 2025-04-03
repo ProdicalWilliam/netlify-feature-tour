@@ -1,247 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Vaani</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Audio Play on Enter</title>
   <style>
-    /* Global Styles */
-    html, body {
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
       margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: 'Montserrat', sans-serif;
-      background: url('https://i.pinimg.com/originals/7c/2a/90/7c2a9051c8a66e5b2863001300a878a4.gif');
-      background-size: cover;
-      background-position: center;
-      overflow-x: hidden;
-      position: relative;
-      color: #fff;
     }
-    a { color: #fff; text-decoration: none; }
-    .profile-page {
-      position: relative;
-      min-height: 100vh;
-      display: block;
-    }
-    .home-link {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(255, 182, 193, 0.7);
-      padding: 10px 15px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 20;
-      transition: transform 0.3s ease;
-    }
-    .home-link:hover {
-      transform: translateY(-3px);
-    }
-    .content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
-    /* Profile Container Styling */
-    .profile-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(255, 182, 193, 0.7);
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      transition: opacity 0.6s ease;
-      z-index: 5;
-    }
-    .hidden { display: none; }
-    .avatar {
-      width: 128px;
-      height: 128px;
-      border-radius: 50%;
-      border: 3px solid #fff;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transition: all 0.8s ease;
-      margin-bottom: 15px;
-    }
-    .avatar.visible, .avatar:hover {
-      opacity: 1;
-      transform: translateY(-10px);
-    }
-    .overlay {
-      background: rgba(255, 105, 180, 0.8);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      opacity: 0;
-      transition: all 0.6s ease;
-    }
-    .overlay.visible {
-      opacity: 1;
-    }
-    .overlay:hover {
-      transform: translateY(-10px);
-    }
-    .overlay h2 {
-      margin: 0.5em 0;
-      font-size: 2em;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: #fff;
-    }
-    .info-row {
-      margin: 8px 0;
-      font-weight: 300;
-      font-size: 1.1em;
-      color: #fff;
-    }
-    .view-counter {
-      margin-top: 10px;
-      font-size: 1em;
-      font-weight: bold;
-      color: #ffeb3b;
-    }
-    /* Intro Overlay */
-    .intro-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 204, 255, 0.95);
-      z-index: 30;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-    }
-    .intro-overlay img {
-      max-width: 200px;
-    }
-    .intro-button {
-      background: #ff69b4;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      color: #fff;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-    .intro-button:hover {
-      transform: translateY(-5px);
-    }
-    /* Emoji Rain */
-    .emoji-rain {
-      pointer-events: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 15;
-    }
-    .emoji {
-      position: absolute;
-      top: -50px;
+    .message {
       font-size: 24px;
-      opacity: 1;
-      animation: rain 5s linear infinite;
-    }
-    @keyframes rain {
-      0% { top: -50px; opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 110vh; opacity: 0; }
+      font-family: Arial, sans-serif;
     }
   </style>
 </head>
 <body>
-  <!-- Audio -->
-  <audio id="vaani-audio" autoplay loop>
-    <source src="https://cdn.discordapp.com/attachments/1342976939488710727/1357180375155085392/Addison_Rae_-_Diet_Pepsi_Official_Video.mp4?ex=67ef4438&is=67edf2b8&hm=86b23d9740554fda6b89a3fd3501e86cbb30fe11f948e98250fd8d31f3c7c2ef&" type="audio/mp4">
-  </audio>
-
-  <!-- Emoji Rain Container -->
-  <div class="emoji-rain" id="emoji-rain"></div>
-
-  <!-- Intro Overlay with Hello Kitty Plush -->
-  <div id="intro-overlay" class="intro-overlay">
-    <img src="https://pngimg.com/d/hello_kitty_PNG16.png" alt="Hello Kitty Plush">
-    <button id="intro-button" class="intro-button">Click to Enter</button>
-  </div>
-
-  <!-- Main Content -->
-  <section id="vaani" class="profile-page hidden">
-    <a href="/" class="home-link">← Home</a>
-    <div class="content">
-      <div id="vaani-profile-container" class="profile-container">
-        <img src="https://cdn.discordapp.com/avatars/1009265481921867856/a_66badd0cab886797faf965715e0d98c6?size=1024" alt="Vaani Avatar" class="avatar" id="vaani-avatar">
-        <div class="overlay" id="vaani-overlay">
-          <h2>senicide</h2>
-          <div class="info-row">Account Created: 8/17/2022, 1:00:42 AM</div>
-          <div class="info-row">Account Age: 2 years, 7 months, 17 days, 5 hours, 40 minutes, 9 seconds</div>
-          <div class="info-row">Bio: Hello Kitty lover | Join our Discord: <a href="https://discord.gg/dazes" target="_blank">discord.gg/dazes</a></div>
-          <div class="info-row view-counter">Views: <span id="vaani-view-count">0</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <div class="message">Press Enter to Start Music</div>
+  
+  <!-- Audio element with the new audio link -->
+  <audio id="myAudio" src="https://cdn.discordapp.com/attachments/1351692984831180853/1357220607825281024/Beyonce_-_All_Night_Audio.mp3?ex=67ef69b0&is=67ee1830&hm=c4f3d1ef1790bd1e91b30897c315eb97f199281f6f97c3d3d4e66e0d26106226&" preload="auto"></audio>
+  
   <script>
-    // Function to create emoji rain effect
-    function spawnEmojis() {
-      const container = document.getElementById('emoji-rain');
-      const emojis = ['🩷', '🌸', '🌷', '🎀'];
-      const numEmojis = 30; // Adjust number of emojis as needed
-
-      for (let i = 0; i < numEmojis; i++) {
-        const emojiEl = document.createElement('span');
-        emojiEl.classList.add('emoji');
-        emojiEl.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        // Set a random horizontal position (0% to 100% width)
-        emojiEl.style.left = Math.random() * 100 + 'vw';
-        // Add a random animation delay for staggered effect
-        emojiEl.style.animationDelay = Math.random() * 5 + 's';
-        // Optionally randomize the animation duration slightly
-        emojiEl.style.animationDuration = (4 + Math.random() * 2) + 's';
-        container.appendChild(emojiEl);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const audio = document.getElementById('myAudio');
+        audio.play().catch(function(error) {
+          console.error("Audio playback failed:", error);
+        });
+        // Optionally hide the message after audio starts playing
+        document.querySelector('.message').style.display = 'none';
       }
-    }
-    spawnEmojis();
-
-    // When the "Click to Enter" button is pressed, fade out the intro overlay and show main content
-    document.getElementById('intro-button').addEventListener('click', () => {
-      const introOverlay = document.getElementById('intro-overlay');
-      introOverlay.style.transition = 'opacity 1s ease';
-      introOverlay.style.opacity = '0';
-      setTimeout(() => {
-        introOverlay.style.display = 'none';
-        document.getElementById('vaani').classList.remove('hidden');
-        // Demo view counter update (client-side)
-        let viewCount = parseInt(localStorage.getItem('vaaniViewCount') || '0');
-        viewCount++;
-        localStorage.setItem('vaaniViewCount', viewCount.toString());
-        document.getElementById('vaani-view-count').textContent = viewCount;
-        // Reveal profile animations
-        document.getElementById('vaani-avatar').classList.add('visible');
-        document.getElementById('vaani-overlay').classList.add('visible');
-      }, 1000);
     });
   </script>
 </body>
