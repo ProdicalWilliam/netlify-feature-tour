@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Maddie's Spotify-Style Login</title>
+  <title>Spotify - Maddie</title>
   <!-- Font: Montserrat for a cleaner look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -174,7 +174,7 @@
     .forgot-pass:hover {
       text-decoration: underline;
     }
-    /* Dazes button now has no animation */
+    /* Dazes Button now fades in */
     .btn-login {
       width: 100%;
       background-color: #1ed760;
@@ -185,8 +185,9 @@
       font-size: 1em;
       font-weight: bold;
       cursor: pointer;
-      /* Remove the pop-in animation for dazes button */
-      opacity: 1;
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards;
+      animation-delay: 1s;
     }
     .btn-login:hover {
       background-color: #1fdf64;
@@ -219,7 +220,6 @@
     #black-page {
       background-color: rgba(0,0,0,0.9);
       backdrop-filter: blur(5px);
-      /* Removed extra blur so that the background image has ~35% blur effect */
       width: 100%;
       height: 100%;
       display: flex;
@@ -250,22 +250,27 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
-      filter: blur(5px); /* Apply background blur */
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background-color: #000033; /* Dark blue base color */
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.5s ease;
     }
-    /* Container for toggling between Discord widget and info panel */
+    /* Use a pseudo-element for the background image with 50px blur */
+    #cozy-page::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
+      filter: blur(50px);
+      z-index: -1;
+    }
+    /* Final container remains sharp */
     .final-container {
       position: relative;
       display: flex;
       align-items: center;
       gap: 20px;
-      filter: none; /* Ensure the final container is sharp over the blurred background */
     }
     /* Discord widget container */
     #discord-container {
@@ -275,9 +280,9 @@
       border: 1px solid #fff;
       border-radius: 8px;
       animation: popIn 1s ease forwards;
-      animation-delay: 0s; /* No delay so that animation plays immediately */
+      animation-delay: 0s;
     }
-    /* Info panel (hidden by default) */
+    /* Info panel with smooth animation and hover float */
     #info-container {
       background: rgba(0, 0, 0, 0.85);
       border: 2px solid #1ed760;
@@ -290,6 +295,18 @@
       align-items: center;
       box-shadow: 0 0 15px rgba(0,0,0,0.5);
       position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+    #info-container.show {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Info container hover effect */
+    #info-container:hover {
+      transform: translateY(-5px);
     }
     /* Banner behind avatar container */
     .avatar-banner {
@@ -319,7 +336,7 @@
       object-fit: cover;
     }
     #info-container h2 {
-      margin-top: 100px; /* leave space for the overlapping avatar */
+      margin-top: 100px;
       margin-bottom: 10px;
       font-size: 1.4em;
       color: #1ed760;
@@ -365,17 +382,17 @@
     /* Position toggle buttons on opposite sides */
     #show-info-btn {
       position: absolute;
-      left: -50px; /* For Discord widget, place on left */
+      left: -50px;
       top: 50%;
       transform: translateY(-50%);
     }
     #show-widget-btn {
       position: absolute;
-      right: -50px; /* For info card, place on right */
+      right: -50px;
       top: 50%;
       transform: translateY(-50%);
     }
-    /* "Go back home" button styling on info panel only */
+    /* "Go back home" button styling on info panel */
     .go-home-btn {
       margin-top: 10px;
       padding: 0.6em 1.2em;
@@ -455,7 +472,7 @@
         </label>
         <a href="#" class="forgot-pass">Forgot your password?</a>
       </div>
-      <!-- Dazes Button (static, no animation) -->
+      <!-- Dazes Button (fades in) -->
       <button class="btn-login" id="dazes-btn">Dazes</button>
       <div class="signup">
         Don't have an account? <a href="#">Sign up for Spotify</a>
@@ -464,7 +481,7 @@
     <div class="copyright slide-up">© 2025 Spotify AB William</div>
   </div>
 
-  <!-- 2) Black Wine Page (Back-to-home button removed) -->
+  <!-- 2) Black Wine Page (no go-back button) -->
   <div id="black-page" class="hidden">
     <div class="black-container">
       <!-- Wine Glass Image -->
@@ -485,7 +502,7 @@
         <!-- Toggle button to show info panel (placed on left side) -->
         <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
       </div>
-      <!-- Info Panel (initially hidden) -->
+      <!-- Info Panel (initially hidden, with smooth animation) -->
       <div id="info-container">
         <!-- Banner & Avatar container -->
         <div class="avatar-banner"></div>
@@ -561,14 +578,14 @@
         }, 500);
       });
 
-      // Toggle: Show info panel over widget
+      // Toggle: Show info panel over widget with smooth animation
       showInfoBtn.addEventListener('click', () => {
         discordContainer.style.display = 'none';
-        infoContainer.style.display = 'flex';
+        infoContainer.classList.add('show');
       });
       // Toggle: Go back to Discord widget view
       showWidgetBtn.addEventListener('click', () => {
-        infoContainer.style.display = 'none';
+        infoContainer.classList.remove('show');
         discordContainer.style.display = 'block';
       });
 
