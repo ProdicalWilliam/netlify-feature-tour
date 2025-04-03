@@ -19,8 +19,34 @@
       overflow: hidden;
       background: #000;
     }
+    /* Helper classes for animations */
+    .fade-in {
+      animation: fadeIn 1s ease forwards;
+    }
+    .pop-in {
+      animation: popIn 0.8s ease-out forwards;
+    }
+    .slide-up {
+      animation: slideUp 1s ease forwards;
+    }
+    /* Hidden pages initially (opacity 0) */
     .hidden {
-      display: none;
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* Keyframes */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
     /* --- 1) Spotify-Style Login Page --- */
@@ -34,6 +60,8 @@
       align-items: center;
       position: relative;
       color: #fff;
+      opacity: 1;
+      transition: opacity 0.5s ease;
     }
     .login-container {
       background-color: #000;
@@ -48,6 +76,7 @@
       font-size: 2em;
       margin-bottom: 1em;
       text-align: center;
+      animation: slideUp 1s ease forwards;
     }
     .btn-social {
       width: 100%;
@@ -59,6 +88,9 @@
       padding: 0.8em;
       margin-bottom: 0.8em;
       cursor: default;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 0.2s;
     }
     .btn-social i {
       margin-right: 8px;
@@ -71,6 +103,9 @@
       align-items: center;
       width: 100%;
       margin: 1em 0;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 0.4s;
     }
     .or-line {
       flex: 1;
@@ -85,6 +120,9 @@
     .input-field {
       width: 100%;
       margin-bottom: 1em;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 0.6s;
     }
     .input-field label {
       display: block;
@@ -105,6 +143,9 @@
       display: flex;
       align-items: center;
       margin-bottom: 1em;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 0.8s;
     }
     .remember-me input {
       margin-right: 0.5em;
@@ -128,6 +169,9 @@
       font-size: 1em;
       font-weight: bold;
       cursor: pointer;
+      opacity: 0;
+      animation: popIn 0.8s ease forwards;
+      animation-delay: 1s;
     }
     .btn-login:hover {
       background-color: #1fdf64;
@@ -136,6 +180,9 @@
       margin-top: 1em;
       font-size: 0.9em;
       color: #b3b3b3;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 1.2s;
     }
     .signup a {
       color: #fff;
@@ -147,6 +194,9 @@
       bottom: 10px;
       font-size: 0.7em;
       color: #555;
+      opacity: 0;
+      animation: slideUp 1s ease forwards;
+      animation-delay: 1.4s;
     }
 
     /* --- 2) Black Page with Wine Glass --- */
@@ -157,18 +207,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     .black-container {
       position: relative;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
     }
     .black-container img {
       max-width: 200px;
       cursor: pointer;
+      animation: popIn 1s ease forwards;
     }
 
-    /* --- 3) Cozy Orange Final Page --- */
+    /* --- 3) Cozy Orange Final Page with Discord Widget --- */
     #cozy-page {
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center / cover;
@@ -176,8 +234,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      opacity: 0;
     }
-    /* A semi-transparent cozy overlay (if needed) */
     .cozy-overlay {
       background: rgba(255, 140, 0, 0.7);
       border-radius: 20px;
@@ -185,10 +243,14 @@
       text-align: center;
       color: #fff;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 0.5s;
     }
-    /* Discord widget styling adjustments (if needed) */
     .discord-widget {
       border: none;
+      animation: popIn 1s ease forwards;
+      animation-delay: 0.7s;
     }
 
     /* --- Brain Emoji Rain --- */
@@ -236,13 +298,13 @@
   <!-- 1) Spotify-Style Login Screen -->
   <div id="spotify-page">
     <div class="login-container">
-      <h1>Log in to Spotify</h1>
+      <h1 class="pop-in">Log in to Spotify</h1>
 
       <!-- Social Buttons (non-functional) -->
-      <button class="btn-social"><i class="fab fa-google"></i> Continue with Google</button>
-      <button class="btn-social"><i class="fab fa-facebook-f"></i> Continue with Facebook</button>
-      <button class="btn-social"><i class="fab fa-apple"></i> Continue with Apple</button>
-      <button class="btn-social"><i class="fas fa-phone"></i> Continue with phone number</button>
+      <button class="btn-social pop-in"><i class="fab fa-google"></i> Continue with Google</button>
+      <button class="btn-social pop-in"><i class="fab fa-facebook-f"></i> Continue with Facebook</button>
+      <button class="btn-social pop-in"><i class="fab fa-apple"></i> Continue with Apple</button>
+      <button class="btn-social pop-in"><i class="fas fa-phone"></i> Continue with phone number</button>
 
       <div class="or-container">
         <div class="or-line"></div>
@@ -261,7 +323,7 @@
       </div>
 
       <!-- Remember me + Forgot password row -->
-      <div class="remember-me" style="width:100%;">
+      <div class="remember-me">
         <label>
           <input type="checkbox" disabled> Remember me
         </label>
@@ -269,7 +331,7 @@
       </div>
 
       <!-- Dazes Button (replaces "Log in") -->
-      <button class="btn-login" id="dazes-btn">Dazes</button>
+      <button class="btn-login pop-in" id="dazes-btn">Dazes</button>
 
       <!-- Sign Up -->
       <div class="signup">
@@ -277,9 +339,7 @@
       </div>
     </div>
     <!-- Copyright notice (only on the login page) -->
-    <div class="copyright">
-      © 2025 Spotify AB William
-    </div>
+    <div class="copyright slide-up">© 2025 Spotify AB William</div>
   </div>
 
   <!-- 2) Black Page with Wine Glass -->
@@ -305,7 +365,6 @@
   </div>
 
   <script>
-    // Wait for the DOM to load
     document.addEventListener("DOMContentLoaded", function() {
       const spotifyPage = document.getElementById('spotify-page');
       const blackPage = document.getElementById('black-page');
@@ -314,33 +373,46 @@
       const cupImage = document.getElementById('cup-image');
       const audioElement = document.getElementById('bg-audio');
 
+      // Function to remove the "hidden" class with a fade-in effect
+      function showPage(page) {
+        page.classList.remove('hidden');
+        page.classList.add('fade-in');
+        page.style.pointerEvents = 'all';
+      }
+
       // When the user clicks the "Dazes" button:
-      // Start audio playback and transition to the wine page.
       dazesBtn.addEventListener('click', () => {
         // Start the audio (user interaction enables playback)
         audioElement.play().catch(err => {
           console.error("Audio playback failed:", err);
         });
-        // Transition to black page (wine glass)
-        spotifyPage.classList.add('hidden');
-        blackPage.classList.remove('hidden');
+        // Fade out Spotify page
+        spotifyPage.style.opacity = 0;
+        // Wait for the fade-out to finish then show black page
+        setTimeout(() => {
+          spotifyPage.style.display = 'none';
+          showPage(blackPage);
+        }, 500);
       });
 
       // When the user clicks the wine glass, transition to final cozy page
       cupImage.addEventListener('click', () => {
-        blackPage.classList.add('hidden');
-        cozyPage.classList.remove('hidden');
-        startBrainRain();
+        blackPage.style.opacity = 0;
+        setTimeout(() => {
+          blackPage.style.display = 'none';
+          showPage(cozyPage);
+          startBrainRain();
+        }, 500);
       });
 
       // --- Brain Emoji Rain Logic ---
       function startBrainRain() {
         const container = document.getElementById('brain-rain');
-        const totalBrains = 30; // Number of emojis to start with
+        const totalBrains = 30; // Number of initial emojis
         for (let i = 0; i < totalBrains; i++) {
           createBrain(container);
         }
-        // Optionally, continue creating brains at intervals
+        // Optionally continue adding brains at intervals
         setInterval(() => {
           for (let i = 0; i < totalBrains / 2; i++) {
             createBrain(container);
@@ -352,13 +424,10 @@
         const brain = document.createElement('div');
         brain.classList.add('brain');
         brain.textContent = '🧠';
-        // Random horizontal start position
         brain.style.left = Math.random() * 100 + 'vw';
-        // Random animation duration (4-7 seconds)
         const fallDuration = 4 + Math.random() * 3;
         brain.style.animationDuration = fallDuration + 's';
         container.appendChild(brain);
-        // Remove the emoji after its animation completes
         setTimeout(() => {
           container.removeChild(brain);
         }, fallDuration * 1000);
