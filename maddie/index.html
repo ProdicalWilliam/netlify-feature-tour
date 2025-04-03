@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Spotify - Maddie</title>
+  <title>Maddie</title>
   <!-- Font: Montserrat for a cleaner look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,12 +205,10 @@
     /* 3) Cozy Final Page with Discord Widget & Info Panel */
     /* ----------------------- */
     #cozy-page {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: relative;
       width: 100%;
       height: 100%;
-      /* Keep original background image ("law in order") */
+      /* Keep original background image */
       background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
       overflow: hidden;
       opacity: 0;
@@ -219,21 +217,20 @@
       justify-content: center;
       align-items: center;
     }
-    /* Pseudo-element for background blur – applies only to the background */
+    /* Pseudo-element for background blur (applied only to the background) */
     #cozy-page::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      filter: blur(50px);
-      opacity: 0.5;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      filter: blur(10px);
+      /* Adjust this value as needed for your desired blur intensity */
       z-index: -1;
     }
-    /* Center final container (widget & info card) */
+    /* Center final container (Discord widget, info box, and toggle buttons) */
     .final-container {
       position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -338,7 +335,7 @@
       background: #000066;
       transform: scale(1.05);
     }
-    /* Re-center toggle buttons within the final container */
+    /* Place the swap button for widget/info within their containers */
     #show-info-btn, #show-widget-btn { align-self: center; }
     
     /* "Go Back Home" button on info panel */
@@ -378,7 +375,10 @@
       color: #fff;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
-    @keyframes brainFall { 0% { transform: translateY(-50px); opacity: 1; } 100% { transform: translateY(110vh); opacity: 0; } }
+    @keyframes brainFall {
+      0% { transform: translateY(-50px); opacity: 1; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -432,6 +432,7 @@
     <div class="final-container">
       <div id="discord-container">
         <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+        <!-- Button to switch to info panel -->
         <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
       </div>
       <div id="info-container">
@@ -444,6 +445,7 @@
         <p><strong>Account Age:</strong> 3 years</p>
         <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚　 ✩₊˚.   ☾      ⋆      ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
         <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
+        <!-- Button to switch back to widget -->
         <button class="toggle-btn" id="show-widget-btn" title="Show Widget"><i class="fas fa-arrow-left"></i></button>
         <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
