@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Spotify</title>
+  <title>Maddie's Spotify-Style Login</title>
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-dO4wKQ9rj5mDIFkN27xKVJZvhwkX+F9ogWdZw5EiN+KJJxD3SWyoZxum7VDa3WjUIpFRL7YqZcZz8+1K+4C6sA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     /* Global Resets */
     * {
@@ -27,8 +29,11 @@
       width: 100%; 
       height: 100%;
       display: flex; 
-      align-items: center; 
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
+      position: relative;
+      color: #fff;
     }
     .login-container {
       background-color: #000; 
@@ -37,6 +42,7 @@
       display: flex; 
       flex-direction: column; 
       align-items: center;
+      padding-bottom: 50px;
     }
     .login-container h1 {
       font-size: 2em; 
@@ -54,7 +60,9 @@
       margin-bottom: 0.8em; 
       cursor: default; /* Non-clickable */
     }
-    /* Make them look “disabled” by changing cursor, but keep the style similar */
+    .btn-social i {
+      margin-right: 8px;
+    }
     .btn-social:hover {
       background-color: #111; 
     }
@@ -133,8 +141,15 @@
       color: #fff; 
       text-decoration: underline;
     }
+    /* Copyright (only on this page) */
+    .copyright {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.7em;
+      color: #555;
+    }
 
-    /* --- 2) Black Page with Cup --- */
+    /* --- 2) Black Page with Wine Glass --- */
     #black-page {
       background-color: #000; 
       width: 100%; 
@@ -151,7 +166,7 @@
       cursor: pointer;
     }
 
-    /* --- 3) Cozy Orange Page --- */
+    /* --- 3) Cozy Orange Page (final) --- */
     #cozy-page {
       position: relative;
       width: 100%;
@@ -235,10 +250,10 @@
       <h1>Log in to Spotify</h1>
 
       <!-- Social Buttons (non-functional) -->
-      <button class="btn-social">Continue with Google</button>
-      <button class="btn-social">Continue with Facebook</button>
-      <button class="btn-social">Continue with Apple</button>
-      <button class="btn-social">Continue with phone number</button>
+      <button class="btn-social"><i class="fab fa-google"></i> Continue with Google</button>
+      <button class="btn-social"><i class="fab fa-facebook-f"></i> Continue with Facebook</button>
+      <button class="btn-social"><i class="fab fa-apple"></i> Continue with Apple</button>
+      <button class="btn-social"><i class="fas fa-phone"></i> Continue with phone number</button>
 
       <div class="or-container">
         <div class="or-line"></div>
@@ -246,7 +261,7 @@
         <div class="or-line"></div>
       </div>
 
-      <!-- Email/Password Fields -->
+      <!-- Email/Password Fields (disabled) -->
       <div class="input-field">
         <label for="email-username">Email or username</label>
         <input type="text" id="email-username" placeholder="Email or username" disabled>
@@ -272,15 +287,19 @@
         Don't have an account? <a href="#">Sign up for Spotify</a>
       </div>
     </div>
+    <!-- Copyright notice (only on this page) -->
+    <div class="copyright">
+      © 2025 Spotify AB William
+    </div>
   </div>
 
-  <!-- 2) Black Page with Cup -->
+  <!-- 2) Black Page with Wine Glass -->
   <div id="black-page" class="hidden">
     <div class="black-container">
-      <!-- Replace with your desired cup image -->
+      <!-- Wine Glass Image (clickable) -->
       <img 
         src="https://cdn.discordapp.com/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&format=webp&quality=lossless&width=365&height=365" 
-        alt="Cup" 
+        alt="Wine Glass" 
         id="cup-image"
       >
     </div>
@@ -303,56 +322,59 @@
   </div>
 
   <script>
-    const spotifyPage = document.getElementById('spotify-page');
-    const blackPage = document.getElementById('black-page');
-    const cozyPage = document.getElementById('cozy-page');
-    const dazesBtn = document.getElementById('dazes-btn');
-    const cupImage = document.getElementById('cup-image');
+    // Ensure DOM is loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      const spotifyPage = document.getElementById('spotify-page');
+      const blackPage = document.getElementById('black-page');
+      const cozyPage = document.getElementById('cozy-page');
+      const dazesBtn = document.getElementById('dazes-btn');
+      const cupImage = document.getElementById('cup-image');
 
-    // 1) Click "Dazes" -> Go to black page
-    dazesBtn.addEventListener('click', () => {
-      spotifyPage.classList.add('hidden');
-      blackPage.classList.remove('hidden');
-    });
+      // 1) Click "Dazes" -> Go to black page with wine glass
+      dazesBtn.addEventListener('click', () => {
+        spotifyPage.classList.add('hidden');
+        blackPage.classList.remove('hidden');
+      });
 
-    // 2) Click Cup -> Go to cozy orange page
-    cupImage.addEventListener('click', () => {
-      blackPage.classList.add('hidden');
-      cozyPage.classList.remove('hidden');
-      startBrainRain();
-    });
+      // 2) Click Wine Glass -> Go to cozy orange page
+      cupImage.addEventListener('click', () => {
+        blackPage.classList.add('hidden');
+        cozyPage.classList.remove('hidden');
+        startBrainRain();
+      });
 
-    // --- Brain Emoji Rain Logic ---
-    function startBrainRain() {
-      const container = document.getElementById('brain-rain');
-      const totalBrains = 30; // Adjust the number of falling emojis
-      for (let i = 0; i < totalBrains; i++) {
-        createBrain(container);
-      }
-      // Repeatedly create more brains every few seconds if desired
-      setInterval(() => {
-        for (let i = 0; i < totalBrains / 2; i++) {
+      // --- Brain Emoji Rain Logic ---
+      function startBrainRain() {
+        const container = document.getElementById('brain-rain');
+        const totalBrains = 30; // Adjust the number of falling emojis
+        for (let i = 0; i < totalBrains; i++) {
           createBrain(container);
         }
-      }, 3000);
-    }
+        // Repeatedly create more brains every few seconds if desired
+        setInterval(() => {
+          for (let i = 0; i < totalBrains / 2; i++) {
+            createBrain(container);
+          }
+        }, 3000);
+      }
 
-    function createBrain(container) {
-      const brain = document.createElement('div');
-      brain.classList.add('brain');
-      brain.textContent = '🧠';
-      // Random horizontal start
-      brain.style.left = Math.random() * 100 + 'vw';
-      // Random delay & duration
-      const fallDuration = 4 + Math.random() * 3; // 4-7 seconds
-      brain.style.animationDuration = fallDuration + 's';
-      container.appendChild(brain);
+      function createBrain(container) {
+        const brain = document.createElement('div');
+        brain.classList.add('brain');
+        brain.textContent = '🧠';
+        // Random horizontal start
+        brain.style.left = Math.random() * 100 + 'vw';
+        // Random delay & duration
+        const fallDuration = 4 + Math.random() * 3; // 4-7 seconds
+        brain.style.animationDuration = fallDuration + 's';
+        container.appendChild(brain);
 
-      // Remove from DOM once the animation ends to avoid infinite nodes
-      setTimeout(() => {
-        container.removeChild(brain);
-      }, fallDuration * 1000);
-    }
+        // Remove from DOM once the animation ends to avoid infinite nodes
+        setTimeout(() => {
+          container.removeChild(brain);
+        }, fallDuration * 1000);
+      }
+    });
   </script>
 </body>
 </html>
