@@ -25,36 +25,15 @@
       overflow: hidden;
       background: #000;
     }
-    /* Helper animation classes */
-    .fade-in {
-      animation: fadeIn 1s ease forwards;
-    }
-    .pop-in {
-      animation: popIn 0.8s ease-out forwards;
-    }
-    .slide-up {
-      animation: slideUp 1s ease forwards;
-    }
-    /* Hidden state */
-    .hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    /* Keyframes */
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      60% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(1); }
-    }
-    @keyframes slideUp {
-      0% { transform: translateY(50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
+    /* Animations */
+    .fade-in { animation: fadeIn 1s ease forwards; }
+    .pop-in { animation: popIn 0.8s ease-out forwards; }
+    .slide-up { animation: slideUp 1s ease forwards; }
+    .hidden { opacity: 0; pointer-events: none; }
+    @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+    @keyframes slideUp { 0% { transform: translateY(50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    
     /* ----------------------- */
     /* 1) Spotify-Style Login Page */
     /* ----------------------- */
@@ -68,12 +47,10 @@
       align-items: center;
       position: relative;
       color: #fff;
-      opacity: 1;
       transition: opacity 0.5s ease;
     }
     .login-container {
       background-color: #000;
-      color: #fff;
       width: 360px;
       display: flex;
       flex-direction: column;
@@ -100,12 +77,8 @@
       animation: slideUp 1s ease forwards;
       animation-delay: 0.2s;
     }
-    .btn-social i {
-      margin-right: 8px;
-    }
-    .btn-social:hover {
-      background-color: #111;
-    }
+    .btn-social i { margin-right: 8px; }
+    .btn-social:hover { background-color: #111; }
     .or-container {
       display: flex;
       align-items: center;
@@ -115,11 +88,7 @@
       animation: slideUp 1s ease forwards;
       animation-delay: 0.4s;
     }
-    .or-line {
-      flex: 1;
-      height: 1px;
-      background-color: #3e3e3e;
-    }
+    .or-line { flex: 1; height: 1px; background-color: #3e3e3e; }
     .or-text {
       margin: 0 1em;
       font-size: 0.9em;
@@ -163,17 +132,13 @@
       font-size: 0.9em;
       color: #b3b3b3;
     }
-    .remember-me input {
-      margin-right: 0.5em;
-    }
+    .remember-me input { margin-right: 0.5em; }
     .forgot-pass {
       font-size: 0.9em;
       color: #b3b3b3;
       text-decoration: none;
     }
-    .forgot-pass:hover {
-      text-decoration: underline;
-    }
+    .forgot-pass:hover { text-decoration: underline; }
     /* Dazes Button now fades in */
     .btn-login {
       width: 100%;
@@ -189,9 +154,7 @@
       animation: fadeIn 1.2s ease forwards;
       animation-delay: 1s;
     }
-    .btn-login:hover {
-      background-color: #1fdf64;
-    }
+    .btn-login:hover { background-color: #1fdf64; }
     .signup {
       margin-top: 1em;
       font-size: 0.9em;
@@ -200,10 +163,7 @@
       animation: slideUp 1s ease forwards;
       animation-delay: 1.2s;
     }
-    .signup a {
-      color: #fff;
-      text-decoration: underline;
-    }
+    .signup a { color: #fff; text-decoration: underline; }
     .copyright {
       position: absolute;
       bottom: 10px;
@@ -213,7 +173,7 @@
       animation: slideUp 1s ease forwards;
       animation-delay: 1.4s;
     }
-
+    
     /* ----------------------- */
     /* 2) Black Wine Page */
     /* ----------------------- */
@@ -240,7 +200,7 @@
       cursor: pointer;
       animation: popIn 1s ease forwards;
     }
-
+    
     /* ----------------------- */
     /* 3) Cozy Final Page with Discord Widget & Info Panel */
     /* ----------------------- */
@@ -250,39 +210,44 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #000033; /* Dark blue base color */
+      /* Keep original background image ("law in order") */
+      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.5s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    /* Use a pseudo-element for the background image with 50px blur */
+    /* Pseudo-element for background blur – applies only to the background */
     #cozy-page::before {
       content: "";
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://images7.alphacoders.com/799/thumb-1920-799924.jpg') no-repeat center center/cover;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       filter: blur(50px);
+      opacity: 0.5;
       z-index: -1;
     }
-    /* Final container remains sharp */
+    /* Center final container (widget & info card) */
     .final-container {
       position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 20px;
     }
     /* Discord widget container */
-    #discord-container {
-      position: relative;
-    }
+    #discord-container { position: relative; }
     .discord-widget {
       border: 1px solid #fff;
       border-radius: 8px;
       animation: popIn 1s ease forwards;
-      animation-delay: 0s;
     }
-    /* Info panel with smooth animation and hover float */
+    
+    /* Info Panel with smooth animation and hover float */
     #info-container {
       background: rgba(0, 0, 0, 0.85);
       border: 2px solid #1ed760;
@@ -304,20 +269,14 @@
       opacity: 1;
       transform: translateY(0);
     }
-    /* Info container hover effect */
-    #info-container:hover {
-      transform: translateY(-5px);
-    }
-    /* Banner behind avatar container */
+    #info-container:hover { transform: translateY(-5px); }
     .avatar-banner {
       width: 100%;
       height: 100px;
-      background: url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center/cover;
+      background: url('https://cdn.discordapp.com/banners/852670898053185568/0a1c46f0ca9eb6076e5d488855972d55?size=4096') no-repeat center center/cover;
       border-top-left-radius: 13px;
       border-top-right-radius: 13px;
-      position: relative;
     }
-    /* Avatar positioned to overlap banner */
     #avatar-container {
       position: absolute;
       top: 40px;
@@ -347,22 +306,21 @@
       text-align: center;
       line-height: 1.5;
     }
-    /* Unicode text for bio */
     .unicode-text {
       font-size: 0.9em;
       margin: 8px 0;
       text-align: center;
       line-height: 1.4;
     }
-    /* Additional link to advertise the server */
     .advertise-link {
       margin-top: 10px;
       text-decoration: underline;
       color: #1ed760;
     }
-    /* Toggle button(s) for switching views */
+    
+    /* Toggle Buttons (now dark blue) */
     .toggle-btn {
-      background: #C71585; /* Dark pink */
+      background: #00008B;
       border: none;
       border-radius: 50%;
       width: 40px;
@@ -374,25 +332,16 @@
       font-size: 1.2em;
       color: #fff;
       transition: background 0.3s ease, transform 0.3s ease;
+      margin: 10px;
     }
     .toggle-btn:hover {
-      background: #b10e70;
+      background: #000066;
       transform: scale(1.05);
     }
-    /* Position toggle buttons on opposite sides */
-    #show-info-btn {
-      position: absolute;
-      left: -50px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    #show-widget-btn {
-      position: absolute;
-      right: -50px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    /* "Go back home" button styling on info panel */
+    /* Re-center toggle buttons within the final container */
+    #show-info-btn, #show-widget-btn { align-self: center; }
+    
+    /* "Go Back Home" button on info panel */
     .go-home-btn {
       margin-top: 10px;
       padding: 0.6em 1.2em;
@@ -407,7 +356,7 @@
       background: #1ed760;
       color: #000;
     }
-
+    
     /* ----------------------- */
     /* Brain Emoji Rain */
     /* ----------------------- */
@@ -429,25 +378,20 @@
       color: #fff;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
-    @keyframes brainFall {
-      0% { transform: translateY(-50px); opacity: 1; }
-      100% { transform: translateY(110vh); opacity: 0; }
-    }
+    @keyframes brainFall { 0% { transform: translateY(-50px); opacity: 1; } 100% { transform: translateY(110vh); opacity: 0; } }
   </style>
 </head>
 <body>
-
-  <!-- Audio Element (not autoplayed until interaction) -->
+  <!-- Audio Element -->
   <audio id="bg-audio" loop>
     <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357194666516414515/FREE_Splurge_Type_Beat_Law__Order.mp3?ex=67ef5187&is=67ee0007&hm=77c8d6a9fa2a3ab860b1dde2b17659d104634344ee49ffa2f62cab238418854f" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
-
+  
   <!-- 1) Spotify-Style Login Screen -->
   <div id="spotify-page">
     <div class="login-container">
       <h1 class="pop-in">Log in to Spotify</h1>
-      <!-- Social Buttons -->
       <button class="btn-social pop-in"><i class="fab fa-google"></i> Continue with Google</button>
       <button class="btn-social pop-in"><i class="fab fa-facebook-f"></i> Continue with Facebook</button>
       <button class="btn-social pop-in"><i class="fab fa-apple"></i> Continue with Apple</button>
@@ -457,7 +401,6 @@
         <div class="or-text">or</div>
         <div class="or-line"></div>
       </div>
-      <!-- Disabled Fields -->
       <div class="input-field">
         <label for="email-username">Email or username</label>
         <input type="text" id="email-username" placeholder="Email or username" disabled>
@@ -467,64 +410,46 @@
         <input type="password" id="password" placeholder="Password" disabled>
       </div>
       <div class="remember-me">
-        <label>
-          <input type="checkbox" disabled> Remember me
-        </label>
+        <label><input type="checkbox" disabled> Remember me</label>
         <a href="#" class="forgot-pass">Forgot your password?</a>
       </div>
-      <!-- Dazes Button (fades in) -->
       <button class="btn-login" id="dazes-btn">Dazes</button>
-      <div class="signup">
-        Don't have an account? <a href="#">Sign up for Spotify</a>
-      </div>
+      <div class="signup">Don't have an account? <a href="#">Sign up for Spotify</a></div>
     </div>
     <div class="copyright slide-up">© 2025 Spotify AB William</div>
   </div>
-
-  <!-- 2) Black Wine Page (no go-back button) -->
+  
+  <!-- 2) Black Wine Page -->
   <div id="black-page" class="hidden">
     <div class="black-container">
-      <!-- Wine Glass Image -->
-      <img src="https://media.discordapp.net/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&=&format=webp&quality=lossless&width=365&height=365" 
-           alt="Wine Glass" id="cup-image">
+      <img src="https://media.discordapp.net/attachments/1342976939488710727/1357193644985159933/JAAAAAElFTkSuQmCC.png?ex=67ef5094&is=67edff14&hm=4861330cb58678f5de14c7baf7348e810713b59815e47db96345b9b464225402&=&format=webp&quality=lossless&width=365&height=365" alt="Wine Glass" id="cup-image">
     </div>
   </div>
-
+  
   <!-- 3) Cozy Final Page with Discord Widget & Info Panel -->
   <div id="cozy-page" class="hidden">
-    <!-- Brain Emoji Rain -->
     <div id="brain-rain"></div>
-    <!-- Final Container -->
     <div class="final-container">
-      <!-- Discord Widget Container -->
       <div id="discord-container">
         <iframe class="discord-widget" src="https://discord.com/widget?id=1342961798168711198&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-        <!-- Toggle button to show info panel (placed on left side) -->
         <button class="toggle-btn" id="show-info-btn" title="Show Info"><i class="fas fa-info"></i></button>
       </div>
-      <!-- Info Panel (initially hidden, with smooth animation) -->
       <div id="info-container">
-        <!-- Banner & Avatar container -->
         <div class="avatar-banner"></div>
         <div id="avatar-container">
           <img src="https://cdn.discordapp.com/avatars/852670898053185568/7e8ab0b5f2c0bbb35be54b54ea3dbd07?size=1024" alt="Avatar">
         </div>
         <h2>iluvmads</h2>
-        <!-- Updated bio info -->
         <p><strong>Account Created:</strong> 2021</p>
         <p><strong>Account Age:</strong> 3 years</p>
-        <!-- Custom Unicode art added -->
         <p class="unicode-text">˚　 ⋆⁺₊✦⁺₊ 　 ˚　.˚  .　 ☁.　　. 　 ˚　⁺⋆₊　.˚  .　. ✦⋆⁺₊  　 ˚　. ☁ ˚　.˚　 ✩₊˚.   ☾      ⋆      ⁺₊✧  　　˚　⁺₊ . 　 ˚　.　　⁺₊✦₊　　 ☁  　˚　　 . 　⁺₊✧˚　　 . 　 ˚　⁺₊˚  .</p>
-        <!-- Advertise the Discord server -->
         <a class="advertise-link" href="https://discord.gg/dazes" target="_blank">Join discord.gg/dazes</a>
-        <!-- Toggle button to go back to Discord widget (placed on right side) -->
         <button class="toggle-btn" id="show-widget-btn" title="Show Widget"><i class="fas fa-arrow-left"></i></button>
-        <!-- "Go back home" button on info panel -->
         <button class="go-home-btn" id="back-home-from-info">Go Back to Home</button>
       </div>
     </div>
   </div>
-
+  
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const spotifyPage = document.getElementById('spotify-page');
@@ -533,63 +458,44 @@
       const dazesBtn = document.getElementById('dazes-btn');
       const cupImage = document.getElementById('cup-image');
       const audioElement = document.getElementById('bg-audio');
-
-      // For final page view toggling
       const discordContainer = document.getElementById('discord-container');
       const infoContainer = document.getElementById('info-container');
       const showInfoBtn = document.getElementById('show-info-btn');
       const showWidgetBtn = document.getElementById('show-widget-btn');
-
-      // "Go back home" button on info panel
       const backHomeFromInfo = document.getElementById('back-home-from-info');
-
-      // Function to show a page with fade-in
+      
       function showPage(page) {
         page.classList.remove('hidden');
         page.style.opacity = 1;
         page.style.pointerEvents = 'all';
       }
-      // Function to hide a page with fade-out
       function hidePage(page) {
         page.style.opacity = 0;
         page.style.pointerEvents = 'none';
-        setTimeout(() => {
-          page.classList.add('hidden');
-        }, 500);
+        setTimeout(() => { page.classList.add('hidden'); }, 500);
       }
-
-      // When "Dazes" is clicked:
+      
       dazesBtn.addEventListener('click', () => {
-        audioElement.play().catch(err => {
-          console.error("Audio playback failed:", err);
-        });
+        audioElement.play().catch(err => { console.error("Audio playback failed:", err); });
         hidePage(spotifyPage);
-        setTimeout(() => {
-          showPage(blackPage);
-        }, 500);
+        setTimeout(() => { showPage(blackPage); }, 500);
       });
-
-      // When the wine glass is clicked, transition to cozy page
+      
       cupImage.addEventListener('click', () => {
         hidePage(blackPage);
-        setTimeout(() => {
-          showPage(cozyPage);
-          startBrainRain();
-        }, 500);
+        setTimeout(() => { showPage(cozyPage); startBrainRain(); }, 500);
       });
-
-      // Toggle: Show info panel over widget with smooth animation
+      
       showInfoBtn.addEventListener('click', () => {
         discordContainer.style.display = 'none';
         infoContainer.classList.add('show');
       });
-      // Toggle: Go back to Discord widget view
+      
       showWidgetBtn.addEventListener('click', () => {
         infoContainer.classList.remove('show');
         discordContainer.style.display = 'block';
       });
-
-      // Go back home from info panel
+      
       backHomeFromInfo.addEventListener('click', () => {
         hidePage(cozyPage);
         setTimeout(() => {
@@ -598,14 +504,12 @@
           spotifyPage.style.pointerEvents = 'all';
         }, 500);
       });
-
-      // --- Brain Emoji Rain: spawn continuously every 500ms ---
+      
       function startBrainRain() {
         const container = document.getElementById('brain-rain');
-        setInterval(() => {
-          createBrain(container);
-        }, 500);
+        setInterval(() => { createBrain(container); }, 500);
       }
+      
       function createBrain(container) {
         const brain = document.createElement('div');
         brain.classList.add('brain');
@@ -614,9 +518,7 @@
         const fallDuration = 4 + Math.random() * 3;
         brain.style.animationDuration = fallDuration + 's';
         container.appendChild(brain);
-        setTimeout(() => {
-          container.removeChild(brain);
-        }, fallDuration * 1000);
+        setTimeout(() => { container.removeChild(brain); }, fallDuration * 1000);
       }
     });
   </script>
