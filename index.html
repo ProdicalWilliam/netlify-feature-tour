@@ -40,7 +40,8 @@
       align-items: center;
       padding: 2rem;
       text-align: center;
-      background: rgba(0, 0, 0, 0.5);
+      /* Lightened overlay: reduced opacity for less dimming */
+      background: rgba(0, 0, 0, 0.2);
       min-height: 100vh;
     }
     h1 {
@@ -68,20 +69,21 @@
       max-width: 960px;
       margin-bottom: 2rem;
     }
-    /* Card Styles */
+    /* Card Styles with strong shadows and white glow */
     .name-card {
       position: relative;
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 12px;
       padding: 2rem;
       transition: transform 0.4s ease, box-shadow 0.4s ease;
       overflow: hidden;
       cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
     }
     .name-card:hover {
       transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
     }
     .name-card a {
       color: #fff;
@@ -89,25 +91,6 @@
       text-decoration: none;
       z-index: 2;
       position: relative;
-    }
-    /* Card Preview Styling */
-    .card-preview {
-      position: absolute;
-      bottom: -100%;
-      left: 0;
-      width: 100%;
-      padding: 0.8rem;
-      background: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      font-size: 1rem;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-      text-align: center;
-      transition: bottom 0.4s ease;
-      pointer-events: none;
-    }
-    .name-card:hover .card-preview {
-      bottom: 0;
     }
     /* Home link styling (for in-page sections) */
     .home-link {
@@ -137,29 +120,18 @@
       margin-top: 3rem;
       text-align: center;
     }
-    /* Footer */
+    /* Footer/Watermark Styles */
     footer {
       background: #111;
       padding: 1rem;
       text-align: center;
       font-size: 0.9rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    /* Mini Game Styles */
-    #miniGame {
-      margin-top: 2rem;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 1rem;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    #gameCanvas {
-      border: 2px solid #fff;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      background: #000;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
     }
   </style>
 </head>
@@ -174,42 +146,28 @@
       <div class="name-grid" id="nameGrid">
         <div class="name-card" data-name="William">
           <a href="/william">William</a>
-          <div class="card-preview">Discover William's creative projects and ideas.</div>
         </div>
         <div class="name-card" data-name="Brayden">
           <a href="/brayden/">Brayden</a>
-          <div class="card-preview">Learn more about Brayden's work and portfolio.</div>
         </div>
         <div class="name-card" data-name="Vaani">
           <a href="/vaani">Vaani</a>
-          <div class="card-preview">Explore Vaani’s innovative designs and concepts.</div>
         </div>
         <div class="name-card" data-name="Maddie">
           <a href="/maddie">Maddie</a>
-          <div class="card-preview">See Maddie’s artful creations and projects.</div>
         </div>
         <div class="name-card" data-name="Bambi">
           <a href="/bambi">Bambi</a>
-          <div class="card-preview">Check out Bambi's vibrant and engaging work.</div>
         </div>
         <div class="name-card" data-name="Logann">
           <a href="/logann/">Logann</a>
-          <div class="card-preview">Dive into Logann's digital portfolio and ideas.</div>
         </div>
         <div class="name-card" data-name="Mikey">
           <a href="/mikey">Mikey</a>
-          <div class="card-preview">Explore Mikey’s projects and creative endeavors.</div>
         </div>
         <div class="name-card" data-name="Proxy">
           <a href="/proxy">Proxy</a>
-          <div class="card-preview">Learn more about Proxy's digital innovations.</div>
         </div>
-      </div>
-      <!-- Mini Game Section -->
-      <div id="miniGame">
-        <h2>Mini Game: Click the Demon!</h2>
-        <canvas id="gameCanvas" width="300" height="300"></canvas>
-        <p>Score: <span id="score">0</span></p>
       </div>
     </div>
   </section>
@@ -252,7 +210,7 @@
   </section>
   <!-- Additional profile sections (Brayden, Vaani, etc.) can be added similarly -->
 
-  <!-- Footer -->
+  <!-- Footer / Watermark -->
   <footer>
     <p>Copyright @William INC 2025 Dazes.org</p>
   </footer>
@@ -288,52 +246,6 @@
         card.style.display = name.includes(filter) ? 'block' : 'none';
       });
     });
-
-    /* --- Mini Game: Click the Demon --- */
-    (function() {
-      const canvas = document.getElementById('gameCanvas');
-      const ctx = canvas.getContext('2d');
-      const scoreDisplay = document.getElementById('score');
-      let score = 0;
-      let demonX = Math.random() * (canvas.width - 50);
-      let demonY = Math.random() * (canvas.height - 50);
-      const demonSize = 50;
-
-      // Load demon image for the mini game
-      const demonImg = new Image();
-      demonImg.src = "https://pngimg.com/d/demon_PNG63.png";
-
-      // Draw the demon image at its current location
-      function drawDemon() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(demonImg, demonX, demonY, demonSize, demonSize);
-      }
-
-      // Update the demon's location randomly
-      function updateDemon() {
-        demonX = Math.random() * (canvas.width - demonSize);
-        demonY = Math.random() * (canvas.height - demonSize);
-        drawDemon();
-      }
-
-      // Increase score on click if within demon boundaries
-      canvas.addEventListener('click', function(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        if (clickX >= demonX && clickX <= demonX + demonSize &&
-            clickY >= demonY && clickY <= demonY + demonSize) {
-          score++;
-          scoreDisplay.textContent = score;
-          updateDemon();
-        }
-      });
-
-      // Initialize game once demon image is loaded
-      demonImg.onload = function() {
-        drawDemon();
-      };
-    })();
   </script>
 </body>
 </html>
