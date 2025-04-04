@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
+  <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
     :root {
@@ -19,8 +19,6 @@
       --outlineColor: #4b0082;
       /* Custom crosshair image URL */
       --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
-      /* Background overlay color */
-      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
     }
     /* Global Reset */
     * {
@@ -33,7 +31,12 @@
       height: 100%;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      /* When custom cursor is enabled, hide system cursor */
       cursor: default;
+    }
+    /* Hide the default cursor when custom one is active */
+    body.custom-cursor {
+      cursor: none;
     }
     /* Background Video */
     #bgVideo {
@@ -45,7 +48,7 @@
       object-fit: cover;
       z-index: -3;
     }
-    /* Background Audio (hidden) */
+    /* Background Audio */
     #bgAudio {
       display: none;
     }
@@ -79,6 +82,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      background: rgba(0,0,0,0.2);
     }
     /* Tilt Container for Card */
     #cardContainer {
@@ -124,7 +128,19 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* Custom Cursor (for info page) */
+    /* Draggable Straw (static on this page) */
+    #straw {
+      position: absolute;
+      width: 48px;
+      height: 131px;
+      bottom: 20px;
+      right: 20px;
+      user-select: none;
+      z-index: 1010;
+      /* Remove pointer events to disable dragging */
+      pointer-events: none;
+    }
+    /* Custom Cursor (enabled on info page) */
     #customCursor {
       position: fixed;
       width: 50px;
@@ -148,19 +164,6 @@
       opacity: 0.8;
       transform: translate(-50%, -50%);
       filter: drop-shadow(0 0 8px #ffb6c1);
-    }
-    /* Draggable Straw (placed at bottom right) */
-    #straw {
-      position: absolute;
-      width: 48px;
-      height: 131px;
-      bottom: 20px;
-      right: 20px;
-      user-select: none;
-      z-index: 1010;
-      pointer-events: auto;
-      transition: transform 0.3s ease;
-      touch-action: none;
     }
   </style>
 </head>
@@ -199,9 +202,9 @@
       </div>
     </div>
   </div>
-  <!-- Draggable Straw -->
+  <!-- Straw (static, non-draggable) -->
   <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
-  <!-- Custom Cursor Element (enabled on info page) -->
+  <!-- Custom Cursor Element -->
   <div id="customCursor"></div>
   
   <script>
@@ -224,7 +227,7 @@
     typewriteTitle();
 
     // ---------------------------
-    // Custom Cursor (for info page)
+    // Enable Custom Cursor (for info page)
     // ---------------------------
     function enableCustomCursor() {
       document.body.classList.add("custom-cursor");
@@ -247,7 +250,7 @@
         setTimeout(() => { trail.remove(); }, 600);
       }, 20);
     }
-    // For debugging, you can disable the custom cursor by not calling enableCustomCursor()
+    // Enable custom cursor immediately (you can control when to enable this)
     enableCustomCursor();
 
     // ---------------------------
@@ -264,62 +267,55 @@
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
       }
     });
-
+    
     // ---------------------------
-    // Draggable Straw Logic
+    // Firebase Initialization (if needed)
     // ---------------------------
-    // This code makes the straw snap to your cursor on click and follow it until released.
-    const straw = document.getElementById("straw");
-    let isStrawDragging = false;
-    straw.addEventListener('mousedown', strawStartDrag);
-    straw.addEventListener('touchstart', strawStartDragTouch);
-    function strawStartDrag(e) {
-      isStrawDragging = true;
-      updateStrawPosition(e.clientX, e.clientY);
-      document.addEventListener('mousemove', strawDrag);
-      document.addEventListener('mouseup', strawEndDrag);
-      e.preventDefault();
-    }
-    function strawStartDragTouch(e) {
-      isStrawDragging = true;
-      const touch = e.touches[0];
-      updateStrawPosition(touch.clientX, touch.clientY);
-      document.addEventListener('touchmove', strawDragTouch);
-      document.addEventListener('touchend', strawEndDragTouch);
-      e.preventDefault();
-    }
-    function strawDrag(e) {
-      if (!isStrawDragging) return;
-      updateStrawPosition(e.clientX, e.clientY);
-    }
-    function strawDragTouch(e) {
-      if (!isStrawDragging) return;
-      const touch = e.touches[0];
-      updateStrawPosition(touch.clientX, touch.clientY);
-      e.preventDefault();
-    }
-    function updateStrawPosition(x, y) {
-      // Center the straw on the cursor position
-      const strawWidth = straw.offsetWidth;
-      const strawHeight = straw.offsetHeight;
-      straw.style.left = (x - strawWidth / 2) + "px";
-      straw.style.top = (y - strawHeight / 2) + "px";
-    }
-    function strawEndDrag() {
-      isStrawDragging = false;
-      document.removeEventListener('mousemove', strawDrag);
-      document.removeEventListener('mouseup', strawEndDrag);
-      // For debugging, you may leave the straw where it is
-    }
-    function strawEndDragTouch() {
-      isStrawDragging = false;
-      document.removeEventListener('touchmove', strawDragTouch);
-      document.removeEventListener('touchend', strawEndDragTouch);
-    }
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.firebasestorage.app",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data();
+        if (data) {
+          const bgVideo = document.getElementById("bgVideo");
+          const videoSource = bgVideo.querySelector("source");
+          if (data.videoURL && videoSource.src !== data.videoURL) {
+            videoSource.src = data.videoURL;
+            bgVideo.load();
+            bgVideo.play();
+          }
+          const bgAudio = document.getElementById("bgAudio");
+          const audioSource = bgAudio.querySelector("source");
+          if (data.audioURL && audioSource.src !== data.audioURL) {
+            audioSource.src = data.audioURL;
+            bgAudio.load();
+            bgAudio.play();
+          }
+          if (data.avatarURL) {
+            document.getElementById("avatarImg").src = data.avatarURL;
+          }
+          if (data.profileName) {
+            document.getElementById("profileName").innerText = data.profileName;
+          }
+          if (data.joinedLine) {
+            document.getElementById("joinedLine").innerText = data.joinedLine;
+          }
+        }
+      });
   </script>
-  <!-- Load Firebase SDK if needed for further debugging -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <!-- Load Firebase SDK (if needed) -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script> -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
