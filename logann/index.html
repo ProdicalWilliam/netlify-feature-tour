@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
-  <link rel="icon" href="https://images-ext-1.discordapp.net/external/yV27HOYXsoOKBNI2fWA1pzk2ZXdORI1IY-RQV6XI6FM/https/www.disneyclips.com/images5/images/bambi-thumper10.png?format=webp&quality=lossless&width=620&height=531" sizes="32x32">
+  <!-- Favicon set to your provided full juice image -->
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -89,21 +89,17 @@
       transition: opacity 0.5s ease;
       overflow: hidden;
     }
-    /* Table in the middle */
-    #tableImg {
-      position: absolute;
-      max-width: 300px;
-      max-height: 300px;
-      z-index: 1;
-    }
-    /* Juice Box centered on table */
+    /* Remove table image; only use juiceBox and straw now */
+    /* Juice Box (without straw) */
     #juiceBox {
       position: absolute;
       max-width: 365px;
       max-height: 546px;
       z-index: 2;
+      /* Initially visible */
+      opacity: 1;
     }
-    /* Straw positioned under the table */
+    /* Straw */
     #straw {
       position: absolute;
       width: 48px;
@@ -114,7 +110,7 @@
       user-select: none;
       z-index: 2;
     }
-    /* Full Juice container */
+    /* Full Juice Container */
     #fullJuiceContainer {
       display: none;
       position: fixed;
@@ -262,31 +258,22 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* League Stats Section – Not Editable by Default */
-    .lol-stats {
+    /* Receipt Box instead of Info Box */
+    .receipt-box {
       display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+      justify-content: center;
       align-items: center;
-      padding: 10px;
+      border: 2px solid var(--outlineColor);
       border-radius: 10px;
       background: var(--containerColor);
-      border: 2px solid var(--outlineColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 0 auto;
     }
-    .lol-stats .stats-info {
-      flex: 1;
-      min-width: 200px;
-    }
-    .lol-stats h2 {
-      font-size: 18px;
-      margin-bottom: 4px;
-      color: #fff;
-    }
-    .lol-stats p {
-      font-size: 14px;
-      margin: 2px 0;
-      color: var(--textSecondary);
-      white-space: pre-wrap;
+    .receipt-box img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
     }
     /* Custom Cursor */
     .cursor {
@@ -326,7 +313,7 @@
       width: 100%;
       height: 100%;
       background: var(--modalBg);
-      display: none; /* Hidden by default; shown on key sequence */
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 2000;
@@ -408,14 +395,16 @@
 
   <!-- Entry Overlay (Mini-game) -->
   <div id="entryOverlay">
-    <img id="tableImg" src="https://www.freeiconspng.com/uploads/table-clipart-7.png" alt="Table">
-    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png" alt="Juice Box">
-    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png" alt="Straw" draggable="true">
+    <!-- Removed table image -->
+    <!-- Juice Box (without straw) -->
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
+    <!-- Straw -->
+    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131" alt="Straw">
   </div>
 
   <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
-    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" alt="Full Juice">
+    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
   </div>
 
   <!-- Login Modal (Triggered by Key Sequence "w w w e e q") -->
@@ -465,15 +454,10 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- League Stats Section – Not Editable by Default -->
-        <div class="lol-stats" id="leagueInfo" contenteditable="false">
-          <div class="stats-info">
-            <h2>League of Legends Stats</h2>
-            <p>Summoner: Logann</p>
-            <p>Rank: Gold / 60 LP</p>
-            <p>Wins: 120, Losses: 100</p>
-            <p>KDA: 3.8, CS per minute: 7.5</p>
-          </div>
+        <!-- Receipt Box instead of Info Box -->
+        <div class="receipt-box" id="receiptBox">
+          <!-- Replace the URL below with your receipt image URL -->
+          <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
         <!-- Edit Controls (Hidden by Default) -->
         <div id="editControls">
@@ -482,7 +466,8 @@
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
-          <textarea id="leagueText" rows="8" placeholder="Edit League Info"></textarea>
+          <!-- For receipt, allow updating the receipt image -->
+          <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
       </div>
@@ -539,9 +524,9 @@
           if (data.joinedLine) {
             document.getElementById('joinedLine').innerText = data.joinedLine;
           }
-          // Update league info text
-          if (data.leagueInfo) {
-            document.getElementById('leagueInfo').innerHTML = data.leagueInfo;
+          // Update receipt image if provided
+          if (data.receiptURL) {
+            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
           }
         }
       });
@@ -569,7 +554,7 @@
           const user = result.user;
           // Check if the signed in user's UID is allowed to edit
           if(user.uid === "UvlkhrcNaXcUU1DX6qD1E176TqI3"){
-            document.getElementById('leagueInfo').contentEditable = "true";
+            document.getElementById('receiptBox').contentEditable = "true";
             document.getElementById('editControls').style.display = 'flex';
             alert("Edit mode enabled!");
             document.getElementById('loginModal').style.display = 'none';
@@ -584,12 +569,12 @@
         });
     });
 
-    // Save edits: update video, audio, avatar, profile info, and league info in Firestore
+    // Save edits: update video, audio, avatar, profile info, and receipt image in Firestore
     document.getElementById('saveEdits').addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
       const newAudioURL = document.getElementById('audioURL').value;
       const newAvatarURL = document.getElementById('avatarURL').value;
-      const leagueText = document.getElementById('leagueText').value;
+      const newReceiptURL = document.getElementById('receiptURL').value;
       const newProfileName = document.getElementById('profileNameInput').value;
       const newJoinedLine = document.getElementById('joinedLineInput').value;
       
@@ -597,14 +582,14 @@
         videoURL: newVideoURL || "",
         audioURL: newAudioURL || "",
         avatarURL: newAvatarURL || "",
-        leagueInfo: leagueText || "",
+        receiptURL: newReceiptURL || "",
         profileName: newProfileName || "",
         joinedLine: newJoinedLine || ""
       }, { merge: true })
       .then(() => {
         alert("Changes saved globally!");
         // Disable editing and hide controls
-        document.getElementById('leagueInfo').contentEditable = "false";
+        document.getElementById('receiptBox').contentEditable = "false";
         document.getElementById('editControls').style.display = "none";
       })
       .catch((error) => {
