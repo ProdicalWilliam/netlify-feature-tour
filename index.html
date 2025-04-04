@@ -227,7 +227,8 @@
           <a href="#bambi">Bambi</a>
         </div>
         <div class="name-card" data-name="Logann">
-          <a href="#logann">Logann</a>
+          <!-- Direct navigation to the Logann website -->
+          <a href="/logann/index.html">Logann</a>
         </div>
         <div class="name-card" data-name="Mikey">
           <a href="#mikey">Mikey</a>
@@ -307,8 +308,12 @@
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
 
-    // Get auth instance
+    // Get auth instance and set persistence to LOCAL (default, but explicitly setting for clarity)
     const auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .catch((error) => {
+        console.error("Error setting persistence:", error);
+      });
 
     // Modal and auth form elements
     const authModal = document.getElementById('authModal');
