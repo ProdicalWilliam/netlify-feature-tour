@@ -89,14 +89,12 @@
       transition: opacity 0.5s ease;
       overflow: hidden;
     }
-    /* Remove table image; only use juiceBox and straw now */
     /* Juice Box (without straw) */
     #juiceBox {
       position: absolute;
       max-width: 365px;
       max-height: 546px;
       z-index: 2;
-      /* Initially visible */
       opacity: 1;
     }
     /* Straw */
@@ -109,6 +107,7 @@
       cursor: grab;
       user-select: none;
       z-index: 2;
+      transition: transform 0.3s ease;
     }
     /* Full Juice Container */
     #fullJuiceContainer {
@@ -123,7 +122,7 @@
       max-width: 365px;
       max-height: 546px;
       opacity: 0;
-      transition: opacity 0.5s ease-in;
+      transition: opacity 0.7s ease-in-out;
     }
     /* Main Content Container (Information Page) */
     #mainContent {
@@ -329,6 +328,16 @@
       color: var(--textColor);
       font-size: 1.1em;
     }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+      font-size: 1em;
+    }
     #loginModal button {
       padding: 10px 20px;
       background: var(--outlineColor);
@@ -393,9 +402,8 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay (Mini-game) -->
+  <!-- Entry Overlay (Mini‑Game) -->
   <div id="entryOverlay">
-    <!-- Removed table image -->
     <!-- Juice Box (without straw) -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
     <!-- Straw -->
@@ -407,12 +415,14 @@
     <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
   </div>
 
-  <!-- Login Modal (Triggered by Key Sequence "w w w e e q") -->
+  <!-- Login Modal (Email/Password based) -->
   <div id="loginModal">
     <div class="modal-content">
       <h2>Admin Login</h2>
-      <p>Please sign in with Google to access edit mode.</p>
-      <button id="googleSignIn">Sign in with Google</button>
+      <p>Please sign in to access edit mode.</p>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign in</button>
     </div>
   </div>
 
@@ -454,9 +464,8 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Receipt Box instead of Info Box -->
+        <!-- Receipt Box (Image based) -->
         <div class="receipt-box" id="receiptBox">
-          <!-- Replace the URL below with your receipt image URL -->
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
         <!-- Edit Controls (Hidden by Default) -->
@@ -492,7 +501,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Listen for real-time updates on the "global" settings document
+    // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
@@ -546,26 +555,22 @@
       }
     });
 
-    // Handle Google Sign-In when "Sign in with Google" button is clicked
-    document.getElementById('googleSignIn').addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
+    // Handle Email/Password Sign-In when "Sign in" button is clicked
+    document.getElementById('emailSignIn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
           const user = result.user;
-          // Check if the signed in user's UID is allowed to edit
-          if(user.uid === "UvlkhrcNaXcUU1DX6qD1E176TqI3"){
-            document.getElementById('receiptBox').contentEditable = "true";
-            document.getElementById('editControls').style.display = 'flex';
-            alert("Edit mode enabled!");
-            document.getElementById('loginModal').style.display = 'none';
-          } else {
-            alert("You are not authorized to edit this page.");
-            auth.signOut();
-          }
+          // Allow any valid user (or check against your own criteria)
+          document.getElementById('receiptBox').contentEditable = "true";
+          document.getElementById('editControls').style.display = 'flex';
+          alert("Edit mode enabled!");
+          document.getElementById('loginModal').style.display = 'none';
         })
         .catch((error) => {
           console.error("Error during sign-in:", error);
-          alert("Error logging in. Please try again later.");
+          alert("Error logging in. Please check your credentials and try again.");
         });
     });
 
@@ -597,54 +602,94 @@
       });
     });
 
-    // Entry Overlay Drag & Drop handling
+    // Entry Overlay Drag & Drop handling using pointer events
     const entryOverlay = document.getElementById('entryOverlay');
     const juiceBox = document.getElementById('juiceBox');
     const straw = document.getElementById('straw');
     const fullJuiceContainer = document.getElementById('fullJuiceContainer');
     const fullJuice = document.getElementById('fullJuice');
-    // Pause video during mini-game
+    // Pause video during mini‑game
     const bgVideo = document.getElementById('bgVideo');
     bgVideo.pause();
 
-    // Straw drag handling
-    straw.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData("text/plain", "straw");
+    // Save original straw position
+    let strawOrig = { x: straw.offsetLeft, y: straw.offsetTop };
+    let dragging = false, offset = { x: 0, y: 0 };
+
+    straw.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      straw.style.cursor = 'grabbing';
+      offset.x = e.clientX - straw.offsetLeft;
+      offset.y = e.clientY - straw.offsetTop;
+      straw.setPointerCapture(e.pointerId);
     });
-    juiceBox.addEventListener('dragover', (e) => {
-      e.preventDefault();
+
+    straw.addEventListener('pointermove', (e) => {
+      if(dragging){
+        // Move straw with pointer
+        straw.style.left = (e.clientX - offset.x) + 'px';
+        straw.style.top = (e.clientY - offset.y) + 'px';
+      }
     });
-    juiceBox.addEventListener('drop', (e) => {
-      e.preventDefault();
-      juiceBox.style.transition = "opacity 0.5s ease-out";
-      straw.style.transition = "opacity 0.5s ease-out";
-      juiceBox.style.opacity = "0";
-      straw.style.opacity = "0";
-      setTimeout(() => {
-        entryOverlay.style.display = "none";
-        fullJuiceContainer.style.display = "block";
-        fullJuice.style.opacity = "0";
-        fullJuice.style.transition = "opacity 0.5s ease-in";
+
+    straw.addEventListener('pointerup', (e) => {
+      dragging = false;
+      straw.style.cursor = 'grab';
+      straw.releasePointerCapture(e.pointerId);
+      // Check if straw overlaps with juiceBox
+      const juiceRect = juiceBox.getBoundingClientRect();
+      const strawRect = straw.getBoundingClientRect();
+      if (
+        strawRect.right > juiceRect.left &&
+        strawRect.left < juiceRect.right &&
+        strawRect.bottom > juiceRect.top &&
+        strawRect.top < juiceRect.bottom
+      ) {
+        // Successful drop: animate straw and juiceBox fade out
+        juiceBox.style.transition = "opacity 0.5s ease-out";
+        straw.style.transition = "opacity 0.5s ease-out";
+        juiceBox.style.opacity = "0";
+        straw.style.opacity = "0";
         setTimeout(() => {
-          fullJuice.style.opacity = "1";
-        }, 50);
+          entryOverlay.style.display = "none";
+          // Show full juice with a smooth fade in
+          fullJuiceContainer.style.display = "block";
+          fullJuice.style.opacity = "0";
+          setTimeout(() => {
+            fullJuice.style.opacity = "1";
+          }, 50);
+          // After a short delay, fade full juice out and reveal main content
+          setTimeout(() => {
+            fullJuice.style.opacity = "0";
+            setTimeout(() => {
+              fullJuiceContainer.style.display = "none";
+              document.getElementById('mainContent').style.opacity = "1";
+              bgVideo.play();
+              document.getElementById('cursor').style.display = "block";
+            }, 700);
+          }, 1500);
+        }, 500);
+      } else {
+        // If not dropped correctly, return straw to its original position smoothly
+        straw.style.transition = "left 0.3s ease, top 0.3s ease";
+        straw.style.left = strawOrig.x + "px";
+        straw.style.top = strawOrig.y + "px";
+      }
+    });
+
+    // Clicking on the overlay (outside of dragging) will also let you bypass the mini‑game
+    entryOverlay.addEventListener('click', (e) => {
+      // Only trigger if not dragging the straw
+      if(!dragging) {
+        entryOverlay.style.opacity = '0';
         setTimeout(() => {
-          document.getElementById('mainContent').style.opacity = "1";
+          entryOverlay.style.display = 'none';
+          document.getElementById('mainContent').style.opacity = '1';
           bgVideo.play();
           document.getElementById('cursor').style.display = "block";
-          fullJuiceContainer.style.display = "none";
-        }, 1500);
-      }, 500);
-    });
-    entryOverlay.addEventListener('click', () => {
-      entryOverlay.style.opacity = '0';
-      setTimeout(() => {
-        entryOverlay.style.display = 'none';
-        document.getElementById('mainContent').style.opacity = '1';
-        bgVideo.play();
-        document.getElementById('cursor').style.display = "block";
-      }, 500);
-      document.getElementById('bgAudio').muted = false;
+        }, 500);
+        document.getElementById('bgAudio').muted = false;
+      }
     });
 
     // Audio Toggle: controls bgAudio element
