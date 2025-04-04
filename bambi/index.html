@@ -7,9 +7,7 @@
   <!-- Favicon -->
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2325/2325163.png" type="image/png">
   <style>
-    /* ---------------------------
-       RESET & GLOBAL
-    --------------------------- */
+    /* ---------- RESET & GLOBAL ---------- */
     * {
       margin: 0;
       padding: 0;
@@ -19,14 +17,12 @@
     html, body {
       width: 100%;
       height: 100%;
-      /* Remove black background so video is visible */
+      /* No background color so video shows through */
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
-    /* ---------------------------
-       BACKGROUND VIDEO
-    --------------------------- */
+    /* ---------- BACKGROUND VIDEO ---------- */
     #bgVideo {
       position: fixed;
       top: 0;
@@ -34,11 +30,9 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: -2;
+      z-index: -3;
     }
-    /* ---------------------------
-       AUDIO TOGGLE BUTTON (Top Left)
-    --------------------------- */
+    /* ---------- AUDIO TOGGLE BUTTON (Top Left) ---------- */
     #audioToggle {
       position: fixed;
       top: 15px;
@@ -59,9 +53,7 @@
       height: 24px;
       fill: #fff;
     }
-    /* ---------------------------
-       ENTRY OVERLAY ("BITCH?")
-    --------------------------- */
+    /* ---------- ENTRY OVERLAY ("BITCH?") ---------- */
     #entryOverlay {
       position: fixed;
       top: 0;
@@ -84,9 +76,7 @@
       cursor: pointer;
       user-select: none;
     }
-    /* ---------------------------
-       MAIN CONTENT CONTAINER
-    --------------------------- */
+    /* ---------- MAIN CONTENT ---------- */
     .container {
       width: 100vw;
       height: 100vh;
@@ -96,12 +86,11 @@
       perspective: 1000px;
       z-index: 2;
     }
-    /* ---------------------------
-       TILTING INFO CARD
-    --------------------------- */
+    /* ---------- INFO CARD ---------- */
     .card {
-      background: rgba(255, 255, 255, 0.18); /* more white, slightly transparent */
-      border: 5px solid rgba(173, 216, 230, 0.5); /* thicker border with a blue tint */
+      background: rgba(255, 255, 255, 0.18); /* a more white, semi-transparent background */
+      border: 5px solid rgba(173, 216, 230, 0.5); /* thicker blue-tinged border */
+      border-image: linear-gradient(to right, rgba(255,255,255,0.8), rgba(173,216,230,0.8)) 1;
       border-radius: 16px;
       padding: 20px;
       width: 350px;
@@ -123,7 +112,7 @@
       font-weight: 600;
       margin-bottom: 10px;
     }
-    /* Initially hidden typewriter text */
+    /* ---------- TYPEWRITER TEXT (appears on card hover) ---------- */
     .typewriter {
       color: #fff;
       font-size: 18px;
@@ -135,7 +124,6 @@
       transition: opacity 0.3s ease;
       margin-bottom: 10px;
     }
-    /* Only show typewriter when mouse hovers over card */
     .card:hover .typewriter {
       opacity: 1;
       animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
@@ -167,14 +155,12 @@
       font-weight: bold;
       font-size: 16px;
     }
-    /* ---------------------------
-       CUSTOM CURSOR & SNOW TRAIL
-    --------------------------- */
+    /* ---------- CUSTOM CURSOR & SNOW TRAIL ---------- */
     .cursor {
       position: fixed;
       top: 0;
       left: 0;
-      width: 12px; /* a bit bigger */
+      width: 12px; /* slightly larger than before */
       height: 12px;
       background: radial-gradient(circle, #fff, rgba(255,255,255,0));
       border-radius: 50%;
@@ -186,8 +172,8 @@
   </style>
 </head>
 <body>
-  <!-- Background Video (Looped, Unmuted after entry) -->
-  <video id="bgVideo" autoplay loop playsinline style="z-index: -2;">
+  <!-- Background Video -->
+  <video id="bgVideo" autoplay loop playsinline style="z-index: -3;">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144919/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -202,12 +188,12 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay with "BITCH?" text -->
+  <!-- Entry Overlay ("BITCH?") -->
   <div id="entryOverlay">
     <h1 id="entryText">BITCH?</h1>
   </div>
 
-  <!-- Main Content -->
+  <!-- Main Content Container -->
   <div class="container" id="mainContent" style="display:none;">
     <div class="card" id="card">
       <img class="avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024" alt="Avatar">
@@ -225,28 +211,31 @@
   <div class="cursor" id="cursor"></div>
 
   <script>
-    /* -------------- CARD TILT EFFECT (More Sensitive) -------------- */
+    /* ---------- CARD TILT (Only when cursor over card, with small tilt) ---------- */
     const card = document.getElementById('card');
-    document.addEventListener('mousemove', (e) => {
+    card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const cardX = rect.left + rect.width / 2;
       const cardY = rect.top + rect.height / 2;
       const deltaX = e.clientX - cardX;
       const deltaY = e.clientY - cardY;
-      // Increase tilt sensitivity
-      const rotateY = deltaX / 15;
-      const rotateX = -deltaY / 15;
+      // Limit tilt to a small angle (e.g. max 3°)
+      const maxTilt = 3;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
       card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
 
-    /* -------------- CUSTOM CURSOR & SNOW TRAIL -------------- */
+    /* ---------- CUSTOM CURSOR & SNOW TRAIL ---------- */
     const cursor = document.getElementById('cursor');
     let lastMouseX = 0, lastMouseY = 0;
     document.addEventListener('mousemove', (e) => {
       cursor.style.top = e.clientY + 'px';
       cursor.style.left = e.clientX + 'px';
-      
-      // Only create a snow drop if the mouse moved enough
+      // Create snow drop only if mouse has moved enough
       if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
         const dot = document.createElement('div');
         dot.style.position = 'fixed';
@@ -271,7 +260,7 @@
       }
     });
 
-    /* -------------- AUDIO TOGGLE -------------- */
+    /* ---------- AUDIO TOGGLE ---------- */
     const bgVideo = document.getElementById('bgVideo');
     const audioToggle = document.getElementById('audioToggle');
     const audioIcon = document.getElementById('audioIcon');
@@ -284,7 +273,7 @@
       }
     });
 
-    /* -------------- ENTRY OVERLAY & AUDIO PERMISSION -------------- */
+    /* ---------- ENTRY OVERLAY & AUDIO PERMISSION ---------- */
     const entryOverlay = document.getElementById('entryOverlay');
     const entryText = document.getElementById('entryText');
     const mainContent = document.getElementById('mainContent');
@@ -298,7 +287,7 @@
       bgVideo.muted = false;
     });
 
-    /* -------------- SIMULATED DISCORD ONLINE CHECK -------------- */
+    /* ---------- SIMULATED DISCORD ONLINE CHECK ---------- */
     const discordUserId = "1353073691864338625";
     function checkDiscordOnlineStatus(userId) {
       // Simulated check – always returns true
