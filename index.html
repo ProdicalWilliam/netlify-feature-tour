@@ -3,66 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <title>Dazes</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
   <style>
-    /* Main site styles */
-    html, body {
+    /* Reset and base styles */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
       height: 100%;
       font-family: 'Montserrat', sans-serif;
+      background: #111;
       color: #fff;
       scroll-behavior: smooth;
     }
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
-    /* Main page styles */
+
+    /* Main page background with subtle animation */
     .main-page {
-      height: 100vh;
-      overflow: hidden;
-      background: linear-gradient(45deg, #222, #fff);
-      background-size: 200% 200%;
-      animation: gradientAnimation 10s linear infinite;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a1a, #333);
+      animation: bgAnimation 15s ease infinite;
     }
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 100% 100%; }
+    @keyframes bgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
+
+    /* Container centering content */
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
       padding: 2rem;
       text-align: center;
     }
+
     h1 {
       font-size: 3rem;
       margin-bottom: 2rem;
-      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+      text-shadow: 0 0 10px rgba(0,0,0,0.7);
     }
+
+    /* Grid layout for cards */
     .name-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 20px;
-      max-width: 800px;
+      width: 100%;
+      max-width: 960px;
     }
+
+    /* Card styling with hover effect and preview */
     .name-card {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      transition: all 0.3s ease;
+      position: relative;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      cursor: pointer;
     }
     .name-card:hover {
-      transform: translateY(-10px);
-      background: rgba(0,0,0,0.5);
-      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
-    a {
+
+    .name-card a {
+      color: #fff;
+      font-size: 1.2rem;
+      text-decoration: none;
+      z-index: 2;
+      position: relative;
+    }
+
+    /* Card preview hidden by default */
+    .card-preview {
+      position: absolute;
+      bottom: -100%;
+      left: 0;
+      width: 100%;
+      padding: 0.8rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 0.9rem;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      text-align: center;
+      transition: bottom 0.3s ease;
+      pointer-events: none;
+    }
+    .name-card:hover .card-preview {
+      bottom: 0;
+    }
+
+    /* Back link styling */
+    .home-link {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
       color: #fff;
       text-decoration: none;
-      font-size: 1.2rem;
-      display: block;
+      font-size: 1rem;
+      background: rgba(0,0,0,0.5);
+      padding: 0.5rem 0.8rem;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .home-link:hover {
+      background: rgba(0,0,0,0.7);
+    }
+
+    /* Profile page basic styling */
+    .profile-page {
+      display: none;
+      min-height: 100vh;
+      padding: 2rem;
+      background: #222;
+      position: relative;
+    }
+    .profile-page .content {
+      margin-top: 3rem;
+      text-align: center;
     }
   </style>
 </head>
@@ -72,16 +137,38 @@
     <div class="container">
       <h1>Welcome to Dazes.org</h1>
       <div class="name-grid">
-        <div class="name-card"><a href="/william">William</a></div>
-        <!-- Brayden now lives in its own folder -->
-        <div class="name-card"><a href="/brayden/">Brayden</a></div>
-        <div class="name-card"><a href="/vaani">Vaani</a></div>
-        <div class="name-card"><a href="/maddie">Maddie</a></div>
-        <div class="name-card"><a href="/bambi">Bambi</a></div>
-        <!-- Logann now lives in its own folder -->
-        <div class="name-card"><a href="/logann/">Logann</a></div>
-        <div class="name-card"><a href="/mikey">Mikey</a></div>
-        <div class="name-card"><a href="/proxy">Proxy</a></div>
+        <div class="name-card">
+          <a href="/william">William</a>
+          <div class="card-preview">Discover William's creative projects and ideas.</div>
+        </div>
+        <div class="name-card">
+          <a href="/brayden/">Brayden</a>
+          <div class="card-preview">Learn more about Brayden's work and portfolio.</div>
+        </div>
+        <div class="name-card">
+          <a href="/vaani">Vaani</a>
+          <div class="card-preview">Explore Vaani’s innovative designs and concepts.</div>
+        </div>
+        <div class="name-card">
+          <a href="/maddie">Maddie</a>
+          <div class="card-preview">See Maddie’s artful creations and projects.</div>
+        </div>
+        <div class="name-card">
+          <a href="/bambi">Bambi</a>
+          <div class="card-preview">Check out Bambi's vibrant and engaging work.</div>
+        </div>
+        <div class="name-card">
+          <a href="/logann/">Logann</a>
+          <div class="card-preview">Dive into Logann's digital portfolio and ideas.</div>
+        </div>
+        <div class="name-card">
+          <a href="/mikey">Mikey</a>
+          <div class="card-preview">Explore Mikey’s projects and creative endeavors.</div>
+        </div>
+        <div class="name-card">
+          <a href="/proxy">Proxy</a>
+          <div class="card-preview">Learn more about Proxy's digital innovations.</div>
+        </div>
       </div>
     </div>
   </section>
@@ -90,7 +177,8 @@
   <section id="william" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
-      <h1>#TEMP#</h1>
+      <h1>William's Profile</h1>
+      <!-- Additional content for William can go here -->
     </div>
   </section>
 
@@ -98,7 +186,8 @@
   <section id="maddie" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
-      <h1>#TEMP#</h1>
+      <h1>Maddie's Profile</h1>
+      <!-- Additional content for Maddie can go here -->
     </div>
   </section>
 
@@ -106,7 +195,8 @@
   <section id="bambi" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
-      <h1>#TEMP#</h1>
+      <h1>Bambi's Profile</h1>
+      <!-- Additional content for Bambi can go here -->
     </div>
   </section>
 
@@ -114,7 +204,8 @@
   <section id="mikey" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
-      <h1>#TEMP#</h1>
+      <h1>Mikey's Profile</h1>
+      <!-- Additional content for Mikey can go here -->
     </div>
   </section>
 
@@ -122,12 +213,15 @@
   <section id="proxy" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
-      <h1>#TEMP#</h1>
+      <h1>Proxy's Profile</h1>
+      <!-- Additional content for Proxy can go here -->
     </div>
   </section>
 
+  <!-- Brayden's and Vaani's pages can be structured similarly -->
+  
   <script>
-    // Basic hash navigation for the in-page sections
+    // Basic hash navigation for in-page sections
     document.addEventListener('DOMContentLoaded', function() {
       const sections = document.querySelectorAll('.profile-page');
       function showSection(hash) {
@@ -144,7 +238,7 @@
       window.addEventListener('hashchange', () => {
         showSection(window.location.hash.substring(1));
       });
-      // Initialize display
+      // Initialize display based on the current hash
       showSection(window.location.hash.substring(1));
     });
   </script>
