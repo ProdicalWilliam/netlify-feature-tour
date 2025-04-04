@@ -1,396 +1,756 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Brayden</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon updated to use the full juice box image without cropping -->
+  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
-    /* Global styles */
-    html, body {
+    :root {
+      --containerColor: rgba(0, 0, 0, 0.4);
+      --containerBlur: 12px;
+      --containerBorder: 2px solid #4b0082;
+      --containerRadius: 20px;
+      --containerWidth: 42rem;
+      --containerPadding: 20px 25px;
+      --textColor: #fff;
+      --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
+      --outlineColor: #4b0082;
+      /* Custom crosshair image URL */
+      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
+      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
+      --modalBg: rgba(0, 0, 0, 0.85);
+      --modalBorder: 2px solid #4b0082;
+    }
+    /* Global Reset */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      /* Initially use the default cursor so dragging works during the mini‑game */
+      /* (No custom cursor styling applied yet) */
+    }
+    html, body {
+      width: 100%;
       height: 100%;
-      font-family: 'Montserrat', sans-serif;
-      background: #000;
-      color: #fff;
-      overflow-x: hidden;
-      position: relative;
-    }
-    a {
-      color: #fff;
-      text-decoration: none;
-    }
-    .profile-page {
-      position: relative;
-      min-height: 100vh;
-      display: block;
-    }
-    .home-link {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px 15px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 20;
-      transition: transform 0.3s ease;
-    }
-    .home-link:hover {
-      transform: translateY(-3px);
-    }
-    .content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
+      background: none;
+      font-family: Arial, sans-serif;
       overflow: hidden;
+      cursor: default;
     }
-    /* Brayden background using the provided GIF */
-    .profile-background {
+    /* When custom cursor is enabled on info page */
+    body.custom-cursor {
+      cursor: none;
+    }
+    /* Background Video */
+    #bgVideo {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('https://cdn.discordapp.com/attachments/1261103952293003297/1357153384582353106/ezgif-8e3f696cac0c5b.gif?ex=67ef2b15&is=67edd995&hm=497cb808a3b13616db194d3515ad75c05d17a445d87bc2e7f078315d1de9c31a') no-repeat center center/cover;
-      z-index: 0;
-      filter: blur(5px);
+      object-fit: cover;
+      z-index: -3;
+      opacity: 1;
+      transition: opacity 1s ease;
     }
-    /* Interactive container */
-    .interactive-container {
-      position: relative;
-      width: 100%;
-      height: 300px;
-      margin-bottom: 20px;
-    }
-    /* Draggable key using new asset */
-    .draggable-key {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: transparent;
-      left: 30px;
-      top: 85px;
-      cursor: pointer;
-      background-image: url('https://static.vecteezy.com/system/resources/previews/027/050/096/non_2x/key-game-assets-3d-illustrations-png.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
-    /* Lock target using new asset */
-    .lock-target {
-      position: absolute;
-      width: 70px;
-      height: 70px;
-      background: transparent;
-      right: 30px;
-      top: 85px;
-      background-image: url('https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-cartoon-lock-png-image_6564340.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
-    /* Table background decorative element */
-    .table-background {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-    /* Profile container and overlay styling */
-    .profile-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: opacity 0.5s ease;
-      z-index: 5;
-    }
-    .hidden {
+    /* Background Audio */
+    #bgAudio {
       display: none;
     }
-    .avatar {
-      width: 128px;
-      height: 128px;
+    /* Audio Toggle Button */
+    #audioToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.3);
+      border: none;
       border-radius: 50%;
-      border: 3px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-      opacity: 0;
-      transition: all 0.8s ease;
-      margin-bottom: 15px;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: background 0.2s;
     }
-    .avatar.visible, .avatar:hover {
+    #audioToggle:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    #audioToggle svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+    /* Entry Overlay (Mini‑Game) */
+    #entryOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--overlayBg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+    /* Juice Box (without straw) */
+    #juiceBox {
+      position: absolute;
+      max-width: 365px;
+      max-height: 546px;
+      z-index: 2;
       opacity: 1;
-      transform: translateY(-10px);
     }
-    .overlay {
-      background: rgba(20, 0, 30, 0.7);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    /* Straw – placed at bottom right and made draggable using mousedown/touch events */
+    #straw {
+      position: absolute;
+      width: 48px;
+      height: 131px;
+      bottom: 20px;
+      right: 20px;
+      user-select: none;
+      z-index: 1010;
+      transition: transform 0.3s ease;
+      touch-action: none;
+      pointer-events: auto;
+    }
+    /* Full Juice Container */
+    #fullJuiceContainer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1500;
+    }
+    #fullJuice {
+      max-width: 365px;
+      max-height: 546px;
       opacity: 0;
-      transition: all 0.6s ease;
+      transition: opacity 0.7s ease-in-out;
     }
-    .overlay.visible {
-      opacity: 1;
+    /* Main Content Container (Information Page) */
+    #mainContent {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.8s ease;
     }
-    .overlay:hover {
-      transform: translateY(-10px);
+    /* Tilt Container for Card */
+    #cardContainer {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
+      transform: rotateX(6.67deg) rotateY(-7.57deg);
     }
-    .overlay h2 {
-      margin: 0.5em 0;
-      font-size: 2em;
+    /* Profile Card */
+    .profile-card {
+      width: var(--containerWidth);
+      max-width: 95%;
+      padding: var(--containerPadding);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      backdrop-filter: blur(var(--containerBlur));
+      -webkit-backdrop-filter: blur(var(--containerBlur));
+      color: var(--textColor);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-sizing: border-box;
+      animation: cardGlow 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+      50% { box-shadow: 0 0 20px 4px var(--outlineColor); }
+      100% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+    }
+    /* Head Section */
+    .profile-head {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .profile-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-info h1 {
       font-weight: 600;
-      letter-spacing: 1px;
+      font-size: 36px;
+      line-height: 42px;
+      margin: 0;
     }
-    .info-row {
-      margin: 8px 0;
-      font-weight: 300;
+    .joined-line {
+      font-weight: 400;
+      font-size: 13px;
+      margin: 0;
+      color: var(--textSecondary);
+    }
+    /* Server Embed Section */
+    .server-embed {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .server-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .server-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .server-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .server-details h1 {
+      font-weight: 450;
+      font-size: 18px;
+      margin: 0;
+    }
+    .server-stats {
+      font-weight: 450;
+      font-size: 12.5px;
+      color: var(--onlineColor);
+      display: flex;
+      gap: 10px;
+    }
+    .server-stats svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 3px;
+    }
+    .server-details a {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 450;
+      font-size: 12px;
+      color: #fff;
+      text-decoration: none;
+      margin-top: 2px;
+      transition: background 0.3s ease;
+    }
+    .server-details a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    /* Receipt Box (Image based) */
+    .receipt-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .receipt-box img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Login Modal Styles (Clean & Readable) */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modalBg);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--modalBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      color: var(--textColor);
       font-size: 1.1em;
     }
-    .view-counter {
-      margin-top: 10px;
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
       font-size: 1em;
-      font-weight: bold;
-      color: #ffeb3b;
     }
-    /* Animated BAMBI text effect (falling and rotating behind the info card) */
-    .bambi-text {
-      position: absolute;
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #bb86fc;
-      text-shadow: 0 0 10px rgba(187, 134, 252, 0.8);
-      z-index: 4;
+    #loginModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    #loginModal button:hover {
+      background: #2a0a5e;
+    }
+    /* Edit Controls (Hidden by Default) */
+    #editControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #editControls input, #editControls textarea {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Custom Cursor (enabled on info page) */
+    #customCursor {
+      position: fixed;
+      width: 50px;
+      height: 50px;
       pointer-events: none;
-      opacity: 0.5;
-      left: 50%;
-      /* Added blur to simulate a 20% blur effect */
-      filter: blur(3px);
+      z-index: 99999;
+      background: var(--cursorImage) no-repeat center center;
+      background-size: contain;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+    /* Trail Effect for Custom Cursor */
+    .cursorTrail {
+      position: fixed;
+      width: 54px;
+      height: 54px;
+      pointer-events: none;
+      z-index: 9999;
+      background: var(--cursorImage) no-repeat center center;
+      background-size: contain;
+      opacity: 0.8;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 8px #ffb6c1);
     }
   </style>
 </head>
 <body>
-  <div class="profile-background"></div>
-  <section id="brayden" class="profile-page">
-    <a href="/" class="home-link">← Home</a>
-    <div class="content">
-      <!-- Interactive lock and key elements -->
-      <div id="brayden-interactive" class="interactive-container">
-        <div id="brayden-key" class="draggable-key"></div>
-        <div id="brayden-lock" class="lock-target"></div>
-        <div id="brayden-table" class="table-background"></div>
-      </div>
-      
-      <!-- Profile revealed after unlocking -->
-      <div id="brayden-profile-container" class="profile-container hidden">
-        <img src="https://cdn.discordapp.com/avatars/226217786572144643/a1a1c0e162d1eb1a946b0c2d3afbc8b7?size=1024" alt="Discord Avatar" class="avatar" id="brayden-avatar">
-        <div class="overlay" id="brayden-overlay">
-          <h2>lostunhinged</h2>
-          <div class="info-row">Member since September 2016</div>
-          <div class="info-row">Account age: 8+ years</div>
-          <div class="info-row">EST timezone</div>
-          <div class="info-row view-counter">Views: <span id="brayden-view-count">0</span></div>
+  <!-- Background Video -->
+  <video id="bgVideo" autoplay loop playsinline muted preload="auto">
+    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <!-- Background Audio -->
+  <audio id="bgAudio" autoplay loop preload="auto">
+    <source src="https://example.com/default-audio.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+  <!-- Audio Toggle Button -->
+  <button id="audioToggle" title="Toggle Audio">
+    <svg id="audioIcon" viewBox="0 0 24 24">
+      <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
+      <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
+      <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
+    </svg>
+  </button>
+  <!-- Entry Overlay (Mini‑Game) -->
+  <div id="entryOverlay">
+    <!-- Juice Box (without straw) -->
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
+    <!-- Straw with dragging functions (placed at bottom right) -->
+    <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
+  </div>
+  <!-- Full Juice Container -->
+  <div id="fullJuiceContainer">
+    <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
+  </div>
+  <!-- Login Modal (Email/Password based) -->
+  <div id="loginModal">
+    <div class="modal-content">
+      <h2>Admin Login</h2>
+      <p>Please sign in to access edit mode.</p>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign in</button>
+    </div>
+  </div>
+  <!-- Main Content Container -->
+  <div id="mainContent">
+    <!-- Tilt Container -->
+    <div id="cardContainer">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <!-- Head Section -->
+        <div class="profile-head">
+          <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
+          <div class="profile-info">
+            <h1 id="profileName">Logann</h1>
+            <p class="joined-line" id="joinedLine">joined 4 months ago</p>
+          </div>
         </div>
-        <!-- Animated BAMBI text falling behind the info card -->
-        <div id="bambi-text" class="bambi-text">BAMBI 💚</div>
+        <!-- Server Embed Section -->
+        <div class="server-embed">
+          <div class="server-icon">
+            <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+          </div>
+          <div class="server-details">
+            <h1>Dazes</h1>
+            <h3 class="server-stats">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                36 Online
+              </span>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                162 Members
+              </span>
+            </h3>
+            <a href="https://discord.gg/dazes" target="_blank">Join</a>
+          </div>
+        </div>
+        <!-- Receipt Box (Image based) -->
+        <div class="receipt-box" id="receiptBox">
+          <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+        </div>
+        <!-- Edit Controls (Hidden by Default) -->
+        <div id="editControls">
+          <input type="text" id="profileNameInput" placeholder="Enter new profile name">
+          <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
+          <input type="text" id="videoURL" placeholder="Enter new video URL">
+          <input type="text" id="audioURL" placeholder="Enter new audio URL">
+          <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <!-- For receipt, allow updating the receipt image -->
+          <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
+          <button id="saveEdits">Save Changes</button>
+        </div>
       </div>
     </div>
-    
-    <!-- Audio element set to autoplay unmuted using the provided Discord link -->
-    <audio id="brayden-audio" autoplay loop>
-      <source src="https://cdn.discordapp.com/attachments/1261103952293003297/1357164177172598834/Aura_Farming_from_Solo_Leveling.mp3?ex=67ef3522&is=67ede3a2&hm=113ca0de1c0dbc865747ac70946245f32f2e5bc652630fd2d5ded5dd3d955311&" type="audio/mpeg">
-    </audio>
-  </section>
+  </div>
+  <!-- Custom Cursor Element (shown after mini‑game finishes) -->
+  <div id="customCursor"></div>
   
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Element references
-      const braydenInteractive = document.getElementById('brayden-interactive');
-      const braydenKey = document.getElementById('brayden-key');
-      const braydenLock = document.getElementById('brayden-lock');
-      const braydenProfileContainer = document.getElementById('brayden-profile-container');
-      const braydenAvatar = document.getElementById('brayden-avatar');
-      const braydenOverlay = document.getElementById('brayden-overlay');
-      const braydenAudio = document.getElementById('brayden-audio');
-      const braydenViewCount = document.getElementById('brayden-view-count');
-      const bambiText = document.getElementById('bambi-text');
-      
-      // Initialize view counter
-      let viewCount = parseInt(localStorage.getItem('braydenViewCount') || '0');
-      viewCount++;
-      localStorage.setItem('braydenViewCount', viewCount.toString());
-      braydenViewCount.textContent = viewCount.toString();
-      
-      // Draggable key functionality
-      let isDragging = false;
-      let offsetX, offsetY;
-      let unlocked = false;
-      
-      braydenKey.addEventListener('mousedown', startDrag);
-      braydenKey.addEventListener('touchstart', startDragTouch);
-      
-      function startDrag(e) {
-        if (unlocked) return;
-        isDragging = true;
-        offsetX = e.clientX - braydenKey.getBoundingClientRect().left;
-        offsetY = e.clientY - braydenKey.getBoundingClientRect().top;
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', endDrag);
-        e.preventDefault();
-      }
-      
-      function startDragTouch(e) {
-        if (unlocked) return;
-        isDragging = true;
-        const touch = e.touches[0];
-        offsetX = touch.clientX - braydenKey.getBoundingClientRect().left;
-        offsetY = touch.clientY - braydenKey.getBoundingClientRect().top;
-        document.addEventListener('touchmove', dragTouch);
-        document.addEventListener('touchend', endDragTouch);
-        e.preventDefault();
-      }
-      
-      function drag(e) {
-        if (!isDragging) return;
-        const left = e.clientX - offsetX;
-        const top = e.clientY - offsetY;
-        braydenKey.style.left = left + 'px';
-        braydenKey.style.top = top + 'px';
-        checkCollision();
-      }
-      
-      function dragTouch(e) {
-        if (!isDragging) return;
-        const touch = e.touches[0];
-        const left = touch.clientX - offsetX;
-        const top = touch.clientY - offsetY;
-        braydenKey.style.left = left + 'px';
-        braydenKey.style.top = top + 'px';
-        checkCollision();
-        e.preventDefault();
-      }
-      
-      function endDrag() {
-        isDragging = false;
-        document.removeEventListener('mousemove', drag);
-        document.removeEventListener('mouseup', endDrag);
-        if (!unlocked) {
-          braydenKey.style.transition = 'left 0.5s ease, top 0.5s ease';
-          braydenKey.style.left = '30px';
-          braydenKey.style.top = '85px';
-          setTimeout(() => { braydenKey.style.transition = ''; }, 500);
+    // ---------------------------
+    // 1. Typewriter Effect for Tab Title
+    // ---------------------------
+    async function typewriteTitle() {
+      const text = "logann";
+      while (true) {
+        for (let i = 1; i <= text.length; i++) {
+          document.title = text.slice(0, i) + "|";
+          await sleep(200);
         }
+        await sleep(500);
+        // (Keeping the full text for a moment before repeating)
       }
-      
-      function endDragTouch() {
-        isDragging = false;
-        document.removeEventListener('touchmove', dragTouch);
-        document.removeEventListener('touchend', endDragTouch);
-        if (!unlocked) {
-          braydenKey.style.transition = 'left 0.5s ease, top 0.5s ease';
-          braydenKey.style.left = '30px';
-          braydenKey.style.top = '85px';
-          setTimeout(() => { braydenKey.style.transition = ''; }, 500);
-        }
-      }
-      
-      function checkCollision() {
-        if (unlocked) return;
-        const keyRect = braydenKey.getBoundingClientRect();
-        const lockRect = braydenLock.getBoundingClientRect();
-        if (
-          keyRect.right > lockRect.left &&
-          keyRect.left < lockRect.right &&
-          keyRect.bottom > lockRect.top &&
-          keyRect.top < lockRect.bottom
-        ) {
-          unlockAnimation();
-        }
-      }
-      
-      function unlockAnimation() {
-        if (unlocked) return;
-        unlocked = true;
-        isDragging = false;
-        document.removeEventListener('mousemove', drag);
-        document.removeEventListener('mouseup', endDrag);
-        document.removeEventListener('touchmove', dragTouch);
-        document.removeEventListener('touchend', endDragTouch);
-        
-        // Snap key to center of lock
-        braydenKey.style.transition = 'all 0.5s ease';
-        braydenKey.style.left = (braydenLock.offsetLeft + (braydenLock.offsetWidth / 2) - (braydenKey.offsetWidth / 2)) + 'px';
-        braydenKey.style.top = (braydenLock.offsetTop + (braydenLock.offsetHeight / 2) - (braydenKey.offsetHeight / 2)) + 'px';
-        
-        setTimeout(() => {
-          // Flash effect
-          const flash = document.createElement('div');
-          flash.style.position = 'fixed';
-          flash.style.top = '0';
-          flash.style.left = '0';
-          flash.style.width = '100%';
-          flash.style.height = '100%';
-          flash.style.backgroundColor = 'white';
-          flash.style.opacity = '0';
-          flash.style.zIndex = '10';
-          flash.style.transition = 'opacity 0.5s ease';
-          document.body.appendChild(flash);
-          setTimeout(() => { flash.style.opacity = '1'; }, 10);
-          setTimeout(() => {
-            flash.style.opacity = '0';
-            braydenInteractive.style.opacity = '0';
-            setTimeout(() => { braydenInteractive.style.display = 'none'; }, 500);
-            braydenProfileContainer.classList.remove('hidden');
-            setTimeout(() => {
-              braydenAvatar.classList.add('visible');
-              braydenOverlay.classList.add('visible');
-            }, 100);
-            setTimeout(() => { flash.remove(); }, 500);
-          }, 600);
-        }, 500);
-      }
-      
-      // Animate the BAMBI text (falling and rotating behind the info card)
-      function animateBambiText() {
-        let posY = -50;
-        let angle = 0;
-        function animate() {
-          posY += 1; // Adjust speed as needed
-          angle += 1; // Adjust rotation speed
-          bambiText.style.top = posY + 'px';
-          bambiText.style.transform = 'translate(-50%, 0) rotate(' + angle + 'deg)';
-          // Continue animation until a sset point (or loop)
-          if (posY < braydenOverlay.getBoundingClientRect().bottom) {
-            requestAnimationFrame(animate);
+    }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    typewriteTitle();
+
+    // ---------------------------
+    // 2. Function to Enable Custom Cursor (for info page)
+    // ---------------------------
+    function enableCustomCursor() {
+      document.body.classList.add("custom-cursor");
+      const customCursor = document.getElementById("customCursor");
+      customCursor.style.display = "block";
+      document.addEventListener("mousemove", customCursorHandler);
+    }
+    function customCursorHandler(e) {
+      const customCursor = document.getElementById("customCursor");
+      customCursor.style.left = e.clientX + "px";
+      customCursor.style.top = e.clientY + "px";
+      const trail = document.createElement("div");
+      trail.classList.add("cursorTrail");
+      trail.style.left = e.clientX + "px";
+      trail.style.top = e.clientY + "px";
+      document.body.appendChild(trail);
+      setTimeout(() => {
+        trail.style.transition = "opacity 0.6s ease-out";
+        trail.style.opacity = "0";
+        setTimeout(() => { trail.remove(); }, 600);
+      }, 20);
+    }
+
+    // ---------------------------
+    // 3. Firebase Initialization and Settings Update Listener
+    // ---------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.firebasestorage.app",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data();
+        if (data) {
+          const bgVideo = document.getElementById("bgVideo");
+          const videoSource = bgVideo.querySelector("source");
+          if (data.videoURL && videoSource.src !== data.videoURL) {
+            videoSource.src = data.videoURL;
+            bgVideo.load();
+            bgVideo.play();
+          }
+          const bgAudio = document.getElementById("bgAudio");
+          const audioSource = bgAudio.querySelector("source");
+          if (data.audioURL && audioSource.src !== data.audioURL) {
+            audioSource.src = data.audioURL;
+            bgAudio.load();
+            bgAudio.play();
+          }
+          if (data.avatarURL) {
+            document.getElementById("avatarImg").src = data.avatarURL;
+          }
+          if (data.profileName) {
+            document.getElementById("profileName").innerText = data.profileName;
+          }
+          if (data.joinedLine) {
+            document.getElementById("joinedLine").innerText = data.joinedLine;
+          }
+          if (data.receiptURL) {
+            document.getElementById("receiptBox").querySelector("img").src = data.receiptURL;
           }
         }
-        requestAnimationFrame(animate);
+      });
+
+    // ---------------------------
+    // 4. Mini‑Game, Login Modal, and Straw Dragging Logic
+    // ---------------------------
+    // Key sequence detection for "w w w e e q" to show login modal
+    const keySequence = [];
+    const targetSequence = ["w", "w", "w", "e", "e", "q"];
+    document.addEventListener("keydown", (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if (keySequence.length > targetSequence.length) keySequence.shift();
+      if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
+        document.getElementById("loginModal").style.display = "flex";
+        keySequence.length = 0;
       }
-      
-      // Start the BAMBI text animation after profile reveal
-      setTimeout(() => {
-        animateBambiText();
-      }, 1200);
-      
-      // Ensure audio plays unmuted
-      braydenAudio.muted = false;
-      braydenAudio.volume = 0.3;
-      braydenAudio.play().catch(err => {
-        console.error("Audio playback error:", err);
+    });
+    document.getElementById("emailSignIn").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then((result) => {
+          document.getElementById("receiptBox").contentEditable = "true";
+          document.getElementById("editControls").style.display = "flex";
+          alert("Edit mode enabled!");
+          document.getElementById("loginModal").style.display = "none";
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error logging in. Please check your credentials and try again.");
+        });
+    });
+    document.getElementById("saveEdits").addEventListener("click", () => {
+      const newVideoURL = document.getElementById("videoURL").value;
+      const newAudioURL = document.getElementById("audioURL").value;
+      const newAvatarURL = document.getElementById("avatarURL").value;
+      const newReceiptURL = document.getElementById("receiptURL").value;
+      const newProfileName = document.getElementById("profileNameInput").value;
+      const newJoinedLine = document.getElementById("joinedLineInput").value;
+      db.collection("settings").doc("global").set({
+        videoURL: newVideoURL || "",
+        audioURL: newAudioURL || "",
+        avatarURL: newAvatarURL || "",
+        receiptURL: newReceiptURL || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
+      }, { merge: true })
+      .then(() => {
+        alert("Changes saved globally!");
+        document.getElementById("receiptBox").contentEditable = "false";
+        document.getElementById("editControls").style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Error updating settings:", error);
       });
     });
+    const entryOverlay = document.getElementById("entryOverlay");
+    const juiceBox = document.getElementById("juiceBox");
+    const straw = document.getElementById("straw");
+    const fullJuiceContainer = document.getElementById("fullJuiceContainer");
+    const fullJuice = document.getElementById("fullJuice");
+    const bgVideo = document.getElementById("bgVideo");
+    bgVideo.pause();
+    // Record the original position of the straw
+    const strawOrig = {
+      left: straw.getBoundingClientRect().left,
+      top: straw.getBoundingClientRect().top
+    };
+    // Implement dragging functions for straw using mousedown/touch (from the provided script)
+    let isStrawDragging = false;
+    let strawOffsetX, strawOffsetY;
+    straw.addEventListener('mousedown', strawStartDrag);
+    straw.addEventListener('touchstart', strawStartDragTouch);
+    function strawStartDrag(e) {
+      isStrawDragging = true;
+      strawOffsetX = e.clientX - straw.getBoundingClientRect().left;
+      strawOffsetY = e.clientY - straw.getBoundingClientRect().top;
+      document.addEventListener('mousemove', strawDrag);
+      document.addEventListener('mouseup', strawEndDrag);
+      e.preventDefault();
+    }
+    function strawStartDragTouch(e) {
+      isStrawDragging = true;
+      const touch = e.touches[0];
+      strawOffsetX = touch.clientX - straw.getBoundingClientRect().left;
+      strawOffsetY = touch.clientY - straw.getBoundingClientRect().top;
+      document.addEventListener('touchmove', strawDragTouch);
+      document.addEventListener('touchend', strawEndDragTouch);
+      e.preventDefault();
+    }
+    function strawDrag(e) {
+      if (!isStrawDragging) return;
+      const left = e.clientX - strawOffsetX;
+      const top = e.clientY - strawOffsetY;
+      straw.style.left = left + 'px';
+      straw.style.top = top + 'px';
+    }
+    function strawDragTouch(e) {
+      if (!isStrawDragging) return;
+      const touch = e.touches[0];
+      const left = touch.clientX - strawOffsetX;
+      const top = touch.clientY - strawOffsetY;
+      straw.style.left = left + 'px';
+      straw.style.top = top + 'px';
+      e.preventDefault();
+    }
+    function strawEndDrag() {
+      isStrawDragging = false;
+      document.removeEventListener('mousemove', strawDrag);
+      document.removeEventListener('mouseup', strawEndDrag);
+      // Optionally, reset straw position if needed:
+      // straw.style.left = strawOrig.left + 'px';
+      // straw.style.top = strawOrig.top + 'px';
+    }
+    function strawEndDragTouch() {
+      isStrawDragging = false;
+      document.removeEventListener('touchmove', strawDragTouch);
+      document.removeEventListener('touchend', strawEndDragTouch);
+    }
+    // When straw is dropped over the juice box, proceed with mini‑game success
+    straw.addEventListener("mouseup", () => {
+      const juiceRect = juiceBox.getBoundingClientRect();
+      const strawRect = straw.getBoundingClientRect();
+      if (
+        strawRect.right > juiceRect.left &&
+        strawRect.left < juiceRect.right &&
+        strawRect.bottom > juiceRect.top &&
+        strawRect.top < juiceRect.bottom
+      ) {
+        // Successful drop: animate fade out then reveal full juice
+        juiceBox.style.transition = "opacity 0.5s ease-out";
+        straw.style.transition = "opacity 0.5s ease-out";
+        juiceBox.style.opacity = "0";
+        straw.style.opacity = "0";
+        setTimeout(() => {
+          entryOverlay.style.display = "none";
+          fullJuiceContainer.style.display = "block";
+          fullJuice.style.opacity = "0";
+          setTimeout(() => {
+            fullJuice.style.opacity = "1";
+          }, 50);
+          setTimeout(() => {
+            fullJuice.style.opacity = "0";
+            setTimeout(() => {
+              fullJuiceContainer.style.display = "none";
+              document.getElementById("mainContent").style.opacity = "1";
+              // Now enable custom cursor on info page
+              enableCustomCursor();
+            }, 700);
+          }, 1500);
+        }, 500);
+      }
+    });
+    const bgAudio = document.getElementById("bgAudio");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioIcon = document.getElementById("audioIcon");
+    audioToggle.addEventListener("click", () => {
+      bgAudio.muted = !bgAudio.muted;
+      if (bgAudio.muted) {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
+    });
+    const cardContainer = document.getElementById("cardContainer");
+    cardContainer.addEventListener("mousemove", (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener("mouseleave", () => {
+      cardContainer.style.transform = "perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)";
+    });
   </script>
+  <!-- Load Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
