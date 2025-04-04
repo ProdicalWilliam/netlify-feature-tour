@@ -288,16 +288,6 @@
       color: var(--textSecondary);
       white-space: pre-wrap;
     }
-    /* Typewriter Cursor */
-    .Typewriter__cursor {
-      color: #fff;
-      margin-left: 2px;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
     /* Custom Cursor */
     .cursor {
       display: none;
@@ -374,6 +364,28 @@
     }
     #loginModal button:hover {
       background: #2a0a5e;
+    }
+    /* Edit Controls (Hidden by Default) */
+    #editControls {
+      display: none; /* Hide these fields unless user logs in */
+      flex-direction: column;
+      gap: 10px;
+    }
+    #editControls input, #editControls textarea {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
     }
   </style>
 
@@ -462,7 +474,7 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- League Stats Section – Editable -->
+        <!-- League Stats Section – Not Editable by Default -->
         <div class="lol-stats" id="leagueInfo" contenteditable="false">
           <div class="stats-info">
             <h2>League of Legends Stats</h2>
@@ -472,7 +484,7 @@
             <p>KDA: 3.8, CS per minute: 7.5</p>
           </div>
         </div>
-        <!-- Edit Controls (Admin Only) -->
+        <!-- Edit Controls (Hidden by Default) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
@@ -561,13 +573,14 @@
     let editMode = false;
     document.getElementById('loginSubmit').addEventListener('click', () => {
       const userCode = document.getElementById('loginCode').value;
-      // Retrieve expected access code from Firestore (e.g. from collection "admin", doc "login")
+      // Retrieve expected access code from Firestore (e.g., collection "admin", doc "login")
       db.collection("admin").doc("login").get().then((doc) => {
         if(doc.exists){
-          const expectedCode = doc.data().accessCode; // e.g., stored in plain text (for demo)
+          const expectedCode = doc.data().accessCode; 
           if(userCode === expectedCode){
             editMode = true;
             document.getElementById('leagueInfo').contentEditable = "true";
+            // Show edit fields
             document.getElementById('editControls').style.display = 'flex';
             alert("Edit mode enabled!");
             document.getElementById('loginModal').style.display = 'none';
@@ -605,6 +618,7 @@
         // Disable editing and hide controls
         document.getElementById('leagueInfo').contentEditable = "false";
         document.getElementById('editControls').style.display = "none";
+        editMode = false;
       })
       .catch((error) => {
         console.error("Error updating settings:", error);
@@ -617,7 +631,6 @@
     const straw = document.getElementById('straw');
     const fullJuiceContainer = document.getElementById('fullJuiceContainer');
     const fullJuice = document.getElementById('fullJuice');
-
     // Pause video during mini-game
     const bgVideo = document.getElementById('bgVideo');
     bgVideo.pause();
