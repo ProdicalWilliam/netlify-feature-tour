@@ -404,7 +404,7 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Receipt Box (Image based Info Box) -->
+        <!-- Receipt Box (Info Box Style) -->
         <div class="receipt-box" id="receiptBox">
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
@@ -536,6 +536,23 @@
           }
         }
       });
+
+    // Tilt Effect on Card Container
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener('mouseleave', () => {
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
 
     // Custom Cursor & Trail
     const cursor = document.getElementById('cursor');
