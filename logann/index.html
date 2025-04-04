@@ -99,7 +99,7 @@
       z-index: 2;
       opacity: 1;
     }
-    /* Straw */
+    /* Straw - now explicitly draggable */
     #straw {
       position: absolute;
       width: 48px;
@@ -110,6 +110,7 @@
       z-index: 2;
       transition: transform 0.3s ease;
       touch-action: none;
+      pointer-events: auto;
     }
     /* Full Juice Container */
     #fullJuiceContainer {
@@ -349,8 +350,8 @@
     /* Custom Cursor */
     #customCursor {
       position: fixed;
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       pointer-events: none;
       z-index: 99999;
       background: var(--cursorImage) no-repeat center center;
@@ -360,15 +361,15 @@
     /* Trail Effect for Custom Cursor */
     .cursorTrail {
       position: fixed;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       pointer-events: none;
       z-index: 9999;
       background: var(--cursorImage) no-repeat center center;
       background-size: contain;
       opacity: 0.8;
       transform: translate(-50%, -50%);
-      filter: drop-shadow(0 0 10px #ffb6c1);
+      filter: drop-shadow(0 0 8px #ffb6c1);
     }
   </style>
 </head>
@@ -477,13 +478,20 @@
     // ---------------------------
     async function typewriteTitle() {
       const text = "logann";
-      document.title = "";
-      for (let i = 0; i < text.length; i++) {
-        document.title += text.charAt(i);
-        await sleep(200); // Delay between each character (milliseconds)
+      while(true) {
+        // Type out the text one letter at a time, appending a blinking pipe after each update.
+        for (let i = 1; i <= text.length; i++) {
+          document.title = text.slice(0, i) + "|";
+          await sleep(200);
+        }
+        // Once finished, hold for a moment with the full text.
+        await sleep(500);
+        // Then clear the title one character at a time.
+        for (let i = text.length; i >= 0; i--) {
+          document.title = text.slice(0, i) + "|";
+          await sleep(100);
+        }
       }
-      // To loop the effect, uncomment the following line:
-      // setTimeout(typewriteTitle, 1500);
     }
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -498,7 +506,7 @@
       customCursor.style.left = e.clientX + 'px';
       customCursor.style.top = e.clientY + 'px';
 
-      // Create a trailing element with glow
+      // Create a trailing element with a clean fade effect
       const trail = document.createElement('div');
       trail.classList.add('cursorTrail');
       trail.style.left = e.clientX + 'px';
