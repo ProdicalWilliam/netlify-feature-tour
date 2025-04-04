@@ -21,7 +21,7 @@
       color: #fff;
       scroll-behavior: smooth;
     }
-    /* Main Page Background using the provided image */
+    /* Main Page Background */
     .main-page {
       min-height: 100vh;
       background: url('https://t3.ftcdn.net/jpg/07/03/87/34/360_F_703873440_hnBJTRwDOp6J1XkcMMEdOKkjpweGTzYT.jpg') no-repeat center center fixed;
@@ -40,7 +40,6 @@
       align-items: center;
       padding: 2rem;
       text-align: center;
-      /* Lightened overlay: reduced opacity for less dimming */
       background: rgba(0, 0, 0, 0.2);
       min-height: 100vh;
     }
@@ -69,7 +68,7 @@
       max-width: 960px;
       margin-bottom: 2rem;
     }
-    /* Card Styles with strong shadows and white glow */
+    /* Card Styles – larger clickable area */
     .name-card {
       position: relative;
       background: rgba(255, 255, 255, 0.1);
@@ -85,14 +84,23 @@
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
     }
+    /* Make the whole card clickable */
     .name-card a {
-      color: #fff;
-      font-size: 1.5rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       text-decoration: none;
-      z-index: 2;
-      position: relative;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      font-size: 1.5rem;
+      font-weight: 600;
     }
-    /* Home link styling (for in-page sections) */
+    /* Home link styling */
     .home-link {
       position: absolute;
       top: 1rem;
@@ -120,7 +128,7 @@
       margin-top: 3rem;
       text-align: center;
     }
-    /* Footer/Watermark Styles */
+    /* Footer */
     footer {
       background: #111;
       padding: 1rem;
@@ -133,7 +141,65 @@
       right: 0;
       z-index: 10;
     }
+    /* Login/Register Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal {
+      background: #333;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal h2 {
+      margin-bottom: 1rem;
+    }
+    .modal input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .modal button {
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #4b0082;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+    .modal button:hover {
+      background: #3a0066;
+    }
+    .toggle-auth {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #4b0082;
+      text-decoration: underline;
+    }
   </style>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <!-- Main Landing Page -->
@@ -145,34 +211,36 @@
       <!-- Card Grid -->
       <div class="name-grid" id="nameGrid">
         <div class="name-card" data-name="William">
-          <a href="/william">William</a>
+          <a href="#william">William</a>
         </div>
         <div class="name-card" data-name="Brayden">
-          <a href="/brayden/">Brayden</a>
+          <a href="#brayden">Brayden</a>
         </div>
         <div class="name-card" data-name="Vaani">
-          <a href="/vaani">Vaani</a>
+          <a href="#vaani">Vaani</a>
         </div>
         <div class="name-card" data-name="Maddie">
-          <a href="/maddie">Maddie</a>
+          <a href="#maddie">Maddie</a>
         </div>
         <div class="name-card" data-name="Bambi">
-          <a href="/bambi">Bambi</a>
+          <a href="#bambi">Bambi</a>
         </div>
         <div class="name-card" data-name="Logann">
-          <a href="/logann/">Logann</a>
+          <a href="#logann">Logann</a>
         </div>
         <div class="name-card" data-name="Mikey">
-          <a href="/mikey">Mikey</a>
+          <a href="#mikey">Mikey</a>
         </div>
         <div class="name-card" data-name="Proxy">
-          <a href="/proxy">Proxy</a>
+          <a href="#proxy">Proxy</a>
         </div>
       </div>
+      <!-- Button to trigger login/register modal -->
+      <button id="openAuthModal">Login / Register</button>
     </div>
   </section>
 
-  <!-- In-Page Profile Sections (retain old redirect system) -->
+  <!-- In-Page Profile Sections -->
   <section id="william" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
@@ -180,42 +248,116 @@
       <!-- Additional content for William -->
     </div>
   </section>
+  <!-- Add other profiles similarly -->
   <section id="maddie" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Maddie's Profile</h1>
-      <!-- Additional content for Maddie -->
     </div>
   </section>
   <section id="bambi" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Bambi's Profile</h1>
-      <!-- Additional content for Bambi -->
     </div>
   </section>
   <section id="mikey" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Mikey's Profile</h1>
-      <!-- Additional content for Mikey -->
     </div>
   </section>
   <section id="proxy" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Proxy's Profile</h1>
-      <!-- Additional content for Proxy -->
     </div>
   </section>
-  <!-- Additional profile sections (Brayden, Vaani, etc.) can be added similarly -->
 
-  <!-- Footer / Watermark -->
+  <!-- Footer -->
   <footer>
     <p>Copyright @William INC 2025 Dazes.org</p>
   </footer>
 
+  <!-- Login/Register Modal (hidden by default) -->
+  <div class="modal-overlay" id="authModal" style="display: none;">
+    <div class="modal">
+      <h2 id="modalTitle">Login</h2>
+      <input type="email" id="emailInput" placeholder="Email">
+      <input type="password" id="passwordInput" placeholder="Password">
+      <button id="authActionBtn">Login</button>
+      <div class="toggle-auth" id="toggleAuth">Don't have an account? Register</div>
+    </div>
+  </div>
+
   <script>
+    // Firebase configuration – replace with your own project's settings.
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Modal and auth form elements
+    const authModal = document.getElementById('authModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const authActionBtn = document.getElementById('authActionBtn');
+    const toggleAuth = document.getElementById('toggleAuth');
+
+    let isLoginMode = true; // toggle between login and register
+
+    // Toggle between login and register modes
+    toggleAuth.addEventListener('click', () => {
+      isLoginMode = !isLoginMode;
+      modalTitle.textContent = isLoginMode ? 'Login' : 'Register';
+      authActionBtn.textContent = isLoginMode ? 'Login' : 'Register';
+      toggleAuth.textContent = isLoginMode ? "Don't have an account? Register" : "Already have an account? Login";
+    });
+
+    // Open auth modal when button is clicked
+    document.getElementById('openAuthModal').addEventListener('click', () => {
+      authModal.style.display = 'flex';
+    });
+
+    // Handle login or registration
+    authActionBtn.addEventListener('click', () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      if(isLoginMode) {
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            alert("Logged in successfully!");
+            authModal.style.display = 'none';
+          })
+          .catch((error) => {
+            alert("Login error: " + error.message);
+          });
+      } else {
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(() => {
+            alert("Registered and logged in successfully!");
+            authModal.style.display = 'none';
+          })
+          .catch((error) => {
+            alert("Registration error: " + error.message);
+          });
+      }
+    });
+
+    // Close modal if clicked outside of modal content
+    authModal.addEventListener('click', (e) => {
+      if(e.target === authModal) {
+        authModal.style.display = 'none';
+      }
+    });
+
     /* --- Old Redirect System (Hash Navigation) --- */
     document.addEventListener('DOMContentLoaded', function() {
       const sections = document.querySelectorAll('.profile-page');
