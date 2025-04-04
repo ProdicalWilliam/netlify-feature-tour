@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bambi</title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
   <link rel="icon" href="https://images-ext-1.discordapp.net/external/yV27HOYXsoOKBNI2fWA1pzk2ZXdORI1IY-RQV6XI6FM/https/www.disneyclips.com/images5/images/bambi-thumper10.png?format=webp&quality=lossless&width=620&height=531" sizes="32x32">
@@ -27,7 +27,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      cursor: none; /* Hide default cursor */
+      cursor: none;
     }
     html, body {
       width: 100%;
@@ -73,7 +73,7 @@
       height: 24px;
       fill: #fff;
     }
-    /* Entry Overlay (Drag & Drop UI) */
+    /* Entry Overlay (Mini‑Game) */
     #entryOverlay {
       position: fixed;
       top: 0;
@@ -88,30 +88,47 @@
       transition: opacity 0.5s ease;
       overflow: hidden;
     }
-    /* Juice Box (centered) */
+    /* Table in the middle */
+    #tableImg {
+      position: absolute;
+      max-width: 300px;
+      max-height: 300px;
+      z-index: 1;
+    }
+    /* Juice Box centered on table */
     #juiceBox {
+      position: absolute;
       max-width: 365px;
       max-height: 546px;
-      user-select: none;
+      z-index: 2;
     }
-    /* Straw (draggable, positioned at far right) */
+    /* Straw positioned under the table */
     #straw {
       position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
       width: 48px;
       height: 131px;
+      bottom: 20px;
+      right: 20px;
       cursor: grab;
       user-select: none;
+      z-index: 2;
     }
-    /* Hidden full juice image */
-    #fullJuice {
+    /* Full Juice container */
+    #fullJuiceContainer {
       display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1500;
+    }
+    #fullJuice {
       max-width: 365px;
       max-height: 546px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
     }
-    /* Main Content Container (revealed after overlay fades) */
+    /* Main Content Container (Information Page) */
     #mainContent {
       display: flex;
       justify-content: center;
@@ -186,38 +203,7 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* Presence Section */
-    .presence-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .presence-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      position: relative;
-    }
-    .presence-avatar.offline::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: red;
-    }
-    .presence-details {
-      display: flex;
-      flex-direction: column;
-      font-size: 14px;
-    }
-    .presence-details span {
-      font-weight: 550;
-      font-size: 15px;
-    }
+    /* Remove duplicate presence section */
     /* Server Embed Section */
     .server-embed {
       display: flex;
@@ -312,8 +298,9 @@
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0; }
     }
-    /* Custom Cursor: Cross Shape */
+    /* Custom Cursor: Cross shape rotated 90deg clockwise; only visible on mainContent */
     .cursor {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
@@ -321,7 +308,7 @@
       height: 20px;
       pointer-events: none;
       z-index: 10000;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) rotate(90deg);
     }
     .cursor:before, .cursor:after {
       content: "";
@@ -406,7 +393,7 @@
   </style>
 </head>
 <body>
-  <!-- Background Video -->
+  <!-- Background Video (will be paused during mini-game) -->
   <video id="bgVideo" autoplay loop playsinline muted preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90&" type="video/mp4">
     Your browser does not support the video tag.
@@ -426,16 +413,18 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay (Drag & Drop UI) -->
+  <!-- Entry Overlay (Mini-game) with Table, Juice Box, and Straw -->
   <div id="entryOverlay">
-    <!-- Juice Box in center -->
+    <!-- Table Image (centered) -->
+    <img id="tableImg" src="https://www.freeiconspng.com/uploads/table-clipart-7.png" alt="Table">
+    <!-- Juice Box centered on table -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f0a12e&is=67ef4fae&hm=1342a4fc1f9d3d5e9dcc18574e5900932c642fb0264a16b9257c9baf5fd096a9&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
-    <!-- Straw at far right, draggable -->
+    <!-- Straw positioned under table -->
     <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f0a1a6&is=67ef5026&hm=5747f75624b41f3a7f545796e4162d249bd6b7d762fa0daa6c3b4ed65ae70b1b&=&format=webp&quality=lossless&width=48&height=131" alt="Straw" draggable="true">
   </div>
 
-  <!-- Full Juice Image (hidden until drop) -->
-  <div id="fullJuiceContainer" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1500;">
+  <!-- Full Juice Container (hidden until drop or click) -->
+  <div id="fullJuiceContainer">
     <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f098fb&is=67ef477b&hm=c651b4ae536cbbc23b5d5204f176627397a0248983a871a81200ab3895720d17&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
   </div>
 
@@ -449,25 +438,19 @@
     </div>
   </div>
 
-  <!-- Main Content Container -->
+  <!-- Main Content Container (Information Page) -->
   <div id="mainContent">
     <!-- Tilt Container -->
     <div id="cardContainer">
       <!-- Profile Card -->
       <div class="profile-card">
-        <!-- Head Section -->
+        <!-- Head Section (only one instance now) -->
         <div class="profile-head">
-          <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Bambi Avatar">
+          <!-- Removed extra avatar/text -->
+          <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
           <div class="profile-info">
-            <h1>Bambi</h1>
+            <h1>Logann</h1>
             <p class="joined-line">joined 4 months ago</p>
-          </div>
-        </div>
-        <!-- Presence Section -->
-        <div class="presence-info">
-          <img class="presence-avatar" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Bambi Avatar">
-          <div class="presence-details">
-            <span>Bambi</span>
           </div>
         </div>
         <!-- Server Embed Section -->
@@ -498,13 +481,13 @@
         <div class="lol-stats" id="leagueInfo" contenteditable="false">
           <div class="stats-info">
             <h2>League of Legends Stats</h2>
-            <p>Summoner: Bambi</p>
+            <p>Summoner: Logann</p>
             <p>Rank: Gold / 60 LP</p>
             <p>Wins: 120, Losses: 100</p>
             <p>KDA: 3.8, CS per minute: 7.5</p>
           </div>
         </div>
-        <!-- Edit Controls (hidden by default) -->
+        <!-- Edit Controls -->
         <div id="editControls">
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
@@ -516,10 +499,13 @@
     </div>
   </div>
 
-  <!-- Custom Cursor -->
+  <!-- Custom Cursor (only for mainContent) -->
   <div class="cursor" id="cursor"></div>
 
   <script>
+    // Initially hide custom cursor; will be shown when mainContent is visible.
+    document.getElementById('cursor').style.display = 'none';
+
     // Obfuscated expected code: base64 encoded "999shit"
     const expectedCode = atob("OTk5c2hpdA==");
     let editMode = false;
@@ -577,6 +563,9 @@
       }
       const leagueText = document.getElementById('leagueInfo').innerHTML;
       localStorage.setItem("leagueInfoText", leagueText);
+      // After saving, disable editing and hide controls
+      document.getElementById('leagueInfo').contentEditable = "false";
+      document.getElementById('editControls').style.display = "none";
       alert("Changes saved!");
     });
 
@@ -615,79 +604,118 @@
     const fullJuiceContainer = document.getElementById('fullJuiceContainer');
     const fullJuice = document.getElementById('fullJuice');
 
-    // Enable dragging on the straw
+    // Pause video during mini-game
+    const bgVideo = document.getElementById('bgVideo');
+    bgVideo.pause();
+
+    // Straw drag handling
     straw.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData("text/plain", "straw");
     });
-
-    // Prevent default dragover behavior on juiceBox
     juiceBox.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
-
-    // When straw is dropped on juiceBox
     juiceBox.addEventListener('drop', (e) => {
       e.preventDefault();
-      // Animate fade out of both straw and juiceBox
+      // Fade out juice box and straw
       juiceBox.style.transition = "opacity 0.5s ease-out";
       straw.style.transition = "opacity 0.5s ease-out";
       juiceBox.style.opacity = "0";
       straw.style.opacity = "0";
       setTimeout(() => {
+        // Hide overlay and show full juice image
         entryOverlay.style.display = "none";
-        // Show the full juice image
         fullJuiceContainer.style.display = "block";
         fullJuice.style.opacity = "0";
         fullJuice.style.transition = "opacity 0.5s ease-in";
         setTimeout(() => {
           fullJuice.style.opacity = "1";
         }, 50);
-        // After a short delay, transition to the main site content
+        // Transition to main content after a short delay
         setTimeout(() => {
           document.getElementById('mainContent').style.opacity = "1";
+          // Resume video playback on main content
+          bgVideo.play();
+          // Show custom cursor on main content
+          document.getElementById('cursor').style.display = "block";
           fullJuiceContainer.style.display = "none";
         }, 1500);
       }, 500);
     });
-
-    // Custom Cursor & Trail (cleaner version)
-    const cursor = document.getElementById('cursor');
-    let lastMouseX = 0, lastMouseY = 0;
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.top = e.clientY + 'px';
-      cursor.style.left = e.clientX + 'px';
-      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
-        const dot = document.createElement('div');
-        dot.style.position = 'fixed';
-        dot.style.top = e.clientY + 'px';
-        dot.style.left = e.clientX + 'px';
-        dot.style.width = '4px';
-        dot.style.height = '4px';
-        dot.style.background = "var(--cursorColor)";
-        dot.style.borderRadius = '50%';
-        dot.style.pointerEvents = 'none';
-        dot.style.opacity = '0.8';
-        dot.style.transform = 'translate(-50%, -50%)';
-        dot.style.filter = 'drop-shadow(0 0 2px var(--cursorColor))';
-        document.body.appendChild(dot);
-        setTimeout(() => {
-          dot.style.transition = 'opacity 0.3s ease-out';
-          dot.style.opacity = '0';
-          setTimeout(() => { dot.remove(); }, 300);
-        }, 0);
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-      }
-    });
-
-    // Also, clicking the overlay without dragging will reveal the main content (if needed)
+    // Also allow click to start if not dragging
     entryOverlay.addEventListener('click', () => {
       entryOverlay.style.opacity = '0';
       setTimeout(() => {
         entryOverlay.style.display = 'none';
         document.getElementById('mainContent').style.opacity = '1';
+        bgVideo.play();
+        document.getElementById('cursor').style.display = "block";
       }, 500);
+      // Unmute audio on entry
       document.getElementById('bgAudio').muted = false;
+    });
+
+    // Audio Toggle: controls bgAudio element
+    const bgAudio = document.getElementById('bgAudio');
+    const audioToggle = document.getElementById('audioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    audioToggle.addEventListener('click', () => {
+      bgAudio.muted = !bgAudio.muted;
+      if (bgAudio.muted) {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
+    });
+
+    // Tilt Effect on Card Container
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener('mouseleave', () => {
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
+
+    // Custom Cursor & Trail (only on mainContent)
+    const cursor = document.getElementById('cursor');
+    let lastMouseX = 0, lastMouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      // Only update cursor if mainContent is visible
+      if(document.getElementById('mainContent').style.opacity === "1"){
+        cursor.style.top = e.clientY + 'px';
+        cursor.style.left = e.clientX + 'px';
+        if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+          const dot = document.createElement('div');
+          dot.style.position = 'fixed';
+          dot.style.top = e.clientY + 'px';
+          dot.style.left = e.clientX + 'px';
+          dot.style.width = '4px';
+          dot.style.height = '4px';
+          dot.style.background = "var(--cursorColor)";
+          dot.style.borderRadius = '50%';
+          dot.style.pointerEvents = 'none';
+          dot.style.opacity = '0.8';
+          dot.style.transform = 'translate(-50%, -50%)';
+          dot.style.filter = 'drop-shadow(0 0 2px var(--cursorColor))';
+          document.body.appendChild(dot);
+          setTimeout(() => {
+            dot.style.transition = 'opacity 0.3s ease-out';
+            dot.style.opacity = '0';
+            setTimeout(() => { dot.remove(); }, 300);
+          }, 0);
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+        }
+      }
     });
   </script>
 </body>
