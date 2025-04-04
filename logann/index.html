@@ -75,29 +75,6 @@
       height: 24px;
       fill: #fff;
     }
-    /* Site Name with Typewriter Effect */
-    #siteName {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 2rem;
-      color: #fff;
-      z-index: 1100;
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: 2px solid #fff;
-      width: 0;
-      animation: typewriter 4s steps(7) infinite, blink 0.75s step-end infinite;
-    }
-    @keyframes typewriter {
-      0% { width: 0; }
-      50% { width: 7ch; }
-      100% { width: 0; }
-    }
-    @keyframes blink {
-      from, to { border-color: transparent; }
-      50% { border-color: #fff; }
-    }
     /* Entry Overlay (Mini‑Game) */
     #entryOverlay {
       position: fixed;
@@ -131,6 +108,7 @@
       user-select: none;
       z-index: 2;
       transition: transform 0.3s ease;
+      touch-action: none;
     }
     /* Full Juice Container */
     #fullJuiceContainer {
@@ -393,8 +371,6 @@
   </style>
 </head>
 <body>
-  <!-- Site Name with Typewriter Effect -->
-  <div id="siteName">Logann</div>
   <!-- Background Video -->
   <video id="bgVideo" autoplay loop playsinline muted preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
@@ -417,8 +393,8 @@
   <div id="entryOverlay">
     <!-- Juice Box (without straw) -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-    <!-- Straw -->
-    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
+    <!-- Straw with draggable attribute -->
+    <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
   </div>
   <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
@@ -508,6 +484,19 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // Typewriter effect for the tab title
+    const titleText = "Logann";
+    let currentIndex = 0;
+    function typeTitle() {
+      document.title = titleText.substring(0, currentIndex);
+      currentIndex++;
+      if (currentIndex > titleText.length) {
+        currentIndex = 0;
+      }
+      setTimeout(typeTitle, 300);
+    }
+    typeTitle();
+
     // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
@@ -549,27 +538,20 @@
 
     // Custom Cursor Implementation
     const customCursor = document.getElementById('customCursor');
-    let lastX = window.innerWidth / 2, lastY = window.innerHeight / 2;
     document.addEventListener('mousemove', (e) => {
-      // Move the custom cursor element
       customCursor.style.left = e.clientX + 'px';
       customCursor.style.top = e.clientY + 'px';
-
       // Create a trailing element
       const trail = document.createElement('div');
       trail.classList.add('cursorTrail');
       trail.style.left = e.clientX + 'px';
       trail.style.top = e.clientY + 'px';
       document.body.appendChild(trail);
-      // Fade and remove the trail
       setTimeout(() => {
         trail.style.transition = 'opacity 0.6s ease-out';
         trail.style.opacity = '0';
         setTimeout(() => { trail.remove(); }, 600);
       }, 20);
-
-      lastX = e.clientX;
-      lastY = e.clientY;
     });
 
     // Key sequence detection for "w w w e e q" to show login modal
