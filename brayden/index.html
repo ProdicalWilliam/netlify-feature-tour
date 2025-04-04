@@ -29,8 +29,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Initially use the default cursor so dragging works during the mini‑game */
-      /* (No custom cursor styling applied yet) */
+      /* Use default cursor during mini‑game so dragging works */
     }
     html, body {
       width: 100%;
@@ -104,7 +103,7 @@
       z-index: 2;
       opacity: 1;
     }
-    /* Straw – placed at bottom right and made draggable using mousedown/touch events */
+    /* Straw – placed at bottom right; clicking it attaches it to your cursor */
     #straw {
       position: absolute;
       width: 48px;
@@ -490,7 +489,6 @@
           await sleep(200);
         }
         await sleep(500);
-        // (Keeping the full text for a moment before repeating)
       }
     }
     function sleep(ms) {
@@ -631,20 +629,14 @@
     const fullJuice = document.getElementById("fullJuice");
     const bgVideo = document.getElementById("bgVideo");
     bgVideo.pause();
-    // Record the original position of the straw
-    const strawOrig = {
-      left: straw.getBoundingClientRect().left,
-      top: straw.getBoundingClientRect().top
-    };
-    // Implement dragging functions for straw using mousedown/touch (from the provided script)
+    // Use center-on-cursor dragging for the straw
     let isStrawDragging = false;
-    let strawOffsetX, strawOffsetY;
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
     function strawStartDrag(e) {
       isStrawDragging = true;
-      strawOffsetX = e.clientX - straw.getBoundingClientRect().left;
-      strawOffsetY = e.clientY - straw.getBoundingClientRect().top;
+      // Immediately attach straw to cursor center
+      updateStrawPosition(e.clientX, e.clientY);
       document.addEventListener('mousemove', strawDrag);
       document.addEventListener('mouseup', strawEndDrag);
       e.preventDefault();
@@ -652,43 +644,41 @@
     function strawStartDragTouch(e) {
       isStrawDragging = true;
       const touch = e.touches[0];
-      strawOffsetX = touch.clientX - straw.getBoundingClientRect().left;
-      strawOffsetY = touch.clientY - straw.getBoundingClientRect().top;
+      updateStrawPosition(touch.clientX, touch.clientY);
       document.addEventListener('touchmove', strawDragTouch);
       document.addEventListener('touchend', strawEndDragTouch);
       e.preventDefault();
     }
     function strawDrag(e) {
       if (!isStrawDragging) return;
-      const left = e.clientX - strawOffsetX;
-      const top = e.clientY - strawOffsetY;
-      straw.style.left = left + 'px';
-      straw.style.top = top + 'px';
+      updateStrawPosition(e.clientX, e.clientY);
     }
     function strawDragTouch(e) {
       if (!isStrawDragging) return;
       const touch = e.touches[0];
-      const left = touch.clientX - strawOffsetX;
-      const top = touch.clientY - strawOffsetY;
-      straw.style.left = left + 'px';
-      straw.style.top = top + 'px';
+      updateStrawPosition(touch.clientX, touch.clientY);
       e.preventDefault();
+    }
+    function updateStrawPosition(x, y) {
+      // Center the straw on the cursor position
+      const strawWidth = straw.offsetWidth;
+      const strawHeight = straw.offsetHeight;
+      straw.style.left = (x - strawWidth / 2) + "px";
+      straw.style.top = (y - strawHeight / 2) + "px";
     }
     function strawEndDrag() {
       isStrawDragging = false;
       document.removeEventListener('mousemove', strawDrag);
       document.removeEventListener('mouseup', strawEndDrag);
-      // Optionally, reset straw position if needed:
-      // straw.style.left = strawOrig.left + 'px';
-      // straw.style.top = strawOrig.top + 'px';
+      checkStrawDrop();
     }
     function strawEndDragTouch() {
       isStrawDragging = false;
       document.removeEventListener('touchmove', strawDragTouch);
       document.removeEventListener('touchend', strawEndDragTouch);
+      checkStrawDrop();
     }
-    // When straw is dropped over the juice box, proceed with mini‑game success
-    straw.addEventListener("mouseup", () => {
+    function checkStrawDrop() {
       const juiceRect = juiceBox.getBoundingClientRect();
       const strawRect = straw.getBoundingClientRect();
       if (
@@ -697,7 +687,7 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate fade out then reveal full juice
+        // Successful drop: animate fade-out then reveal full juice
         juiceBox.style.transition = "opacity 0.5s ease-out";
         straw.style.transition = "opacity 0.5s ease-out";
         juiceBox.style.opacity = "0";
@@ -714,13 +704,13 @@
             setTimeout(() => {
               fullJuiceContainer.style.display = "none";
               document.getElementById("mainContent").style.opacity = "1";
-              // Now enable custom cursor on info page
+              // Enable custom cursor on info page
               enableCustomCursor();
             }, 700);
           }, 1500);
         }, 500);
       }
-    });
+    }
     const bgAudio = document.getElementById("bgAudio");
     const audioToggle = document.getElementById("audioToggle");
     const audioIcon = document.getElementById("audioIcon");
