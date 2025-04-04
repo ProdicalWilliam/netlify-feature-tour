@@ -5,7 +5,7 @@
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -152,11 +152,12 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* View Counter */
+    /* Live View Counter (Fixed Bottom Left) */
     #viewCounter {
-      font-size: 14px;
-      color: var(--textSecondary);
-      text-align: center;
+      position: fixed;
+      bottom: 12px;
+      left: 15px;
+      z-index: 1000;
     }
     /* Server Embed Section */
     .server-embed {
@@ -233,22 +234,52 @@
       height: auto;
       object-fit: contain;
     }
-    /* Comment Section */
-    #commentSection {
-      border: 2px solid var(--outlineColor);
-      border-radius: 10px;
-      background: var(--containerColor);
-      padding: 10px;
-      margin: 10px 0;
-    }
-    #commentSection h3 {
-      margin-bottom: 10px;
+    /* Comment Section Container (Hidden by default, fixed at bottom) */
+    #commentBox {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      max-width: 600px;
+      z-index: 1000;
       text-align: center;
     }
+    /* Toggle Box */
+    #commentToggle {
+      background: var(--containerColor);
+      border: var(--outlineColor);
+      border-radius: var(--containerRadius);
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+      margin-bottom: 5px;
+    }
+    #commentToggle:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+    /* Comment Container (hidden until hover) */
+    #commentContainer {
+      display: none;
+      border: 2px solid var(--outlineColor);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      padding: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      animation: commentGlow 2s infinite alternate;
+    }
+    @keyframes commentGlow {
+      from { box-shadow: 0 0 10px 2px var(--glowColor); }
+      to { box-shadow: 0 0 20px 4px var(--glowColor); }
+    }
+    /* Comment Form */
     #commentForm {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      margin-bottom: 10px;
     }
     #commentForm input, #commentForm textarea {
       width: 100%;
@@ -271,6 +302,19 @@
     #commentForm button:hover {
       background: #2a0a5e;
     }
+    /* Drag & Drop Avatar Zone */
+    #avatarDropZone {
+      border: 2px dashed var(--outlineColor);
+      border-radius: var(--inputRadius);
+      padding: 15px;
+      text-align: center;
+      color: var(--textSecondary);
+      margin-bottom: 8px;
+    }
+    #avatarDropZone.hover {
+      background: rgba(255,255,255,0.1);
+    }
+    /* Comments List */
     .comment {
       display: flex;
       align-items: flex-start;
@@ -288,54 +332,12 @@
     }
     .comment-content {
       flex: 1;
+      text-align: left;
     }
     .comment-date {
       font-size: 0.8em;
       color: var(--textSecondary);
       margin-left: 5px;
-    }
-    .comment button {
-      background: #ff0000;
-      border: none;
-      border-radius: var(--inputRadius);
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.8em;
-      padding: 5px;
-    }
-    /* Edit Controls (Styled like receipt box) */
-    #editControls {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      border: 2px solid var(--outlineColor);
-      border-radius: 10px;
-      background: var(--containerColor);
-      padding: 10px;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    #editControls input {
-      width: 100%;
-      padding: 8px;
-      border: var(--inputBorder);
-      border-radius: var(--inputRadius);
-      background: var(--inputBg);
-      color: var(--textColor);
-      font-size: 1em;
-    }
-    #editControls button {
-      padding: 10px;
-      background: var(--outlineColor);
-      border: none;
-      border-radius: var(--inputRadius);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s ease;
-    }
-    #editControls button:hover {
-      background: #2a0a5e;
     }
     /* Custom Cursor */
     .cursor {
@@ -457,8 +459,8 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
-        <!-- View Counter -->
-        <div id="viewCounter">Views: 0</div>
+        <!-- The view counter will be updated live and is now rendered via Firestore data -->
+        <div id="viewCounter"></div>
         <!-- Server Embed Section -->
         <div class="server-embed">
           <div class="server-icon">
@@ -492,7 +494,8 @@
           <h3>Comments</h3>
           <form id="commentForm">
             <input type="text" id="commentUsername" placeholder="Your username" required>
-            <input type="text" id="commentAvatar" placeholder="Avatar URL (optional)">
+            <!-- Drag & Drop Avatar Zone -->
+            <div id="avatarDropZone">Drag & Drop Avatar Image Here</div>
             <textarea id="commentMessage" placeholder="Your comment" required></textarea>
             <button type="submit">Post Comment</button>
           </form>
@@ -509,6 +512,14 @@
           <button id="saveEdits">Save Changes</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Comment Box (Toggle on hover) -->
+  <div id="commentBox">
+    <div id="commentToggle">Want to Comment?</div>
+    <div id="commentContainer">
+      <!-- The comment form and comment list are included inside the profile card -->
     </div>
   </div>
 
@@ -531,17 +542,57 @@
     const auth = firebase.auth();
 
     // Increase view counter on page load
-    const viewCounterElem = document.getElementById('viewCounter');
     db.collection("settings").doc("global").update({
       views: firebase.firestore.FieldValue.increment(1)
-    }).then(() => {
-      db.collection("settings").doc("global").get().then(doc => {
-        const data = doc.data();
-        viewCounterElem.textContent = "Views: " + (data.views || 0);
-      });
     }).catch(error => {
       console.error("Error incrementing view count:", error);
     });
+
+    // Listen for real-time updates on the "settings/global" document (including live view counter updates)
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data();
+        if (data) {
+          // Update video if provided
+          const bgVideo = document.getElementById('bgVideo');
+          const videoSource = bgVideo.querySelector('source');
+          if (data.videoURL && videoSource.src !== data.videoURL) {
+            videoSource.src = data.videoURL;
+            bgVideo.load();
+            bgVideo.play();
+          }
+          // Update audio if provided
+          const bgAudio = document.getElementById('bgAudio');
+          const audioSource = bgAudio.querySelector('source');
+          if (data.audioURL && audioSource.src !== data.audioURL) {
+            audioSource.src = data.audioURL;
+            bgAudio.load();
+            bgAudio.play();
+          }
+          // Update avatar if provided
+          if (data.avatarURL) {
+            document.getElementById('avatarImg').src = data.avatarURL;
+          }
+          // Update profile name and joined text if provided
+          if (data.profileName) {
+            document.getElementById('profileName').innerText = data.profileName;
+          }
+          if (data.joinedLine) {
+            document.getElementById('joinedLine').innerText = data.joinedLine;
+          }
+          // Update receipt image if provided
+          if (data.receiptURL) {
+            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
+          }
+          // Update live view counter with provided SVG icon and styling
+          const viewCounterElem = document.getElementById('viewCounter');
+          viewCounterElem.innerHTML = `<span style="font-weight:550;font-size:14px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+            </svg> ${data.views || 0} views
+          </span>`;
+        }
+      });
 
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
@@ -605,86 +656,45 @@
       });
     });
 
-    // Listen for real-time updates on the "settings/global" document
-    db.collection("settings").doc("global")
-      .onSnapshot((doc) => {
-        const data = doc.data();
-        if (data) {
-          // Update video
-          const bgVideo = document.getElementById('bgVideo');
-          const videoSource = bgVideo.querySelector('source');
-          if (data.videoURL && videoSource.src !== data.videoURL) {
-            videoSource.src = data.videoURL;
-            bgVideo.load();
-            bgVideo.play();
-          }
-          // Update audio
-          const bgAudio = document.getElementById('bgAudio');
-          const audioSource = bgAudio.querySelector('source');
-          if (data.audioURL && audioSource.src !== data.audioURL) {
-            audioSource.src = data.audioURL;
-            bgAudio.load();
-            bgAudio.play();
-          }
-          // Update avatar
-          if (data.avatarURL) {
-            document.getElementById('avatarImg').src = data.avatarURL;
-          }
-          // Update profile name and joined text
-          if (data.profileName) {
-            document.getElementById('profileName').innerText = data.profileName;
-          }
-          if (data.joinedLine) {
-            document.getElementById('joinedLine').innerText = data.joinedLine;
-          }
-          // Update receipt image if provided
-          if (data.receiptURL) {
-            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
-          }
-        }
-      });
-
     // Public Comments
     const commentForm = document.getElementById('commentForm');
     const commentList = document.getElementById('commentList');
 
     commentForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      // Check if this device already commented
-      if(localStorage.getItem("hasCommented")){
-        alert("You have already commented on this profile.");
-        return;
-      }
       const username = document.getElementById('commentUsername').value;
-      let avatar = document.getElementById('commentAvatar').value;
       const message = document.getElementById('commentMessage').value;
-      if(!avatar) {
-          avatar = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+      let avatarURL = document.getElementById('avatarDropZone').getAttribute('data-avatar') || "";
+      if(!avatarURL) {
+          avatarURL = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
       }
       db.collection("comments").add({
         username,
-        avatar,
+        avatar: avatarURL,
         message,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then((docRef) => {
-        localStorage.setItem("hasCommented", docRef.id);
+      }).then(() => {
         alert("Comment posted!");
         commentForm.reset();
+        document.getElementById('avatarDropZone').removeAttribute('data-avatar');
+        document.getElementById('avatarDropZone').innerText = "Drag & Drop Avatar Image Here";
       }).catch((error) => {
         console.error("Error posting comment: ", error);
         alert("Error posting comment, please try again.");
       });
     });
 
-    // Listen for latest 5 comments
-    db.collection("comments").orderBy("timestamp", "desc").limit(5)
+    // Listen for latest comments (displayed in descending order; newest at the bottom)
+    db.collection("comments").orderBy("timestamp", "desc")
       .onSnapshot(snapshot => {
+        // Reverse the order so the latest comments appear at the bottom
+        const comments = snapshot.docs.reverse();
         commentList.innerHTML = "";
-        snapshot.forEach(doc => {
+        comments.forEach(doc => {
           const data = doc.data();
+          const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : "Just now";
           const commentDiv = document.createElement("div");
           commentDiv.className = "comment";
-          const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : "Just now";
           commentDiv.innerHTML = `
             <div class="comment-avatar"><img src="${data.avatar}" alt="Avatar"></div>
             <div class="comment-content">
@@ -698,10 +708,7 @@
             delBtn.textContent = "Delete";
             delBtn.addEventListener("click", () => {
               db.collection("comments").doc(doc.id).delete().then(() => {
-                // If this device had commented, reset the flag
-                if(localStorage.getItem("hasCommented") === doc.id){
-                  localStorage.removeItem("hasCommented");
-                }
+                console.log("Comment deleted");
               });
             });
             commentDiv.appendChild(delBtn);
@@ -709,6 +716,41 @@
           commentList.appendChild(commentDiv);
         });
       });
+
+    // Toggle Comment Box on Hover
+    const commentToggle = document.getElementById('commentToggle');
+    const commentContainer = document.getElementById('commentContainer');
+    commentToggle.addEventListener('mouseover', () => {
+      commentContainer.style.display = 'block';
+    });
+    commentToggle.addEventListener('mouseout', () => {
+      commentContainer.style.display = 'none';
+    });
+
+    // Drag & Drop for Avatar in Comment Form
+    const avatarDropZone = document.getElementById('avatarDropZone');
+    avatarDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      avatarDropZone.classList.add('hover');
+    });
+    avatarDropZone.addEventListener('dragleave', () => {
+      avatarDropZone.classList.remove('hover');
+    });
+    avatarDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      avatarDropZone.classList.remove('hover');
+      const file = e.dataTransfer.files[0];
+      if(file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          avatarDropZone.setAttribute('data-avatar', event.target.result);
+          avatarDropZone.innerText = "Avatar Selected";
+        }
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please drop an image file.");
+      }
+    });
 
     // Tilt Effect on Card Container
     const cardContainer = document.getElementById('cardContainer');
