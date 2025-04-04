@@ -2,24 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>eojonas Info Page</title>
+  <title>Bambi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2325/2325163.png" type="image/png">
   <style>
     /* ---------------------------
-       RESET & GLOBAL SETTINGS
+       RESET & GLOBAL
     --------------------------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      cursor: none; /* Hide the default cursor */
+      cursor: none; /* Hide default cursor */
     }
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
       background: #000;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
     }
     /* ---------------------------
        BACKGROUND VIDEO
@@ -34,12 +36,12 @@
       z-index: -2;
     }
     /* ---------------------------
-       AUDIO TOGGLE BUTTON (Top Right)
+       AUDIO TOGGLE BUTTON (Top Left)
     --------------------------- */
     #audioToggle {
       position: fixed;
       top: 15px;
-      right: 15px;
+      left: 15px;
       background: rgba(255, 255, 255, 0.3);
       border: none;
       border-radius: 50%;
@@ -57,7 +59,7 @@
       fill: #fff;
     }
     /* ---------------------------
-       ENTRY OVERLAY (BITCH? BUTTON)
+       ENTRY OVERLAY ("BITCH?")
     --------------------------- */
     #entryOverlay {
       position: fixed;
@@ -73,11 +75,11 @@
       transition: opacity 0.5s ease;
     }
     #entryOverlay h1 {
-      font-size: 72px;
+      font-size: 96px;
       color: #fff;
       text-transform: uppercase;
       text-align: center;
-      filter: drop-shadow(0 0 15px #fff);
+      filter: drop-shadow(0 0 25px #fff);
       cursor: pointer;
       user-select: none;
     }
@@ -97,8 +99,9 @@
        TILTING INFO CARD
     --------------------------- */
     .card {
-      background: rgba(245, 245, 245, 0.2); /* white-grayish, semi-transparent */
-      border: 2px solid rgba(255, 255, 255, 0.4); /* slightly whiter semi-transparent border */
+      background: rgba(255, 255, 255, 0.15); /* semi-transparent white-grayish */
+      border: 4px solid rgba(255, 255, 255, 0.5); /* thicker semi-transparent white */
+      border-image: linear-gradient(to right, rgba(255,255,255,0.8), rgba(173,216,230,0.8)) 1;
       border-radius: 16px;
       padding: 20px;
       width: 350px;
@@ -110,7 +113,7 @@
       width: 100px;
       height: 100px;
       border-radius: 50%;
-      border: 3px solid #fff;
+      border: 3px solid rgba(255,255,255,0.8);
       margin-bottom: 15px;
       object-fit: cover;
     }
@@ -120,6 +123,7 @@
       font-weight: 600;
       margin-bottom: 10px;
     }
+    /* Initially hidden typewriter text */
     .typewriter {
       color: #fff;
       font-size: 18px;
@@ -127,8 +131,13 @@
       overflow: hidden;
       border-right: 2px solid #fff;
       width: 0;
-      animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
       margin-bottom: 10px;
+    }
+    .card:hover .typewriter {
+      opacity: 1;
+      animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
     }
     @keyframes typing {
       from { width: 0; }
@@ -164,27 +173,27 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 10px; /* smaller cursor */
-      height: 10px;
+      width: 12px; /* slightly bigger than before */
+      height: 12px;
       background: radial-gradient(circle, #fff, rgba(255,255,255,0));
       border-radius: 50%;
       pointer-events: none;
       transform: translate(-50%, -50%);
-      filter: drop-shadow(0 0 4px #fff);
+      filter: drop-shadow(0 0 6px #fff);
       z-index: 10000;
     }
   </style>
 </head>
 <body>
-  <!-- Background Video (with audio) -->
-  <video id="bgVideo" autoplay loop playsinline>
+  <!-- Background Video (Looped, Unmuted after entry) -->
+  <video id="bgVideo" autoplay loop playsinline muted style="z-index: -2;">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144919/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
-  <!-- Audio Toggle Button -->
+  <!-- Audio Toggle Button (Top Left) -->
   <button id="audioToggle" title="Toggle Audio">
-    <!-- Initially show an "audio on" icon -->
+    <!-- Initially show audio on icon -->
     <svg id="audioIcon" viewBox="0 0 24 24">
       <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
       <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
@@ -201,7 +210,7 @@
   <div class="container" id="mainContent" style="display:none;">
     <div class="card" id="card">
       <img class="avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024" alt="Avatar">
-      <h1 class="name">eojonas</h1>
+      <h1 class="name">Bambi</h1>
       <div class="typewriter" id="typewriter">follow me ♥</div>
       <div class="joined">joined 4 months ago</div>
       <div class="server-info">
@@ -223,7 +232,7 @@
       const cardY = rect.top + rect.height / 2;
       const deltaX = e.clientX - cardX;
       const deltaY = e.clientY - cardY;
-      // Increase tilt sensitivity (smaller divisor => more tilt)
+      // Increase tilt sensitivity
       const rotateY = deltaX / 15;
       const rotateX = -deltaY / 15;
       card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -236,7 +245,7 @@
       cursor.style.top = e.clientY + 'px';
       cursor.style.left = e.clientX + 'px';
       
-      // Only drop a snow trail dot when the mouse moves a sufficient distance
+      // Only create a snow drop if mouse moved enough
       if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
         const dot = document.createElement('div');
         dot.style.position = 'fixed';
@@ -254,9 +263,7 @@
         setTimeout(() => {
           dot.style.transition = 'opacity 0.4s ease-out';
           dot.style.opacity = '0';
-          setTimeout(() => {
-            dot.remove();
-          }, 400);
+          setTimeout(() => { dot.remove(); }, 400);
         }, 0);
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
@@ -269,12 +276,9 @@
     const audioIcon = document.getElementById('audioIcon');
     audioToggle.addEventListener('click', () => {
       bgVideo.muted = !bgVideo.muted;
-      // Change icon based on muted state
       if (bgVideo.muted) {
-        // Audio off icon (simple crossed speaker)
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
       } else {
-        // Audio on icon
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
       }
     });
@@ -284,20 +288,18 @@
     const entryText = document.getElementById('entryText');
     const mainContent = document.getElementById('mainContent');
     entryText.addEventListener('click', () => {
-      // Fade out the overlay
       entryOverlay.style.opacity = '0';
       setTimeout(() => {
         entryOverlay.style.display = 'none';
         mainContent.style.display = 'flex';
       }, 500);
-      // Unmute the video (accepting audio playback)
       bgVideo.muted = false;
     });
 
     /* -------------- SIMULATED DISCORD ONLINE CHECK -------------- */
     const discordUserId = "1353073691864338625";
     function checkDiscordOnlineStatus(userId) {
-      // For demonstration, we simulate the user is online.
+      // Simulated check – always returns true
       return true;
     }
     const onlineStatusEl = document.getElementById('onlineStatus');
