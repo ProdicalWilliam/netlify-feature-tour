@@ -19,7 +19,8 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000;
+      /* Remove black background so video is visible */
+      background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -99,9 +100,8 @@
        TILTING INFO CARD
     --------------------------- */
     .card {
-      background: rgba(255, 255, 255, 0.15); /* semi-transparent white-grayish */
-      border: 4px solid rgba(255, 255, 255, 0.5); /* thicker semi-transparent white */
-      border-image: linear-gradient(to right, rgba(255,255,255,0.8), rgba(173,216,230,0.8)) 1;
+      background: rgba(255, 255, 255, 0.18); /* more white, slightly transparent */
+      border: 5px solid rgba(173, 216, 230, 0.5); /* thicker border with a blue tint */
       border-radius: 16px;
       padding: 20px;
       width: 350px;
@@ -135,6 +135,7 @@
       transition: opacity 0.3s ease;
       margin-bottom: 10px;
     }
+    /* Only show typewriter when mouse hovers over card */
     .card:hover .typewriter {
       opacity: 1;
       animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
@@ -173,7 +174,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 12px; /* slightly bigger than before */
+      width: 12px; /* a bit bigger */
       height: 12px;
       background: radial-gradient(circle, #fff, rgba(255,255,255,0));
       border-radius: 50%;
@@ -186,7 +187,7 @@
 </head>
 <body>
   <!-- Background Video (Looped, Unmuted after entry) -->
-  <video id="bgVideo" autoplay loop playsinline muted style="z-index: -2;">
+  <video id="bgVideo" autoplay loop playsinline style="z-index: -2;">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144919/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -245,7 +246,7 @@
       cursor.style.top = e.clientY + 'px';
       cursor.style.left = e.clientX + 'px';
       
-      // Only create a snow drop if mouse moved enough
+      // Only create a snow drop if the mouse moved enough
       if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
         const dot = document.createElement('div');
         dot.style.position = 'fixed';
@@ -293,6 +294,7 @@
         entryOverlay.style.display = 'none';
         mainContent.style.display = 'flex';
       }, 500);
+      // Unmute video after user gesture
       bgVideo.muted = false;
     });
 
