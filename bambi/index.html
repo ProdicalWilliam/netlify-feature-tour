@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>Bambi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
-  <link rel="icon" href="https://preview.redd.it/ennd5zljlql21.png?width=256&format=png&auto=webp&s=d699fed3ae40c76c8735354c175a07b74d2e1e03">
+  <!-- Favicon with defined size -->
+  <link rel="icon" href="https://preview.redd.it/ennd5zljlql21.png?width=256&format=png&auto=webp&s=d699fed3ae40c76c8735354c175a07b74d2e1e03" sizes="32x32">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4); /* Dark translucent background */
@@ -17,8 +17,8 @@
       --textColor: #fff;
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
-      /* Gradient matching the card glow */
-      --glowGradient: linear-gradient(135deg, rgba(58,121,255,0.4), rgba(247,223,148,0.4));
+      /* Updated gradient glow: stronger with higher opacity */
+      --glowGradient: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(247,223,148,0.6));
     }
 
     /* Global Reset */
@@ -87,8 +87,9 @@
       color: #fff;
       text-transform: uppercase;
       text-align: center;
-      /* Strong white glow */
-      filter: drop-shadow(0 0 35px #fff);
+      /* Strong white glow added with heavier drop-shadow and text-shadow */
+      filter: drop-shadow(0 0 50px #fff);
+      text-shadow: 0 0 30px #fff, 0 0 40px #fff, 0 0 50px #fff;
       cursor: pointer;
       user-select: none;
       transition: transform 0.5s ease;
@@ -139,9 +140,9 @@
       transition: transform 0.3s ease;
     }
     @keyframes cardGlow {
-      0% { box-shadow: 0 0 10px 2px #3a79ff; }
+      0% { box-shadow: 0 0 10px 2px #fff; }
       50% { box-shadow: 0 0 20px 4px #f7df94; }
-      100% { box-shadow: 0 0 10px 2px #3a79ff; }
+      100% { box-shadow: 0 0 10px 2px #fff; }
     }
     /* Head Section */
     .profile-head {
@@ -301,8 +302,9 @@
       flex: 0 0 auto;
     }
     .lol-stats .stats-image img {
-      max-width: 256px;
-      width: 100%;
+      /* Reduced size to only the necessary dimensions */
+      max-width: 50px;
+      width: auto;
       border-radius: 10px;
     }
     /* Social Row: Removed extra Discord button; only the server embed remains */
