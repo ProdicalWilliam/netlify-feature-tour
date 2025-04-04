@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Dazes</title>
+  <!-- Favicon -->
+  <link rel="icon" href="https://pngimg.com/d/demon_PNG63.png" type="image/png">
+  <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
   <style>
-    /* Reset and base styles */
+    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
@@ -18,69 +21,76 @@
       color: #fff;
       scroll-behavior: smooth;
     }
-
-    /* Main page background with subtle animation */
+    /* Main Page Background using the provided image */
     .main-page {
       min-height: 100vh;
-      background: linear-gradient(135deg, #1a1a1a, #333);
-      animation: bgAnimation 15s ease infinite;
+      background: url('https://t3.ftcdn.net/jpg/07/03/87/34/360_F_703873440_hnBJTRwDOp6J1XkcMMEdOKkjpweGTzYT.jpg') no-repeat center center fixed;
+      background-size: cover;
+      animation: fadeIn 1.5s ease-in;
+      position: relative;
     }
-    @keyframes bgAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    /* Container centering content */
+    /* Container to center content */
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 2rem;
       text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      min-height: 100vh;
     }
-
     h1 {
       font-size: 3rem;
-      margin-bottom: 2rem;
-      text-shadow: 0 0 10px rgba(0,0,0,0.7);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     }
-
-    /* Grid layout for cards */
+    /* Search Bar */
+    #searchInput {
+      padding: 0.8rem 1rem;
+      width: 90%;
+      max-width: 400px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+    /* Grid Layout for Cards */
     .name-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       width: 100%;
       max-width: 960px;
+      margin-bottom: 2rem;
     }
-
-    /* Card styling with hover effect and preview */
+    /* Card Styles */
     .name-card {
       position: relative;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
-      padding: 1.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 2rem;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
       overflow: hidden;
       cursor: pointer;
     }
     .name-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
     }
-
     .name-card a {
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       text-decoration: none;
       z-index: 2;
       position: relative;
     }
-
-    /* Card preview hidden by default */
+    /* Card Preview Styling */
     .card-preview {
       position: absolute;
       bottom: -100%;
@@ -89,18 +99,17 @@
       padding: 0.8rem;
       background: rgba(0, 0, 0, 0.8);
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 1rem;
       border-bottom-left-radius: 12px;
       border-bottom-right-radius: 12px;
       text-align: center;
-      transition: bottom 0.3s ease;
+      transition: bottom 0.4s ease;
       pointer-events: none;
     }
     .name-card:hover .card-preview {
       bottom: 0;
     }
-
-    /* Back link styling */
+    /* Home link styling (for in-page sections) */
     .home-link {
       position: absolute;
       top: 1rem;
@@ -108,16 +117,15 @@
       color: #fff;
       text-decoration: none;
       font-size: 1rem;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       padding: 0.5rem 0.8rem;
       border-radius: 5px;
       transition: background 0.3s ease;
     }
     .home-link:hover {
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
     }
-
-    /* Profile page basic styling */
+    /* Profile Page Styles */
     .profile-page {
       display: none;
       min-height: 100vh;
@@ -129,99 +137,128 @@
       margin-top: 3rem;
       text-align: center;
     }
+    /* Footer */
+    footer {
+      background: #111;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    /* Mini Game Styles */
+    #miniGame {
+      margin-top: 2rem;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    #gameCanvas {
+      border: 2px solid #fff;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      background: #000;
+    }
   </style>
 </head>
 <body>
-  <!-- Main landing page -->
+  <!-- Main Landing Page -->
   <section id="home" class="main-page">
     <div class="container">
       <h1>Welcome to Dazes.org</h1>
-      <div class="name-grid">
-        <div class="name-card">
+      <!-- Search Bar -->
+      <input type="text" id="searchInput" placeholder="Search by name...">
+      <!-- Card Grid -->
+      <div class="name-grid" id="nameGrid">
+        <div class="name-card" data-name="William">
           <a href="/william">William</a>
           <div class="card-preview">Discover William's creative projects and ideas.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Brayden">
           <a href="/brayden/">Brayden</a>
           <div class="card-preview">Learn more about Brayden's work and portfolio.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Vaani">
           <a href="/vaani">Vaani</a>
           <div class="card-preview">Explore Vaani’s innovative designs and concepts.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Maddie">
           <a href="/maddie">Maddie</a>
           <div class="card-preview">See Maddie’s artful creations and projects.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Bambi">
           <a href="/bambi">Bambi</a>
           <div class="card-preview">Check out Bambi's vibrant and engaging work.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Logann">
           <a href="/logann/">Logann</a>
           <div class="card-preview">Dive into Logann's digital portfolio and ideas.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Mikey">
           <a href="/mikey">Mikey</a>
           <div class="card-preview">Explore Mikey’s projects and creative endeavors.</div>
         </div>
-        <div class="name-card">
+        <div class="name-card" data-name="Proxy">
           <a href="/proxy">Proxy</a>
           <div class="card-preview">Learn more about Proxy's digital innovations.</div>
         </div>
       </div>
+      <!-- Mini Game Section -->
+      <div id="miniGame">
+        <h2>Mini Game: Click the Demon!</h2>
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+        <p>Score: <span id="score">0</span></p>
+      </div>
     </div>
   </section>
 
-  <!-- William's Page (in-page) -->
+  <!-- In-Page Profile Sections (retain old redirect system) -->
   <section id="william" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>William's Profile</h1>
-      <!-- Additional content for William can go here -->
+      <!-- Additional content for William -->
     </div>
   </section>
-
-  <!-- Maddie's Page (in-page) -->
   <section id="maddie" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Maddie's Profile</h1>
-      <!-- Additional content for Maddie can go here -->
+      <!-- Additional content for Maddie -->
     </div>
   </section>
-
-  <!-- Bambi's Page (in-page) -->
   <section id="bambi" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Bambi's Profile</h1>
-      <!-- Additional content for Bambi can go here -->
+      <!-- Additional content for Bambi -->
     </div>
   </section>
-
-  <!-- Mikey's Page (in-page) -->
   <section id="mikey" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Mikey's Profile</h1>
-      <!-- Additional content for Mikey can go here -->
+      <!-- Additional content for Mikey -->
     </div>
   </section>
-
-  <!-- Proxy's Page (in-page) -->
   <section id="proxy" class="profile-page">
     <a href="#home" class="home-link">← Home</a>
     <div class="content">
       <h1>Proxy's Profile</h1>
-      <!-- Additional content for Proxy can go here -->
+      <!-- Additional content for Proxy -->
     </div>
   </section>
+  <!-- Additional profile sections (Brayden, Vaani, etc.) can be added similarly -->
 
-  <!-- Brayden's and Vaani's pages can be structured similarly -->
-  
+  <!-- Footer -->
+  <footer>
+    <p>Copyright @William INC 2025 Dazes.org</p>
+  </footer>
+
   <script>
-    // Basic hash navigation for in-page sections
+    /* --- Old Redirect System (Hash Navigation) --- */
     document.addEventListener('DOMContentLoaded', function() {
       const sections = document.querySelectorAll('.profile-page');
       function showSection(hash) {
@@ -241,6 +278,62 @@
       // Initialize display based on the current hash
       showSection(window.location.hash.substring(1));
     });
+
+    /* --- Search Filter for Name Cards --- */
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const cards = document.querySelectorAll('.name-card');
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(filter) ? 'block' : 'none';
+      });
+    });
+
+    /* --- Mini Game: Click the Demon --- */
+    (function() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const scoreDisplay = document.getElementById('score');
+      let score = 0;
+      let demonX = Math.random() * (canvas.width - 50);
+      let demonY = Math.random() * (canvas.height - 50);
+      const demonSize = 50;
+
+      // Load demon image for the mini game
+      const demonImg = new Image();
+      demonImg.src = "https://pngimg.com/d/demon_PNG63.png";
+
+      // Draw the demon image at its current location
+      function drawDemon() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(demonImg, demonX, demonY, demonSize, demonSize);
+      }
+
+      // Update the demon's location randomly
+      function updateDemon() {
+        demonX = Math.random() * (canvas.width - demonSize);
+        demonY = Math.random() * (canvas.height - demonSize);
+        drawDemon();
+      }
+
+      // Increase score on click if within demon boundaries
+      canvas.addEventListener('click', function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        if (clickX >= demonX && clickX <= demonX + demonSize &&
+            clickY >= demonY && clickY <= demonY + demonSize) {
+          score++;
+          scoreDisplay.textContent = score;
+          updateDemon();
+        }
+      });
+
+      // Initialize game once demon image is loaded
+      demonImg.onload = function() {
+        drawDemon();
+      };
+    })();
   </script>
 </body>
 </html>
