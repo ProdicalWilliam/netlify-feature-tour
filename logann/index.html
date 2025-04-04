@@ -16,25 +16,31 @@
       --containerPadding: 20px 25px;
       --textColor: #fff;
       --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
       --outlineColor: #4b0082;
       /* Custom crosshair image URL */
       --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
+      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
+      --modalBg: rgba(0, 0, 0, 0.85);
+      --modalBorder: 2px solid #4b0082;
     }
     /* Global Reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      /* Initially use the default cursor so dragging works during the mini‑game */
+      /* (No custom cursor styling applied yet) */
     }
     html, body {
       width: 100%;
       height: 100%;
+      background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      /* When custom cursor is enabled, hide system cursor */
       cursor: default;
     }
-    /* Hide the default cursor when custom one is active */
+    /* When custom cursor is enabled on info page */
     body.custom-cursor {
       cursor: none;
     }
@@ -47,6 +53,8 @@
       height: 100%;
       object-fit: cover;
       z-index: -3;
+      opacity: 1;
+      transition: opacity 1s ease;
     }
     /* Background Audio */
     #bgAudio {
@@ -73,19 +81,76 @@
       height: 24px;
       fill: #fff;
     }
-    /* Main Content Container (Information Page) */
-    #mainContent {
-      position: relative;
+    /* Entry Overlay (Mini‑Game) */
+    #entryOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      z-index: 2;
+      background: var(--overlayBg);
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+    /* Juice Box (without straw) */
+    #juiceBox {
+      position: absolute;
+      max-width: 365px;
+      max-height: 546px;
+      z-index: 2;
+      opacity: 1;
+    }
+    /* Straw – placed at bottom right and made draggable using mousedown/touch events */
+    #straw {
+      position: absolute;
+      width: 48px;
+      height: 131px;
+      bottom: 20px;
+      right: 20px;
+      user-select: none;
+      z-index: 1010;
+      transition: transform 0.3s ease;
+      touch-action: none;
+      pointer-events: auto;
+    }
+    /* Full Juice Container */
+    #fullJuiceContainer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1500;
+    }
+    #fullJuice {
+      max-width: 365px;
+      max-height: 546px;
+      opacity: 0;
+      transition: opacity 0.7s ease-in-out;
+    }
+    /* Main Content Container (Information Page) */
+    #mainContent {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.8s ease;
     }
     /* Tilt Container for Card */
     #cardContainer {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       perspective: 1000px;
       transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
       transform: rotateX(6.67deg) rotateY(-7.57deg);
@@ -99,11 +164,21 @@
       border-radius: var(--containerRadius);
       background: var(--containerColor);
       backdrop-filter: blur(var(--containerBlur));
+      -webkit-backdrop-filter: blur(var(--containerBlur));
       color: var(--textColor);
       display: flex;
       flex-direction: column;
       gap: 20px;
+      box-sizing: border-box;
+      animation: cardGlow 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
     }
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+      50% { box-shadow: 0 0 20px 4px var(--outlineColor); }
+      100% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+    }
+    /* Head Section */
     .profile-head {
       display: flex;
       align-items: center;
@@ -115,6 +190,10 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(255,255,255,0.2);
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
     }
     .profile-info h1 {
       font-weight: 600;
@@ -128,17 +207,150 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* Draggable Straw (static on this page) */
-    #straw {
-      position: absolute;
-      width: 48px;
-      height: 131px;
-      bottom: 20px;
-      right: 20px;
-      user-select: none;
-      z-index: 1010;
-      /* Remove pointer events to disable dragging */
-      pointer-events: none;
+    /* Server Embed Section */
+    .server-embed {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .server-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .server-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .server-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .server-details h1 {
+      font-weight: 450;
+      font-size: 18px;
+      margin: 0;
+    }
+    .server-stats {
+      font-weight: 450;
+      font-size: 12.5px;
+      color: var(--onlineColor);
+      display: flex;
+      gap: 10px;
+    }
+    .server-stats svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 3px;
+    }
+    .server-details a {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 450;
+      font-size: 12px;
+      color: #fff;
+      text-decoration: none;
+      margin-top: 2px;
+      transition: background 0.3s ease;
+    }
+    .server-details a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    /* Receipt Box (Image based) */
+    .receipt-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .receipt-box img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Login Modal Styles (Clean & Readable) */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modalBg);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--modalBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      color: var(--textColor);
+      font-size: 1.1em;
+    }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #loginModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    #loginModal button:hover {
+      background: #2a0a5e;
+    }
+    /* Edit Controls (Hidden by Default) */
+    #editControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #editControls input, #editControls textarea {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
     }
     /* Custom Cursor (enabled on info page) */
     #customCursor {
@@ -186,12 +398,34 @@
       <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
     </svg>
   </button>
+  <!-- Entry Overlay (Mini‑Game) -->
+  <div id="entryOverlay">
+    <!-- Juice Box (without straw) -->
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
+    <!-- Straw with dragging functions (placed at bottom right) -->
+    <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
+  </div>
+  <!-- Full Juice Container -->
+  <div id="fullJuiceContainer">
+    <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
+  </div>
+  <!-- Login Modal (Email/Password based) -->
+  <div id="loginModal">
+    <div class="modal-content">
+      <h2>Admin Login</h2>
+      <p>Please sign in to access edit mode.</p>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign in</button>
+    </div>
+  </div>
   <!-- Main Content Container -->
   <div id="mainContent">
-    <!-- Tilt Container for Card -->
+    <!-- Tilt Container -->
     <div id="cardContainer">
       <!-- Profile Card -->
       <div class="profile-card">
+        <!-- Head Section -->
         <div class="profile-head">
           <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
           <div class="profile-info">
@@ -199,17 +433,54 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
+        <!-- Server Embed Section -->
+        <div class="server-embed">
+          <div class="server-icon">
+            <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+          </div>
+          <div class="server-details">
+            <h1>Dazes</h1>
+            <h3 class="server-stats">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                36 Online
+              </span>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                162 Members
+              </span>
+            </h3>
+            <a href="https://discord.gg/dazes" target="_blank">Join</a>
+          </div>
+        </div>
+        <!-- Receipt Box (Image based) -->
+        <div class="receipt-box" id="receiptBox">
+          <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+        </div>
+        <!-- Edit Controls (Hidden by Default) -->
+        <div id="editControls">
+          <input type="text" id="profileNameInput" placeholder="Enter new profile name">
+          <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
+          <input type="text" id="videoURL" placeholder="Enter new video URL">
+          <input type="text" id="audioURL" placeholder="Enter new audio URL">
+          <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <!-- For receipt, allow updating the receipt image -->
+          <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
+          <button id="saveEdits">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
-  <!-- Straw (static, non-draggable) -->
-  <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
-  <!-- Custom Cursor Element -->
+  <!-- Custom Cursor Element (shown after mini‑game finishes) -->
   <div id="customCursor"></div>
   
   <script>
     // ---------------------------
-    // Typewriter Effect for Tab Title
+    // 1. Typewriter Effect for Tab Title
     // ---------------------------
     async function typewriteTitle() {
       const text = "logann";
@@ -219,6 +490,7 @@
           await sleep(200);
         }
         await sleep(500);
+        // (Keeping the full text for a moment before repeating)
       }
     }
     function sleep(ms) {
@@ -227,7 +499,7 @@
     typewriteTitle();
 
     // ---------------------------
-    // Enable Custom Cursor (for info page)
+    // 2. Function to Enable Custom Cursor (for info page)
     // ---------------------------
     function enableCustomCursor() {
       document.body.classList.add("custom-cursor");
@@ -250,26 +522,9 @@
         setTimeout(() => { trail.remove(); }, 600);
       }, 20);
     }
-    // Enable custom cursor immediately (you can control when to enable this)
-    enableCustomCursor();
 
     // ---------------------------
-    // Audio Toggle
-    // ---------------------------
-    const bgAudio = document.getElementById("bgAudio");
-    const audioToggle = document.getElementById("audioToggle");
-    const audioIcon = document.getElementById("audioIcon");
-    audioToggle.addEventListener("click", () => {
-      bgAudio.muted = !bgAudio.muted;
-      if (bgAudio.muted) {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
-      } else {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
-      }
-    });
-    
-    // ---------------------------
-    // Firebase Initialization (if needed)
+    // 3. Firebase Initialization and Settings Update Listener
     // ---------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
@@ -310,10 +565,190 @@
           if (data.joinedLine) {
             document.getElementById("joinedLine").innerText = data.joinedLine;
           }
+          if (data.receiptURL) {
+            document.getElementById("receiptBox").querySelector("img").src = data.receiptURL;
+          }
         }
       });
+
+    // ---------------------------
+    // 4. Mini‑Game, Login Modal, and Straw Dragging Logic
+    // ---------------------------
+    // Key sequence detection for "w w w e e q" to show login modal
+    const keySequence = [];
+    const targetSequence = ["w", "w", "w", "e", "e", "q"];
+    document.addEventListener("keydown", (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if (keySequence.length > targetSequence.length) keySequence.shift();
+      if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
+        document.getElementById("loginModal").style.display = "flex";
+        keySequence.length = 0;
+      }
+    });
+    document.getElementById("emailSignIn").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then((result) => {
+          document.getElementById("receiptBox").contentEditable = "true";
+          document.getElementById("editControls").style.display = "flex";
+          alert("Edit mode enabled!");
+          document.getElementById("loginModal").style.display = "none";
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error logging in. Please check your credentials and try again.");
+        });
+    });
+    document.getElementById("saveEdits").addEventListener("click", () => {
+      const newVideoURL = document.getElementById("videoURL").value;
+      const newAudioURL = document.getElementById("audioURL").value;
+      const newAvatarURL = document.getElementById("avatarURL").value;
+      const newReceiptURL = document.getElementById("receiptURL").value;
+      const newProfileName = document.getElementById("profileNameInput").value;
+      const newJoinedLine = document.getElementById("joinedLineInput").value;
+      db.collection("settings").doc("global").set({
+        videoURL: newVideoURL || "",
+        audioURL: newAudioURL || "",
+        avatarURL: newAvatarURL || "",
+        receiptURL: newReceiptURL || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
+      }, { merge: true })
+      .then(() => {
+        alert("Changes saved globally!");
+        document.getElementById("receiptBox").contentEditable = "false";
+        document.getElementById("editControls").style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Error updating settings:", error);
+      });
+    });
+    const entryOverlay = document.getElementById("entryOverlay");
+    const juiceBox = document.getElementById("juiceBox");
+    const straw = document.getElementById("straw");
+    const fullJuiceContainer = document.getElementById("fullJuiceContainer");
+    const fullJuice = document.getElementById("fullJuice");
+    const bgVideo = document.getElementById("bgVideo");
+    bgVideo.pause();
+    // Record the original position of the straw
+    const strawOrig = {
+      left: straw.getBoundingClientRect().left,
+      top: straw.getBoundingClientRect().top
+    };
+    // Implement dragging functions for straw using mousedown/touch (from the provided script)
+    let isStrawDragging = false;
+    let strawOffsetX, strawOffsetY;
+    straw.addEventListener('mousedown', strawStartDrag);
+    straw.addEventListener('touchstart', strawStartDragTouch);
+    function strawStartDrag(e) {
+      isStrawDragging = true;
+      strawOffsetX = e.clientX - straw.getBoundingClientRect().left;
+      strawOffsetY = e.clientY - straw.getBoundingClientRect().top;
+      document.addEventListener('mousemove', strawDrag);
+      document.addEventListener('mouseup', strawEndDrag);
+      e.preventDefault();
+    }
+    function strawStartDragTouch(e) {
+      isStrawDragging = true;
+      const touch = e.touches[0];
+      strawOffsetX = touch.clientX - straw.getBoundingClientRect().left;
+      strawOffsetY = touch.clientY - straw.getBoundingClientRect().top;
+      document.addEventListener('touchmove', strawDragTouch);
+      document.addEventListener('touchend', strawEndDragTouch);
+      e.preventDefault();
+    }
+    function strawDrag(e) {
+      if (!isStrawDragging) return;
+      const left = e.clientX - strawOffsetX;
+      const top = e.clientY - strawOffsetY;
+      straw.style.left = left + 'px';
+      straw.style.top = top + 'px';
+    }
+    function strawDragTouch(e) {
+      if (!isStrawDragging) return;
+      const touch = e.touches[0];
+      const left = touch.clientX - strawOffsetX;
+      const top = touch.clientY - strawOffsetY;
+      straw.style.left = left + 'px';
+      straw.style.top = top + 'px';
+      e.preventDefault();
+    }
+    function strawEndDrag() {
+      isStrawDragging = false;
+      document.removeEventListener('mousemove', strawDrag);
+      document.removeEventListener('mouseup', strawEndDrag);
+      // Optionally, reset straw position if needed:
+      // straw.style.left = strawOrig.left + 'px';
+      // straw.style.top = strawOrig.top + 'px';
+    }
+    function strawEndDragTouch() {
+      isStrawDragging = false;
+      document.removeEventListener('touchmove', strawDragTouch);
+      document.removeEventListener('touchend', strawEndDragTouch);
+    }
+    // When straw is dropped over the juice box, proceed with mini‑game success
+    straw.addEventListener("mouseup", () => {
+      const juiceRect = juiceBox.getBoundingClientRect();
+      const strawRect = straw.getBoundingClientRect();
+      if (
+        strawRect.right > juiceRect.left &&
+        strawRect.left < juiceRect.right &&
+        strawRect.bottom > juiceRect.top &&
+        strawRect.top < juiceRect.bottom
+      ) {
+        // Successful drop: animate fade out then reveal full juice
+        juiceBox.style.transition = "opacity 0.5s ease-out";
+        straw.style.transition = "opacity 0.5s ease-out";
+        juiceBox.style.opacity = "0";
+        straw.style.opacity = "0";
+        setTimeout(() => {
+          entryOverlay.style.display = "none";
+          fullJuiceContainer.style.display = "block";
+          fullJuice.style.opacity = "0";
+          setTimeout(() => {
+            fullJuice.style.opacity = "1";
+          }, 50);
+          setTimeout(() => {
+            fullJuice.style.opacity = "0";
+            setTimeout(() => {
+              fullJuiceContainer.style.display = "none";
+              document.getElementById("mainContent").style.opacity = "1";
+              // Now enable custom cursor on info page
+              enableCustomCursor();
+            }, 700);
+          }, 1500);
+        }, 500);
+      }
+    });
+    const bgAudio = document.getElementById("bgAudio");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioIcon = document.getElementById("audioIcon");
+    audioToggle.addEventListener("click", () => {
+      bgAudio.muted = !bgAudio.muted;
+      if (bgAudio.muted) {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
+    });
+    const cardContainer = document.getElementById("cardContainer");
+    cardContainer.addEventListener("mousemove", (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener("mouseleave", () => {
+      cardContainer.style.transform = "perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)";
+    });
   </script>
-  <!-- Load Firebase SDK (if needed) -->
+  <!-- Load Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
