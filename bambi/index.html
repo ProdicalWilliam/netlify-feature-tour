@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bambi Card</title>
+  <title>Bambi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2325/2325163.png" type="image/png">
+  <link rel="icon" href="https://images-ext-1.discordapp.net/external/yV27HOYXsoOKBNI2fWA1pzk2ZXdORI1IY-RQV6XI6FM/https/www.disneyclips.com/images5/images/bambi-thumper10.png?format=webp&quality=lossless&width=620&height=531" type="image/png">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4); /* Dark translucent background */
@@ -18,7 +18,6 @@
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
     }
-
     /* Global Reset */
     * {
       margin: 0;
@@ -29,7 +28,6 @@
     html, body {
       width: 100%;
       height: 100%;
-      /* Remove black background: let the video show */
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
@@ -115,7 +113,7 @@
       align-items: center;
       perspective: 1000px;
       transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
-      /* Initial tilt as given in your snippet */
+      /* Initial tilt (as provided) */
       transform: rotateX(6.67deg) rotateY(-7.57deg);
     }
     /* Profile Card (blurred transparent container) */
@@ -133,7 +131,14 @@
       flex-direction: column;
       gap: 20px;
       box-sizing: border-box;
+      /* Glow Animation with gradient blend */
+      animation: cardGlow 3s ease-in-out infinite;
       transition: transform 0.3s ease;
+    }
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 10px 2px #3a79ff; }
+      50% { box-shadow: 0 0 20px 4px #f7df94; }
+      100% { box-shadow: 0 0 10px 2px #3a79ff; }
     }
     /* Head Section */
     .profile-head {
@@ -264,7 +269,27 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Social Icons Row (only Discord) */
+    /* LoL Stats Section */
+    .lol-stats {
+      padding: 10px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(58,121,255,0.3), rgba(247,223,148,0.3));
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .lol-stats h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .lol-stats p {
+      font-size: 14px;
+      margin: 0;
+      color: var(--textSecondary);
+    }
+    /* Social Row (Discord icon with glowing effect) */
     .social-row {
       display: flex;
       gap: 16px;
@@ -323,14 +348,14 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay (Click to dismiss) -->
+  <!-- Entry Overlay (Click to reveal content) -->
   <div id="entryOverlay">
     <h1 id="entryText">BITCH?</h1>
   </div>
 
-  <!-- Main Content Container (hidden initially) -->
+  <!-- Main Content Container -->
   <div id="mainContent">
-    <!-- Tilt Container (for card tilt effect) -->
+    <!-- Tilt Container for card tilt effect -->
     <div id="cardContainer">
       <!-- Profile Card -->
       <div class="profile-card">
@@ -380,10 +405,17 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Social Row (Only Discord) -->
+        <!-- League of Legends Stats Section -->
+        <div class="lol-stats">
+          <h2>League of Legends Stats</h2>
+          <p>Summoner: Bambi</p>
+          <p>Rank: Gold / 60 LP</p>
+          <p>Wins: 120, Losses: 100</p>
+          <p>KDA: 3.8, CS per minute: 7.5</p>
+        </div>
+        <!-- Social Row (Discord Icon with Glow) -->
         <div class="social-row">
           <a href="https://discord.gg/dazes" target="_blank">
-            <!-- Discord Icon (custom glowing one) -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"></path>
               <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
@@ -412,7 +444,7 @@
       }
     });
 
-    // Entry Overlay: fade out on click; now use smooth animations and do not overlap content.
+    // Entry Overlay: fade out on click and reveal main content
     const entryOverlay = document.getElementById('entryOverlay');
     const entryText = document.getElementById('entryText');
     const mainContent = document.getElementById('mainContent');
@@ -422,7 +454,6 @@
         entryOverlay.style.display = 'none';
         mainContent.style.opacity = '1';
       }, 500);
-      // Unmute video after click
       bgVideo.muted = false;
     });
 
@@ -434,13 +465,12 @@
       const cardY = rect.top + rect.height / 2;
       const deltaX = e.clientX - cardX;
       const deltaY = e.clientY - cardY;
-      const maxTilt = 6; // maximum tilt degrees
+      const maxTilt = 6;
       const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
       const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
       cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
     cardContainer.addEventListener('mouseleave', () => {
-      // Return to initial tilt smoothly
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
 
