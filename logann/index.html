@@ -395,9 +395,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <!-- Background Video (will be paused during mini-game) -->
+  <!-- Background Video -->
   <video id="bgVideo" autoplay loop playsinline muted preload="auto">
-    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90&" type="video/mp4">
+    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
   <!-- Background Audio -->
@@ -415,19 +415,16 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay (Mini-game) with Table, Juice Box, and Straw -->
+  <!-- Entry Overlay (Mini-game) -->
   <div id="entryOverlay">
-    <!-- Table Image (centered) -->
     <img id="tableImg" src="https://www.freeiconspng.com/uploads/table-clipart-7.png" alt="Table">
-    <!-- Juice Box centered on table -->
-    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f0a12e&is=67ef4fae&hm=1342a4fc1f9d3d5e9dcc18574e5900932c642fb0264a16b9257c9baf5fd096a9&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
-    <!-- Straw positioned under table -->
-    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f0a1a6&is=67ef5026&hm=5747f75624b41f3a7f545796e4162d249bd6b7d762fa0daa6c3b4ed65ae70b1b&=&format=webp&quality=lossless&width=48&height=131" alt="Straw" draggable="true">
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png" alt="Juice Box">
+    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png" alt="Straw" draggable="true">
   </div>
 
-  <!-- Full Juice Container (hidden until drop or click) -->
+  <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
-    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f098fb&is=67ef477b&hm=c651b4ae536cbbc23b5d5204f176627397a0248983a871a81200ab3895720d17&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
+    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" alt="Full Juice">
   </div>
 
   <!-- Login Modal -->
@@ -440,7 +437,7 @@
     </div>
   </div>
 
-  <!-- Main Content Container (Information Page) -->
+  <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Tilt Container -->
     <div id="cardContainer">
@@ -450,8 +447,10 @@
         <div class="profile-head">
           <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
           <div class="profile-info">
-            <h1>Logann</h1>
-            <p class="joined-line">joined 4 months ago</p>
+            <!-- Editable Profile Name -->
+            <h1 id="profileName">Logann</h1>
+            <!-- Editable Joined Line -->
+            <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
         <!-- Server Embed Section -->
@@ -488,11 +487,16 @@
             <p>KDA: 3.8, CS per minute: 7.5</p>
           </div>
         </div>
-        <!-- Edit Controls -->
+        <!-- Edit Controls (Admin Only) -->
         <div id="editControls">
+          <!-- New fields for profile info -->
+          <input type="text" id="profileNameInput" placeholder="Enter new profile name">
+          <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
+          <!-- Fields for background video, audio, and avatar -->
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <!-- Field for league info (info box) -->
           <textarea id="leagueText" rows="8" placeholder="Edit League Info"></textarea>
           <button id="saveEdits">Save Changes</button>
         </div>
@@ -500,7 +504,7 @@
     </div>
   </div>
 
-  <!-- Custom Cursor (only for mainContent) -->
+  <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
 
   <script>
@@ -542,6 +546,13 @@
           if (data.avatarURL) {
             document.getElementById('avatarImg').src = data.avatarURL;
           }
+          // Update profile name and joined text
+          if (data.profileName) {
+            document.getElementById('profileName').innerText = data.profileName;
+          }
+          if (data.joinedLine) {
+            document.getElementById('joinedLine').innerText = data.joinedLine;
+          }
           // Update league info text
           if (data.leagueInfo) {
             document.getElementById('leagueInfo').innerHTML = data.leagueInfo;
@@ -549,10 +560,10 @@
         }
       });
 
-    // Custom Cursor – hide initially
+    // Hide custom cursor initially
     document.getElementById('cursor').style.display = 'none';
 
-    // Obfuscated expected code: base64 encoded "999shit"
+    // Expected access code (base64 encoded "999shit")
     const expectedCode = atob("OTk5c2hpdA==");
     let editMode = false;
 
@@ -582,18 +593,22 @@
       }
     });
 
-    // Save edits: update video, audio, avatar, and league info text in Firestore
+    // Save edits: update video, audio, avatar, profile info, and league info in Firestore
     document.getElementById('saveEdits').addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
       const newAudioURL = document.getElementById('audioURL').value;
       const newAvatarURL = document.getElementById('avatarURL').value;
-      const leagueText = document.getElementById('leagueInfo').innerHTML;
+      const leagueText = document.getElementById('leagueText').value;
+      const newProfileName = document.getElementById('profileNameInput').value;
+      const newJoinedLine = document.getElementById('joinedLineInput').value;
       
       db.collection("settings").doc("global").set({
         videoURL: newVideoURL || "",
         audioURL: newAudioURL || "",
         avatarURL: newAvatarURL || "",
-        leagueInfo: leagueText || ""
+        leagueInfo: leagueText || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
       }, { merge: true })
       .then(() => {
         alert("Changes saved globally!");
