@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon set to your provided full juice image -->
+  <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
   <style>
     :root {
@@ -24,6 +24,7 @@
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
       --glowColor: #4b0082;
+      --defaultCommentAvatar: url('https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png');
     }
     /* Global Reset */
     * {
@@ -151,6 +152,12 @@
       margin: 0;
       color: var(--textSecondary);
     }
+    /* View Counter */
+    #viewCounter {
+      font-size: 14px;
+      color: var(--textSecondary);
+      text-align: center;
+    }
     /* Server Embed Section */
     .server-embed {
       display: flex;
@@ -225,6 +232,76 @@
       width: 100%;
       height: auto;
       object-fit: contain;
+    }
+    /* Comment Section */
+    #commentSection {
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      margin: 10px 0;
+    }
+    #commentSection h3 {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    #commentForm {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #commentForm input, #commentForm textarea {
+      width: 100%;
+      padding: 8px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+    }
+    #commentForm button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+    }
+    #commentForm button:hover {
+      background: #2a0a5e;
+    }
+    .comment {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-bottom: 1px solid var(--outlineColor);
+      padding: 5px 0;
+    }
+    .comment:last-child {
+      border-bottom: none;
+    }
+    .comment-avatar img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .comment-content {
+      flex: 1;
+    }
+    .comment-date {
+      font-size: 0.8em;
+      color: var(--textSecondary);
+      margin-left: 5px;
+    }
+    .comment button {
+      background: #ff0000;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 5px;
     }
     /* Edit Controls (Styled like receipt box) */
     #editControls {
@@ -380,6 +457,8 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
+        <!-- View Counter -->
+        <div id="viewCounter">Views: 0</div>
         <!-- Server Embed Section -->
         <div class="server-embed">
           <div class="server-icon">
@@ -407,6 +486,17 @@
         <!-- Receipt Box (Info Box Style) -->
         <div class="receipt-box" id="receiptBox">
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+        </div>
+        <!-- Comment Section -->
+        <div id="commentSection">
+          <h3>Comments</h3>
+          <form id="commentForm">
+            <input type="text" id="commentUsername" placeholder="Your username" required>
+            <input type="text" id="commentAvatar" placeholder="Avatar URL (optional)">
+            <textarea id="commentMessage" placeholder="Your comment" required></textarea>
+            <button type="submit">Post Comment</button>
+          </form>
+          <div id="commentList"></div>
         </div>
         <!-- Edit Controls (Styled like the info box) -->
         <div id="editControls">
@@ -440,6 +530,19 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // Increase view counter on page load
+    const viewCounterElem = document.getElementById('viewCounter');
+    db.collection("settings").doc("global").update({
+      views: firebase.firestore.FieldValue.increment(1)
+    }).then(() => {
+      db.collection("settings").doc("global").get().then(doc => {
+        const data = doc.data();
+        viewCounterElem.textContent = "Views: " + (data.views || 0);
+      });
+    }).catch(error => {
+      console.error("Error incrementing view count:", error);
+    });
+
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
@@ -458,10 +561,14 @@
       const password = document.getElementById('loginPassword').value;
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          // Enable edit mode
-          document.getElementById('receiptBox').contentEditable = "true";
-          document.getElementById('editControls').style.display = 'flex';
-          alert("Edit mode enabled!");
+          // Hardcoded admin UID check
+          if(result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33"){
+            document.getElementById('receiptBox').contentEditable = "true";
+            document.getElementById('editControls').style.display = 'flex';
+            alert("Edit mode enabled!");
+          } else {
+            alert("Your account is not authorized for global edits.");
+          }
           document.getElementById('loginModal').style.display = 'none';
         })
         .catch((error) => {
@@ -537,6 +644,72 @@
         }
       });
 
+    // Public Comments
+    const commentForm = document.getElementById('commentForm');
+    const commentList = document.getElementById('commentList');
+
+    commentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Check if this device already commented
+      if(localStorage.getItem("hasCommented")){
+        alert("You have already commented on this profile.");
+        return;
+      }
+      const username = document.getElementById('commentUsername').value;
+      let avatar = document.getElementById('commentAvatar').value;
+      const message = document.getElementById('commentMessage').value;
+      if(!avatar) {
+          avatar = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+      }
+      db.collection("comments").add({
+        username,
+        avatar,
+        message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then((docRef) => {
+        localStorage.setItem("hasCommented", docRef.id);
+        alert("Comment posted!");
+        commentForm.reset();
+      }).catch((error) => {
+        console.error("Error posting comment: ", error);
+        alert("Error posting comment, please try again.");
+      });
+    });
+
+    // Listen for latest 5 comments
+    db.collection("comments").orderBy("timestamp", "desc").limit(5)
+      .onSnapshot(snapshot => {
+        commentList.innerHTML = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const commentDiv = document.createElement("div");
+          commentDiv.className = "comment";
+          const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : "Just now";
+          commentDiv.innerHTML = `
+            <div class="comment-avatar"><img src="${data.avatar}" alt="Avatar"></div>
+            <div class="comment-content">
+              <strong>${data.username}</strong> <span class="comment-date">${date}</span>
+              <p>${data.message}</p>
+            </div>
+          `;
+          // If admin edit mode is enabled, add a delete button
+          if(document.getElementById('editControls').style.display === "flex"){
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.addEventListener("click", () => {
+              db.collection("comments").doc(doc.id).delete().then(() => {
+                // If this device had commented, reset the flag
+                if(localStorage.getItem("hasCommented") === doc.id){
+                  localStorage.removeItem("hasCommented");
+                }
+              });
+            });
+            commentDiv.appendChild(delBtn);
+          }
+          commentList.appendChild(commentDiv);
+        });
+      });
+
     // Tilt Effect on Card Container
     const cardContainer = document.getElementById('cardContainer');
     cardContainer.addEventListener('mousemove', (e) => {
@@ -561,7 +734,6 @@
       cursor.style.top = e.clientY + 'px';
       cursor.style.left = e.clientX + 'px';
       if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
-        // Create a trail element using the same crosshair image
         const trail = document.createElement('div');
         trail.style.position = 'fixed';
         trail.style.top = e.clientY + 'px';
