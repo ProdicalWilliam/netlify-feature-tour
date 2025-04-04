@@ -20,6 +20,10 @@
       --outlineColor: #4b0082;
       --cursorTrailOpacity: 0.6;
       --cursorImage: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
+      --inputBg: rgba(0, 0, 0, 0.4);
+      --inputBorder: 2px solid #4b0082;
+      --inputRadius: 10px;
+      --glowColor: #4b0082;
     }
     /* Global Reset */
     * {
@@ -114,9 +118,9 @@
       transition: transform 0.3s ease;
     }
     @keyframes cardGlow {
-      0% { box-shadow: 0 0 10px 2px var(--outlineColor); }
-      50% { box-shadow: 0 0 20px 4px var(--outlineColor); }
-      100% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+      0% { box-shadow: 0 0 8px 2px var(--glowColor); }
+      50% { box-shadow: 0 0 16px 4px var(--glowColor); }
+      100% { box-shadow: 0 0 8px 2px var(--glowColor); }
     }
     /* Head Section */
     .profile-head {
@@ -205,7 +209,7 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Receipt Box instead of Info Box */
+    /* Receipt Box (Info Box Style) */
     .receipt-box {
       display: flex;
       justify-content: center;
@@ -222,6 +226,40 @@
       height: auto;
       object-fit: contain;
     }
+    /* Edit Controls (Styled like receipt box) */
+    #editControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    #editControls input {
+      width: 100%;
+      padding: 8px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+    }
+    #editControls button:hover {
+      background: #2a0a5e;
+    }
     /* Custom Cursor */
     .cursor {
       position: fixed;
@@ -234,6 +272,60 @@
       background-image: var(--cursorImage);
       background-size: cover;
       transform: translate(-50%, -50%);
+    }
+    /* Login Modal Styles with Glow */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      color: var(--textColor);
+      font-size: 1.1em;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      animation: modalGlow 2s infinite alternate;
+    }
+    @keyframes modalGlow {
+      from { box-shadow: 0 0 10px 2px var(--glowColor); }
+      to { box-shadow: 0 0 20px 4px var(--glowColor); }
+    }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #loginModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    #loginModal button:hover {
+      background: #2a0a5e;
     }
   </style>
 
@@ -312,18 +404,17 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Receipt Box (Image based) -->
+        <!-- Receipt Box (Image based Info Box) -->
         <div class="receipt-box" id="receiptBox">
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
-        <!-- Edit Controls (Hidden by Default) -->
+        <!-- Edit Controls (Styled like the info box) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
-          <!-- For receipt, allow updating the receipt image -->
           <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
@@ -348,6 +439,64 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+
+    // Key sequence detection for "w w w e e q" to show login modal
+    const keySequence = [];
+    const targetSequence = ['w','w','w','e','e','q'];
+    document.addEventListener('keydown', (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if(keySequence.length > targetSequence.length) keySequence.shift();
+      if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
+        document.getElementById('loginModal').style.display = 'flex';
+        keySequence.length = 0;
+      }
+    });
+
+    // Handle Email/Password Sign-In when "Sign in" button is clicked
+    document.getElementById('emailSignIn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then((result) => {
+          // Enable edit mode
+          document.getElementById('receiptBox').contentEditable = "true";
+          document.getElementById('editControls').style.display = 'flex';
+          alert("Edit mode enabled!");
+          document.getElementById('loginModal').style.display = 'none';
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error logging in. Please check your credentials and try again.");
+        });
+    });
+
+    // Save edits: update page settings in Firestore; on success, show "Globally Saved!"
+    document.getElementById('saveEdits').addEventListener('click', () => {
+      const newVideoURL = document.getElementById('videoURL').value;
+      const newAudioURL = document.getElementById('audioURL').value;
+      const newAvatarURL = document.getElementById('avatarURL').value;
+      const newReceiptURL = document.getElementById('receiptURL').value;
+      const newProfileName = document.getElementById('profileNameInput').value;
+      const newJoinedLine = document.getElementById('joinedLineInput').value;
+      
+      db.collection("settings").doc("global").set({
+        videoURL: newVideoURL || "",
+        audioURL: newAudioURL || "",
+        avatarURL: newAvatarURL || "",
+        receiptURL: newReceiptURL || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
+      }, { merge: true })
+      .then(() => {
+        alert("Globally Saved!");
+        // Disable editing and hide controls
+        document.getElementById('receiptBox').contentEditable = "false";
+        document.getElementById('editControls').style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Error updating settings:", error);
+      });
+    });
 
     // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
@@ -387,53 +536,6 @@
           }
         }
       });
-
-    // Handle Email/Password Sign-In when "Sign in" button is clicked
-    document.getElementById('emailSignIn').addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then((result) => {
-          const user = result.user;
-          // Allow any valid user (or check against your own criteria)
-          document.getElementById('receiptBox').contentEditable = "true";
-          document.getElementById('editControls').style.display = 'flex';
-          alert("Edit mode enabled!");
-          document.getElementById('loginModal').style.display = 'none';
-        })
-        .catch((error) => {
-          console.error("Error during sign-in:", error);
-          alert("Error logging in. Please check your credentials and try again.");
-        });
-    });
-
-    // Save edits: update video, audio, avatar, profile info, and receipt image in Firestore
-    document.getElementById('saveEdits').addEventListener('click', () => {
-      const newVideoURL = document.getElementById('videoURL').value;
-      const newAudioURL = document.getElementById('audioURL').value;
-      const newAvatarURL = document.getElementById('avatarURL').value;
-      const newReceiptURL = document.getElementById('receiptURL').value;
-      const newProfileName = document.getElementById('profileNameInput').value;
-      const newJoinedLine = document.getElementById('joinedLineInput').value;
-      
-      db.collection("settings").doc("global").set({
-        videoURL: newVideoURL || "",
-        audioURL: newAudioURL || "",
-        avatarURL: newAvatarURL || "",
-        receiptURL: newReceiptURL || "",
-        profileName: newProfileName || "",
-        joinedLine: newJoinedLine || ""
-      }, { merge: true })
-      .then(() => {
-        alert("Changes saved globally!");
-        // Disable editing and hide controls
-        document.getElementById('receiptBox').contentEditable = "false";
-        document.getElementById('editControls').style.display = "none";
-      })
-      .catch((error) => {
-        console.error("Error updating settings:", error);
-      });
-    });
 
     // Custom Cursor & Trail
     const cursor = document.getElementById('cursor');
