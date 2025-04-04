@@ -565,9 +565,9 @@
     const auth = firebase.auth();
 
     // Increase view counter on every page load (everyone's view counts)
-    db.collection("settings").doc("global").update({
+    db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
-    }).catch(error => {
+    }, { merge: true }).catch(error => {
       console.error("Error incrementing view count:", error);
     });
 
@@ -607,9 +607,9 @@
           if (data.receiptURL) {
             document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
           }
-          // Update live view counter with provided SVG icon and styling
+          // Update live view counter with provided SVG icon and styling (font-size: 1em to match the icon)
           const viewCounterElem = document.getElementById('viewCounter');
-          viewCounterElem.innerHTML = `<span style="font-weight:550;font-size:14px">
+          viewCounterElem.innerHTML = `<span style="font-weight:550;font-size:1em">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
               <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
             </svg> ${data.views || 0} views
