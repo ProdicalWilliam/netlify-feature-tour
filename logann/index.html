@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Logann</title>
+  <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
@@ -18,7 +18,7 @@
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
       --outlineColor: #4b0082;
-      /* Set the custom crosshair image URL */
+      /* Custom crosshair image URL */
       --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
       --modalBg: rgba(0, 0, 0, 0.85);
@@ -346,7 +346,7 @@
       color: #fff;
       cursor: pointer;
     }
-    /* Custom Cursor Container */
+    /* Custom Cursor */
     #customCursor {
       position: fixed;
       width: 32px;
@@ -357,17 +357,18 @@
       background-size: contain;
       transform: translate(-50%, -50%);
     }
-    /* Trail styles */
+    /* Trail Effect for Custom Cursor */
     .cursorTrail {
       position: fixed;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       pointer-events: none;
       z-index: 9999;
       background: var(--cursorImage) no-repeat center center;
       background-size: contain;
-      opacity: 0.6;
+      opacity: 0.8;
       transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 10px #ffb6c1);
     }
   </style>
 </head>
@@ -469,9 +470,52 @@
   </div>
   <!-- Custom Cursor Element -->
   <div id="customCursor"></div>
-
+  
   <script>
-    // Firebase config and initialization
+    // ---------------------------
+    // 1. Typewriter Effect for Tab Title
+    // ---------------------------
+    async function typewriteTitle() {
+      const text = "logann";
+      document.title = "";
+      for (let i = 0; i < text.length; i++) {
+        document.title += text.charAt(i);
+        await sleep(200); // Delay between each character (milliseconds)
+      }
+      // To loop the effect, uncomment the following line:
+      // setTimeout(typewriteTitle, 1500);
+    }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    typewriteTitle();
+
+    // ---------------------------
+    // 2. Custom Cursor with Trail Effect
+    // ---------------------------
+    const customCursor = document.getElementById('customCursor');
+    document.addEventListener('mousemove', (e) => {
+      customCursor.style.left = e.clientX + 'px';
+      customCursor.style.top = e.clientY + 'px';
+
+      // Create a trailing element with glow
+      const trail = document.createElement('div');
+      trail.classList.add('cursorTrail');
+      trail.style.left = e.clientX + 'px';
+      trail.style.top = e.clientY + 'px';
+      document.body.appendChild(trail);
+      
+      setTimeout(() => {
+        trail.style.transition = 'opacity 0.6s ease-out';
+        trail.style.opacity = '0';
+        setTimeout(() => { trail.remove(); }, 600);
+      }, 20);
+    });
+
+    // ---------------------------
+    // 3. Firebase Initialization and Settings Update Listener
+    // ---------------------------
+    // Ensure Firebase SDK is loaded before this script (not shown in this code)
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -485,20 +529,6 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Typewriter effect for the tab title
-    const titleText = "Logann";
-    let currentIndex = 0;
-    function typeTitle() {
-      document.title = titleText.substring(0, currentIndex);
-      currentIndex++;
-      if (currentIndex > titleText.length) {
-        currentIndex = 0;
-      }
-      setTimeout(typeTitle, 300);
-    }
-    typeTitle();
-
-    // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
@@ -537,24 +567,9 @@
         }
       });
 
-    // Custom Cursor Implementation
-    const customCursor = document.getElementById('customCursor');
-    document.addEventListener('mousemove', (e) => {
-      customCursor.style.left = e.clientX + 'px';
-      customCursor.style.top = e.clientY + 'px';
-      // Create a trailing element
-      const trail = document.createElement('div');
-      trail.classList.add('cursorTrail');
-      trail.style.left = e.clientX + 'px';
-      trail.style.top = e.clientY + 'px';
-      document.body.appendChild(trail);
-      setTimeout(() => {
-        trail.style.transition = 'opacity 0.6s ease-out';
-        trail.style.opacity = '0';
-        setTimeout(() => { trail.remove(); }, 600);
-      }, 20);
-    });
-
+    // ---------------------------
+    // 4. Custom Cursor, Login Modal, and Mini‑Game Logic
+    // ---------------------------
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
@@ -706,5 +721,9 @@
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
   </script>
+  <!-- Load Firebase SDK (make sure to include these in your project) -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
