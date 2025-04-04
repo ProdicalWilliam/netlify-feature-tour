@@ -1,242 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Logann</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon -->
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f098fb&is=67ef477b&hm=c651b4ae536cbbc23b5d5204f176627397a0248983a871a81200ab3895720d17&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
   <style>
-    /* Global styles */
-    html, body {
+    :root {
+      --containerColor: rgba(0, 0, 0, 0.4);
+      --containerBlur: 12px;
+      --containerBorder: 2px solid #4b0082; /* midnight purple */
+      --containerRadius: 20px;
+      --containerWidth: 42rem;
+      --containerPadding: 20px 25px;
+      --textColor: #fff;
+      --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
+      --outlineColor: #4b0082; /* midnight purple outline */
+      --cursorColor: #b19cd9; /* light purple */
+    }
+
+    /* Global Reset */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      cursor: none; /* Hide default cursor */
+    }
+    html, body {
+      width: 100%;
       height: 100%;
-      font-family: 'Montserrat', sans-serif;
-      background: #000;
-      color: #fff;
-      overflow-x: hidden;
-      position: relative;
-    }
-    a {
-      color: #fff;
-      text-decoration: none;
-    }
-    .profile-page {
-      position: relative;
-      min-height: 100vh;
-      display: block;
-    }
-    .home-link {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px 15px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 20;
-      transition: transform 0.3s ease;
-    }
-    .home-link:hover {
-      transform: translateY(-3px);
-    }
-    .content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
+      background: none;
+      font-family: Arial, sans-serif;
       overflow: hidden;
     }
-    /* Video background styling */
-    .video-bg {
+    /* Background Video */
+    #bgVideo {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: 1;
-      filter: blur(10px);
-      opacity: 0;
+      z-index: -3;
+      opacity: 1;
       transition: opacity 1s ease;
     }
-    /* Profile container styling */
-    .profile-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: opacity 0.6s ease;
-      z-index: 5;
-    }
-    .hidden {
+    /* Background Audio (hidden controls) */
+    #bgAudio {
       display: none;
     }
-    .avatar {
-      width: 128px;
-      height: 128px;
+    /* Audio Toggle Button */
+    #audioToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.3);
+      border: none;
       border-radius: 50%;
-      border: 3px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-      opacity: 0;
-      transition: all 0.8s ease;
-      margin-bottom: 15px;
-    }
-    .avatar.visible, .avatar:hover {
-      opacity: 1;
-      transform: translateY(-10px);
-    }
-    /* Purple neon overlay styling */
-    .overlay {
-      background: rgba(128, 0, 128, 0.7);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-      opacity: 0;
-      transition: all 0.6s ease;
-    }
-    .overlay.visible {
-      opacity: 1;
-    }
-    .overlay:hover {
-      transform: translateY(-10px);
-    }
-    .overlay h2 {
-      margin: 0.5em 0;
-      font-size: 2em;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: #ff00ff;
-    }
-    .info-row {
-      margin: 8px 0;
-      font-weight: 300;
-      font-size: 1.1em;
-    }
-    .view-counter {
-      margin-top: 10px;
-      font-size: 1em;
-      font-weight: bold;
-      color: #ffeb3b;
-    }
-    /* Intro circle styling */
-    .intro-circle {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(128, 0, 255, 0.7) 0%, rgba(60, 0, 120, 0.7) 70%, rgba(40, 0, 80, 0) 100%);
-      border-radius: 50%;
-      box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5);
+      padding: 10px;
       cursor: pointer;
-      animation: circleEntry 1.5s ease-out forwards, circlePulse 2s infinite 1.5s;
+      z-index: 1001;
+      transition: background 0.2s;
+    }
+    #audioToggle:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    #audioToggle svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+    /* Entry Overlay */
+    #entryOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+    #entryOverlay h1 {
+      font-size: 96px;
+      color: #fff;
+      text-transform: uppercase;
+      text-align: center;
+      filter: drop-shadow(0 0 50px #fff);
+      text-shadow: 0 0 30px #fff, 0 0 40px #fff, 0 0 50px #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.5s ease;
+    }
+    #entryOverlay h1:hover {
+      transform: scale(1.05);
+    }
+    /* Main Content Container */
+    #mainContent {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
       opacity: 0;
-      transform: translateY(-100vh);
+      transition: opacity 0.8s ease;
+    }
+    /* Tilt Container for Card */
+    #cardContainer {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
+      transform: rotateX(6.67deg) rotateY(-7.57deg);
+    }
+    /* Profile Card */
+    .profile-card {
+      width: var(--containerWidth);
+      max-width: 95%;
+      padding: var(--containerPadding);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      backdrop-filter: blur(var(--containerBlur));
+      -webkit-backdrop-filter: blur(var(--containerBlur));
+      color: var(--textColor);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-sizing: border-box;
+      animation: cardGlow 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+      50% { box-shadow: 0 0 20px 4px var(--outlineColor); }
+      100% { box-shadow: 0 0 10px 2px var(--outlineColor); }
+    }
+    /* Head Section */
+    .profile-head {
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 10;
+      gap: 20px;
     }
-    .intro-circle::after {
-      content: "CLICK";
-      font-family: 'Montserrat', sans-serif;
+    .profile-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-info h1 {
       font-weight: 600;
-      font-size: 20px;
-      color: white;
-      text-shadow: 0 0 10px white;
+      font-size: 36px;
+      line-height: 42px;
+      margin: 0;
     }
-    @keyframes circleEntry {
-      0% { transform: translateY(-100vh); opacity: 0; }
-      70% { transform: translateY(20px); opacity: 1; }
-      100% { transform: translateY(0); opacity: 1; }
+    .joined-line {
+      font-weight: 400;
+      font-size: 13px;
+      margin: 0;
+      color: var(--textSecondary);
     }
-    @keyframes circlePulse {
-      0% { box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5); transform: scale(1); }
-      50% { box-shadow: 0 0 60px 25px rgba(128, 0, 255, 0.6); transform: scale(1.05); }
-      100% { box-shadow: 0 0 50px 20px rgba(128, 0, 255, 0.5); transform: scale(1); }
+    /* Presence Section */
+    .presence-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .presence-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      position: relative;
+    }
+    .presence-avatar.offline::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: red;
+    }
+    .presence-details {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+    .presence-details span {
+      font-weight: 550;
+      font-size: 15px;
+    }
+    /* Server Embed Section */
+    .server-embed {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .server-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .server-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .server-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .server-details h1 {
+      font-weight: 450;
+      font-size: 18px;
+      margin: 0;
+    }
+    .server-stats {
+      font-weight: 450;
+      font-size: 12.5px;
+      color: var(--onlineColor);
+      display: flex;
+      gap: 10px;
+    }
+    .server-stats svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 3px;
+    }
+    .server-details a {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 450;
+      font-size: 12px;
+      color: #fff;
+      text-decoration: none;
+      margin-top: 2px;
+      transition: background 0.3s ease;
+    }
+    .server-details a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    /* League Stats Section – Editable */
+    .lol-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--containerColor);
+      border: 2px solid var(--outlineColor);
+    }
+    .lol-stats .stats-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    .lol-stats h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .lol-stats p {
+      font-size: 14px;
+      margin: 2px 0;
+      color: var(--textSecondary);
+      white-space: pre-wrap;
+    }
+    /* Default league info text */
+    #leagueInfo::before {
+      content: "ORDER #0002 FOR LOGANN\n\nTHURSDAY, APRIL 3, 2025\n\nQTY    ITEM    AMT\n01    PLAYBOI CARTI    95\n02    LIL UZI VERT    86\n03    A BOOGIE WIT DA HOODIE    78\n04    KENDRICK LAMAR    97\n05    KEN CARSON    79\n06    DRAKE    98\n07    FUTURE    93\n08    JUICE WRLD    89\n09    LIL TECCA    84\n10    BABYCHIEFDOIT    67\nITEM COUNT:    10\nTOTAL:    866.00\nCARD #:   ** 2023\n\nAUTH CODE: 123421\n\nCARDHOLDER: LOGANN";
+      white-space: pre-wrap;
+      display: block;
+      visibility: hidden;
+      height: 0;
+    }
+    /* Typewriter Cursor */
+    .Typewriter__cursor {
+      color: #fff;
+      margin-left: 2px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    /* Custom Cursor: Cross shape */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+    }
+    .cursor:before, .cursor:after {
+      content: "";
+      position: absolute;
+      background: var(--cursorColor);
+      border-radius: 2px;
+    }
+    .cursor:before {
+      width: 100%;
+      height: 2px;
+      top: 50%;
+      left: 0;
+    }
+    .cursor:after {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+    }
+    /* Login Modal Styles */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    #loginModal input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+    }
+    #loginModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Edit Controls */
+    #editControls {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #editControls input, #editControls textarea {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--textColor);
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <video id="logann-video-bg" class="video-bg" autoplay loop muted playsinline preload="auto">
+  <!-- Background Video -->
+  <video id="bgVideo" autoplay loop playsinline muted preload="auto">
+    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90&" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-  <section id="logann" class="profile-page">
-    <a href="/" class="home-link">← Home</a>
-    <div class="content">
-      <div id="logann-intro-circle" class="intro-circle"></div>
-      <div id="logann-profile-container" class="profile-container hidden">
-        <img src="https://media.discordapp.net/attachments/1342706156048617504/1357168658077585479/IMG_5244.jpg?ex=67ef394f&is=67ede7cf&hm=3904abbd3ae227c240f292766cdf5b0d7c39ee249f5bf9721bcfa601268fe84b&=&format=webp&width=536&height=535" alt="Discord Avatar" class="avatar" id="logann-avatar">
-        <div class="overlay" id="logann-overlay">
-          <!-- Simplified profile info -->
-          <h2>goat</h2>
-          <div class="info-row">999</div>
-          <div class="info-row view-counter">Views: <span id="logann-view-count">0</span></div>
+  <!-- Background Audio -->
+  <audio id="bgAudio" autoplay loop preload="auto">
+    <source src="https://example.com/default-audio.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Audio Toggle Button -->
+  <button id="audioToggle" title="Toggle Audio">
+    <svg id="audioIcon" viewBox="0 0 24 24">
+      <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
+      <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
+      <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
+    </svg>
+  </button>
+
+  <!-- Entry Overlay -->
+  <div id="entryOverlay">
+    <h1 id="entryText">999 large</h1>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" style="display:none;">
+    <div class="modal-content">
+      <h2>Enter Access Code</h2>
+      <input type="text" id="loginCode" placeholder="Enter code">
+      <br>
+      <button id="loginSubmit">Login</button>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div id="mainContent">
+    <!-- Tilt Container -->
+    <div id="cardContainer">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <!-- Head Section -->
+        <div class="profile-head">
+          <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Bambi Avatar">
+          <div class="profile-info">
+            <h1>Bambi</h1>
+            <p class="joined-line">joined 4 months ago</p>
+          </div>
+        </div>
+        <!-- Presence Section -->
+        <div class="presence-info">
+          <img class="presence-avatar" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Bambi Avatar">
+          <div class="presence-details">
+            <span>Bambi</span>
+          </div>
+        </div>
+        <!-- Server Embed Section -->
+        <div class="server-embed">
+          <div class="server-icon">
+            <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+          </div>
+          <div class="server-details">
+            <h1>Dazes</h1>
+            <h3 class="server-stats">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                36 Online
+              </span>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                162 Members
+              </span>
+            </h3>
+            <a href="https://discord.gg/dazes" target="_blank">Join</a>
+          </div>
+        </div>
+        <!-- League Stats Section – Editable -->
+        <div class="lol-stats" id="leagueInfo" contenteditable="false">
+          <div class="stats-info">
+            <h2>League of Legends Stats</h2>
+            <p>Summoner: Bambi</p>
+            <p>Rank: Gold / 60 LP</p>
+            <p>Wins: 120, Losses: 100</p>
+            <p>KDA: 3.8, CS per minute: 7.5</p>
+          </div>
+        </div>
+        <!-- Edit Controls (hidden by default) -->
+        <div id="editControls">
+          <input type="text" id="videoURL" placeholder="Enter new video URL">
+          <input type="text" id="audioURL" placeholder="Enter new audio URL">
+          <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <textarea id="leagueText" rows="8" placeholder="Edit League Info"></textarea>
+          <button id="saveEdits">Save Changes</button>
         </div>
       </div>
     </div>
-  </section>
-  
+  </div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const logannIntroCircle = document.getElementById('logann-intro-circle');
-      const logannProfileContainer = document.getElementById('logann-profile-container');
-      const logannAvatar = document.getElementById('logann-avatar');
-      const logannOverlay = document.getElementById('logann-overlay');
-      const logannVideoElement = document.getElementById('logann-video-bg');
-      const logannViewCount = document.getElementById('logann-view-count');
-      
-      // Initialize view counter
-      let viewCount = parseInt(localStorage.getItem('logannViewCount') || '0');
-      viewCount++;
-      localStorage.setItem('logannViewCount', viewCount.toString());
-      logannViewCount.textContent = viewCount.toString();
-      
-      // Set video source and preload (Juice WRLD video and audio)
-      logannVideoElement.src = "https://cdn.discordapp.com/attachments/1261103952293003297/1357163210058367056/Juice_WRLD_-_Armed__Dangerous_Official_Music_Video.mp4?ex=67ef343c&is=67ede2bc&hm=a0d44a48a63789ee2c372927fa33bd2470f0e9b649c40c9235916cede86d72ab&";
-      logannVideoElement.preload = "auto";
-      
-      // Intro circle click: reveal profile and remove circle from DOM
-      logannIntroCircle.addEventListener('click', () => {
-        logannIntroCircle.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
-        logannIntroCircle.style.transform = "scale(1.5)";
-        logannIntroCircle.style.opacity = "0";
-        setTimeout(() => {
-          logannIntroCircle.remove();  // Remove the click button so it doesn't remain visible
-          logannProfileContainer.classList.remove('hidden');
-          attemptLogannPlayback();
-          startLogannEffects();
-        }, 500);
-      });
-      
-      function attemptLogannPlayback() {
-        logannVideoElement.play().then(() => {
-          logannVideoElement.playbackRate = 1.0;
-          logannVideoElement.style.opacity = "1";
-          logannVideoElement.muted = false;
-        }).catch(err => {
-          console.error("Playback error:", err);
-        });
+    // Obfuscated expected code: base64 encoded "999shit"
+    const expectedCode = atob("OTk5c2hpdA==");
+    let editMode = false;
+
+    // Key sequence detection for "w w w e e q"
+    const keySequence = [];
+    const targetSequence = ['w','w','w','e','e','q'];
+    document.addEventListener('keydown', (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if(keySequence.length > targetSequence.length){
+        keySequence.shift();
       }
-      
-      function startLogannEffects() {
-        setTimeout(() => {
-          logannAvatar.classList.add('visible');
-          logannOverlay.classList.add('visible');
-        }, 300);
+      if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
+        document.getElementById('loginModal').style.display = 'flex';
+        keySequence.length = 0;
       }
-      
-      // Auto-trigger intro if URL hash is "#logann" (optional)
-      if (window.location.hash === '#logann') {
+    });
+
+    // Login Modal Handling
+    document.getElementById('loginSubmit').addEventListener('click', () => {
+      const userCode = document.getElementById('loginCode').value;
+      if(userCode === expectedCode){
+        editMode = true;
+        document.getElementById('leagueInfo').contentEditable = "true";
+        document.getElementById('editControls').style.display = 'flex';
+        alert("Edit mode enabled!");
+        document.getElementById('loginModal').style.display = 'none';
+      } else {
+        alert("Incorrect code!");
+      }
+    });
+
+    // Save edits: update video, audio, avatar, and league info text
+    document.getElementById('saveEdits').addEventListener('click', () => {
+      const newVideoURL = document.getElementById('videoURL').value;
+      if(newVideoURL) {
+        const bgVideo = document.getElementById('bgVideo');
+        bgVideo.pause();
+        bgVideo.querySelector('source').src = newVideoURL;
+        bgVideo.load();
+        bgVideo.play();
+        localStorage.setItem("bgVideoURL", newVideoURL);
+      }
+      const newAudioURL = document.getElementById('audioURL').value;
+      if(newAudioURL) {
+        const bgAudio = document.getElementById('bgAudio');
+        bgAudio.pause();
+        bgAudio.querySelector('source').src = newAudioURL;
+        bgAudio.load();
+        bgAudio.play();
+        localStorage.setItem("bgAudioURL", newAudioURL);
+      }
+      const newAvatarURL = document.getElementById('avatarURL').value;
+      if(newAvatarURL) {
+        document.getElementById('avatarImg').src = newAvatarURL;
+        localStorage.setItem("avatarURL", newAvatarURL);
+      }
+      const leagueText = document.getElementById('leagueInfo').innerHTML;
+      localStorage.setItem("leagueInfoText", leagueText);
+      alert("Changes saved!");
+    });
+
+    // On load, retrieve saved edits if any
+    window.addEventListener('load', () => {
+      const savedVideoURL = localStorage.getItem("bgVideoURL");
+      if(savedVideoURL) {
+        const bgVideo = document.getElementById('bgVideo');
+        bgVideo.pause();
+        bgVideo.querySelector('source').src = savedVideoURL;
+        bgVideo.load();
+        bgVideo.play();
+      }
+      const savedAudioURL = localStorage.getItem("bgAudioURL");
+      if(savedAudioURL) {
+        const bgAudio = document.getElementById('bgAudio');
+        bgAudio.pause();
+        bgAudio.querySelector('source').src = savedAudioURL;
+        bgAudio.load();
+        bgAudio.play();
+      }
+      const savedAvatarURL = localStorage.getItem("avatarURL");
+      if(savedAvatarURL) {
+        document.getElementById('avatarImg').src = savedAvatarURL;
+      }
+      const savedLeague = localStorage.getItem("leagueInfoText");
+      if(savedLeague) {
+        document.getElementById('leagueInfo').innerHTML = savedLeague;
+      }
+    });
+
+    // Entry Overlay: on click, hide overlay and reveal main content
+    const entryOverlay = document.getElementById('entryOverlay');
+    const entryText = document.getElementById('entryText');
+    const mainContent = document.getElementById('mainContent');
+    entryText.addEventListener('click', () => {
+      entryOverlay.style.opacity = '0';
+      setTimeout(() => {
+        entryOverlay.style.display = 'none';
+        mainContent.style.opacity = '1';
+      }, 500);
+      // Unmute audio on entry
+      document.getElementById('bgAudio').muted = false;
+    });
+
+    // Audio Toggle: now controls the bgAudio element
+    const bgAudio = document.getElementById('bgAudio');
+    const audioToggle = document.getElementById('audioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    audioToggle.addEventListener('click', () => {
+      bgAudio.muted = !bgAudio.muted;
+      if (bgAudio.muted) {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
+    });
+
+    // Tilt Effect on Card Container
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener('mouseleave', () => {
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
+
+    // Custom Cursor & Trail (cleaner version)
+    const cursor = document.getElementById('cursor');
+    let lastMouseX = 0, lastMouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+        const dot = document.createElement('div');
+        dot.style.position = 'fixed';
+        dot.style.top = e.clientY + 'px';
+        dot.style.left = e.clientX + 'px';
+        dot.style.width = '4px';
+        dot.style.height = '4px';
+        dot.style.background = var(--cursorColor);
+        dot.style.background = "var(--cursorColor)";
+        dot.style.borderRadius = '50%';
+        dot.style.pointerEvents = 'none';
+        dot.style.opacity = '0.8';
+        dot.style.transform = 'translate(-50%, -50%)';
+        dot.style.filter = 'drop-shadow(0 0 2px var(--cursorColor))';
+        document.body.appendChild(dot);
         setTimeout(() => {
-          logannIntroCircle.click();
-        }, 1000);
+          dot.style.transition = 'opacity 0.3s ease-out';
+          dot.style.opacity = '0';
+          setTimeout(() => { dot.remove(); }, 300);
+        }, 0);
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
       }
     });
   </script>
