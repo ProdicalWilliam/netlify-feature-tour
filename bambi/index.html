@@ -5,7 +5,7 @@
   <title>Bambi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://images-ext-1.discordapp.net/external/yV27HOYXsoOKBNI2fWA1pzk2ZXdORI1IY-RQV6XI6FM/https/www.disneyclips.com/images5/images/bambi-thumper10.png?format=webp&quality=lossless&width=620&height=531" type="image/png">
+  <link rel="icon" href="https://preview.redd.it/ennd5zljlql21.png?width=256&format=png&auto=webp&s=d699fed3ae40c76c8735354c175a07b74d2e1e03">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4); /* Dark translucent background */
@@ -17,7 +17,10 @@
       --textColor: #fff;
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
+      /* Gradient matching the card glow */
+      --glowGradient: linear-gradient(135deg, rgba(58,121,255,0.4), rgba(247,223,148,0.4));
     }
+
     /* Global Reset */
     * {
       margin: 0;
@@ -84,7 +87,8 @@
       color: #fff;
       text-transform: uppercase;
       text-align: center;
-      filter: drop-shadow(0 0 25px #fff);
+      /* Strong white glow */
+      filter: drop-shadow(0 0 35px #fff);
       cursor: pointer;
       user-select: none;
       transition: transform 0.5s ease;
@@ -113,10 +117,10 @@
       align-items: center;
       perspective: 1000px;
       transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
-      /* Initial tilt (as provided) */
+      /* Initial tilt */
       transform: rotateX(6.67deg) rotateY(-7.57deg);
     }
-    /* Profile Card (blurred transparent container) */
+    /* Profile Card (blurred transparent container with glow) */
     .profile-card {
       width: var(--containerWidth);
       max-width: 95%;
@@ -131,7 +135,6 @@
       flex-direction: column;
       gap: 20px;
       box-sizing: border-box;
-      /* Glow Animation with gradient blend */
       animation: cardGlow 3s ease-in-out infinite;
       transition: transform 0.3s ease;
     }
@@ -269,15 +272,20 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* LoL Stats Section */
+    /* League of Legends Stats Section with Gradient Matching Glow */
     .lol-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
       padding: 10px;
       border-radius: 10px;
-      background: linear-gradient(135deg, rgba(58,121,255,0.3), rgba(247,223,148,0.3));
+      background: var(--glowGradient);
       border: 1px solid rgba(255,255,255,0.2);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    }
+    .lol-stats .stats-info {
+      flex: 1;
+      min-width: 200px;
     }
     .lol-stats h2 {
       font-size: 18px;
@@ -286,26 +294,18 @@
     }
     .lol-stats p {
       font-size: 14px;
-      margin: 0;
+      margin: 2px 0;
       color: var(--textSecondary);
     }
-    /* Social Row (Discord icon with glowing effect) */
-    .social-row {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 10px;
+    .lol-stats .stats-image {
+      flex: 0 0 auto;
     }
-    .social-row a svg {
-      width: 24px;
-      height: 24px;
-      color: #fff;
-      filter: drop-shadow(#fff 1px 0 7px);
-      transition: transform 0.2s;
+    .lol-stats .stats-image img {
+      max-width: 256px;
+      width: 100%;
+      border-radius: 10px;
     }
-    .social-row a:hover svg {
-      transform: scale(1.1);
-    }
+    /* Social Row: Removed extra Discord button; only the server embed remains */
     /* Typewriter Cursor */
     .Typewriter__cursor {
       color: #fff;
@@ -355,7 +355,7 @@
 
   <!-- Main Content Container -->
   <div id="mainContent">
-    <!-- Tilt Container for card tilt effect -->
+    <!-- Tilt Container for Card Tilt Effect -->
     <div id="cardContainer">
       <!-- Profile Card -->
       <div class="profile-card">
@@ -405,23 +405,18 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- League of Legends Stats Section -->
+        <!-- League of Legends Stats Section with Gradient -->
         <div class="lol-stats">
-          <h2>League of Legends Stats</h2>
-          <p>Summoner: Bambi</p>
-          <p>Rank: Gold / 60 LP</p>
-          <p>Wins: 120, Losses: 100</p>
-          <p>KDA: 3.8, CS per minute: 7.5</p>
-        </div>
-        <!-- Social Row (Discord Icon with Glow) -->
-        <div class="social-row">
-          <a href="https://discord.gg/dazes" target="_blank">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"></path>
-              <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
-              <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
-            </svg>
-          </a>
+          <div class="stats-info">
+            <h2>League of Legends Stats</h2>
+            <p>Summoner: Bambi</p>
+            <p>Rank: Gold / 60 LP</p>
+            <p>Wins: 120, Losses: 100</p>
+            <p>KDA: 3.8, CS per minute: 7.5</p>
+          </div>
+          <div class="stats-image">
+            <img src="https://preview.redd.it/ennd5zljlql21.png?width=256&format=png&auto=webp&s=d699fed3ae40c76c8735354c175a07b74d2e1e03" alt="LoL Stats Image">
+          </div>
         </div>
       </div>
     </div>
