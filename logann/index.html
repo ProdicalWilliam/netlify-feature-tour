@@ -29,8 +29,6 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Initially use the default cursor so dragging works during the mini‑game */
-      /* (No custom cursor styling applied yet) */
     }
     html, body {
       width: 100%;
@@ -90,7 +88,7 @@
       height: 100%;
       position: relative;
       z-index: 2;
-      opacity: 1; /* Set visible immediately */
+      opacity: 1; /* Visible immediately */
       transition: opacity 0.8s ease;
     }
     /* Tilt Container for Card */
@@ -231,7 +229,7 @@
       height: auto;
       object-fit: contain;
     }
-    /* Login Modal Styles (Clean & Readable) */
+    /* Login Modal (Email/Password based) */
     #loginModal {
       position: fixed;
       top: 0;
@@ -348,6 +346,17 @@
     </svg>
   </button>
   
+  <!-- Login Modal (Email/Password based) -->
+  <div id="loginModal">
+    <div class="modal-content">
+      <h2>Admin Login</h2>
+      <p>Please sign in to access edit mode.</p>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign in</button>
+    </div>
+  </div>
+  
   <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Tilt Container -->
@@ -397,7 +406,6 @@
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
-          <!-- For receipt, allow updating the receipt image -->
           <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
@@ -502,7 +510,7 @@
       });
 
     // ---------------------------
-    // 4. Login Modal Logic
+    // 4. Login Modal & Edit Controls Logic
     // ---------------------------
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
@@ -554,6 +562,7 @@
         console.error("Error updating settings:", error);
       });
     });
+
     // ---------------------------
     // 5. Card Tilt Effect
     // ---------------------------
@@ -571,6 +580,21 @@
     });
     cardContainer.addEventListener("mouseleave", () => {
       cardContainer.style.transform = "perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)";
+    });
+
+    // ---------------------------
+    // 6. Audio Toggle Logic
+    // ---------------------------
+    const bgAudio = document.getElementById("bgAudio");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioIcon = document.getElementById("audioIcon");
+    audioToggle.addEventListener("click", () => {
+      bgAudio.muted = !bgAudio.muted;
+      if (bgAudio.muted) {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
     });
   </script>
   <!-- Load Firebase SDK -->
