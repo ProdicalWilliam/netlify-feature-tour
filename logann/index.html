@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Logann</title>
+  <title>Bambi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f098fb&is=67ef477b&hm=c651b4ae536cbbc23b5d5204f176627397a0248983a871a81200ab3895720d17&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
+  <link rel="icon" href="https://images-ext-1.discordapp.net/external/yV27HOYXsoOKBNI2fWA1pzk2ZXdORI1IY-RQV6XI6FM/https/www.disneyclips.com/images5/images/bambi-thumper10.png?format=webp&quality=lossless&width=620&height=531" sizes="32x32">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -17,8 +17,9 @@
       --textColor: #fff;
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
-      --outlineColor: #4b0082; /* midnight purple outline */
+      --outlineColor: #4b0082;
       --cursorColor: #b19cd9; /* light purple */
+      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
     }
 
     /* Global Reset */
@@ -47,7 +48,7 @@
       opacity: 1;
       transition: opacity 1s ease;
     }
-    /* Background Audio (hidden controls) */
+    /* Background Audio */
     #bgAudio {
       display: none;
     }
@@ -72,35 +73,45 @@
       height: 24px;
       fill: #fff;
     }
-    /* Entry Overlay */
+    /* Entry Overlay (Drag & Drop UI) */
     #entryOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: transparent;
+      background: var(--overlayBg);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
       transition: opacity 0.5s ease;
+      overflow: hidden;
     }
-    #entryOverlay h1 {
-      font-size: 96px;
-      color: #fff;
-      text-transform: uppercase;
-      text-align: center;
-      filter: drop-shadow(0 0 50px #fff);
-      text-shadow: 0 0 30px #fff, 0 0 40px #fff, 0 0 50px #fff;
-      cursor: pointer;
+    /* Juice Box (centered) */
+    #juiceBox {
+      max-width: 365px;
+      max-height: 546px;
       user-select: none;
-      transition: transform 0.5s ease;
     }
-    #entryOverlay h1:hover {
-      transform: scale(1.05);
+    /* Straw (draggable, positioned at far right) */
+    #straw {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 131px;
+      cursor: grab;
+      user-select: none;
     }
-    /* Main Content Container */
+    /* Hidden full juice image */
+    #fullJuice {
+      display: none;
+      max-width: 365px;
+      max-height: 546px;
+    }
+    /* Main Content Container (revealed after overlay fades) */
     #mainContent {
       display: flex;
       justify-content: center;
@@ -291,14 +302,6 @@
       color: var(--textSecondary);
       white-space: pre-wrap;
     }
-    /* Default league info text */
-    #leagueInfo::before {
-      content: "ORDER #0002 FOR LOGANN\n\nTHURSDAY, APRIL 3, 2025\n\nQTY    ITEM    AMT\n01    PLAYBOI CARTI    95\n02    LIL UZI VERT    86\n03    A BOOGIE WIT DA HOODIE    78\n04    KENDRICK LAMAR    97\n05    KEN CARSON    79\n06    DRAKE    98\n07    FUTURE    93\n08    JUICE WRLD    89\n09    LIL TECCA    84\n10    BABYCHIEFDOIT    67\nITEM COUNT:    10\nTOTAL:    866.00\nCARD #:   ** 2023\n\nAUTH CODE: 123421\n\nCARDHOLDER: LOGANN";
-      white-space: pre-wrap;
-      display: block;
-      visibility: hidden;
-      height: 0;
-    }
     /* Typewriter Cursor */
     .Typewriter__cursor {
       color: #fff;
@@ -309,7 +312,7 @@
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0; }
     }
-    /* Custom Cursor: Cross shape */
+    /* Custom Cursor: Cross Shape */
     .cursor {
       position: fixed;
       top: 0;
@@ -423,9 +426,17 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay -->
+  <!-- Entry Overlay (Drag & Drop UI) -->
   <div id="entryOverlay">
-    <h1 id="entryText">999 large</h1>
+    <!-- Juice Box in center -->
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f0a12e&is=67ef4fae&hm=1342a4fc1f9d3d5e9dcc18574e5900932c642fb0264a16b9257c9baf5fd096a9&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
+    <!-- Straw at far right, draggable -->
+    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f0a1a6&is=67ef5026&hm=5747f75624b41f3a7f545796e4162d249bd6b7d762fa0daa6c3b4ed65ae70b1b&=&format=webp&quality=lossless&width=48&height=131" alt="Straw" draggable="true">
+  </div>
+
+  <!-- Full Juice Image (hidden until drop) -->
+  <div id="fullJuiceContainer" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1500;">
+    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f098fb&is=67ef477b&hm=c651b4ae536cbbc23b5d5204f176627397a0248983a871a81200ab3895720d17&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
   </div>
 
   <!-- Login Modal -->
@@ -518,9 +529,7 @@
     const targetSequence = ['w','w','w','e','e','q'];
     document.addEventListener('keydown', (e) => {
       keySequence.push(e.key.toLowerCase());
-      if(keySequence.length > targetSequence.length){
-        keySequence.shift();
-      }
+      if(keySequence.length > targetSequence.length) keySequence.shift();
       if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
         document.getElementById('loginModal').style.display = 'flex';
         keySequence.length = 0;
@@ -599,48 +608,46 @@
       }
     });
 
-    // Entry Overlay: on click, hide overlay and reveal main content
+    // Entry Overlay Drag & Drop handling
     const entryOverlay = document.getElementById('entryOverlay');
-    const entryText = document.getElementById('entryText');
-    const mainContent = document.getElementById('mainContent');
-    entryText.addEventListener('click', () => {
-      entryOverlay.style.opacity = '0';
+    const juiceBox = document.getElementById('juiceBox');
+    const straw = document.getElementById('straw');
+    const fullJuiceContainer = document.getElementById('fullJuiceContainer');
+    const fullJuice = document.getElementById('fullJuice');
+
+    // Enable dragging on the straw
+    straw.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData("text/plain", "straw");
+    });
+
+    // Prevent default dragover behavior on juiceBox
+    juiceBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    // When straw is dropped on juiceBox
+    juiceBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+      // Animate fade out of both straw and juiceBox
+      juiceBox.style.transition = "opacity 0.5s ease-out";
+      straw.style.transition = "opacity 0.5s ease-out";
+      juiceBox.style.opacity = "0";
+      straw.style.opacity = "0";
       setTimeout(() => {
-        entryOverlay.style.display = 'none';
-        mainContent.style.opacity = '1';
+        entryOverlay.style.display = "none";
+        // Show the full juice image
+        fullJuiceContainer.style.display = "block";
+        fullJuice.style.opacity = "0";
+        fullJuice.style.transition = "opacity 0.5s ease-in";
+        setTimeout(() => {
+          fullJuice.style.opacity = "1";
+        }, 50);
+        // After a short delay, transition to the main site content
+        setTimeout(() => {
+          document.getElementById('mainContent').style.opacity = "1";
+          fullJuiceContainer.style.display = "none";
+        }, 1500);
       }, 500);
-      // Unmute audio on entry
-      document.getElementById('bgAudio').muted = false;
-    });
-
-    // Audio Toggle: now controls the bgAudio element
-    const bgAudio = document.getElementById('bgAudio');
-    const audioToggle = document.getElementById('audioToggle');
-    const audioIcon = document.getElementById('audioIcon');
-    audioToggle.addEventListener('click', () => {
-      bgAudio.muted = !bgAudio.muted;
-      if (bgAudio.muted) {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
-      } else {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
-      }
-    });
-
-    // Tilt Effect on Card Container
-    const cardContainer = document.getElementById('cardContainer');
-    cardContainer.addEventListener('mousemove', (e) => {
-      const rect = cardContainer.getBoundingClientRect();
-      const cardX = rect.left + rect.width / 2;
-      const cardY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - cardX;
-      const deltaY = e.clientY - cardY;
-      const maxTilt = 6;
-      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
-      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
-      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-    cardContainer.addEventListener('mouseleave', () => {
-      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
 
     // Custom Cursor & Trail (cleaner version)
@@ -656,7 +663,6 @@
         dot.style.left = e.clientX + 'px';
         dot.style.width = '4px';
         dot.style.height = '4px';
-        dot.style.background = var(--cursorColor);
         dot.style.background = "var(--cursorColor)";
         dot.style.borderRadius = '50%';
         dot.style.pointerEvents = 'none';
@@ -672,6 +678,16 @@
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
       }
+    });
+
+    // Also, clicking the overlay without dragging will reveal the main content (if needed)
+    entryOverlay.addEventListener('click', () => {
+      entryOverlay.style.opacity = '0';
+      setTimeout(() => {
+        entryOverlay.style.display = 'none';
+        document.getElementById('mainContent').style.opacity = '1';
+      }, 500);
+      document.getElementById('bgAudio').muted = false;
     });
   </script>
 </body>
