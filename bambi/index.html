@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bambi</title>
+  <title>Bambi Card</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2325/2325163.png" type="image/png">
@@ -16,7 +16,9 @@
       --containerPadding: 20px 25px;
       --textColor: #fff;
       --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
     }
+
     /* Global Reset */
     * {
       margin: 0;
@@ -27,7 +29,8 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000;
+      /* Remove black background: let the video show */
+      background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -64,14 +67,14 @@
       height: 24px;
       fill: #fff;
     }
-    /* Entry Overlay (if needed) - here we let the video show through */
+    /* Entry Overlay */
     #entryOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: none;
+      background: transparent;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -86,6 +89,10 @@
       filter: drop-shadow(0 0 25px #fff);
       cursor: pointer;
       user-select: none;
+      transition: transform 0.5s ease;
+    }
+    #entryOverlay h1:hover {
+      transform: scale(1.05);
     }
     /* Main Content Container (centered card) */
     #mainContent {
@@ -96,6 +103,20 @@
       height: 100%;
       position: relative;
       z-index: 2;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    /* Tilt Container for the card */
+    #cardContainer {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
+      /* Initial tilt as given in your snippet */
+      transform: rotateX(6.67deg) rotateY(-7.57deg);
     }
     /* Profile Card (blurred transparent container) */
     .profile-card {
@@ -112,6 +133,7 @@
       flex-direction: column;
       gap: 20px;
       box-sizing: border-box;
+      transition: transform 0.3s ease;
     }
     /* Head Section */
     .profile-head {
@@ -147,7 +169,7 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* Presence Section (Last seen) */
+    /* Presence Section */
     .presence-info {
       display: flex;
       align-items: center;
@@ -217,7 +239,7 @@
     .server-stats {
       font-weight: 450;
       font-size: 12.5px;
-      color: var(--textSecondary);
+      color: var(--onlineColor);
       display: flex;
       gap: 10px;
     }
@@ -237,12 +259,12 @@
       color: #fff;
       text-decoration: none;
       margin-top: 2px;
+      transition: background 0.3s ease;
     }
-    /* Remove extra Discord text/icon (if any) */
-    .server-discord {
-      display: none;
+    .server-details a:hover {
+      background: rgba(255,255,255,0.3);
     }
-    /* Social Icons Row */
+    /* Social Icons Row (only Discord) */
     .social-row {
       display: flex;
       gap: 16px;
@@ -286,7 +308,7 @@
   </style>
 </head>
 <body>
-  <!-- Background Video -->
+  <!-- Background Video (Discord MP4) -->
   <video id="bgVideo" autoplay loop playsinline muted preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90&" type="video/mp4">
     Your browser does not support the video tag.
@@ -301,82 +323,74 @@
     </svg>
   </button>
 
-  <!-- Optional Entry Overlay (click to reveal content) -->
+  <!-- Entry Overlay (Click to dismiss) -->
   <div id="entryOverlay">
     <h1 id="entryText">BITCH?</h1>
   </div>
 
-  <!-- Main Content Container (centered card) -->
+  <!-- Main Content Container (hidden initially) -->
   <div id="mainContent">
-    <div class="profile-card">
-      <!-- Head Section -->
-      <div class="profile-head">
-        <img class="profile-avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974.png?size=1024" alt="Bambi Avatar">
-        <div class="profile-info">
-          <h1>Bambi</h1>
-          <div class="follow-line">
-            <div class="Typewriter" data-testid="typewriter-wrapper">
-              <span class="Typewriter__wrapper">follow me ♥</span>
-              <span class="Typewriter__cursor">|</span>
+    <!-- Tilt Container (for card tilt effect) -->
+    <div id="cardContainer">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <!-- Head Section -->
+        <div class="profile-head">
+          <img class="profile-avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974.png?size=1024" alt="Bambi Avatar">
+          <div class="profile-info">
+            <h1>Bambi</h1>
+            <div class="follow-line">
+              <div class="Typewriter" data-testid="typewriter-wrapper">
+                <span class="Typewriter__wrapper">follow me ♥</span>
+                <span class="Typewriter__cursor">|</span>
+              </div>
             </div>
+            <p class="joined-line">joined 4 months ago</p>
           </div>
-          <p class="joined-line">joined 4 months ago</p>
         </div>
-      </div>
-      <!-- Presence Section -->
-      <div class="presence-info">
-        <img class="presence-avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974.png?size=1024" alt="Bambi Avatar">
-        <div class="presence-details">
-          <span>Bambi</span>
-          <span class="last-seen">last seen 36 minutes ago</span>
+        <!-- Presence Section -->
+        <div class="presence-info">
+          <img class="presence-avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974.png?size=1024" alt="Bambi Avatar">
+          <div class="presence-details">
+            <span>Bambi</span>
+            <span class="last-seen">last seen 1 hour ago</span>
+          </div>
         </div>
-      </div>
-      <!-- Server Embed Section -->
-      <div class="server-embed">
-        <div class="server-icon">
-          <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+        <!-- Server Embed Section -->
+        <div class="server-embed">
+          <div class="server-icon">
+            <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+          </div>
+          <div class="server-details">
+            <h1>Bambi</h1>
+            <h3 class="server-stats">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                36 Online
+              </span>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                162 Members
+              </span>
+            </h3>
+            <a href="https://discord.gg/dazes" target="_blank">Join</a>
+          </div>
         </div>
-        <div class="server-details">
-          <h1>Bambi</h1>
-          <h3 class="server-stats">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
-              </svg>
-              36 Online
-            </span>
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
-              </svg>
-              162 Members
-            </span>
-          </h3>
-          <a href="https://discord.gg/dazes" target="_blank">Join</a>
+        <!-- Social Row (Only Discord) -->
+        <div class="social-row">
+          <a href="https://discord.gg/dazes" target="_blank">
+            <!-- Discord Icon (custom glowing one) -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"></path>
+              <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
+              <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
+            </svg>
+          </a>
         </div>
-      </div>
-      <!-- Social Icons Row -->
-      <div class="social-row">
-        <a href="https://roblox.com/users/965138273/profile" target="_blank">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M5.164 0L.16 18.928L18.836 24L23.84 5.072Zm8.747 15.354l-5.219-1.417l1.399-5.29l5.22 1.418l-1.4 5.29z"></path>
-          </svg>
-        </a>
-        <a href="https://discord.com/users/864081350323208203" target="_blank">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M14.82 4.26a10.14 10.14 0 0 0-.53 1.1a14.66 14.66 0 0 0-4.58 0a10.14 10.14 0 0 0-.53-1.1a16 16 0 0 0-4.13 1.3a17.33 17.33 0 0 0-3 11.59a16.6 16.6 0 0 0 5.07 2.59A12.89 12.89 0 0 0 8.23 18a9.65 9.65 0 0 1-1.71-.83a3.39 3.39 0 0 0 .42-.33a11.66 11.66 0 0 0 10.12 0q.21.18.42.33a10.84 10.84 0 0 1-1.71.84a12.41 12.41 0 0 0 1.08 1.78a16.44 16.44 0 0 0 5.06-2.59a17.22 17.22 0 0 0-3-11.59a16.09 16.09 0 0 0-4.09-1.35zM8.68 14.81a1.94 1.94 0 0 1-1.8-2a1.93 1.93 0 0 1 1.8-2a1.93 1.93 0 0 1 1.8 2a1.93 1.93 0 0 1-1.8 2zm6.64 0a1.94 1.94 0 0 1-1.8-2a1.93 1.93 0 0 1 1.8-2a1.92 1.92 0 0 1 1.8 2a1.92 1.92 0 0 1-1.8 2z"></path>
-          </svg>
-        </a>
-        <a href="https://tiktok.com/@Bambi" target="_blank">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="3.2 2 17.43 19.99">
-            <path fill="currentColor" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74a2.89 2.89 0 0 1 2.31-4.64a2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"></path>
-          </svg>
-        </a>
-        <a href="https://guns.lol/expectativa" target="_blank">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 28 28">
-            <path fill="currentColor" d="M11 16c0-1.393.078-2.734.222-4h9.556c.144 1.266.222 2.607.222 4c0 1.393-.078 2.734-.222 4h-9.556A35.485 35.485 0 0 1 11 16Zm-1.79 4A37.618 37.618 0 0 1 9 16c0-1.379.073-2.72.21-4H2.58A14.002 14.002 0 0 0 2 16c0 1.39.203 2.733.58 4h6.63Zm-5.863 2h6.138c.314 1.86.771 3.547 1.344 4.978c.369.922.793 1.758 1.272 2.472A14.036 14.036 0 0 1 3.347 22Zm8.168 0h8.97c-.29 1.6-.69 3.032-1.17 4.235c-.516 1.288-1.104 2.262-1.706 2.9c-.6.634-1.144.865-1.609.865c-.465 0-1.009-.231-1.609-.866c-.602-.637-1.19-1.611-1.705-2.899c-.481-1.203-.881-2.636-1.171-4.235Zm11 0c-.314 1.86-.771 3.547-1.344 4.978c-.369.922-.793 1.758-1.272 2.472A14.036 14.036 0 0 0 28.653 22h-6.138Zm6.905-2c.377-1.267.58-2.61.58-4c0-1.39-.203-2.733-.58-4h-6.63c.137 1.28.21 2.621.21 4s-.073 2.72-.21 4h6.63ZM19.314 5.765c.481 1.203.881 2.636 1.171 4.235h-8.97c.29-1.6.69-3.032 1.17-4.235c.516-1.288 1.104-2.263 1.706-2.9c.598-.631 1.14-.863 1.604-.865h.008c.464 0 1.007.233 1.606.866c.602.636 1.19 1.611 1.705 2.899ZM22.515 10h6.138a14.036 14.036 0 0 0-8.754-7.45c.479.714.903 1.55 1.272 2.472c.573 1.431 1.03 3.118 1.344 4.978ZM3.347 10h6.138c.314-1.86.771-3.547 1.344-4.978c.369-.922.793-1.758 1.272-2.472A14.036 14.036 0 0 0 3.347 10Z"></path>
-          </svg>
-        </a>
       </div>
     </div>
   </div>
@@ -385,7 +399,7 @@
   <div class="cursor" id="cursor"></div>
 
   <script>
-    /* Audio Toggle Script */
+    // Audio Toggle
     const bgVideo = document.getElementById('bgVideo');
     const audioToggle = document.getElementById('audioToggle');
     const audioIcon = document.getElementById('audioIcon');
@@ -398,7 +412,7 @@
       }
     });
 
-    /* Entry Overlay: Hide on click and reveal content */
+    // Entry Overlay: fade out on click; now use smooth animations and do not overlap content.
     const entryOverlay = document.getElementById('entryOverlay');
     const entryText = document.getElementById('entryText');
     const mainContent = document.getElementById('mainContent');
@@ -406,11 +420,31 @@
       entryOverlay.style.opacity = '0';
       setTimeout(() => {
         entryOverlay.style.display = 'none';
+        mainContent.style.opacity = '1';
       }, 500);
+      // Unmute video after click
       bgVideo.muted = false;
     });
 
-    /* Custom Cursor & Snow Trail */
+    // Tilt Effect on Card Container
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6; // maximum tilt degrees
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer.addEventListener('mouseleave', () => {
+      // Return to initial tilt smoothly
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
+
+    // Custom Cursor & Snow Trail
     const cursor = document.getElementById('cursor');
     let lastMouseX = 0, lastMouseY = 0;
     document.addEventListener('mousemove', (e) => {
