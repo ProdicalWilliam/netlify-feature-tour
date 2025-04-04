@@ -2,294 +2,312 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>eojonas - Replica Page</title>
+  <title>eojonas Info Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ------------------------------
-       RESET
-    ------------------------------ */
+    /* ---------------------------
+       RESET & GLOBAL SETTINGS
+    --------------------------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      cursor: none; /* Hide default cursor */
+      cursor: none; /* Hide the default cursor */
     }
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: "Arial", sans-serif;
+      font-family: Arial, sans-serif;
       background: #000;
-      color: #fff;
     }
-
-    /* ------------------------------
-       BACKGROUND
-       (Replace with your actual image)
-    ------------------------------ */
-    body {
-      background: url('https://i.ibb.co/QcLPC3m/bedroom-background.jpg') no-repeat center center;
-      background-size: cover;
-      perspective: 1000px; /* For tilt effect */
-    }
-
-    /* ------------------------------
-       MAIN WRAPPER
-    ------------------------------ */
-    .container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ------------------------------
-       GLASS CARD
-    ------------------------------ */
-    .glass-card {
-      position: relative;
-      width: 450px;
-      max-width: 90%;
-      padding: 1.5rem;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 30px rgba(0,0,0,0.4);
-      transition: transform 0.1s ease; /* smooth tilt transitions */
-      will-change: transform;
-    }
-
-    /* “Tilt” is applied dynamically with JS. */
-
-    /* Card Title / Username row */
-    .card-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .avatar-img {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 1rem;
-      border: 2px solid #fff;
-    }
-    .card-title {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-
-    /* Info under the username (like "follow me | joined ...") */
-    .card-subtitle {
-      display: flex;
-      align-items: center;
-      margin-top: 0.25rem;
-      color: #ccc;
-      font-size: 0.9rem;
-      gap: 0.5rem;
-    }
-
-    /* Info Rows (the server, etc.) */
-    .info-block {
-      margin: 1rem 0;
-      background: rgba(255,255,255,0.07);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .info-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.95rem;
-    }
-    .info-item h4 {
-      margin-right: 0.5rem;
-      font-weight: 600;
-    }
-    .info-item span {
-      color: #bbb;
-      font-size: 0.85rem;
-    }
-
-    /* Example: server row with join button */
-    .server-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .server-stats {
-      font-size: 0.85rem;
-      color: #ccc;
-    }
-    .join-btn {
-      background: rgba(255,255,255,0.2);
-      padding: 0.3rem 0.8rem;
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .join-btn:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    /* Footer icons (like Discord, music, etc.) */
-    .footer-icons {
-      display: flex;
-      justify-content: center;
-      gap: 1.2rem;
-      margin-top: 1rem;
-    }
-    .footer-icons a {
-      font-size: 1.2rem;
-      color: #fff;
-      text-decoration: none;
-      transition: transform 0.2s;
-    }
-    .footer-icons a:hover {
-      transform: scale(1.1);
-    }
-
-    /* “Snow trail” + custom glowing cursor */
-    .cursor-dot {
+    /* ---------------------------
+       BACKGROUND VIDEO
+    --------------------------- */
+    #bgVideo {
       position: fixed;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+    /* ---------------------------
+       AUDIO TOGGLE BUTTON (Top Right)
+    --------------------------- */
+    #audioToggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      border-radius: 50%;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: background 0.2s;
+    }
+    #audioToggle:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    #audioToggle svg {
       width: 24px;
       height: 24px;
-      background: radial-gradient(white, rgba(255,255,255,0));
+      fill: #fff;
+    }
+    /* ---------------------------
+       ENTRY OVERLAY (BITCH? BUTTON)
+    --------------------------- */
+    #entryOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+    #entryOverlay h1 {
+      font-size: 72px;
+      color: #fff;
+      text-transform: uppercase;
+      text-align: center;
+      filter: drop-shadow(0 0 15px #fff);
+      cursor: pointer;
+      user-select: none;
+    }
+    /* ---------------------------
+       MAIN CONTENT CONTAINER
+    --------------------------- */
+    .container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      z-index: 2;
+    }
+    /* ---------------------------
+       TILTING INFO CARD
+    --------------------------- */
+    .card {
+      background: rgba(245, 245, 245, 0.2); /* white-grayish, semi-transparent */
+      border: 2px solid rgba(255, 255, 255, 0.4); /* slightly whiter semi-transparent border */
+      border-radius: 16px;
+      padding: 20px;
+      width: 350px;
+      text-align: center;
+      transition: transform 0.1s ease;
+      will-change: transform;
+    }
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      margin-bottom: 15px;
+      object-fit: cover;
+    }
+    h1.name {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .typewriter {
+      color: #fff;
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #fff;
+      width: 0;
+      animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 200px; }
+    }
+    @keyframes blink-caret {
+      50% { border-color: transparent; }
+    }
+    .joined {
+      color: #ccc;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .server-info {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #fff;
+    }
+    .server-info a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .online-status {
+      margin-top: 5px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    /* ---------------------------
+       CUSTOM CURSOR & SNOW TRAIL
+    --------------------------- */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 10px; /* smaller cursor */
+      height: 10px;
+      background: radial-gradient(circle, #fff, rgba(255,255,255,0));
       border-radius: 50%;
       pointer-events: none;
-      opacity: 0.9;
       transform: translate(-50%, -50%);
-      filter: drop-shadow(0 0 6px white);
-      animation: fadeOut 0.8s forwards ease-in;
-    }
-    @keyframes fadeOut {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      filter: drop-shadow(0 0 4px #fff);
+      z-index: 10000;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <!-- Glass Card -->
-    <div class="glass-card" id="glassCard">
-      <!-- Header -->
-      <div class="card-header">
-        <img class="avatar-img" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024"
-             alt="User Avatar">
-        <div>
-          <div class="card-title">eojonas <span style="font-size:0.8rem;">★★★✰</span></div>
-          <div class="card-subtitle">
-            <span>follow me || joined 4 months ago</span>
-          </div>
-        </div>
-      </div>
+  <!-- Background Video (with audio) -->
+  <video id="bgVideo" autoplay loop playsinline>
+    <source src="https://cdn.discordapp.com/attachments/1186034032929144919/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 
-      <!-- Info Blocks -->
-      <div class="info-block">
-        <div class="info-item">
-          <h4>eojonas</h4>
-          <span>last seen unknown</span>
-        </div>
-        <div class="info-item server-row">
-          <h4>eojonas</h4>
-          <div class="server-stats">2 Online | 1.1k Members</div>
-          <button class="join-btn">Join</button>
-        </div>
-      </div>
+  <!-- Audio Toggle Button -->
+  <button id="audioToggle" title="Toggle Audio">
+    <!-- Initially show an "audio on" icon -->
+    <svg id="audioIcon" viewBox="0 0 24 24">
+      <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
+      <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
+      <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
+    </svg>
+  </button>
 
-      <!-- Footer icons (example placeholders) -->
-      <div class="footer-icons">
-        <a href="#" title="Discord">
-          <svg width="24" height="24" fill="currentColor" aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.0371 19.7363 19.7363 0 00-4.8851 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.84-.8923a.077.077 0 01-.0076-.1277c.1236-.0933.2472-.1867.3652-.28a.0743.0743 0 01.0776-.0105c3.8618 1.7633 8.0362 1.7633 11.8612 0a.0739.0739 0 01.0785.0095c.118.0934.2417.187.3663.2804a.077.077 0 01-.0066.1277 12.2986 12.2986 0 01-1.841.8934.0766.0766 0 00-.0407.1047c.3608.698.7723 1.3629 1.225 1.9932a.076.076 0 00.0842.0286c1.9618-.6067 3.9503-1.5219 6.0031-3.0294a.076.076 0 00.0312-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286z"></path>
-          </svg>
-        </a>
-        <a href="#" title="Music">
-          <svg width="24" height="24" fill="currentColor" aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M9 19V6l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
-          </svg>
-        </a>
-        <a href="#" title="Global">
-          <svg width="24" height="24" fill="currentColor" aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12c0
-                     5.52 4.48 10 10 10s10-4.48
-                     10-10C22 6.48 17.52 2 12
-                     2zm0 2c1.2 0 2.34.26 3.37.73C14.07
-                     6.04 13.25 7.78 13.07
-                     10H10.93c-.18-2.22-1-3.96-2.3-5.27C9.66
-                     4.26 10.8 4 12 4zM8.11
-                     5.55C9.54 7.01 10.06 8.74 10.24
-                     10H4.07c.2-2.09 1.37-3.89
-                     3.04-5.16zm-3.04 7.16h6.17c-.18
-                     2.22-.7 3.95-2.13 5.42C5.44
-                     16.59 4.27 14.79 4.07
-                     12.71zM12 20c-1.2 0-2.34-.26-3.37-.73
-                     1.31-1.31 2.12-3.05 2.3-5.27h2.14c.18
-                     2.22.99 3.96 2.3 5.27C14.34
-                     19.74 13.2 20 12 20zm1.76-7h6.17c-.2
-                     2.08-1.37 3.88-3.04
-                     5.15-1.43-1.47-1.95-3.2-2.13-5.42zm0-2c.18-2.22
-                     .7-3.95 2.13-5.42 1.67
-                     1.27 2.84 3.07 3.04 5.16h-6.17z"></path>
-          </svg>
-        </a>
+  <!-- Entry Overlay with "BITCH?" text -->
+  <div id="entryOverlay">
+    <h1 id="entryText">BITCH?</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container" id="mainContent" style="display:none;">
+    <div class="card" id="card">
+      <img class="avatar" src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024" alt="Avatar">
+      <h1 class="name">eojonas</h1>
+      <div class="typewriter" id="typewriter">follow me ♥</div>
+      <div class="joined">joined 4 months ago</div>
+      <div class="server-info">
+        <div><a href="https://discord.gg/dazes" target="_blank">discord.gg/dazes</a></div>
+        <div class="online-status" id="onlineStatus"></div>
       </div>
     </div>
   </div>
 
-  <!-- Custom Cursor / Snow Trail JS -->
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
   <script>
-    /* 
-      1) Card Tilt: We'll track mouse position and apply transform to .glass-card
-      2) Custom Cursor: We'll spawn small glowing circles that fade out
-    */
-    const container = document.getElementById('container');
-    const glassCard = document.getElementById('glassCard');
-
-    // 1) CARD TILT
-    container.addEventListener('mousemove', (e) => {
-      // get bounding box
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left; // x pos within container
-      const y = e.clientY - rect.top;  // y pos within container
-
-      // find center
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      // calculate rotation
-      const rotateX = ((y - centerY) / centerY) * 10; // up to ~10 deg
-      const rotateY = ((x - centerX) / centerX) * 10; // up to ~10 deg
-
-      // apply transform
-      glassCard.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-
-    // 2) CUSTOM CURSOR TRAIL
+    /* -------------- CARD TILT EFFECT (More Sensitive) -------------- */
+    const card = document.getElementById('card');
     document.addEventListener('mousemove', (e) => {
-      // Create a dot
-      const dot = document.createElement('div');
-      dot.className = 'cursor-dot';
-      dot.style.left = e.pageX + 'px';
-      dot.style.top = e.pageY + 'px';
-
-      document.body.appendChild(dot);
-
-      // Remove the dot after animation completes
-      setTimeout(() => {
-        document.body.removeChild(dot);
-      }, 800);
+      const rect = card.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      // Increase tilt sensitivity (smaller divisor => more tilt)
+      const rotateY = deltaX / 15;
+      const rotateX = -deltaY / 15;
+      card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
+
+    /* -------------- CUSTOM CURSOR & SNOW TRAIL -------------- */
+    const cursor = document.getElementById('cursor');
+    let lastMouseX = 0, lastMouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+      
+      // Only drop a snow trail dot when the mouse moves a sufficient distance
+      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+        const dot = document.createElement('div');
+        dot.style.position = 'fixed';
+        dot.style.top = e.clientY + 'px';
+        dot.style.left = e.clientX + 'px';
+        dot.style.width = '6px';
+        dot.style.height = '6px';
+        dot.style.background = 'rgba(255,255,255,0.8)';
+        dot.style.borderRadius = '50%';
+        dot.style.pointerEvents = 'none';
+        dot.style.opacity = '0.8';
+        dot.style.transform = 'translate(-50%, -50%)';
+        dot.style.filter = 'drop-shadow(0 0 3px #fff)';
+        document.body.appendChild(dot);
+        setTimeout(() => {
+          dot.style.transition = 'opacity 0.4s ease-out';
+          dot.style.opacity = '0';
+          setTimeout(() => {
+            dot.remove();
+          }, 400);
+        }, 0);
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      }
+    });
+
+    /* -------------- AUDIO TOGGLE -------------- */
+    const bgVideo = document.getElementById('bgVideo');
+    const audioToggle = document.getElementById('audioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    audioToggle.addEventListener('click', () => {
+      bgVideo.muted = !bgVideo.muted;
+      // Change icon based on muted state
+      if (bgVideo.muted) {
+        // Audio off icon (simple crossed speaker)
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
+      } else {
+        // Audio on icon
+        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+      }
+    });
+
+    /* -------------- ENTRY OVERLAY & AUDIO PERMISSION -------------- */
+    const entryOverlay = document.getElementById('entryOverlay');
+    const entryText = document.getElementById('entryText');
+    const mainContent = document.getElementById('mainContent');
+    entryText.addEventListener('click', () => {
+      // Fade out the overlay
+      entryOverlay.style.opacity = '0';
+      setTimeout(() => {
+        entryOverlay.style.display = 'none';
+        mainContent.style.display = 'flex';
+      }, 500);
+      // Unmute the video (accepting audio playback)
+      bgVideo.muted = false;
+    });
+
+    /* -------------- SIMULATED DISCORD ONLINE CHECK -------------- */
+    const discordUserId = "1353073691864338625";
+    function checkDiscordOnlineStatus(userId) {
+      // For demonstration, we simulate the user is online.
+      return true;
+    }
+    const onlineStatusEl = document.getElementById('onlineStatus');
+    if (checkDiscordOnlineStatus(discordUserId)) {
+      onlineStatusEl.textContent = "Online";
+      onlineStatusEl.style.color = "#00ff00";
+    } else {
+      onlineStatusEl.textContent = "Offline";
+      onlineStatusEl.style.color = "#ff0000";
+    }
   </script>
 </body>
 </html>
