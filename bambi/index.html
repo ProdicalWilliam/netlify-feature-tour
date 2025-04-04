@@ -17,8 +17,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      /* No background color so video shows through */
-      background: none;
+      background: #000; /* Set background to black */
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -31,6 +30,8 @@
       height: 100%;
       object-fit: cover;
       z-index: -3;
+      opacity: 0; /* Start hidden */
+      transition: opacity 1s ease;
     }
     /* ---------- AUDIO TOGGLE BUTTON (Top Left) ---------- */
     #audioToggle {
@@ -53,7 +54,7 @@
       height: 24px;
       fill: #fff;
     }
-    /* ---------- ENTRY OVERLAY ("BITCH?") ---------- */
+    /* ---------- ENTRY OVERLAY ---------- */
     #entryOverlay {
       position: fixed;
       top: 0;
@@ -88,8 +89,8 @@
     }
     /* ---------- INFO CARD ---------- */
     .card {
-      background: rgba(255, 255, 255, 0.18); /* a more white, semi-transparent background */
-      border: 5px solid rgba(173, 216, 230, 0.5); /* thicker blue-tinged border */
+      background: rgba(255, 255, 255, 0.18); /* Semi-transparent white background */
+      border: 5px solid rgba(173, 216, 230, 0.5); /* Thicker blue-tinged border */
       border-image: linear-gradient(to right, rgba(255,255,255,0.8), rgba(173,216,230,0.8)) 1;
       border-radius: 16px;
       padding: 20px;
@@ -160,7 +161,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 12px; /* slightly larger than before */
+      width: 12px;
       height: 12px;
       background: radial-gradient(circle, #fff, rgba(255,255,255,0));
       border-radius: 50%;
@@ -173,8 +174,8 @@
 </head>
 <body>
   <!-- Background Video -->
-  <video id="bgVideo" autoplay loop playsinline style="z-index: -3;">
-    <source src="https://cdn.discordapp.com/attachments/1186034032929144919/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90" type="video/mp4">
+  <video id="bgVideo" autoplay loop playsinline muted preload="auto" style="z-index: -3;">
+    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4?ex=67f07978&is=67ef27f8&hm=6fe1d7468390753125f7e51f735836d39aa00beddd471cf33b2ca4b3b99a5b90&" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
@@ -188,7 +189,7 @@
     </svg>
   </button>
 
-  <!-- Entry Overlay ("BITCH?") -->
+  <!-- Entry Overlay -->
   <div id="entryOverlay">
     <h1 id="entryText">BITCH?</h1>
   </div>
@@ -211,7 +212,7 @@
   <div class="cursor" id="cursor"></div>
 
   <script>
-    /* ---------- CARD TILT (Only when cursor over card, with small tilt) ---------- */
+    /* ---------- CARD TILT (with increased tilt) ---------- */
     const card = document.getElementById('card');
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
@@ -219,8 +220,8 @@
       const cardY = rect.top + rect.height / 2;
       const deltaX = e.clientX - cardX;
       const deltaY = e.clientY - cardY;
-      // Limit tilt to a small angle (e.g. max 3°)
-      const maxTilt = 3;
+      // Increased maximum tilt angle to 6°
+      const maxTilt = 6;
       const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
       const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
       card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -235,7 +236,6 @@
     document.addEventListener('mousemove', (e) => {
       cursor.style.top = e.clientY + 'px';
       cursor.style.left = e.clientX + 'px';
-      // Create snow drop only if mouse has moved enough
       if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
         const dot = document.createElement('div');
         dot.style.position = 'fixed';
@@ -282,6 +282,7 @@
       setTimeout(() => {
         entryOverlay.style.display = 'none';
         mainContent.style.display = 'flex';
+        bgVideo.style.opacity = '1';
       }, 500);
       // Unmute video after user gesture
       bgVideo.muted = false;
