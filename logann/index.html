@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon set to your provided full juice image -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
+  <!-- Favicon updated to use the full juice box image without cropping -->
+  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -18,7 +18,7 @@
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
       --outlineColor: #4b0082;
-      --cursorColor: #b19cd9; /* light purple */
+      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
       --modalBg: rgba(0, 0, 0, 0.85);
       --modalBorder: 2px solid #4b0082;
@@ -28,6 +28,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      /* Hide the default cursor */
       cursor: none;
     }
     html, body {
@@ -74,6 +75,29 @@
       height: 24px;
       fill: #fff;
     }
+    /* Site Name with Typewriter Effect */
+    #siteName {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      color: #fff;
+      z-index: 1100;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #fff;
+      width: 0;
+      animation: typewriter 4s steps(7) infinite, blink 0.75s step-end infinite;
+    }
+    @keyframes typewriter {
+      0% { width: 0; }
+      50% { width: 7ch; }
+      100% { width: 0; }
+    }
+    @keyframes blink {
+      from, to { border-color: transparent; }
+      50% { border-color: #fff; }
+    }
     /* Entry Overlay (Mini‑Game) */
     #entryOverlay {
       position: fixed;
@@ -104,7 +128,6 @@
       height: 131px;
       bottom: 20px;
       right: 20px;
-      cursor: grab;
       user-select: none;
       z-index: 2;
       transition: transform 0.3s ease;
@@ -257,7 +280,7 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Receipt Box instead of Info Box */
+    /* Receipt Box (Image based) */
     .receipt-box {
       display: flex;
       justify-content: center;
@@ -273,36 +296,6 @@
       width: 100%;
       height: auto;
       object-fit: contain;
-    }
-    /* Custom Cursor */
-    .cursor {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 20px;
-      height: 20px;
-      pointer-events: none;
-      z-index: 10000;
-      transform: translate(-50%, -50%) rotate(90deg);
-    }
-    .cursor:before, .cursor:after {
-      content: "";
-      position: absolute;
-      background: var(--cursorColor);
-      border-radius: 2px;
-    }
-    .cursor:before {
-      width: 100%;
-      height: 2px;
-      top: 50%;
-      left: 0;
-    }
-    .cursor:after {
-      width: 2px;
-      height: 100%;
-      left: 50%;
-      top: 0;
     }
     /* Login Modal Styles (Clean & Readable) */
     #loginModal {
@@ -374,14 +367,34 @@
       color: #fff;
       cursor: pointer;
     }
+    /* Custom Cursor Container */
+    #customCursor {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 10000;
+      background: var(--cursorImage) no-repeat center center;
+      background-size: contain;
+      transform: translate(-50%, -50%);
+    }
+    /* Trail styles */
+    .cursorTrail {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 9999;
+      background: var(--cursorImage) no-repeat center center;
+      background-size: contain;
+      opacity: 0.6;
+      transform: translate(-50%, -50%);
+    }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
+  <!-- Site Name with Typewriter Effect -->
+  <div id="siteName">Logann</div>
   <!-- Background Video -->
   <video id="bgVideo" autoplay loop playsinline muted preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
@@ -392,7 +405,6 @@
     <source src="https://example.com/default-audio.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
-
   <!-- Audio Toggle Button -->
   <button id="audioToggle" title="Toggle Audio">
     <svg id="audioIcon" viewBox="0 0 24 24">
@@ -401,20 +413,17 @@
       <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
     </svg>
   </button>
-
   <!-- Entry Overlay (Mini‑Game) -->
   <div id="entryOverlay">
     <!-- Juice Box (without straw) -->
-    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546" alt="Juice Box">
+    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
     <!-- Straw -->
-    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131" alt="Straw">
+    <img id="straw" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
   </div>
-
   <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
-    <img id="fullJuice" src="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" alt="Full Juice">
+    <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
   </div>
-
   <!-- Login Modal (Email/Password based) -->
   <div id="loginModal">
     <div class="modal-content">
@@ -425,7 +434,6 @@
       <button id="emailSignIn">Sign in</button>
     </div>
   </div>
-
   <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Tilt Container -->
@@ -482,9 +490,8 @@
       </div>
     </div>
   </div>
-
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
+  <!-- Custom Cursor Element -->
+  <div id="customCursor"></div>
 
   <script>
     // Firebase config and initialization
@@ -540,8 +547,30 @@
         }
       });
 
-    // Hide custom cursor initially
-    document.getElementById('cursor').style.display = 'none';
+    // Custom Cursor Implementation
+    const customCursor = document.getElementById('customCursor');
+    let lastX = window.innerWidth / 2, lastY = window.innerHeight / 2;
+    document.addEventListener('mousemove', (e) => {
+      // Move the custom cursor element
+      customCursor.style.left = e.clientX + 'px';
+      customCursor.style.top = e.clientY + 'px';
+
+      // Create a trailing element
+      const trail = document.createElement('div');
+      trail.classList.add('cursorTrail');
+      trail.style.left = e.clientX + 'px';
+      trail.style.top = e.clientY + 'px';
+      document.body.appendChild(trail);
+      // Fade and remove the trail
+      setTimeout(() => {
+        trail.style.transition = 'opacity 0.6s ease-out';
+        trail.style.opacity = '0';
+        setTimeout(() => { trail.remove(); }, 600);
+      }, 20);
+
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
 
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
@@ -561,8 +590,6 @@
       const password = document.getElementById('loginPassword').value;
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          const user = result.user;
-          // Allow any valid user (or check against your own criteria)
           document.getElementById('receiptBox').contentEditable = "true";
           document.getElementById('editControls').style.display = 'flex';
           alert("Edit mode enabled!");
@@ -593,7 +620,6 @@
       }, { merge: true })
       .then(() => {
         alert("Changes saved globally!");
-        // Disable editing and hide controls
         document.getElementById('receiptBox').contentEditable = "false";
         document.getElementById('editControls').style.display = "none";
       })
@@ -608,17 +634,13 @@
     const straw = document.getElementById('straw');
     const fullJuiceContainer = document.getElementById('fullJuiceContainer');
     const fullJuice = document.getElementById('fullJuice');
-    // Pause video during mini‑game
     const bgVideo = document.getElementById('bgVideo');
     bgVideo.pause();
-
-    // Save original straw position
     let strawOrig = { x: straw.offsetLeft, y: straw.offsetTop };
     let dragging = false, offset = { x: 0, y: 0 };
 
     straw.addEventListener('pointerdown', (e) => {
       dragging = true;
-      straw.style.cursor = 'grabbing';
       offset.x = e.clientX - straw.offsetLeft;
       offset.y = e.clientY - straw.offsetTop;
       straw.setPointerCapture(e.pointerId);
@@ -626,7 +648,6 @@
 
     straw.addEventListener('pointermove', (e) => {
       if(dragging){
-        // Move straw with pointer
         straw.style.left = (e.clientX - offset.x) + 'px';
         straw.style.top = (e.clientY - offset.y) + 'px';
       }
@@ -634,9 +655,7 @@
 
     straw.addEventListener('pointerup', (e) => {
       dragging = false;
-      straw.style.cursor = 'grab';
       straw.releasePointerCapture(e.pointerId);
-      // Check if straw overlaps with juiceBox
       const juiceRect = juiceBox.getBoundingClientRect();
       const strawRect = straw.getBoundingClientRect();
       if (
@@ -645,50 +664,32 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate straw and juiceBox fade out
+        // Successful drop: animate juiceBox and straw fade out, then show full juice
         juiceBox.style.transition = "opacity 0.5s ease-out";
         straw.style.transition = "opacity 0.5s ease-out";
         juiceBox.style.opacity = "0";
         straw.style.opacity = "0";
         setTimeout(() => {
           entryOverlay.style.display = "none";
-          // Show full juice with a smooth fade in
           fullJuiceContainer.style.display = "block";
           fullJuice.style.opacity = "0";
           setTimeout(() => {
             fullJuice.style.opacity = "1";
           }, 50);
-          // After a short delay, fade full juice out and reveal main content
+          // Hold full juice on-screen before fading out
           setTimeout(() => {
             fullJuice.style.opacity = "0";
             setTimeout(() => {
               fullJuiceContainer.style.display = "none";
               document.getElementById('mainContent').style.opacity = "1";
               bgVideo.play();
-              document.getElementById('cursor').style.display = "block";
             }, 700);
           }, 1500);
         }, 500);
       } else {
-        // If not dropped correctly, return straw to its original position smoothly
         straw.style.transition = "left 0.3s ease, top 0.3s ease";
         straw.style.left = strawOrig.x + "px";
         straw.style.top = strawOrig.y + "px";
-      }
-    });
-
-    // Clicking on the overlay (outside of dragging) will also let you bypass the mini‑game
-    entryOverlay.addEventListener('click', (e) => {
-      // Only trigger if not dragging the straw
-      if(!dragging) {
-        entryOverlay.style.opacity = '0';
-        setTimeout(() => {
-          entryOverlay.style.display = 'none';
-          document.getElementById('mainContent').style.opacity = '1';
-          bgVideo.play();
-          document.getElementById('cursor').style.display = "block";
-        }, 500);
-        document.getElementById('bgAudio').muted = false;
       }
     });
 
@@ -720,38 +721,6 @@
     });
     cardContainer.addEventListener('mouseleave', () => {
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
-    });
-
-    // Custom Cursor & Trail (only on mainContent)
-    const cursor = document.getElementById('cursor');
-    let lastMouseX = 0, lastMouseY = 0;
-    document.addEventListener('mousemove', (e) => {
-      if(document.getElementById('mainContent').style.opacity === "1"){
-        cursor.style.top = e.clientY + 'px';
-        cursor.style.left = e.clientX + 'px';
-        if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
-          const dot = document.createElement('div');
-          dot.style.position = 'fixed';
-          dot.style.top = e.clientY + 'px';
-          dot.style.left = e.clientX + 'px';
-          dot.style.width = '4px';
-          dot.style.height = '4px';
-          dot.style.background = "var(--cursorColor)";
-          dot.style.borderRadius = '50%';
-          dot.style.pointerEvents = 'none';
-          dot.style.opacity = '0.8';
-          dot.style.transform = 'translate(-50%, -50%)';
-          dot.style.filter = 'drop-shadow(0 0 2px var(--cursorColor))';
-          document.body.appendChild(dot);
-          setTimeout(() => {
-            dot.style.transition = 'opacity 0.3s ease-out';
-            dot.style.opacity = '0';
-            setTimeout(() => { dot.remove(); }, 300);
-          }, 0);
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
-        }
-      }
     });
   </script>
 </body>
