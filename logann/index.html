@@ -262,7 +262,7 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* League Stats Section – Editable */
+    /* League Stats Section – Not Editable by Default */
     .lol-stats {
       display: flex;
       flex-wrap: wrap;
@@ -326,7 +326,7 @@
       width: 100%;
       height: 100%;
       background: var(--modalBg);
-      display: flex;
+      display: none; /* Hidden by default; shown on key sequence */
       justify-content: center;
       align-items: center;
       z-index: 2000;
@@ -342,16 +342,6 @@
       color: var(--textColor);
       font-size: 1.1em;
     }
-    #loginModal input {
-      width: 80%;
-      padding: 10px;
-      margin: 15px 0;
-      border: 2px solid var(--outlineColor);
-      border-radius: 5px;
-      background: transparent;
-      color: var(--textColor);
-      font-size: 1em;
-    }
     #loginModal button {
       padding: 10px 20px;
       background: var(--outlineColor);
@@ -361,13 +351,14 @@
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
+      margin-top: 15px;
     }
     #loginModal button:hover {
       background: #2a0a5e;
     }
     /* Edit Controls (Hidden by Default) */
     #editControls {
-      display: none; /* Hide these fields unless user logs in */
+      display: none;
       flex-direction: column;
       gap: 10px;
     }
@@ -392,6 +383,7 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
   <!-- Background Video -->
@@ -427,12 +419,11 @@
   </div>
 
   <!-- Login Modal (Triggered by Key Sequence "w w w e e q") -->
-  <div id="loginModal" style="display: none;">
+  <div id="loginModal">
     <div class="modal-content">
       <h2>Admin Login</h2>
-      <input type="password" id="loginCode" placeholder="Enter admin access code">
-      <br>
-      <button id="loginSubmit">Login</button>
+      <p>Please sign in with Google to access edit mode.</p>
+      <button id="googleSignIn">Sign in with Google</button>
     </div>
   </div>
 
@@ -502,7 +493,7 @@
   <div class="cursor" id="cursor"></div>
 
   <script>
-    // Initialize Firebase
+    // Firebase config and initialization
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -514,6 +505,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
     // Listen for real-time updates on the "global" settings document
     db.collection("settings").doc("global")
@@ -569,31 +561,27 @@
       }
     });
 
-    // Admin Login using Firebase Firestore: check the stored access code
-    let editMode = false;
-    document.getElementById('loginSubmit').addEventListener('click', () => {
-      const userCode = document.getElementById('loginCode').value;
-      // Retrieve expected access code from Firestore (e.g., collection "admin", doc "login")
-      db.collection("admin").doc("login").get().then((doc) => {
-        if(doc.exists){
-          const expectedCode = doc.data().accessCode; 
-          if(userCode === expectedCode){
-            editMode = true;
+    // Handle Google Sign-In when "Sign in with Google" button is clicked
+    document.getElementById('googleSignIn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          // Check if the signed in user's UID is allowed to edit
+          if(user.uid === "UvlkhrcNaXcUU1DX6qD1E176TqI3"){
             document.getElementById('leagueInfo').contentEditable = "true";
-            // Show edit fields
             document.getElementById('editControls').style.display = 'flex';
             alert("Edit mode enabled!");
             document.getElementById('loginModal').style.display = 'none';
           } else {
-            alert("Incorrect access code!");
+            alert("You are not authorized to edit this page.");
+            auth.signOut();
           }
-        } else {
-          alert("Admin login document not found.");
-        }
-      }).catch((error) => {
-        console.error("Error retrieving admin login:", error);
-        alert("Error logging in. Please try again later.");
-      });
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error logging in. Please try again later.");
+        });
     });
 
     // Save edits: update video, audio, avatar, profile info, and league info in Firestore
@@ -618,7 +606,6 @@
         // Disable editing and hide controls
         document.getElementById('leagueInfo').contentEditable = "false";
         document.getElementById('editControls').style.display = "none";
-        editMode = false;
       })
       .catch((error) => {
         console.error("Error updating settings:", error);
