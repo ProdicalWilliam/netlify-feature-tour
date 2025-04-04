@@ -10,7 +10,7 @@
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
       --containerBlur: 12px;
-      --containerBorder: 2px solid #4b0082; /* midnight purple */
+      --containerBorder: 2px solid #4b0082;
       --containerRadius: 20px;
       --containerWidth: 42rem;
       --containerPadding: 20px 25px;
@@ -234,47 +234,25 @@
       height: auto;
       object-fit: contain;
     }
-    /* Comment Section Container (Hidden by default, fixed at bottom) */
-    #commentBox {
+    /* Top Comment Section (Mostly Transparent, Centered) */
+    #commentBoxTop {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-      max-width: 600px;
-      z-index: 1000;
-      text-align: center;
-    }
-    /* Toggle Box */
-    #commentToggle {
-      background: var(--containerColor);
-      border: var(--outlineColor);
-      border-radius: var(--containerRadius);
-      padding: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-      margin-bottom: 5px;
-    }
-    #commentToggle:hover {
-      background: rgba(0, 0, 0, 0.7);
-    }
-    /* Comment Container (hidden until hover) */
-    #commentContainer {
-      display: none;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
       border: 2px solid var(--outlineColor);
       border-radius: var(--containerRadius);
-      background: var(--containerColor);
-      padding: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-      animation: commentGlow 2s infinite alternate;
+      max-width: 600px;
+      width: 90%;
+      z-index: 1000;
     }
-    @keyframes commentGlow {
-      from { box-shadow: 0 0 10px 2px var(--glowColor); }
-      to { box-shadow: 0 0 20px 4px var(--glowColor); }
+    #commentBoxTop h2 {
+      text-align: center;
+      margin-bottom: 10px;
     }
-    /* Comment Form */
+    /* Comment Form inside Top Comment Section */
     #commentForm {
       display: flex;
       flex-direction: column;
@@ -314,7 +292,16 @@
     #avatarDropZone.hover {
       background: rgba(255,255,255,0.1);
     }
-    /* Comments List */
+    /* Comments List inside Top Comment Section */
+    #commentList {
+      max-height: 250px;
+      overflow-y: auto;
+      animation: commentGlow 2s infinite alternate;
+    }
+    @keyframes commentGlow {
+      from { box-shadow: 0 0 10px 2px var(--glowColor); }
+      to { box-shadow: 0 0 20px 4px var(--glowColor); }
+    }
     .comment {
       display: flex;
       align-items: flex-start;
@@ -338,6 +325,40 @@
       font-size: 0.8em;
       color: var(--textSecondary);
       margin-left: 5px;
+    }
+    /* Edit Controls (Hidden unless logged in) */
+    #editControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 20px auto;
+    }
+    #editControls input {
+      width: 100%;
+      padding: 8px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+    }
+    #editControls button:hover {
+      background: #2a0a5e;
     }
     /* Custom Cursor */
     .cursor {
@@ -445,6 +466,19 @@
     </div>
   </div>
 
+  <!-- Top Comment Section -->
+  <div id="commentBoxTop">
+    <h2>Want to Comment?</h2>
+    <form id="commentForm">
+      <input type="text" id="commentUsername" placeholder="Your username" required>
+      <!-- Drag & Drop Avatar Zone -->
+      <div id="avatarDropZone">Drag & Drop Avatar Image Here</div>
+      <textarea id="commentMessage" placeholder="Your comment" required></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+    <div id="commentList"></div>
+  </div>
+
   <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Tilt Container -->
@@ -459,7 +493,7 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
-        <!-- The view counter will be updated live and is now rendered via Firestore data -->
+        <!-- Live View Counter (Updated via Firestore) -->
         <div id="viewCounter"></div>
         <!-- Server Embed Section -->
         <div class="server-embed">
@@ -489,19 +523,7 @@
         <div class="receipt-box" id="receiptBox">
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
-        <!-- Comment Section -->
-        <div id="commentSection">
-          <h3>Comments</h3>
-          <form id="commentForm">
-            <input type="text" id="commentUsername" placeholder="Your username" required>
-            <!-- Drag & Drop Avatar Zone -->
-            <div id="avatarDropZone">Drag & Drop Avatar Image Here</div>
-            <textarea id="commentMessage" placeholder="Your comment" required></textarea>
-            <button type="submit">Post Comment</button>
-          </form>
-          <div id="commentList"></div>
-        </div>
-        <!-- Edit Controls (Styled like the info box) -->
+        <!-- Edit Controls (Visible only when logged in as admin) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
@@ -512,14 +534,6 @@
           <button id="saveEdits">Save Changes</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Comment Box (Toggle on hover) -->
-  <div id="commentBox">
-    <div id="commentToggle">Want to Comment?</div>
-    <div id="commentContainer">
-      <!-- The comment form and comment list are included inside the profile card -->
     </div>
   </div>
 
@@ -684,7 +698,7 @@
       });
     });
 
-    // Listen for latest comments (displayed in descending order; newest at the bottom)
+    // Listen for comments (displayed in descending order; newest at the bottom)
     db.collection("comments").orderBy("timestamp", "desc")
       .onSnapshot(snapshot => {
         // Reverse the order so the latest comments appear at the bottom
@@ -716,41 +730,6 @@
           commentList.appendChild(commentDiv);
         });
       });
-
-    // Toggle Comment Box on Hover
-    const commentToggle = document.getElementById('commentToggle');
-    const commentContainer = document.getElementById('commentContainer');
-    commentToggle.addEventListener('mouseover', () => {
-      commentContainer.style.display = 'block';
-    });
-    commentToggle.addEventListener('mouseout', () => {
-      commentContainer.style.display = 'none';
-    });
-
-    // Drag & Drop for Avatar in Comment Form
-    const avatarDropZone = document.getElementById('avatarDropZone');
-    avatarDropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      avatarDropZone.classList.add('hover');
-    });
-    avatarDropZone.addEventListener('dragleave', () => {
-      avatarDropZone.classList.remove('hover');
-    });
-    avatarDropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      avatarDropZone.classList.remove('hover');
-      const file = e.dataTransfer.files[0];
-      if(file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          avatarDropZone.setAttribute('data-avatar', event.target.result);
-          avatarDropZone.innerText = "Avatar Selected";
-        }
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please drop an image file.");
-      }
-    });
 
     // Tilt Effect on Card Container
     const cardContainer = document.getElementById('cardContainer');
