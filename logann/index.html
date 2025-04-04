@@ -29,8 +29,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Hide the default cursor */
-      cursor: none;
+      /* Do not hide the default cursor initially */
     }
     html, body {
       width: 100%;
@@ -38,6 +37,11 @@
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      cursor: default;
+    }
+    /* When custom cursor is enabled */
+    body.custom-cursor {
+      cursor: none;
     }
     /* Background Video */
     #bgVideo {
@@ -99,7 +103,7 @@
       z-index: 2;
       opacity: 1;
     }
-    /* Straw - now explicitly draggable */
+    /* Straw – explicitly draggable and on top */
     #straw {
       position: absolute;
       width: 48px;
@@ -107,7 +111,7 @@
       bottom: 20px;
       right: 20px;
       user-select: none;
-      z-index: 2;
+      z-index: 1010;
       transition: transform 0.3s ease;
       touch-action: none;
       pointer-events: auto;
@@ -347,22 +351,23 @@
       color: #fff;
       cursor: pointer;
     }
-    /* Custom Cursor */
+    /* Custom Cursor (shown after mini‑game finishes) */
     #customCursor {
       position: fixed;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       pointer-events: none;
       z-index: 99999;
       background: var(--cursorImage) no-repeat center center;
       background-size: contain;
       transform: translate(-50%, -50%);
+      display: none; /* hidden until enabled */
     }
     /* Trail Effect for Custom Cursor */
     .cursorTrail {
       position: fixed;
-      width: 44px;
-      height: 44px;
+      width: 54px;
+      height: 54px;
       pointer-events: none;
       z-index: 9999;
       background: var(--cursorImage) no-repeat center center;
@@ -469,7 +474,7 @@
       </div>
     </div>
   </div>
-  <!-- Custom Cursor Element -->
+  <!-- Custom Cursor Element (hidden until enabled) -->
   <div id="customCursor"></div>
   
   <script>
@@ -478,19 +483,13 @@
     // ---------------------------
     async function typewriteTitle() {
       const text = "logann";
-      while(true) {
-        // Type out the text one letter at a time, appending a blinking pipe after each update.
+      while (true) {
         for (let i = 1; i <= text.length; i++) {
           document.title = text.slice(0, i) + "|";
           await sleep(200);
         }
-        // Once finished, hold for a moment with the full text.
         await sleep(500);
-        // Then clear the title one character at a time.
-        for (let i = text.length; i >= 0; i--) {
-          document.title = text.slice(0, i) + "|";
-          await sleep(100);
-        }
+        // Optionally, you could clear or backspace here.
       }
     }
     function sleep(ms) {
@@ -499,31 +498,37 @@
     typewriteTitle();
 
     // ---------------------------
-    // 2. Custom Cursor with Trail Effect
+    // 2. Function to Enable Custom Cursor (for info page)
     // ---------------------------
-    const customCursor = document.getElementById('customCursor');
-    document.addEventListener('mousemove', (e) => {
-      customCursor.style.left = e.clientX + 'px';
-      customCursor.style.top = e.clientY + 'px';
-
-      // Create a trailing element with a clean fade effect
-      const trail = document.createElement('div');
-      trail.classList.add('cursorTrail');
-      trail.style.left = e.clientX + 'px';
-      trail.style.top = e.clientY + 'px';
+    function enableCustomCursor() {
+      // Add class to hide default cursor
+      document.body.classList.add("custom-cursor");
+      // Show our custom cursor element
+      const customCursor = document.getElementById("customCursor");
+      customCursor.style.display = "block";
+      // Add mousemove listener for custom cursor and trail effect
+      document.addEventListener("mousemove", customCursorHandler);
+    }
+    function customCursorHandler(e) {
+      const customCursor = document.getElementById("customCursor");
+      customCursor.style.left = e.clientX + "px";
+      customCursor.style.top = e.clientY + "px";
+      // Create a trailing element with a smooth fade effect
+      const trail = document.createElement("div");
+      trail.classList.add("cursorTrail");
+      trail.style.left = e.clientX + "px";
+      trail.style.top = e.clientY + "px";
       document.body.appendChild(trail);
-      
       setTimeout(() => {
-        trail.style.transition = 'opacity 0.6s ease-out';
-        trail.style.opacity = '0';
+        trail.style.transition = "opacity 0.6s ease-out";
+        trail.style.opacity = "0";
         setTimeout(() => { trail.remove(); }, 600);
       }, 20);
-    });
+    }
 
     // ---------------------------
     // 3. Firebase Initialization and Settings Update Listener
     // ---------------------------
-    // Ensure Firebase SDK is loaded before this script (not shown in this code)
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -536,86 +541,74 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
         if (data) {
-          // Update video
-          const bgVideo = document.getElementById('bgVideo');
-          const videoSource = bgVideo.querySelector('source');
+          const bgVideo = document.getElementById("bgVideo");
+          const videoSource = bgVideo.querySelector("source");
           if (data.videoURL && videoSource.src !== data.videoURL) {
             videoSource.src = data.videoURL;
             bgVideo.load();
             bgVideo.play();
           }
-          // Update audio
-          const bgAudio = document.getElementById('bgAudio');
-          const audioSource = bgAudio.querySelector('source');
+          const bgAudio = document.getElementById("bgAudio");
+          const audioSource = bgAudio.querySelector("source");
           if (data.audioURL && audioSource.src !== data.audioURL) {
             audioSource.src = data.audioURL;
             bgAudio.load();
             bgAudio.play();
           }
-          // Update avatar
           if (data.avatarURL) {
-            document.getElementById('avatarImg').src = data.avatarURL;
+            document.getElementById("avatarImg").src = data.avatarURL;
           }
-          // Update profile name and joined text
           if (data.profileName) {
-            document.getElementById('profileName').innerText = data.profileName;
+            document.getElementById("profileName").innerText = data.profileName;
           }
           if (data.joinedLine) {
-            document.getElementById('joinedLine').innerText = data.joinedLine;
+            document.getElementById("joinedLine").innerText = data.joinedLine;
           }
-          // Update receipt image if provided
           if (data.receiptURL) {
-            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
+            document.getElementById("receiptBox").querySelector("img").src = data.receiptURL;
           }
         }
       });
 
     // ---------------------------
-    // 4. Custom Cursor, Login Modal, and Mini‑Game Logic
+    // 4. Mini‑Game, Login Modal, and Drag & Drop Logic
     // ---------------------------
-    // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
-    const targetSequence = ['w','w','w','e','e','q'];
-    document.addEventListener('keydown', (e) => {
+    const targetSequence = ["w", "w", "w", "e", "e", "q"];
+    document.addEventListener("keydown", (e) => {
       keySequence.push(e.key.toLowerCase());
-      if(keySequence.length > targetSequence.length) keySequence.shift();
-      if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
-        document.getElementById('loginModal').style.display = 'flex';
+      if (keySequence.length > targetSequence.length) keySequence.shift();
+      if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
+        document.getElementById("loginModal").style.display = "flex";
         keySequence.length = 0;
       }
     });
-
-    // Handle Email/Password Sign-In when "Sign in" button is clicked
-    document.getElementById('emailSignIn').addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
+    document.getElementById("emailSignIn").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          document.getElementById('receiptBox').contentEditable = "true";
-          document.getElementById('editControls').style.display = 'flex';
+          document.getElementById("receiptBox").contentEditable = "true";
+          document.getElementById("editControls").style.display = "flex";
           alert("Edit mode enabled!");
-          document.getElementById('loginModal').style.display = 'none';
+          document.getElementById("loginModal").style.display = "none";
         })
         .catch((error) => {
           console.error("Error during sign-in:", error);
           alert("Error logging in. Please check your credentials and try again.");
         });
     });
-
-    // Save edits: update video, audio, avatar, profile info, and receipt image in Firestore
-    document.getElementById('saveEdits').addEventListener('click', () => {
-      const newVideoURL = document.getElementById('videoURL').value;
-      const newAudioURL = document.getElementById('audioURL').value;
-      const newAvatarURL = document.getElementById('avatarURL').value;
-      const newReceiptURL = document.getElementById('receiptURL').value;
-      const newProfileName = document.getElementById('profileNameInput').value;
-      const newJoinedLine = document.getElementById('joinedLineInput').value;
-      
+    document.getElementById("saveEdits").addEventListener("click", () => {
+      const newVideoURL = document.getElementById("videoURL").value;
+      const newAudioURL = document.getElementById("audioURL").value;
+      const newAvatarURL = document.getElementById("avatarURL").value;
+      const newReceiptURL = document.getElementById("receiptURL").value;
+      const newProfileName = document.getElementById("profileNameInput").value;
+      const newJoinedLine = document.getElementById("joinedLineInput").value;
       db.collection("settings").doc("global").set({
         videoURL: newVideoURL || "",
         audioURL: newAudioURL || "",
@@ -626,40 +619,35 @@
       }, { merge: true })
       .then(() => {
         alert("Changes saved globally!");
-        document.getElementById('receiptBox').contentEditable = "false";
-        document.getElementById('editControls').style.display = "none";
+        document.getElementById("receiptBox").contentEditable = "false";
+        document.getElementById("editControls").style.display = "none";
       })
       .catch((error) => {
         console.error("Error updating settings:", error);
       });
     });
-
-    // Entry Overlay Drag & Drop handling using pointer events
-    const entryOverlay = document.getElementById('entryOverlay');
-    const juiceBox = document.getElementById('juiceBox');
-    const straw = document.getElementById('straw');
-    const fullJuiceContainer = document.getElementById('fullJuiceContainer');
-    const fullJuice = document.getElementById('fullJuice');
-    const bgVideo = document.getElementById('bgVideo');
+    const entryOverlay = document.getElementById("entryOverlay");
+    const juiceBox = document.getElementById("juiceBox");
+    const straw = document.getElementById("straw");
+    const fullJuiceContainer = document.getElementById("fullJuiceContainer");
+    const fullJuice = document.getElementById("fullJuice");
+    const bgVideo = document.getElementById("bgVideo");
     bgVideo.pause();
     let strawOrig = { x: straw.offsetLeft, y: straw.offsetTop };
     let dragging = false, offset = { x: 0, y: 0 };
-
-    straw.addEventListener('pointerdown', (e) => {
+    straw.addEventListener("pointerdown", (e) => {
       dragging = true;
       offset.x = e.clientX - straw.offsetLeft;
       offset.y = e.clientY - straw.offsetTop;
       straw.setPointerCapture(e.pointerId);
     });
-
-    straw.addEventListener('pointermove', (e) => {
-      if(dragging){
-        straw.style.left = (e.clientX - offset.x) + 'px';
-        straw.style.top = (e.clientY - offset.y) + 'px';
+    straw.addEventListener("pointermove", (e) => {
+      if (dragging) {
+        straw.style.left = (e.clientX - offset.x) + "px";
+        straw.style.top = (e.clientY - offset.y) + "px";
       }
     });
-
-    straw.addEventListener('pointerup', (e) => {
+    straw.addEventListener("pointerup", (e) => {
       dragging = false;
       straw.releasePointerCapture(e.pointerId);
       const juiceRect = juiceBox.getBoundingClientRect();
@@ -670,7 +658,7 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate juiceBox and straw fade out, then show full juice
+        // Successful drop: fade out juice box and straw, then show full juice
         juiceBox.style.transition = "opacity 0.5s ease-out";
         straw.style.transition = "opacity 0.5s ease-out";
         juiceBox.style.opacity = "0";
@@ -682,13 +670,14 @@
           setTimeout(() => {
             fullJuice.style.opacity = "1";
           }, 50);
-          // Hold full juice on-screen before fading out
+          // After a delay, fade out full juice, show main content, and enable custom cursor.
           setTimeout(() => {
             fullJuice.style.opacity = "0";
             setTimeout(() => {
               fullJuiceContainer.style.display = "none";
-              document.getElementById('mainContent').style.opacity = "1";
-              bgVideo.play();
+              document.getElementById("mainContent").style.opacity = "1";
+              // Now enable custom cursor for the info page
+              enableCustomCursor();
             }, 700);
           }, 1500);
         }, 500);
@@ -698,12 +687,10 @@
         straw.style.top = strawOrig.y + "px";
       }
     });
-
-    // Audio Toggle: controls bgAudio element
-    const bgAudio = document.getElementById('bgAudio');
-    const audioToggle = document.getElementById('audioToggle');
-    const audioIcon = document.getElementById('audioIcon');
-    audioToggle.addEventListener('click', () => {
+    const bgAudio = document.getElementById("bgAudio");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioIcon = document.getElementById("audioIcon");
+    audioToggle.addEventListener("click", () => {
       bgAudio.muted = !bgAudio.muted;
       if (bgAudio.muted) {
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
@@ -711,10 +698,8 @@
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
       }
     });
-
-    // Tilt Effect on Card Container
-    const cardContainer = document.getElementById('cardContainer');
-    cardContainer.addEventListener('mousemove', (e) => {
+    const cardContainer = document.getElementById("cardContainer");
+    cardContainer.addEventListener("mousemove", (e) => {
       const rect = cardContainer.getBoundingClientRect();
       const cardX = rect.left + rect.width / 2;
       const cardY = rect.top + rect.height / 2;
@@ -725,11 +710,11 @@
       const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
       cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
-    cardContainer.addEventListener('mouseleave', () => {
-      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    cardContainer.addEventListener("mouseleave", () => {
+      cardContainer.style.transform = "perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)";
     });
   </script>
-  <!-- Load Firebase SDK (make sure to include these in your project) -->
+  <!-- Load Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
