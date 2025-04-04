@@ -2,262 +2,307 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bambi</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Riot Games - Sign In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Example background: Replace with your own champion splash image URL -->
   <style>
-    /* Global Styles */
-    html, body {
+    /* RESET */
+    * {
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: 'Montserrat', sans-serif;
-      /* Background image remains but you can change it if needed */
-      background: url('https://i.pinimg.com/originals/7c/2a/90/7c2a9051c8a66e5b2863001300a878a4.gif');
-      background-size: cover;
-      background-position: center;
-      overflow-x: hidden;
-      position: relative;
-      color: #fff;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
-    a { color: #fff; text-decoration: none; }
-    .profile-page {
-      position: relative;
-      min-height: 100vh;
-      display: block;
-    }
-    .home-link {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(255, 0, 0, 0.7); /* red home button */
-      padding: 10px 15px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 20;
-      transition: transform 0.3s ease;
-      box-shadow: 0 0 10px red;
-    }
-    .home-link:hover {
-      transform: translateY(-3px);
-    }
-    .content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
-    /* Profile Container Styling */
-    .profile-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(255, 0, 0, 0.7); /* red overlay background */
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 30px red;  /* strong red glow */
-      transition: opacity 0.6s ease;
-      z-index: 5;
-    }
-    .hidden { display: none; }
-    .avatar {
-      width: 128px;
-      height: 128px;
-      border-radius: 50%;
-      border: 3px solid #fff;
-      box-shadow: 0 0 15px red; /* red glow for avatar */
-      opacity: 0;
-      transition: all 0.8s ease;
-      margin-bottom: 15px;
-    }
-    .avatar.visible, .avatar:hover {
-      opacity: 1;
-      transform: translateY(-10px);
-    }
-    .overlay {
-      background: rgba(255, 0, 0, 0.8); /* stronger red overlay */
-      border: 2px solid rgba(255, 100, 100, 0.2);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 0 20px red;
-      opacity: 0;
-      transition: all 0.6s ease;
-    }
-    .overlay.visible {
-      opacity: 1;
-    }
-    .overlay:hover {
-      transform: translateY(-10px);
-    }
-    .overlay h2 {
-      margin: 0.5em 0;
-      font-size: 2em;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: #fff;
-      text-shadow: 0 0 10px red; /* red glow on the header text */
-    }
-    .info-row {
-      margin: 8px 0;
-      font-weight: 300;
-      font-size: 1.1em;
-      color: #fff;
-      text-shadow: 0 0 5px red;
-    }
-    .view-counter {
-      margin-top: 10px;
-      font-size: 1em;
-      font-weight: bold;
-      color: #ffeb3b;
-    }
-    /* Intro Overlay */
-    .intro-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
+
+    html, body {
       width: 100%;
       height: 100%;
-      background: rgba(255, 0, 0, 0.95); /* red tinted intro */
-      z-index: 30;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Full-screen background with champion art */
+    body {
+      background: url('https://media.discordapp.net/attachments/1342976939488710727/1357504503292629022/image.png?ex=67f07216&is=67ef2096&hm=47c5264805efa9b5d1682e64db451c3b5b483f4ad19c66ffcec5d5d26ee0e7cf&=&format=webp&quality=lossless&width=620&height=323') center/cover no-repeat;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
+    }
+
+    /* Centered card container */
+    .login-card {
+      width: 380px;
+      background-color: rgba(255,255,255,0.95);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      padding: 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    /* "Sign In" title */
+    .login-card h1 {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #222;
+    }
+
+    /* Input fields */
+    .login-card .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .login-card .form-group label {
+      font-size: 0.85rem;
+      color: #444;
+    }
+    .login-card .form-group input {
+      padding: 10px;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+    .login-card .form-group input:focus {
+      border-color: #bbb;
+    }
+
+    /* Stay signed in checkbox */
+    .stay-signed-in {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+    .stay-signed-in input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Social button groups (from your snippet) */
+    .social-button-container {
+      display: flex;
+      justify-content: start;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    /* The snippet you provided includes .sc-eDDNvR and so on; 
+       we’ll override or replicate minimal styling to show them side-by-side. */
+    .social-button-group {
+      display: inline-block;
+    }
+    .social-button-group button {
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      outline: none;
+    }
+    .sc-gLDzan {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* "Can't sign in? Create an account" */
+    .extra-links {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      color: #666;
+    }
+    .extra-links a {
+      color: #0077ff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .extra-links a:hover {
+      color: #005ecc;
+    }
+
+    /* Big arrow button */
+    .arrow-btn {
+      margin: 0 auto;
+      width: 52px;
+      height: 52px;
+      background-color: #c90;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .arrow-btn:hover {
+      background-color: #eaa000;
+      transform: scale(1.05);
+    }
+    .arrow-icon {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    /* Footer (Support, Privacy, etc.) */
+    .footer {
+      position: absolute;
+      bottom: 16px;
+      width: 100%;
+      display: flex;
       justify-content: center;
       gap: 20px;
-    }
-    .intro-overlay img {
-      max-width: 200px;
-      filter: drop-shadow(0 0 10px red);
-    }
-    .intro-button {
-      background: #ff0000;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1.2rem;
+      font-size: 0.8rem;
       color: #fff;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      box-shadow: 0 0 10px red;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .intro-button:hover {
-      transform: translateY(-5px);
+    .footer a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.2s;
     }
-    /* Emoji Rain */
-    .emoji-rain {
-      pointer-events: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 15;
+    .footer a:hover {
+      color: #ddd;
     }
-    .emoji {
-      position: absolute;
-      top: -50px;
-      font-size: 24px;
-      opacity: 1;
-      animation: rain 5s linear infinite;
-      filter: drop-shadow(0 0 5px red);
-    }
-    @keyframes rain {
-      0% { top: -50px; opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: 110vh; opacity: 0; }
+
+    /* Responsive adjustments */
+    @media (max-width: 420px) {
+      .login-card {
+        width: 90%;
+        max-width: 400px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Audio Element (No autoplay so that it waits for user interaction) -->
-  <audio id="bambi-audio" loop>
-    <source src="https://cdn.discordapp.com/attachments/1351692984831180853/1357220607825281024/Beyonce_-_All_Night_Audio.mp3?ex=67ef69b0&is=67ee1830&hm=c4f3d1ef1790bd1e91b30897c315eb97f199281f6f97c3d3d4e66e0d26106226&" type="audio/mp3">
-  </audio>
+  <!-- Main login card -->
+  <div class="login-card">
+    <h1>Sign in</h1>
 
-  <!-- Emoji Rain Container -->
-  <div class="emoji-rain" id="emoji-rain"></div>
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">USERNAME</label>
+      <input type="text" id="username" name="username" placeholder="" autocomplete="off">
+    </div>
 
-  <!-- Intro Overlay -->
-  <div id="intro-overlay" class="intro-overlay">
-    <img src="https://pngimg.com/d/hello_kitty_PNG16.png" alt="Hello Kitty Plush">
-    <button id="intro-button" class="intro-button">Press Enter to Start Music</button>
-  </div>
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">PASSWORD</label>
+      <input type="password" id="password" name="password" placeholder="" autocomplete="off">
+    </div>
 
-  <!-- Main Content -->
-  <section id="bambi" class="profile-page hidden">
-    <a href="/" class="home-link">← Home</a>
-    <div class="content">
-      <div id="bambi-profile-container" class="profile-container">
-        <!-- Using a League avatar from Discord as an example -->
-        <img src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024" alt="Bambi Avatar" class="avatar" id="bambi-avatar">
-        <div class="overlay" id="bambi-overlay">
-          <h2>Bambi</h2>
-          <div class="info-row">Summoner Level: 123</div>
-          <div class="info-row">Average KDA: 3.21</div>
-          <div class="info-row">Win Rate: 54%</div>
-          <div class="info-row">Favorite Champion: Ahri</div>
-          <div class="info-row">Queue: TEAM_BUILDER_DRAFT_UNRANKED_5x5</div>
-          <div class="info-row view-counter">Views: <span id="bambi-view-count">0</span></div>
+    <!-- Social login buttons -->
+    <div class="social-button-container">
+      <!-- EXACT snippet from your code for each button group -->
+      <div class="sc-etAVug gsMJPZ">
+        <div class="social-button-group">
+          <button data-testid="facebook" class="sc-eDDNvR hkDNpV">
+            <div class="sc-gLDzan gohLCB">
+              <!-- Facebook Icon -->
+              <svg role="img" viewBox="0 0 24 24" aria-label="facebook" class="sc-hLseeU idnFbI sc-iAEyYk jPWCSn">
+                <title>facebook</title>
+                <path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.3882 22.954 10.125 23.8542V15.4687H7.07812V12H10.125V9.35625C10.125 6.34875 11.9166 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92187 17.3438 4.92187V7.875H15.8306C14.34 7.875 13.875 8.80008 13.875 9.74906V12H17.2031L16.6711 15.4687H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z" fill="white"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="sc-etAVug gsMJPZ">
+        <div class="social-button-group">
+          <button data-testid="google" class="sc-eDDNvR kANKFe">
+            <div class="sc-gLDzan gohLCB">
+              <!-- Google Icon -->
+              <svg role="img" viewBox="10 10 28 28" aria-label="google" class="sc-hLseeU idnFbI sc-iAEyYk jPWCSn">
+                <title>google</title>
+                <path d="M35.9999 24.2741C35.9999 23.4584 35.9324 22.6384 35.7884 21.8359H24.2417V26.4565H30.854C30.5796 27.9467 29.6979 29.2649 28.407 30.1026V33.1007H32.3519C34.6684 31.0108 35.9999 27.9246 35.9999 24.2741Z" fill="#4285F4"></path>
+                <path d="M24.2417 35.9984C27.5434 35.9984 30.3277 34.9359 32.3564 33.1018L28.4115 30.1037C27.314 30.8356 25.8971 31.25 24.2462 31.25C21.0526 31.25 18.3447 29.1382 17.3731 26.2988H13.3022V29.3895C15.3804 33.4412 19.6131 35.9984 24.2417 35.9984Z" fill="#34A853"></path>
+                <path d="M17.3685 26.298C16.8557 24.8078 16.8557 23.1941 17.3685 21.7039V18.6133H13.3022C11.5659 22.0037 11.5659 25.9982 13.3022 29.3886L17.3685 26.298Z" fill="#FBBC04"></path>
+                <path d="M24.2417 16.7492C25.987 16.7227 27.6738 17.3664 28.9378 18.548L32.4329 15.1223C30.2198 13.0854 27.2825 11.9655 24.2417 12.0008C19.6131 12.0008 15.3804 14.558 13.3022 18.6142L17.3686 21.7048C18.3357 18.8611 21.0481 16.7492 24.2417 16.7492Z" fill="#EA4335"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="sc-etAVug gsMJPZ">
+        <div class="social-button-group">
+          <button data-testid="apple" class="sc-eDDNvR ejWkHq">
+            <div class="sc-gLDzan gohLCB">
+              <!-- Apple Icon -->
+              <svg role="img" viewBox="0 0 24 32" aria-label="apple" class="sc-hLseeU idnFbI sc-iAEyYk jPWCSn">
+                <title>apple</title>
+                <path d="M23.25 20.765C23.25 20.8551 22.7096 22.7465 21.3586 24.7279C20.1877 26.4392 19.0169 28.0604 17.1255 28.1505C15.2341 28.1505 14.6937 27.0697 12.5321 27.0697C10.3705 27.0697 9.74001 28.1505 8.02874 28.2405C6.22741 28.3306 4.78634 26.4392 3.70554 24.7279C1.27375 21.2153 -0.527587 14.9107 1.90421 10.6775C3.07508 8.606 5.23668 7.255 7.57841 7.255C9.37974 7.255 11.091 8.42586 12.1718 8.42586C13.2526 8.42586 15.3241 6.9848 17.4857 7.16493C18.3864 7.16493 20.9083 7.5252 22.5295 9.86693C22.4394 9.957 19.4672 11.6683 19.5573 15.0908C19.5573 19.3239 23.1599 20.765 23.25 20.765ZM16.0447 4.91326C17.0354 3.7424 17.6659 2.1212 17.4857 0.5C16.1347 0.590067 14.4235 1.40067 13.4327 2.57153C12.5321 3.56227 11.7215 5.27353 11.9917 6.80466C13.5228 6.9848 15.0539 6.08413 16.0447 4.91326Z" fill="white"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="sc-etAVug gsMJPZ">
+        <div class="social-button-group">
+          <button data-testid="xbox" class="sc-eDDNvR bFjmrU">
+            <div class="sc-gLDzan gohLCB">
+              <!-- Xbox Icon -->
+              <svg role="img" viewBox="0 0 22 22" aria-label="xbox" class="sc-hLseeU idnFbI sc-iAEyYk jPWCSn">
+                <title>xbox</title>
+                <path d="M9.93695 21.6234C8.29366 21.4662 6.62994 20.8763 5.20074 19.9444C4.00311 19.1634 3.73266 18.8424 3.73266 18.2017C3.73266 16.9148 5.14843 14.6608 7.57072 12.0912C8.94642 10.6319 10.8627 8.92132 11.0699 8.96764C11.4727 9.05767 14.6936 12.1977 15.8993 13.6758C17.806 16.0132 18.6826 17.9271 18.2373 18.7803C17.8988 19.4289 15.7983 20.6966 14.2551 21.1836C12.9833 21.585 11.3129 21.7552 9.93695 21.6234ZM2.11512 16.8637C1.11992 15.3377 0.617109 13.8355 0.37435 11.6627C0.29419 10.9452 0.322915 10.5348 0.556372 9.06223C0.847342 7.22683 1.89314 5.10352 3.14977 3.79678C3.68498 3.24024 3.73278 3.22668 4.38516 3.44633C5.1774 3.71307 6.02345 4.29706 7.33555 5.48286L8.1011 6.17471L7.68305 6.68801C5.74247 9.07072 3.6939 12.4481 2.92186 14.5377C2.50215 15.6736 2.33286 16.8139 2.51345 17.2886C2.63538 17.6091 2.52339 17.4897 2.11512 16.8637ZM19.584 17.1232C19.6823 16.6435 19.558 15.7626 19.2666 14.874C18.6354 12.9498 16.5258 9.37002 14.5886 6.93613L13.9788 6.16995L14.6385 5.56448C15.5 4.77392 16.0981 4.30055 16.7434 3.89855C17.2526 3.58132 17.9804 3.30049 18.2932 3.30049C18.486 3.30049 19.165 4.00471 19.7131 4.77324C20.562 5.96354 21.1865 7.40644 21.5029 8.90851C21.7073 9.87904 21.7244 11.9565 21.5358 12.9247C21.3811 13.7192 21.0544 14.7498 20.7357 15.4488C20.4969 15.9725 19.903 16.9896 19.6427 17.3206C19.5089 17.4908 19.5088 17.4904 19.584 17.1232Z" fill="white"></path>
+              </svg>
+            </div>
+          </button>
+          <button data-testid="playstation" class="sc-eDDNvR kYQdIt">
+            <div class="sc-gLDzan gohLCB">
+              <!-- PlayStation Icon -->
+              <svg role="img" viewBox="0 0 25 19" aria-label="playstation" class="sc-hLseeU idnFbI sc-iAEyYk jPWCSn">
+                <title>playstation</title>
+                <path d="M9.37418 0V17.0614L13.2844 18.2883V3.97592C13.2844 3.30712 13.5881 2.85971 14.0786 3.01192C14.714 3.18719 14.8401 3.80526 14.8401 4.47406V10.1889C17.2788 11.3512 19.1942 10.1889 19.1942 7.1216C19.1942 3.97592 18.073 2.57835 14.7607 1.45753C13.4573 1.02396 11.0373 0.304421 9.37418 0Z" fill="white"></path>
+                <path d="M14.0272 15.793L20.3154 13.5837C21.0301 13.33 21.1376 12.9748 20.5583 12.7857C19.979 12.5966 18.9325 12.652 18.2177 12.9057L14.0272 14.3632V12.0385L14.2701 11.9555C14.2701 11.9555 15.4801 11.5358 17.1806 11.3467C18.8858 11.1622 20.9694 11.3743 22.6045 11.9832C24.4498 12.5597 24.6554 13.4038 24.1882 13.9896C23.7211 14.5754 22.5718 14.9905 22.5718 14.9905L14.0272 18.0209V15.793Z" fill="white"></path>
+                <path d="M2.20319 15.5578C0.311138 15.0319 -0.0065405 13.9342 0.857732 13.3023C1.6566 12.7165 3.01608 12.2783 3.01608 12.2783L8.62217 10.3134V12.5551L4.59045 13.9803C3.87568 14.234 3.76823 14.5891 4.34752 14.7782C4.92682 14.9627 5.97796 14.912 6.69274 14.6583L8.62684 13.9665V15.9729C8.50538 15.9959 8.3699 16.0144 8.23909 16.0374C6.29564 16.3465 4.2354 16.2173 2.20319 15.5578Z" fill="white"></path>
+              </svg>
+            </div>
+          </button>
         </div>
       </div>
     </div>
-  </section>
 
-  <script>
-    // Function to create emoji rain effect with red-themed emojis
-    function spawnEmojis() {
-      const container = document.getElementById('emoji-rain');
-      const emojis = ['❤️', '🔥', '💥', '⭐'];
-      const numEmojis = 30; // Adjust the number as desired
+    <!-- Stay signed in checkbox -->
+    <label class="stay-signed-in">
+      <input type="checkbox" id="stay-signed-in">
+      Stay signed in
+    </label>
 
-      for (let i = 0; i < numEmojis; i++) {
-        const emojiEl = document.createElement('span');
-        emojiEl.classList.add('emoji');
-        emojiEl.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        emojiEl.style.left = Math.random() * 100 + 'vw';
-        emojiEl.style.animationDelay = Math.random() * 5 + 's';
-        emojiEl.style.animationDuration = (4 + Math.random() * 2) + 's';
-        container.appendChild(emojiEl);
-      }
-    }
-    spawnEmojis();
+    <!-- Arrow button (submits or navigates to next page) -->
+    <!-- On click, go to your Bambi page or whichever page you want -->
+    <button class="arrow-btn" onclick="window.location.href='bambi.html';">
+      <!-- Simple arrow icon in an SVG circle -->
+      <svg class="arrow-icon" viewBox="0 0 24 24">
+        <path d="M12 2C6.485 2 2 6.484 2 12c0 5.514 4.485 10 10 10 5.514 0 10-4.486 10-10 0-5.516-4.486-10-10-10zm3.707 11.293l-3 3a.999.999 0 01-1.414 0l-3-3a.999.999 0 111.414-1.414L11 13.586V8a1 1 0 012 0v5.586l1.293-1.293a.999.999 0 111.414 1.414z"/>
+      </svg>
+    </button>
 
-    // When the "Press Enter to Start Music" button is pressed,
-    // fade out the intro overlay, show main content, and start audio playback.
-    document.getElementById('intro-button').addEventListener('click', () => {
-      const introOverlay = document.getElementById('intro-overlay');
-      introOverlay.style.transition = 'opacity 1s ease';
-      introOverlay.style.opacity = '0';
-      
-      // Start audio playback
-      const audio = document.getElementById('bambi-audio');
-      audio.play().catch(function(error) {
-        console.error("Audio playback failed:", error);
-      });
-      
-      setTimeout(() => {
-        introOverlay.style.display = 'none';
-        document.getElementById('bambi').classList.remove('hidden');
-        // Demo view counter update (client-side)
-        let viewCount = parseInt(localStorage.getItem('bambiViewCount') || '0');
-        viewCount++;
-        localStorage.setItem('bambiViewCount', viewCount.toString());
-        document.getElementById('bambi-view-count').textContent = viewCount;
-        // Reveal profile animations
-        document.getElementById('bambi-avatar').classList.add('visible');
-        document.getElementById('bambi-overlay').classList.add('visible');
-      }, 1000);
-    });
-  </script>
+    <!-- Extra links -->
+    <div class="extra-links">
+      <span>Can't sign in?</span>
+      <a href="https://account.riotgames.com/">Create an Account</a>
+    </div>
+  </div>
+
+  <!-- Footer links for style completeness -->
+  <div class="footer">
+    <a href="#">Support</a>
+    <a href="#">Privacy Notice</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Contact Us</a>
+  </div>
 </body>
 </html>
