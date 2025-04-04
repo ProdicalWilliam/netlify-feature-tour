@@ -2,134 +2,250 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dazes Global Comments</title>
+  <title>Dazes</title>
+  <!-- Favicon -->
   <link rel="icon" href="https://pngimg.com/d/demon_PNG63.png" type="image/png">
-  <!-- Japanese-friendly font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600&display=swap">
+  <!-- Google Font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
   <style>
-    /* Base styles */
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      background: url('https://www.transparenttextures.com/patterns/japanese.png') repeat;
+    /* Reset and Base Styles */
+    * {
       margin: 0;
-      padding: 20px;
-      color: #333;
+      padding: 0;
+      box-sizing: border-box;
     }
+    html, body {
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: #111;
+      color: #fff;
+      scroll-behavior: smooth;
+    }
+    /* Main Page Background using the provided image */
+    .main-page {
+      min-height: 100vh;
+      background: url('https://t3.ftcdn.net/jpg/07/03/87/34/360_F_703873440_hnBJTRwDOp6J1XkcMMEdOKkjpweGTzYT.jpg') no-repeat center center fixed;
+      background-size: cover;
+      animation: fadeIn 1.5s ease-in;
+      position: relative;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    /* Container to center content */
     .container {
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      text-align: center;
+      /* Lightened overlay: reduced opacity for less dimming */
+      background: rgba(0, 0, 0, 0.2);
+      min-height: 100vh;
     }
     h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #333;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     }
-    .comment-form {
-      margin-bottom: 30px;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: vertical;
-    }
-    button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-top: 10px;
-      background: #f44336;
-      color: #fff;
+    /* Search Bar */
+    #searchInput {
+      padding: 0.8rem 1rem;
+      width: 90%;
+      max-width: 400px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-    .comment-card {
-      border: 1px solid #ddd;
-      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      background: #fafafa;
+      outline: none;
     }
-    .comment-meta {
-      font-size: 0.8em;
-      color: #777;
-      margin-bottom: 10px;
+    /* Grid Layout for Cards */
+    .name-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: 2rem;
+    }
+    /* Card Styles with strong shadows and white glow */
+    .name-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    }
+    .name-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+    }
+    .name-card a {
+      color: #fff;
+      font-size: 1.5rem;
+      text-decoration: none;
+      z-index: 2;
+      position: relative;
+    }
+    /* Home link styling (for in-page sections) */
+    .home-link {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.5rem 0.8rem;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .home-link:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+    /* Profile Page Styles */
+    .profile-page {
+      display: none;
+      min-height: 100vh;
+      padding: 2rem;
+      background: #222;
+      position: relative;
+    }
+    .profile-page .content {
+      margin-top: 3rem;
+      text-align: center;
+    }
+    /* Footer/Watermark Styles */
+    footer {
+      background: #111;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Global Comments</h1>
-    <!-- Comment submission form -->
-    <form class="comment-form" id="commentForm">
-      <textarea name="comment" id="commentInput" placeholder="Leave a comment..."></textarea>
-      <br>
-      <button type="submit">Submit Comment</button>
-    </form>
-    <!-- Comments will be injected here -->
-    <div id="commentsContainer">
-      <!-- Comment cards will be dynamically loaded -->
+  <!-- Main Landing Page -->
+  <section id="home" class="main-page">
+    <div class="container">
+      <h1>Welcome to Dazes.org</h1>
+      <!-- Search Bar -->
+      <input type="text" id="searchInput" placeholder="Search by name...">
+      <!-- Card Grid -->
+      <div class="name-grid" id="nameGrid">
+        <div class="name-card" data-name="William">
+          <a href="/william">William</a>
+        </div>
+        <div class="name-card" data-name="Brayden">
+          <a href="/brayden/">Brayden</a>
+        </div>
+        <div class="name-card" data-name="Vaani">
+          <a href="/vaani">Vaani</a>
+        </div>
+        <div class="name-card" data-name="Maddie">
+          <a href="/maddie">Maddie</a>
+        </div>
+        <div class="name-card" data-name="Bambi">
+          <a href="/bambi">Bambi</a>
+        </div>
+        <div class="name-card" data-name="Logann">
+          <a href="/logann/">Logann</a>
+        </div>
+        <div class="name-card" data-name="Mikey">
+          <a href="/mikey">Mikey</a>
+        </div>
+        <div class="name-card" data-name="Proxy">
+          <a href="/proxy">Proxy</a>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- In-Page Profile Sections (retain old redirect system) -->
+  <section id="william" class="profile-page">
+    <a href="#home" class="home-link">← Home</a>
+    <div class="content">
+      <h1>William's Profile</h1>
+      <!-- Additional content for William -->
+    </div>
+  </section>
+  <section id="maddie" class="profile-page">
+    <a href="#home" class="home-link">← Home</a>
+    <div class="content">
+      <h1>Maddie's Profile</h1>
+      <!-- Additional content for Maddie -->
+    </div>
+  </section>
+  <section id="bambi" class="profile-page">
+    <a href="#home" class="home-link">← Home</a>
+    <div class="content">
+      <h1>Bambi's Profile</h1>
+      <!-- Additional content for Bambi -->
+    </div>
+  </section>
+  <section id="mikey" class="profile-page">
+    <a href="#home" class="home-link">← Home</a>
+    <div class="content">
+      <h1>Mikey's Profile</h1>
+      <!-- Additional content for Mikey -->
+    </div>
+  </section>
+  <section id="proxy" class="profile-page">
+    <a href="#home" class="home-link">← Home</a>
+    <div class="content">
+      <h1>Proxy's Profile</h1>
+      <!-- Additional content for Proxy -->
+    </div>
+  </section>
+  <!-- Additional profile sections (Brayden, Vaani, etc.) can be added similarly -->
+
+  <!-- Footer / Watermark -->
+  <footer>
+    <p>Copyright @William INC 2025 Dazes.org</p>
+  </footer>
 
   <script>
-    // Function to load comments from your back-end API
-    async function loadComments() {
-      try {
-        const response = await fetch('/api/comments'); // Ensure this endpoint returns comments as JSON
-        const comments = await response.json();
-        const container = document.getElementById('commentsContainer');
-        container.innerHTML = '';
-        comments.forEach(comment => {
-          const card = document.createElement('div');
-          card.className = 'comment-card';
-          card.innerHTML = `
-            <div class="comment-meta">${comment.ip_address} | ${comment.created_at}</div>
-            <div class="comment-text">${comment.comment}</div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Error loading comments:', err);
-      }
-    }
-
-    // Event listener to handle comment submission via AJAX
-    document.getElementById('commentForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const commentText = document.getElementById('commentInput').value.trim();
-      if (commentText === '') return;
-      try {
-        const response = await fetch('/api/comments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ comment: commentText })
-        });
-        if (response.ok) {
-          document.getElementById('commentInput').value = '';
-          loadComments();
+    /* --- Old Redirect System (Hash Navigation) --- */
+    document.addEventListener('DOMContentLoaded', function() {
+      const sections = document.querySelectorAll('.profile-page');
+      function showSection(hash) {
+        sections.forEach(sec => sec.style.display = 'none');
+        if (hash) {
+          const target = document.getElementById(hash);
+          if (target) {
+            target.style.display = 'block';
+          }
         } else {
-          alert('Failed to submit comment.');
+          document.getElementById('home').style.display = 'block';
         }
-      } catch (err) {
-        console.error('Error submitting comment:', err);
       }
+      window.addEventListener('hashchange', () => {
+        showSection(window.location.hash.substring(1));
+      });
+      // Initialize display based on the current hash
+      showSection(window.location.hash.substring(1));
     });
 
-    // Initial load of comments when the page is ready
-    loadComments();
+    /* --- Search Filter for Name Cards --- */
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const cards = document.querySelectorAll('.name-card');
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(filter) ? 'block' : 'none';
+      });
+    });
   </script>
 </body>
 </html>
