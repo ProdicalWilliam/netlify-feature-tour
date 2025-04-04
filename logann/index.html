@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title></title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon updated to use the full juice box image without cropping -->
-  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
+  <!-- Favicon set to your provided full juice image -->
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
       --containerBlur: 12px;
-      --containerBorder: 2px solid #4b0082;
+      --containerBorder: 2px solid #4b0082; /* midnight purple */
       --containerRadius: 20px;
       --containerWidth: 42rem;
       --containerPadding: 20px 25px;
@@ -18,17 +18,15 @@
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
       --outlineColor: #4b0082;
-      /* Custom crosshair image URL */
-      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/1/10.png');
-      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
-      --modalBg: rgba(0, 0, 0, 0.85);
-      --modalBorder: 2px solid #4b0082;
+      --cursorTrailOpacity: 0.6;
+      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
     }
     /* Global Reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      cursor: none;
     }
     html, body {
       width: 100%;
@@ -36,11 +34,6 @@
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      cursor: default;
-    }
-    /* When custom cursor is enabled on info page */
-    body.custom-cursor {
-      cursor: none;
     }
     /* Background Video */
     #bgVideo {
@@ -88,7 +81,7 @@
       height: 100%;
       position: relative;
       z-index: 2;
-      opacity: 1; /* Visible immediately */
+      opacity: 1;
       transition: opacity 0.8s ease;
     }
     /* Tilt Container for Card */
@@ -212,7 +205,7 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Receipt Box (Image based) */
+    /* Receipt Box instead of Info Box */
     .receipt-box {
       display: flex;
       justify-content: center;
@@ -229,102 +222,25 @@
       height: auto;
       object-fit: contain;
     }
-    /* Login Modal (Email/Password based) */
-    #loginModal {
+    /* Custom Cursor */
+    .cursor {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modalBg);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #loginModal .modal-content {
-      background: var(--containerColor);
-      border: var(--modalBorder);
-      border-radius: var(--containerRadius);
-      padding: 30px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      color: var(--textColor);
-      font-size: 1.1em;
-    }
-    #loginModal input {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 2px solid var(--outlineColor);
-      border-radius: 5px;
-      background: transparent;
-      color: var(--textColor);
-      font-size: 1em;
-    }
-    #loginModal button {
-      padding: 10px 20px;
-      background: var(--outlineColor);
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s ease;
-      margin-top: 15px;
-    }
-    #loginModal button:hover {
-      background: #2a0a5e;
-    }
-    /* Edit Controls (Hidden by Default) */
-    #editControls {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-    }
-    #editControls input, #editControls textarea {
-      width: 100%;
-      padding: 8px;
-      border: 2px solid var(--outlineColor);
-      border-radius: 5px;
-      background: transparent;
-      color: var(--textColor);
-    }
-    #editControls button {
-      padding: 10px;
-      background: var(--outlineColor);
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-    }
-    /* Custom Cursor (enabled on info page) */
-    #customCursor {
-      position: fixed;
-      width: 50px;
-      height: 50px;
+      width: 90px;
+      height: 90px;
       pointer-events: none;
-      z-index: 99999;
-      background: var(--cursorImage) no-repeat center center;
-      background-size: contain;
+      z-index: 10000;
+      background-image: var(--cursorImage);
+      background-size: cover;
       transform: translate(-50%, -50%);
-      display: none;
-    }
-    /* Trail Effect for Custom Cursor */
-    .cursorTrail {
-      position: fixed;
-      width: 54px;
-      height: 54px;
-      pointer-events: none;
-      z-index: 9999;
-      background: var(--cursorImage) no-repeat center center;
-      background-size: contain;
-      opacity: 0.8;
-      transform: translate(-50%, -50%);
-      filter: drop-shadow(0 0 8px #ffb6c1);
     }
   </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
   <!-- Background Video -->
@@ -337,6 +253,7 @@
     <source src="https://example.com/default-audio.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
+
   <!-- Audio Toggle Button -->
   <button id="audioToggle" title="Toggle Audio">
     <svg id="audioIcon" viewBox="0 0 24 24">
@@ -345,7 +262,7 @@
       <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
     </svg>
   </button>
-  
+
   <!-- Login Modal (Email/Password based) -->
   <div id="loginModal">
     <div class="modal-content">
@@ -356,7 +273,7 @@
       <button id="emailSignIn">Sign in</button>
     </div>
   </div>
-  
+
   <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Tilt Container -->
@@ -406,64 +323,19 @@
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <!-- For receipt, allow updating the receipt image -->
           <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
       </div>
     </div>
   </div>
-  <!-- Custom Cursor Element (shown after page loads) -->
-  <div id="customCursor"></div>
-  
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
   <script>
-    // ---------------------------
-    // 1. Typewriter Effect for Tab Title
-    // ---------------------------
-    async function typewriteTitle() {
-      const text = "logann";
-      while (true) {
-        for (let i = 1; i <= text.length; i++) {
-          document.title = text.slice(0, i) + "|";
-          await sleep(200);
-        }
-        await sleep(500);
-      }
-    }
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    typewriteTitle();
-
-    // ---------------------------
-    // 2. Function to Enable Custom Cursor (for info page)
-    // ---------------------------
-    function enableCustomCursor() {
-      document.body.classList.add("custom-cursor");
-      const customCursor = document.getElementById("customCursor");
-      customCursor.style.display = "block";
-      document.addEventListener("mousemove", customCursorHandler);
-    }
-    function customCursorHandler(e) {
-      const customCursor = document.getElementById("customCursor");
-      customCursor.style.left = e.clientX + "px";
-      customCursor.style.top = e.clientY + "px";
-      const trail = document.createElement("div");
-      trail.classList.add("cursorTrail");
-      trail.style.left = e.clientX + "px";
-      trail.style.top = e.clientY + "px";
-      document.body.appendChild(trail);
-      setTimeout(() => {
-        trail.style.transition = "opacity 0.6s ease-out";
-        trail.style.opacity = "0";
-        setTimeout(() => { trail.remove(); }, 600);
-      }, 20);
-    }
-    // Enable custom cursor immediately since there's no mini‑game
-    enableCustomCursor();
-
-    // ---------------------------
-    // 3. Firebase Initialization and Settings Update Listener
-    // ---------------------------
+    // Firebase config and initialization
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -476,75 +348,74 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+
+    // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
         if (data) {
-          const bgVideo = document.getElementById("bgVideo");
-          const videoSource = bgVideo.querySelector("source");
+          // Update video
+          const bgVideo = document.getElementById('bgVideo');
+          const videoSource = bgVideo.querySelector('source');
           if (data.videoURL && videoSource.src !== data.videoURL) {
             videoSource.src = data.videoURL;
             bgVideo.load();
             bgVideo.play();
           }
-          const bgAudio = document.getElementById("bgAudio");
-          const audioSource = bgAudio.querySelector("source");
+          // Update audio
+          const bgAudio = document.getElementById('bgAudio');
+          const audioSource = bgAudio.querySelector('source');
           if (data.audioURL && audioSource.src !== data.audioURL) {
             audioSource.src = data.audioURL;
             bgAudio.load();
             bgAudio.play();
           }
+          // Update avatar
           if (data.avatarURL) {
-            document.getElementById("avatarImg").src = data.avatarURL;
+            document.getElementById('avatarImg').src = data.avatarURL;
           }
+          // Update profile name and joined text
           if (data.profileName) {
-            document.getElementById("profileName").innerText = data.profileName;
+            document.getElementById('profileName').innerText = data.profileName;
           }
           if (data.joinedLine) {
-            document.getElementById("joinedLine").innerText = data.joinedLine;
+            document.getElementById('joinedLine').innerText = data.joinedLine;
           }
+          // Update receipt image if provided
           if (data.receiptURL) {
-            document.getElementById("receiptBox").querySelector("img").src = data.receiptURL;
+            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
           }
         }
       });
 
-    // ---------------------------
-    // 4. Login Modal & Edit Controls Logic
-    // ---------------------------
-    // Key sequence detection for "w w w e e q" to show login modal
-    const keySequence = [];
-    const targetSequence = ["w", "w", "w", "e", "e", "q"];
-    document.addEventListener("keydown", (e) => {
-      keySequence.push(e.key.toLowerCase());
-      if (keySequence.length > targetSequence.length) keySequence.shift();
-      if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
-        document.getElementById("loginModal").style.display = "flex";
-        keySequence.length = 0;
-      }
-    });
-    document.getElementById("emailSignIn").addEventListener("click", () => {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+    // Handle Email/Password Sign-In when "Sign in" button is clicked
+    document.getElementById('emailSignIn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          document.getElementById("receiptBox").contentEditable = "true";
-          document.getElementById("editControls").style.display = "flex";
+          const user = result.user;
+          // Allow any valid user (or check against your own criteria)
+          document.getElementById('receiptBox').contentEditable = "true";
+          document.getElementById('editControls').style.display = 'flex';
           alert("Edit mode enabled!");
-          document.getElementById("loginModal").style.display = "none";
+          document.getElementById('loginModal').style.display = 'none';
         })
         .catch((error) => {
           console.error("Error during sign-in:", error);
           alert("Error logging in. Please check your credentials and try again.");
         });
     });
-    document.getElementById("saveEdits").addEventListener("click", () => {
-      const newVideoURL = document.getElementById("videoURL").value;
-      const newAudioURL = document.getElementById("audioURL").value;
-      const newAvatarURL = document.getElementById("avatarURL").value;
-      const newReceiptURL = document.getElementById("receiptURL").value;
-      const newProfileName = document.getElementById("profileNameInput").value;
-      const newJoinedLine = document.getElementById("joinedLineInput").value;
+
+    // Save edits: update video, audio, avatar, profile info, and receipt image in Firestore
+    document.getElementById('saveEdits').addEventListener('click', () => {
+      const newVideoURL = document.getElementById('videoURL').value;
+      const newAudioURL = document.getElementById('audioURL').value;
+      const newAvatarURL = document.getElementById('avatarURL').value;
+      const newReceiptURL = document.getElementById('receiptURL').value;
+      const newProfileName = document.getElementById('profileNameInput').value;
+      const newJoinedLine = document.getElementById('joinedLineInput').value;
+      
       db.collection("settings").doc("global").set({
         videoURL: newVideoURL || "",
         audioURL: newAudioURL || "",
@@ -555,51 +426,44 @@
       }, { merge: true })
       .then(() => {
         alert("Changes saved globally!");
-        document.getElementById("receiptBox").contentEditable = "false";
-        document.getElementById("editControls").style.display = "none";
+        // Disable editing and hide controls
+        document.getElementById('receiptBox').contentEditable = "false";
+        document.getElementById('editControls').style.display = "none";
       })
       .catch((error) => {
         console.error("Error updating settings:", error);
       });
     });
 
-    // ---------------------------
-    // 5. Card Tilt Effect
-    // ---------------------------
-    const cardContainer = document.getElementById("cardContainer");
-    cardContainer.addEventListener("mousemove", (e) => {
-      const rect = cardContainer.getBoundingClientRect();
-      const cardX = rect.left + rect.width / 2;
-      const cardY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - cardX;
-      const deltaY = e.clientY - cardY;
-      const maxTilt = 6;
-      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
-      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
-      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-    cardContainer.addEventListener("mouseleave", () => {
-      cardContainer.style.transform = "perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)";
-    });
-
-    // ---------------------------
-    // 6. Audio Toggle Logic
-    // ---------------------------
-    const bgAudio = document.getElementById("bgAudio");
-    const audioToggle = document.getElementById("audioToggle");
-    const audioIcon = document.getElementById("audioIcon");
-    audioToggle.addEventListener("click", () => {
-      bgAudio.muted = !bgAudio.muted;
-      if (bgAudio.muted) {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"/><line x1="19" y1="5" x2="5" y2="19" stroke="#fff" stroke-width="2"/>';
-      } else {
-        audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
+    // Custom Cursor & Trail
+    const cursor = document.getElementById('cursor');
+    let lastMouseX = 0, lastMouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+        // Create a trail element using the same crosshair image
+        const trail = document.createElement('div');
+        trail.style.position = 'fixed';
+        trail.style.top = e.clientY + 'px';
+        trail.style.left = e.clientX + 'px';
+        trail.style.width = '90px';
+        trail.style.height = '90px';
+        trail.style.backgroundImage = "var(--cursorImage)";
+        trail.style.backgroundSize = 'cover';
+        trail.style.pointerEvents = 'none';
+        trail.style.opacity = 'var(--cursorTrailOpacity)';
+        trail.style.transform = 'translate(-50%, -50%)';
+        trail.style.transition = 'opacity 0.5s ease-out';
+        document.body.appendChild(trail);
+        setTimeout(() => {
+          trail.style.opacity = '0';
+          setTimeout(() => { trail.remove(); }, 500);
+        }, 0);
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
       }
     });
   </script>
-  <!-- Load Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
