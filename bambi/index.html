@@ -2,276 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>League of Legends - Bambi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riot Games Authentication</title>
+  <!-- Custom Favicon -->
+  <link rel="icon" href="https://logos-world.net/wp-content/uploads/2022/05/Riot-Games-Symbol.png" type="image/png">
   <style>
-    /* -------------------------------------------------------
-       RESET & GLOBAL STYLES
-    ------------------------------------------------------- */
+    /* RESET */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      font-family: 'Spiegel', sans-serif; /* Ensure your hosted Spiegel files are linked via @font-face */
+    
+    /* GLOBAL STYLES */
+    body {
+      font-family: 'Arial', sans-serif;
       background-color: #000;
-      overflow-x: hidden;
-    }
-    a { text-decoration: none; cursor: pointer; }
-    img { display: block; }
-
-    /* -------------------------------------------------------
-       TOP BAR (Non-interactive background image)
-    ------------------------------------------------------- */
-    .top-bar {
-      width: 100%;
-      height: 40px; /* Adjust height as needed */
-      background: url("https://media.discordapp.net/attachments/1186034032929144912/1357491389939712142/image.png?ex=67f065e0&is=67ef1460&hm=71d3900e78815b3329144e7fbbcc3c7031c12dc4777aa41effa698d2703c1b16&=&format=webp&quality=lossless&width=620&height=31")
-                  center/cover no-repeat;
-    }
-
-    /* -------------------------------------------------------
-       NAVIGATION BUTTONS (Interactive, below top bar)
-    ------------------------------------------------------- */
-    .nav-container {
+      color: #fff;
+      height: 100vh;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      background-color: #000;
-      height: 60px;
-    }
-    /* Left side: Orange League logo */
-    .nav-left img {
-      height: 40px;
-      width: auto;
-    }
-    /* Center: Nav items (Game, Champions, News, PBE, Discover, Esports, Shop, Support, Universe) */
-    .nav-center {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-    .nav-item {
-      /* We set a fixed container size so both normal and hover images remain the same */
-      width: 70px;
-      height: 40px;
-      position: relative;
-    }
-    .nav-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    /* Right side: (if needed, add additional buttons; for now we’ll leave it empty) */
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 15px;
+      justify-content: center;
+      /* If you have a background image/video asset, replace the background below */
+      background: url('https://preview.redd.it/ennd5zljlql21.png?width=256&format=png&auto=webp&s=d699fed3ae40c76c8735354c175a07b74d2e1e03') no-repeat center center/cover;
     }
     
-    /* -------------------------------------------------------
-       HERO SECTION
-    ------------------------------------------------------- */
-    .hero {
-      position: relative;
-      width: 100%;
-      height: calc(100vh - 100px); /* subtract top-bar + nav-container height */
-      overflow: hidden;
-    }
-    .hero video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-    .hero-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    /* CONTAINER */
+    .auth-container {
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 8px;
+      width: 400px;
+      padding: 2rem;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
       text-align: center;
     }
-    /* Middle League Logo */
-    .hero-logo {
-      width: 270px;
-      margin-bottom: 20px;
-    }
-    /* "Play For Free" Button */
-    .play-btn {
-      border: none;
-      background: none;
-      cursor: pointer;
-    }
-    .play-btn img {
-      width: 132px;
-      height: auto;
-      /* Ensures hover/normal remain the same size */
+    
+    /* LOGO */
+    .auth-container .logo {
+      width: 120px;
+      margin: 0 auto 1rem;
     }
     
-    /* -------------------------------------------------------
-       INTERACTION: NAV ITEM HOVER
-       (Swap src using inline JS; sizes remain fixed by container)
-    ------------------------------------------------------- */
+    /* TITLE */
+    .auth-container h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: bold;
+    }
+    
+    /* FORM */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    form input {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    form input::placeholder {
+      color: #777;
+    }
+    
+    /* BUTTON */
+    form button {
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      background: #caa538;
+      color: #000;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    form button:hover {
+      background: #d4b04e;
+      transform: translateY(-2px);
+    }
+    
+    /* FOOTER */
+    .footer {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Top bar with fixed background image -->
-  <div class="top-bar"></div>
-
-  <!-- Navigation container (below top bar) -->
-  <div class="nav-container">
-    <!-- Left: Orange League Logo -->
-    <div class="nav-left">
-      <a href="#">
-        <img src="https://images.seeklogo.com/logo-png/38/2/league-of-legends-logo-png_seeklogo-385125.png" alt="League Logo">
-      </a>
-    </div>
-    <!-- Center: Interactive Nav Items -->
-    <div class="nav-center">
-      <!-- Game Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357492015352516658/image.png?ex=67f06675&is=67ef14f5&hm=f7b9432c498ca0831525148a1426d680a8ef6df2f4b173cc29a496936b3f0a21&=&format=webp&quality=lossless&width=56&height=21" 
-               alt="Game"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357493314441707580/image.png?ex=67f067ab&is=67ef162b&hm=a92b32b570056c91bd098d3b6df09d8cb82591ba4e505d6a70c5946c1a998b36&=&format=webp&quality=lossless&width=51&height=33';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357492015352516658/image.png?ex=67f06675&is=67ef14f5&hm=f7b9432c498ca0831525148a1426d680a8ef6df2f4b173cc29a496936b3f0a21&=&format=webp&quality=lossless&width=56&height=21';">
-        </a>
-      </div>
-      <!-- Champions Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357494354293428274/image.png?ex=67f068a3&is=67ef1723&hm=2df8a8d7c145e7163cd42dfafba3e68bf4117fa2b05189dc1734d2cf524708b5&=&format=webp&quality=lossless&width=66&height=24" 
-               alt="Champions"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357493812297072640/image.png?ex=67f06821&is=67ef16a1&hm=058950f113de751a2fa21bb888bf42585ff20babeb7c6eecdf051750d632943e&=&format=webp&quality=lossless&width=72&height=28';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357494354293428274/image.png?ex=67f068a3&is=67ef1723&hm=2df8a8d7c145e7163cd42dfafba3e68bf4117fa2b05189dc1734d2cf524708b5&=&format=webp&quality=lossless&width=66&height=24';">
-        </a>
-      </div>
-      <!-- News Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357494266602979399/image.png?ex=67f0688e&is=67ef170e&hm=e5bc566b429a035ad683454ca2d18a5f16c5125fd5451c0b2d35ffe78926d3ee&=&format=webp&quality=lossless&width=41&height=24" 
-               alt="News"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357496529585443028/image.png?ex=67f06aa9&is=67ef1929&hm=29f051b501f34b151a2ffc5353051a907d2ace370c9ad5e82582934dc133c1a8&=&format=webp&quality=lossless&width=41&height=14';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357494266602979399/image.png?ex=67f0688e&is=67ef170e&hm=e5bc566b429a035ad683454ca2d18a5f16c5125fd5451c0b2d35ffe78926d3ee&=&format=webp&quality=lossless&width=41&height=24';">
-        </a>
-      </div>
-      <!-- PBE Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357494703955902676/image.png?ex=67f068f6&is=67ef1776&hm=25ffe21d4d2c473565dd16ba4d4fd110d14474b33a55d2c6e1d8197a483da3d9&=&format=webp&quality=lossless&width=32&height=19" 
-               alt="PBE"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357494807261483201/image.png?ex=67f0690f&is=67ef178f&hm=8eff67815a5de6004419721bd65efd209f355007f553ee913c85c00e46b4884b&=&format=webp&quality=lossless&width=41&height=28';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357494703955902676/image.png?ex=67f068f6&is=67ef1776&hm=25ffe21d4d2c473565dd16ba4d4fd110d14474b33a55d2c6e1d8197a483da3d9&=&format=webp&quality=lossless&width=32&height=19';">
-        </a>
-      </div>
-      <!-- Discover Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357494989155733644/image.png?ex=67f0693a&is=67ef17ba&hm=cd1a323fcea7e02b4b75ae1594d3d46f052ccb3336483f71d7f723b29795e68a&=&format=webp&quality=lossless&width=65&height=20" 
-               alt="Discover">
-        </a>
-      </div>
-      <!-- Esports Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357495407340556542/image.png?ex=67f0699e&is=67ef181e&hm=546311ea50cc2e77d8f585e708b463dc9c59b08aa20898d96b8f170f9ec43cf4&=&format=webp&quality=lossless&width=53&height=24" 
-               alt="Esports"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495293351825569/image.png?ex=67f06982&is=67ef1802&hm=caf643149906623cb23375076dc4f93d1cdc58a35a2a1df08f81171d320b63fc&=&format=webp&quality=lossless&width=67&height=31';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495407340556542/image.png?ex=67f0699e&is=67ef181e&hm=546311ea50cc2e77d8f585e708b463dc9c59b08aa20898d96b8f170f9ec43cf4&=&format=webp&quality=lossless&width=53&height=24';">
-        </a>
-      </div>
-      <!-- Shop Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357495356237152457/image.png?ex=67f06991&is=67ef1811&hm=d9c98e0b58f033f4c51d18f2351ac4725532ce4ac199ebb79f8e6f162bd46331&=&format=webp&quality=lossless&width=53&height=24" 
-               alt="Shop"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495294127771739/image.png?ex=67f06983&is=67ef1803&hm=b09119ca585da7a0b07044dc78e3bb8967df1d56530715e6d2594e512147055f&=&format=webp&quality=lossless&width=66&height=31';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495356237152457/image.png?ex=67f06991&is=67ef1811&hm=d9c98e0b58f033f4c51d18f2351ac4725532ce4ac199ebb79f8e6f162bd46331&=&format=webp&quality=lossless&width=53&height=24';">
-        </a>
-      </div>
-      <!-- Support Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357495442262200533/image.png?ex=67f069a6&is=67ef1826&hm=741d4fc5d1bc2a607bac600f1a6f032d18e7a27ab175d104daeef6844acad5f3&=&format=webp&quality=lossless&width=53&height=24" 
-               alt="Support"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495590254018692/image.png?ex=67f069c9&is=67ef1849&hm=00af5384638360e3b69430f7273eeb50a471620391c0cbb90e4afb21865de1c8&=&format=webp&quality=lossless&width=68&height=28';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495442262200533/image.png?ex=67f069a6&is=67ef1826&hm=741d4fc5d1bc2a607bac600f1a6f032d18e7a27ab175d104daeef6844acad5f3&=&format=webp&quality=lossless&width=53&height=24';">
-        </a>
-      </div>
-      <!-- Universe Button -->
-      <div class="nav-item">
-        <a href="#">
-          <img src="https://media.discordapp.net/attachments/1186034032929144912/1357495293653811200/image.png?ex=67f06983&is=67ef1803&hm=1b6e57e8f70ded6db16aca64126c3d135c2062202804d728f2d0f22d6862eff4&=&format=webp&quality=lossless&width=67&height=31" 
-               alt="Universe"
-               onmouseover="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495293888954468/image.png?ex=67f06983&is=67ef1803&hm=e91f83a518e282d9f9d8cc6813f2f3c6e24578fcd0a2df516575de3becf0ebad&=&format=webp&quality=lossless&width=67&height=31';" 
-               onmouseout="this.src='https://media.discordapp.net/attachments/1186034032929144912/1357495293653811200/image.png?ex=67f06983&is=67ef1803&hm=1b6e57e8f70ded6db16aca64126c3d135c2062202804d728f2d0f22d6862eff4&=&format=webp&quality=lossless&width=67&height=31';">
-        </a>
-      </div>
-    </div>
-    <!-- Right side: (Optional additional buttons; left empty for now) -->
-    <div class="nav-right">
-      <!-- You can add search or web buttons here if needed -->
+  <div class="auth-container">
+    <!-- Riot Logo (using the favicon asset as logo for demonstration) -->
+    <img class="logo" src="https://logos-world.net/wp-content/uploads/2022/05/Riot-Games-Symbol.png" alt="Riot Games Logo">
+    <h1>Sign in with Riot ID</h1>
+    <form>
+      <input type="text" placeholder="Riot ID" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <div class="footer">
+      © Riot Games, Inc. All rights reserved.
     </div>
   </div>
-
-  <!-- HERO SECTION WITH BACKGROUND VIDEO -->
-  <section class="hero">
-    <video autoplay muted loop playsinline>
-      <source src="https://cmsassets.rgpub.io/sanity/files/dsfx7636/news/8ab3e227121c53aacab0c9b9f7a48adbc65db520.webm" type="video/webm">
-    </video>
-    <div class="hero-content">
-      <!-- Center League Logo -->
-      <img class="hero-logo" src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/9eb028de391e65072d06e77f06d0955f66b9fa2c-736x316.png?auto=format&fit=fill&q=80&w=270" alt="League of Legends">
-      <!-- "Play for Free" Button -->
-      <button class="play-btn" id="showInfoBtn">
-        <img src="https://media.discordapp.net/attachments/1186034032929144912/1357490453297238136/image.png?ex=67f06501&is=67ef1381&hm=243c2fdf495b384ebb9bfc1bd714e56d7f00dec2537bf5c6d740d34964d48ee6&=&format=webp&quality=lossless&width=132&height=49" 
-             alt="Play For Free">
-      </button>
-    </div>
-  </section>
-
-  <!-- (Optional) INFO SECTION: You can toggle this section with JavaScript if needed -->
-  <section id="league-info" style="display: none;">
-    <!-- Add your summoner stats and profile info here -->
-    <a href="#" id="returnHomeBtn" style="position:absolute; top:20px; left:20px; background:rgba(255,255,255,0.1); padding:8px 16px; border-radius:4px; font-weight:600;">← Home</a>
-    <div style="margin-top:120px; text-align:center;">
-      <h1>Summoner Stats</h1>
-      <div style="margin:20px auto; background:rgba(0,0,0,0.4); border:2px solid #caa538; border-radius:10px; padding:2rem; max-width:400px; box-shadow:0 0 20px rgba(202,165,56,0.5);">
-        <img src="https://cdn.discordapp.com/avatars/864081350323208203/a4b2adf7d45789b0c02a59430329d974?size=1024" alt="Summoner Avatar" style="width:128px; height:128px; border-radius:50%; border:3px solid #caa538; margin-bottom:1rem;">
-        <div style="font-size:1.8rem; font-weight:600; margin-bottom:0.5rem;">prettygrlsmiling#lover</div>
-        <div style="margin:0.5rem 0; font-size:1.1rem;"><span style="color:#caa538; font-weight:600;">Level:</span> 123</div>
-        <div style="margin:0.5rem 0; font-size:1.1rem;"><span style="color:#caa538; font-weight:600;">Average KDA:</span> 3.21</div>
-        <div style="margin:0.5rem 0; font-size:1.1rem;"><span style="color:#caa538; font-weight:600;">Win Rate:</span> 54%</div>
-        <div style="margin:0.5rem 0; font-size:1.1rem;"><span style="color:#caa538; font-weight:600;">Favorite Champion:</span> Ahri</div>
-        <div style="margin:0.5rem 0; font-size:1.1rem;"><span style="color:#caa538; font-weight:600;">Queue:</span> Unranked 5x5</div>
-      </div>
-    </div>
-  </section>
-
-  <script>
-    // Toggle between hero and info sections (if desired)
-    const showInfoBtn = document.getElementById('showInfoBtn');
-    const leagueInfo = document.getElementById('league-info');
-    const heroSection = document.querySelector('.hero');
-    const returnHomeBtn = document.getElementById('returnHomeBtn');
-
-    showInfoBtn.addEventListener('click', () => {
-      heroSection.style.display = 'none';
-      leagueInfo.style.display = 'block';
-      window.scrollTo(0, 0);
-    });
-
-    if (returnHomeBtn) {
-      returnHomeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        leagueInfo.style.display = 'none';
-        heroSection.style.display = 'block';
-        window.scrollTo(0, 0);
-      });
-    }
-  </script>
 </body>
 </html>
