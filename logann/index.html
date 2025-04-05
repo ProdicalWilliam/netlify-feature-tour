@@ -57,16 +57,16 @@
       0% { transform: translate(0, 0); }
       100% { transform: translate(200px, 200px); }
     }
-    /* Center lock element */
+    /* Center lock element with new image URL */
     #lock {
       position: relative;
       z-index: 2;
       width: 100px;
       height: 100px;
-      background: url('https://cdn-icons-png.flaticon.com/512/60/60758.png') no-repeat center/contain;
+      background: url('https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546') no-repeat center/contain;
       margin-bottom: 20px;
     }
-    /* Draggable key as an image */
+    /* Draggable key as an image with new URL */
     #key {
       position: absolute;
       z-index: 2;
@@ -581,8 +581,8 @@
     </script>
     <!-- Central Lock -->
     <div id="lock"></div>
-    <!-- Draggable Key as an image -->
-    <img id="key" src="https://cdn-icons-png.flaticon.com/512/60/60745.png" alt="Key" draggable="true">
+    <!-- Draggable Key as an image with updated URL -->
+    <img id="key" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131" alt="Key" draggable="true">
     <p style="color: #fff; z-index:2; position:relative;">Drag the key to the lock</p>
   </div>
   <!-- Flash Overlay -->
@@ -943,6 +943,7 @@
     const lockEl = document.getElementById('lock');
     
     keyEl.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = "move";  // Ensure the effect is allowed
       e.dataTransfer.setData('text/plain', 'key');
     });
     
