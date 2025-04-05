@@ -2,13 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mini‑Game</title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Favicon -->
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
   <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
+      --containerColor: rgba(0, 0, 0, 0.4);
+      --containerBlur: 12px;
+      --containerBorder: 2px solid #4b0082;
+      --containerRadius: 20px;
+      --containerWidth: 42rem;
+      --containerPadding: 20px 25px;
+      --textColor: #fff;
+      --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
+      --outlineColor: #4b0082;
+      --cursorTrailOpacity: 0.6;
+      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
+      --inputBg: rgba(0, 0, 0, 0.4);
+      --inputBorder: 2px solid #4b0082;
+      --inputRadius: 10px;
+      --glowColor: #4b0082;
+      --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
     }
     /* Global Reset */
     * {
@@ -24,6 +43,13 @@
       overflow: hidden;
       cursor: default;
     }
+    /* ---------------- Mini-Game Styles ---------------- */
+    /* The mini‑game is wrapped inside #miniGame */
+    #miniGame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
     /* Entry Overlay (Mini‑Game) */
     #entryOverlay {
       position: fixed;
@@ -33,11 +59,27 @@
       height: 100%;
       background: var(--overlayBg);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       z-index: 1000;
       transition: opacity 0.5s ease;
       overflow: hidden;
+    }
+    /* Glow Objects (for visual effect in mini‑game) */
+    .glow-object {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(138,43,226,0.7);
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: moveDiagonal 5s linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes moveDiagonal {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(200px, 200px); }
     }
     /* Juice Box (without straw) */
     #juiceBox {
@@ -75,45 +117,574 @@
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
     }
-    /* (No extra styling or background added to mini‑game code) */
+    /* Flash Overlay */
+    #flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 0;
+      z-index: 10000;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    /* ---------------- Main Page Styles ---------------- */
+    /* Background Video */
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -3;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    #bgAudio {
+      display: none;
+    }
+    /* Audio Toggle Button */
+    #audioToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.3);
+      border: none;
+      border-radius: 50%;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: background 0.2s;
+    }
+    #audioToggle:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    #audioToggle svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+    /* Main Content Container (hidden until mini‑game completes) */
+    #mainContent {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 1;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    /* Tilt Container for Card */
+    #cardContainer {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
+      transform: rotateX(6.67deg) rotateY(-7.57deg);
+    }
+    /* Profile Card */
+    .profile-card {
+      width: var(--containerWidth);
+      max-width: 95%;
+      padding: var(--containerPadding);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      backdrop-filter: blur(var(--containerBlur));
+      -webkit-backdrop-filter: blur(var(--containerBlur));
+      color: var(--textColor);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-sizing: border-box;
+      animation: cardGlow 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 8px 2px var(--glowColor); }
+      50% { box-shadow: 0 0 16px 4px var(--glowColor); }
+      100% { box-shadow: 0 0 8px 2px var(--glowColor); }
+    }
+    /* Head Section */
+    .profile-head {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .profile-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-info h1 {
+      font-weight: 600;
+      font-size: 36px;
+      line-height: 42px;
+      margin: 0;
+    }
+    .joined-line {
+      font-weight: 400;
+      font-size: 13px;
+      margin: 0;
+      color: var(--textSecondary);
+    }
+    /* Live View Counter */
+    #viewCounter {
+      position: fixed;
+      bottom: 12px;
+      left: 15px;
+      z-index: 1000;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #viewCounter svg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+    /* Server Embed Section */
+    .server-embed {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .server-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .server-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .server-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .server-details h1 {
+      font-weight: 450;
+      font-size: 18px;
+      margin: 0;
+    }
+    .server-stats {
+      font-weight: 450;
+      font-size: 12.5px;
+      color: var(--onlineColor);
+      display: flex;
+      gap: 10px;
+    }
+    .server-stats svg {
+      width: 14px;
+      height: 14px;
+      margin-right: 3px;
+    }
+    .server-details a {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 450;
+      font-size: 12px;
+      color: #fff;
+      text-decoration: none;
+      margin-top: 2px;
+      transition: background 0.3s ease;
+    }
+    .server-details a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    /* Receipt Box */
+    .receipt-box {
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .receipt-box img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Comment Card Styles */
+    .comment-card {
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      width: 45%;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .comment-card img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .comment-card p {
+      color: #fff;
+      font-size: 0.9em;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .like-btn {
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+    }
+    .admin-btn {
+      background: red;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    .pin-btn {
+      background: orange;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    /* View All Comments Button */
+    #viewAllComments {
+      margin: 10px auto;
+      padding: 8px 16px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      display: block;
+    }
+    /* Post Comment Modal */
+    #postCommentModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #postCommentModal .modal-content {
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      color: var(--textColor);
+      font-size: 1.1em;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      animation: modalGlow 2s infinite alternate;
+    }
+    @keyframes modalGlow {
+      from { box-shadow: 0 0 10px 2px var(--glowColor); }
+      to { box-shadow: 0 0 20px 4px var(--glowColor); }
+    }
+    #postCommentModal input, 
+    #postCommentModal textarea {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #postCommentModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    #postCommentModal button:hover {
+      background: #2a0a5e;
+    }
+    /* Post Comment Button (fixed bottom right) */
+    #openPostComment {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1100;
+      background: var(--outlineColor);
+      color: #fff;
+      border: none;
+      border-radius: var(--inputRadius);
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+    }
+    #openPostComment:hover {
+      background: #2a0a5e;
+    }
+    /* Edit Controls (for admin) */
+    #editControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      border: 2px solid var(--outlineColor);
+      border-radius: 10px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      margin: 20px auto;
+    }
+    #editControls input {
+      width: 100%;
+      padding: 8px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #editControls button {
+      padding: 10px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+    }
+    #editControls button:hover {
+      background: #2a0a5e;
+    }
+    /* Custom Cursor */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 90px;
+      height: 90px;
+      pointer-events: none;
+      z-index: 10000;
+      background-image: var(--cursorImage);
+      background-size: cover;
+      transform: translate(-50%, -50%);
+    }
+    /* Login Modal Styles */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      color: var(--textColor);
+      font-size: 1.1em;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      animation: modalGlow 2s infinite alternate;
+    }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #loginModal button {
+      padding: 10px 20px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    #loginModal button:hover {
+      background: #2a0a5e;
+    }
   </style>
 </head>
 <body>
-  <!-- Mini-Game Overlay -->
-  <div id="entryOverlay">
-    <!-- Juice Box (without straw) -->
-    <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-    <!-- Straw with dragging functions -->
-    <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
-    <p style="color: #fff; z-index:2; position:relative;">Drag the straw over the juice box</p>
+  <!-- ---------------- Mini-Game Container ---------------- -->
+  <div id="miniGame">
+    <!-- Generate Glow Objects -->
+    <script>
+      for (let i = 0; i < 10; i++) {
+        const glow = document.createElement('div');
+        glow.className = 'glow-object';
+        glow.style.top = Math.random() * 100 + '%';
+        glow.style.left = Math.random() * 100 + '%';
+        glow.style.animationDuration = (3 + Math.random() * 4) + 's';
+        document.body.appendChild(glow);
+      }
+    </script>
+    <!-- Mini-Game Overlay -->
+    <div id="entryOverlay">
+      <!-- Juice Box (without straw) -->
+      <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
+      <!-- Straw with dragging functions -->
+      <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
+      <p style="color: #fff; z-index:2; position:relative;">Drag the straw over the juice box</p>
+    </div>
+    <!-- Flash Overlay -->
+    <div id="flash"></div>
+    <!-- Full Juice Container -->
+    <div id="fullJuiceContainer">
+      <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
+    </div>
   </div>
-  <!-- Flash Overlay -->
-  <div id="flash"></div>
-  <!-- Full Juice Container -->
-  <div id="fullJuiceContainer">
-    <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
+
+  <!-- ---------------- Main Content Container ---------------- -->
+  <div id="mainContent">
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay loop playsinline muted preload="auto">
+      <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <!-- Content: Profile Card, Server Embed, etc. -->
+    <div id="cardContainer">
+      <div class="profile-card">
+        <div class="profile-head">
+          <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
+          <div class="profile-info">
+            <h1 id="profileName">Logann</h1>
+            <p class="joined-line" id="joinedLine">joined 4 months ago</p>
+          </div>
+        </div>
+        <div id="viewCounter">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+          </svg>
+          <span id="viewsText">0 views</span>
+        </div>
+        <div class="server-embed">
+          <div class="server-icon">
+            <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
+          </div>
+          <div class="server-details">
+            <h1>Dazes</h1>
+            <h3 class="server-stats">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                36 Online
+              </span>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
+                </svg>
+                162 Members
+              </span>
+            </h3>
+            <a href="https://discord.gg/dazes" target="_blank">Join</a>
+          </div>
+        </div>
+        <div class="info-lower">
+          <div class="receipt-area">
+            <div class="receipt-box" id="receiptBox">
+              <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+            </div>
+          </div>
+          <div class="comments-area" id="latestCommentsArea">
+            <!-- Latest 6 comment cards will be injected here -->
+          </div>
+        </div>
+        <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
+        <div id="editControls">
+          <input type="text" id="profileNameInput" placeholder="Enter new profile name">
+          <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
+          <input type="text" id="videoURL" placeholder="Enter new video URL">
+          <input type="text" id="audioURL" placeholder="Enter new audio URL">
+          <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
+          <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
+          <button id="saveEdits">Save Changes</button>
+        </div>
+      </div>
+    </div>
   </div>
-  
-  <!-- Main Content (Info Page) -->
-  <div id="mainContent" style="display:none;">
-    <!-- Replace the content below with your actual info page content -->
-    <h1 style="text-align: center; color: #fff; margin-top: 40px;">Welcome to the Info Page</h1>
-    <p style="text-align: center; color: #fff;">Your content goes here.</p>
-  </div>
-  
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
+  <!-- ---------------- Scripts ---------------- -->
   <script>
-    // Straw dragging using mouse and touch events (mini‑game code, unchanged)
+    // ---------------- Mini-Game Logic (Straw Dragging) ----------------
     const entryOverlay = document.getElementById("entryOverlay");
     const juiceBox = document.getElementById("juiceBox");
     const straw = document.getElementById("straw");
     const fullJuiceContainer = document.getElementById("fullJuiceContainer");
     const fullJuice = document.getElementById("fullJuice");
-    
     let isStrawDragging = false;
-    
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
-    
     function strawStartDrag(e) {
       isStrawDragging = true;
       updateStrawPosition(e.clientX, e.clientY);
@@ -121,7 +692,6 @@
       document.addEventListener('mouseup', strawEndDrag);
       e.preventDefault();
     }
-    
     function strawStartDragTouch(e) {
       isStrawDragging = true;
       const touch = e.touches[0];
@@ -130,40 +700,34 @@
       document.addEventListener('touchend', strawEndDragTouch);
       e.preventDefault();
     }
-    
     function strawDrag(e) {
       if (!isStrawDragging) return;
       updateStrawPosition(e.clientX, e.clientY);
     }
-    
     function strawDragTouch(e) {
       if (!isStrawDragging) return;
       const touch = e.touches[0];
       updateStrawPosition(touch.clientX, touch.clientY);
       e.preventDefault();
     }
-    
     function updateStrawPosition(x, y) {
       const strawWidth = straw.offsetWidth;
       const strawHeight = straw.offsetHeight;
       straw.style.left = (x - strawWidth / 2) + "px";
       straw.style.top = (y - strawHeight / 2) + "px";
     }
-    
     function strawEndDrag() {
       isStrawDragging = false;
       document.removeEventListener('mousemove', strawDrag);
       document.removeEventListener('mouseup', strawEndDrag);
       checkStrawDrop();
     }
-    
     function strawEndDragTouch() {
       isStrawDragging = false;
       document.removeEventListener('touchmove', strawDragTouch);
       document.removeEventListener('touchend', strawEndDragTouch);
       checkStrawDrop();
     }
-    
     function checkStrawDrop() {
       const juiceRect = juiceBox.getBoundingClientRect();
       const strawRect = straw.getBoundingClientRect();
@@ -173,29 +737,330 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate fade-out then reveal full juice
+        // Successful drop: animate fade-out then reveal full juice, then show main content.
         juiceBox.style.transition = "opacity 0.5s ease-out";
         straw.style.transition = "opacity 0.5s ease-out";
         juiceBox.style.opacity = "0";
         straw.style.opacity = "0";
         setTimeout(() => {
-          entryOverlay.style.display = "none";
-          fullJuiceContainer.style.display = "block";
-          fullJuice.style.opacity = "0";
+          entryOverlay.style.opacity = "0";
           setTimeout(() => {
-            fullJuice.style.opacity = "1";
-          }, 50);
-          setTimeout(() => {
+            entryOverlay.style.display = "none";
+            fullJuiceContainer.style.display = "block";
             fullJuice.style.opacity = "0";
             setTimeout(() => {
-              fullJuiceContainer.style.display = "none";
-              // After mini‑game completes, display the info page.
-              document.getElementById("mainContent").style.display = "block";
-            }, 700);
-          }, 1500);
+              fullJuice.style.opacity = "1";
+            }, 50);
+            setTimeout(() => {
+              fullJuice.style.opacity = "0";
+              setTimeout(() => {
+                fullJuiceContainer.style.display = "none";
+                // Reveal the main content after the mini-game completes.
+                document.getElementById("miniGame").style.display = "none";
+                document.getElementById("mainContent").style.display = "flex";
+                // Resume background video and enable custom cursor.
+                document.getElementById("bgVideo").play();
+                enableCustomCursor();
+              }, 700);
+            }, 1500);
+          }, 500);
         }, 500);
       }
     }
+
+    // ---------------- Custom Cursor Logic ----------------
+    function enableCustomCursor() {
+      document.body.classList.add("custom-cursor");
+      const customCursor = document.getElementById("cursor");
+      customCursor.style.display = "block";
+      document.addEventListener("mousemove", customCursorHandler);
+    }
+    function customCursorHandler(e) {
+      const customCursor = document.getElementById("cursor");
+      customCursor.style.left = e.clientX + "px";
+      customCursor.style.top = e.clientY + "px";
+      const trail = document.createElement("div");
+      trail.classList.add("cursorTrail");
+      trail.style.left = e.clientX + "px";
+      trail.style.top = e.clientY + "px";
+      document.body.appendChild(trail);
+      setTimeout(() => {
+        trail.style.transition = "opacity 0.6s ease-out";
+        trail.style.opacity = "0";
+        setTimeout(() => { trail.remove(); }, 600);
+      }, 20);
+    }
+
+    // ---------------- Typewriter Effect for Tab Title ----------------
+    async function typewriteTitle() {
+      const text = "logann";
+      while (true) {
+        for (let i = 1; i <= text.length; i++) {
+          document.title = text.slice(0, i) + "|";
+          await sleep(200);
+        }
+        await sleep(500);
+      }
+    }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    typewriteTitle();
+
+    // ---------------- Firebase Initialization & Main Content Logic ----------------
+    // NOTE: Make sure to load the Firebase SDK scripts below this script.
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.firebasestorage.app",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const defaultSettings = {
+      videoURL: "https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4",
+      audioURL: "https://example.com/default-audio.mp3",
+      avatarURL: "https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024",
+      profileName: "Logann",
+      joinedLine: "joined 4 months ago",
+      receiptURL: "https://via.placeholder.com/300x200?text=Receipt"
+    };
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data() || {};
+        const settings = { ...defaultSettings, ...data };
+        const bgVideo = document.getElementById('bgVideo');
+        const videoSource = bgVideo.querySelector('source');
+        if(videoSource.src !== settings.videoURL){
+          videoSource.src = settings.videoURL;
+          bgVideo.load();
+          bgVideo.play().catch(err => console.error("Video playback error:", err));
+        }
+        const bgAudio = document.getElementById('bgAudio');
+        const audioSource = bgAudio ? bgAudio.querySelector('source') : null;
+        if(bgAudio && audioSource && audioSource.src !== settings.audioURL){
+          audioSource.src = settings.audioURL;
+          bgAudio.load();
+          bgAudio.play();
+        }
+        document.getElementById('avatarImg').src = settings.avatarURL;
+        document.getElementById('profileName').innerText = settings.profileName;
+        document.getElementById('joinedLine').innerText = settings.joinedLine;
+        document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
+        const views = settings.views || 0;
+        document.getElementById('viewsText').innerText = views + " views";
+      });
+    db.collection("settings").doc("global").set({
+      views: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true }).catch(error => {
+      console.error("Error incrementing view count:", error);
+    });
+    function updateLatestComments() {
+      db.collection("comments").orderBy("timestamp", "desc").limit(6)
+        .onSnapshot(snapshot => {
+          const latestCommentsArea = document.getElementById('latestCommentsArea');
+          latestCommentsArea.innerHTML = "";
+          db.collection("settings").doc("global").get().then(doc => {
+            let pinned = null;
+            if(doc.exists && doc.data().pinnedComment){
+              pinned = doc.data().pinnedComment;
+            }
+            snapshot.forEach(docSnap => {
+              const data = docSnap.data();
+              if(pinned && docSnap.id === pinned.id) return;
+              const card = createCommentCard(docSnap.id, data);
+              latestCommentsArea.appendChild(card);
+            });
+            if(pinned){
+              const card = createCommentCard(pinned.id, pinned.data, true);
+              latestCommentsArea.prepend(card);
+            }
+          });
+        });
+    }
+    updateLatestComments();
+    function createCommentCard(commentId, data, isPinned = false) {
+      const card = document.createElement("div");
+      card.className = "comment-card";
+      card.innerHTML = `
+             <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
+             <strong>${data.username}</strong>
+             <p>${data.message}</p>
+             <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
+           `;
+      if(document.getElementById('editControls').style.display === "flex"){
+        const pinBtn = document.createElement("button");
+        pinBtn.className = "pin-btn";
+        pinBtn.textContent = "Pin";
+        pinBtn.addEventListener("click", () => {
+          db.collection("settings").doc("global").set({
+            pinnedComment: { id: commentId, data }
+          }, { merge: true }).then(() => {
+            alert("Comment pinned!");
+          }).catch(err => console.error("Error pinning comment:", err));
+        });
+        const delBtn = document.createElement("button");
+        delBtn.className = "admin-btn";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => {
+          db.collection("comments").doc(commentId).delete().then(() => {
+            alert("Comment deleted");
+          }).catch(err => console.error("Error deleting comment:", err));
+        });
+        card.appendChild(pinBtn);
+        card.appendChild(delBtn);
+      }
+      const likeBtn = card.querySelector(".like-btn");
+      likeBtn.addEventListener("click", () => {
+        if(localStorage.getItem("liked_" + commentId)) return;
+        db.collection("settings").doc("global").get().then(doc => {
+          let likesObj = doc.data().likes || {};
+          likesObj[commentId] = (likesObj[commentId] || 0) + 1;
+          db.collection("settings").doc("global").set({
+            likes: likesObj
+          }, { merge: true }).then(() => {
+            localStorage.setItem("liked_" + commentId, "true");
+          }).catch(err => console.error("Error updating like:", err));
+        });
+      });
+      return card;
+    }
+    function togglePostCommentModal() {
+      const modal = document.getElementById('postCommentModal');
+      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+    document.getElementById('openPostComment')?.addEventListener('click', () => {
+      togglePostCommentModal();
+    });
+    const postCommentForm = document.getElementById('postCommentForm');
+    postCommentForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('postUsername').value;
+      let avatar = document.getElementById('postAvatar').value;
+      if (!avatar) {
+        avatar = "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
+      }
+      const message = document.getElementById('postMessage').value;
+      db.collection("comments").add({
+        username,
+        avatar,
+        message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Comment posted!");
+        postCommentForm.reset();
+        togglePostCommentModal();
+      }).catch((error) => {
+        console.error("Error posting comment: ", error);
+        alert("There was an error posting your comment. Please try again.");
+      });
+    });
+    const keySequence = [];
+    const targetSequence = ['w','w','w','e','e','q'];
+    document.addEventListener('keydown', (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if(keySequence.length > targetSequence.length) keySequence.shift();
+      if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
+        document.getElementById('loginModal').style.display = 'flex';
+        keySequence.length = 0;
+      }
+    });
+    document.getElementById('emailSignIn')?.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      auth.signInWithEmailAndPassword(email, password)
+      .then((result) => {
+        if(result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33"){
+          document.getElementById('receiptBox').contentEditable = "true";
+          document.getElementById('editControls').style.display = 'flex';
+          localStorage.setItem("editorMode", "true");
+          alert("Edit mode enabled!");
+        } else {
+          alert("Your account is not authorized for global edits.");
+        }
+        document.getElementById('loginModal').style.display = 'none';
+      })
+      .catch((error) => {
+        console.error("Error during sign-in:", error);
+        alert("Error logging in. Please check your credentials and try again.");
+      });
+    });
+    document.getElementById('saveEdits')?.addEventListener('click', () => {
+      const newVideoURL = document.getElementById('videoURL').value;
+      const newAudioURL = document.getElementById('audioURL').value;
+      const newAvatarURL = document.getElementById('avatarURL').value;
+      const newReceiptURL = document.getElementById('receiptURL').value;
+      const newProfileName = document.getElementById('profileNameInput').value;
+      const newJoinedLine = document.getElementById('joinedLineInput').value;
+      db.collection("settings").doc("global").set({
+        videoURL: newVideoURL || "",
+        audioURL: newAudioURL || "",
+        avatarURL: newAvatarURL || "",
+        receiptURL: newReceiptURL || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
+      }, { merge: true })
+      .then(() => {
+        alert("Globally Saved!");
+        document.getElementById('receiptBox').contentEditable = "false";
+        document.getElementById('editControls').style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Error updating settings:", error);
+      });
+    });
+    // Tilt Effect for Card Container
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer?.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer?.addEventListener('mouseleave', () => {
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
+    // Custom Cursor & Trail for Main Content
+    const cursor = document.getElementById('cursor');
+    let lastMouseX = 0, lastMouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+        const trail = document.createElement('div');
+        trail.style.position = 'fixed';
+        trail.style.top = e.clientY + 'px';
+        trail.style.left = e.clientX + 'px';
+        trail.style.width = '90px';
+        trail.style.height = '90px';
+        trail.style.backgroundImage = "var(--cursorImage)";
+        trail.style.backgroundSize = 'cover';
+        trail.style.pointerEvents = 'none';
+        trail.style.opacity = 'var(--cursorTrailOpacity)';
+        trail.style.transform = 'translate(-50%, -50%)';
+        trail.style.transition = 'opacity 0.5s ease-out';
+        document.body.appendChild(trail);
+        setTimeout(() => {
+          trail.style.opacity = '0';
+          setTimeout(() => { trail.remove(); }, 500);
+        }, 0);
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      }
+    });
   </script>
+  <!-- ---------------- Firebase SDK Scripts ---------------- -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
