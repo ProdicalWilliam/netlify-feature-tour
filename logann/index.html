@@ -9,14 +9,21 @@
   <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
-    /* Hide default cursor everywhere */
+    /* Global styles; note that the default cursor is hidden only on the main (info) page */
     html, body {
-      cursor: none;
       width: 100%;
       height: 100%;
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
+    }
+    /* Allow default cursor on mini-game page */
+    #miniGame {
+      cursor: auto;
+    }
+    /* Hide default cursor on the main content so that our custom crosshair appears */
+    #mainContent {
+      cursor: none;
     }
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
@@ -79,6 +86,7 @@
       max-height: 546px;
       z-index: 2;
       opacity: 1;
+      background: none;  /* No background so video can be seen behind */
     }
     #straw {
       position: absolute;
@@ -99,12 +107,14 @@
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 1500;
+      background: none;
     }
     #fullJuice {
       max-width: 365px;
       max-height: 546px;
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
+      background: none;
     }
     #flash {
       position: fixed;
@@ -163,6 +173,7 @@
       z-index: 1;
       opacity: 1;
       transition: opacity 0.8s ease;
+      background: none;  /* Remove background so video shows */
     }
     #cardContainer {
       position: fixed;
@@ -577,7 +588,7 @@
 
   <!-- ---------------- Main Content Container ---------------- -->
   <div id="mainContent">
-    <!-- Background Video -->
+    <!-- Background Video (no overlay background) -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -645,7 +656,7 @@
     </div>
   </div>
 
-  <!-- Custom Cursor (Crosshair) -->
+  <!-- Custom Cursor (Crosshair) for main page -->
   <div class="cursor" id="cursor"></div>
 
   <!-- Login Modal -->
@@ -811,15 +822,15 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
     const defaultSettings = {
-      videoURL: "",
+      videoURL: "https://cdn.discordapp.com/attachments/1342706156048617504/1357830783703716002/1743802412.124489_ytshorts.savetube.me.mp4?ex=67f1a1f6&is=67f05076&hm=75d362f4d23481031dc96974ace3bed8d057d1304c8fc93da46b819aa25994d9&",
       audioURL: "",
       avatarURL: "",
       joinedLine: "",
-      leagueInfo: "",
+      leagueInfo: "LMFAO",
       profileName: "",
       receiptURL: "",
       viewCounter: "",
-      views: 0
+      views: 37
     };
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
@@ -844,7 +855,7 @@
         document.getElementById('joinedLine').innerText = settings.joinedLine;
         document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
         document.getElementById('viewsText').innerText = settings.views + " views";
-        // If you wish to update other fields (like leagueInfo) into your main content, add it here.
+        // Additional fields like leagueInfo can be updated here if needed.
       });
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
