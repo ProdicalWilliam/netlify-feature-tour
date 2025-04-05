@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
+  <!-- Favicon updated to use the full juice box image without cropping -->
+  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
     :root {
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -28,36 +28,21 @@
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
     }
     /* ---------------- Mini-Game Styles ---------------- */
-    #miniGame {
+    #entryOverlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: var(--overlayBg);
-      z-index: 9999;
-      overflow: hidden;
       display: flex;
-      align-items: center;
       justify-content: center;
-      flex-direction: column;
+      align-items: center;
+      z-index: 1000;
       transition: opacity 0.5s ease;
+      overflow: hidden;
     }
-    .glow-object {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: rgba(138,43,226,0.7);
-      border-radius: 50%;
-      filter: blur(4px);
-      animation: moveDiagonal 5s linear infinite;
-      opacity: 0.6;
-    }
-    @keyframes moveDiagonal {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(200px, 200px); }
-    }
-    /* The mini‑game uses a juice box and a draggable straw. */
+    /* Juice Box (without straw) */
     #juiceBox {
       position: absolute;
       max-width: 365px;
@@ -65,6 +50,7 @@
       z-index: 2;
       opacity: 1;
     }
+    /* Straw with dragging functions */
     #straw {
       position: absolute;
       width: 48px;
@@ -77,7 +63,7 @@
       touch-action: none;
       pointer-events: auto;
     }
-    /* Full Juice Container (revealed after mini‑game) */
+    /* Full Juice Container */
     #fullJuiceContainer {
       display: none;
       position: fixed;
@@ -92,7 +78,7 @@
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
     }
-    /* Flash overlay effect (used at end of mini‑game) */
+    /* Flash overlay effect */
     #flash {
       position: fixed;
       top: 0;
@@ -560,33 +546,21 @@
 </head>
 <body>
   <!-- Mini-Game Overlay -->
-  <div id="miniGame">
-    <!-- Generate glow objects -->
-    <script>
-      for (let i = 0; i < 10; i++) {
-        const glow = document.createElement('div');
-        glow.className = 'glow-object';
-        glow.style.top = Math.random() * 100 + '%';
-        glow.style.left = Math.random() * 100 + '%';
-        glow.style.animationDuration = (3 + Math.random() * 4) + 's';
-        document.getElementById('miniGame').appendChild(glow);
-      }
-    </script>
-    <!-- Juice Box -->
+  <div id="entryOverlay">
+    <!-- Juice Box (without straw) -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-    <!-- Straw -->
+    <!-- Straw with dragging functions -->
     <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
     <p style="color: #fff; z-index:2; position:relative;">Drag the straw over the juice box</p>
   </div>
   <!-- Flash Overlay -->
   <div id="flash"></div>
-  
-  <!-- Full Juice Container (revealed after mini-game) -->
+  <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
     <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
   </div>
   
-  <!-- Main Content Container -->
+  <!-- Main Content Container (next page) -->
   <div id="mainContent">
     <!-- Background Video -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
@@ -655,6 +629,7 @@
       </div>
     </div>
   </div>
+  
   <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
   
@@ -1009,15 +984,15 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: fade out mini-game elements, reveal full juice, then show main content
+        // Successful drop: animate fade-out then reveal full juice, then show main content.
         document.getElementById("juiceBox").style.transition = "opacity 0.5s ease-out";
         strawElement.style.transition = "opacity 0.5s ease-out";
         document.getElementById("juiceBox").style.opacity = "0";
         strawElement.style.opacity = "0";
         setTimeout(() => {
-          document.getElementById("miniGame").style.opacity = "0";
+          document.getElementById("entryOverlay").style.opacity = "0";
           setTimeout(() => {
-            document.getElementById("miniGame").style.display = "none";
+            document.getElementById("entryOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "flex";
             // Resume background video and enable custom cursor
             document.getElementById("bgVideo").play();
