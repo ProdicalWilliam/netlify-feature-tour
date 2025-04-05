@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>logan</title>
+  <title>logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
   <link rel="icon" type="image/png" 
     href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
@@ -52,6 +52,8 @@
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
       --glowColor: #4b0082;
+      --buttonBg: #6a0dad; /* purple style */
+      --buttonHoverBg: #4e007d;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
     }
     /* Flash overlay morph animation */
@@ -234,7 +236,7 @@
       height: 84px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--glowColor); /* glowing outline */
+      border: 2px solid var(--glowColor);
       box-shadow: 0 0 12px 4px var(--glowColor);
     }
     .profile-info { display: flex; flex-direction: column; }
@@ -378,59 +380,27 @@
       padding: 3px 8px;
       margin-top: 3px;
     }
-    #viewAllComments {
-      margin: 10px auto;
+    /* Buttons container for comments controls */
+    .comments-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    /* Styled purple button for "View All" & "Post Comment" */
+    .styled-btn {
       padding: 8px 16px;
-      background: var(--outlineColor);
-      border: none;
-      border-radius: var(--inputRadius);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1em;
-      display: block;
-    }
-    /* --------- Post Comment Modal (info page only) --------- */
-    #postCommentModal {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: var(--containerColor);
-      border: var(--containerBorder);
-      border-radius: var(--containerRadius);
-      padding: 20px;
-      display: none;
-      z-index: 1100;
-      box-shadow: 0 0 20px 4px var(--glowColor);
-      animation: modalGlow 2s infinite alternate;
-    }
-    @keyframes modalGlow {
-      from { box-shadow: 0 0 10px 2px var(--glowColor); }
-      to { box-shadow: 0 0 20px 4px var(--glowColor); }
-    }
-    #postCommentModal input, 
-    #postCommentModal textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 5px;
-      border: var(--inputBorder);
-      border-radius: var(--inputRadius);
-      background: var(--inputBg);
-      color: var(--textColor);
-      font-size: 1em;
-    }
-    #postCommentModal button {
-      padding: 10px 20px;
-      background: var(--outlineColor);
+      background: var(--buttonBg);
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
-      margin: 5px;
+      box-shadow: 0 0 10px 2px var(--glowColor);
     }
-    #postCommentModal button:hover { background: #2a0a5e; }
-    /* --------- Edit Controls (clean, stacked, glowing) --------- */
+    .styled-btn:hover { background: var(--buttonHoverBg); }
+    /* --------- Edit Controls (only visible to authorized users) --------- */
     #editControls {
       display: none;
       margin-top: 20px;
@@ -454,7 +424,7 @@
     #editControls button {
       grid-column: 1 / -1;
       padding: 10px 20px;
-      background: var(--outlineColor);
+      background: var(--buttonBg);
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
@@ -463,13 +433,12 @@
       transition: background 0.3s ease;
       box-shadow: 0 0 20px 4px var(--glowColor);
     }
-    #editControls button:hover { background: #2a0a5e; }
+    #editControls button:hover { background: var(--buttonHoverBg); }
   </style>
 </head>
 <body>
   <!-- ---------------- Mini-Game Container ---------------- -->
   <div id="miniGame">
-    <!-- Generate Glow Objects -->
     <script>
       for (let i = 0; i < 10; i++) {
         const glow = document.createElement('div');
@@ -480,7 +449,6 @@
         document.body.appendChild(glow);
       }
     </script>
-    <!-- Mini-Game Overlay -->
     <div id="entryOverlay">
       <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
       <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
@@ -546,10 +514,15 @@
             </div>
           </div>
           <div class="comments-area" id="latestCommentsArea">
-            <!-- Comments will be injected here -->
+            <!-- Comments injected here -->
           </div>
         </div>
-        <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
+        <!-- Comments buttons container -->
+        <div class="comments-controls">
+          <button id="viewAllComments" class="styled-btn" onclick="window.location.href='allcomments.html'">View All Comments</button>
+          <button id="openPostComment" class="styled-btn">Post Comment</button>
+        </div>
+        <!-- Edit Controls (visible only after successful login) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Profile Name">
           <input type="text" id="joinedLineInput" placeholder="Joined Text">
@@ -559,7 +532,7 @@
           <input type="text" id="receiptURL" placeholder="Receipt Image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
-        <!-- Post Comment Modal and Button (only on info page) -->
+        <!-- Post Comment Modal -->
         <div id="postCommentModal">
           <input type="text" id="commentUsername" placeholder="Username">
           <input type="text" id="commentAvatarURL" placeholder="Avatar URL (optional)">
@@ -567,7 +540,6 @@
           <button id="submitComment">Submit Comment</button>
           <button id="closeCommentModal">Cancel</button>
         </div>
-        <button id="openPostComment">Post Comment</button>
       </div>
     </div>
   </div>
@@ -586,7 +558,6 @@
   </div>
 
   <!-- ---------------- Scripts ---------------- -->
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
@@ -615,12 +586,11 @@
       views: 37
     };
 
-    // Listen for settings changes
+    // Listen for settings changes and update UI
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data() || {};
         const settings = { ...defaultSettings, ...data };
-        // Update Video
         const bgVideo = document.getElementById('bgVideo');
         const videoSource = bgVideo.querySelector('source');
         if (videoSource.src !== settings.videoURL) {
@@ -628,7 +598,6 @@
           bgVideo.load();
           bgVideo.play().catch(err => console.error("Video error:", err));
         }
-        // Update Audio if set
         const bgAudio = document.getElementById('bgAudio');
         if (bgAudio) {
           const audioSource = bgAudio.querySelector('source');
@@ -639,7 +608,6 @@
             bgAudio.play().catch(err => console.error("Audio error:", err));
           }
         }
-        // Update Profile and Receipt
         document.getElementById('avatarImg').src = settings.avatarURL;
         document.getElementById('profileName').innerText = settings.profileName;
         document.getElementById('joinedLine').innerText = settings.joinedLine;
@@ -647,12 +615,11 @@
         document.getElementById('viewsText').innerText = settings.views + " views";
       });
 
-    // Increment view counter
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true }).catch(error => console.error("Error incrementing view:", error));
+    }, { merge: true }).catch(error => console.error("View count error:", error));
 
-    // Update comments
+    // Comments update
     function updateLatestComments() {
       db.collection("comments").orderBy("timestamp", "desc").limit(6)
         .onSnapshot(snapshot => {
@@ -684,7 +651,7 @@
         <p>${data.message}</p>
         <button class="like-btn" data-id="${commentId}">Like ${data.likes || ""}</button>
       `;
-      if (document.getElementById('editControls').style.display === "flex") {
+      if (document.getElementById('editControls').style.display === "grid") {
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
         pinBtn.textContent = "Pin";
@@ -692,14 +659,14 @@
           db.collection("settings").doc("global").set({
             pinnedComment: { id: commentId, data }
           }, { merge: true }).then(() => alert("Comment pinned!"))
-            .catch(err => console.error("Error pinning comment:", err));
+            .catch(err => console.error("Pin error:", err));
         });
         const delBtn = document.createElement("button");
         delBtn.className = "admin-btn";
         delBtn.textContent = "Delete";
         delBtn.addEventListener("click", () => {
           db.collection("comments").doc(commentId).delete().then(() => alert("Comment deleted"))
-            .catch(err => console.error("Error deleting comment:", err));
+            .catch(err => console.error("Delete error:", err));
         });
         card.appendChild(pinBtn);
         card.appendChild(delBtn);
@@ -712,7 +679,7 @@
           likesObj[commentId] = (likesObj[commentId] || 0) + 1;
           db.collection("settings").doc("global").set({ likes: likesObj }, { merge: true })
             .then(() => { localStorage.setItem("liked_" + commentId, "true"); })
-            .catch(err => console.error("Error updating like:", err));
+            .catch(err => console.error("Like error:", err));
         });
       });
       return card;
@@ -735,7 +702,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
           if (result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33") {
-            document.getElementById('receiptBox').contentEditable = "true";
+            // Show edit controls only for authorized user
             document.getElementById('editControls').style.display = 'grid';
             localStorage.setItem("editorMode", "true");
             alert("Edit mode enabled!");
@@ -745,7 +712,7 @@
           document.getElementById('loginModal').style.display = 'none';
         })
         .catch((error) => {
-          console.error("Error during sign-in:", error);
+          console.error("Login error:", error);
           alert("Error logging in. Please check your credentials.");
         });
     });
@@ -767,10 +734,9 @@
       }, { merge: true })
         .then(() => {
           alert("Changes saved!");
-          document.getElementById('receiptBox').contentEditable = "false";
           document.getElementById('editControls').style.display = "none";
         })
-        .catch((error) => { console.error("Error updating settings:", error); });
+        .catch((error) => { console.error("Update error:", error); });
     });
 
     // ---------------- Tilt Effect ----------------
@@ -919,7 +885,6 @@
     openCommentBtn.addEventListener("click", () => {
       postCommentModal.style.display = "block";
     });
-    // Since the close button is inside modal, add event listener if it exists
     if(closeCommentModal){
       closeCommentModal.addEventListener("click", () => {
         postCommentModal.style.display = "none";
