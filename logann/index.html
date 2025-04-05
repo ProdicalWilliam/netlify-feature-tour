@@ -4,27 +4,20 @@
   <meta charset="UTF-8" />
   <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
-  <link rel="icon" type="image/png" 
-    href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
+  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
-    /* Global Styles */
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
-      background: #111;
+      background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      position: relative;
     }
-    /* Disable default cursor on interactive elements */
-    button, input, textarea, a, .profile-card, .comments-controls, .server-embed {
-      cursor: none !important;
-    }
-    /* Custom Cursor */
+    #miniGame { cursor: auto; }
+    #mainContent { cursor: none; background: none; }
     .cursor {
       position: fixed;
       top: 0;
@@ -38,51 +31,58 @@
       transform: translate(-50%, -50%);
       display: none;
     }
-    /* Rain Filter Overlay */
-    .rain {
-      position: absolute;
+    .trail {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background-color: black;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.6;
+      transition: opacity 0.6s ease-out;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    :root {
+      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
+      --containerColor: rgba(0, 0, 0, 0.4);
+      --containerBlur: 12px;
+      --containerBorder: 2px solid #4b0082;
+      --containerRadius: 20px;
+      --containerWidth: 42rem;
+      --containerPadding: 20px 25px;
+      --textColor: #fff;
+      --textSecondary: rgba(255, 255, 255, 0.6);
+      --onlineColor: #00ff00;
+      --outlineColor: #4b0082;
+      --inputBg: rgba(0, 0, 0, 0.4);
+      --inputBorder: 2px solid #4b0082;
+      --inputRadius: 10px;
+      --glowColor: #4b0082;
+      --buttonBg: #6a0dad;
+      --buttonHoverBg: #4e007d;
+      --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
+    }
+    #flash {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      background: white;
+      opacity: 1;
+      z-index: 10000;
       pointer-events: none;
-      z-index: 2000;
-      background: transparent;
-      overflow: hidden;
+      animation: flashMorph 1s forwards;
     }
-    .drop {
-      position: absolute;
-      top: -10%;
-      width: 2px;
-      height: 20px;
-      background: rgba(255,255,255,0.3);
-      animation: fall linear infinite;
-    }
-    @keyframes fall {
-      0% { transform: translateY(0); opacity: 0.8; }
-      100% { transform: translateY(110vh); opacity: 0; }
-    }
-    /* Random floating objects (for login background) */
-    .floating-object {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 50%;
-      animation: floatObj 10s ease-in-out infinite;
-    }
-    @keyframes floatObj {
-      0% { transform: translateY(0) scale(0.8); opacity: 0.8; }
-      50% { transform: translateY(20px) scale(1); opacity: 0.6; }
-      100% { transform: translateY(0) scale(0.8); opacity: 0.8; }
-    }
-    /* ---------------- Mini-Game & Main Page Styles ---------------- */
-    #miniGame, #mainContent {
-      width: 100%;
-      height: 100%;
-      position: relative;
+    @keyframes flashMorph {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
     }
     #miniGame {
-      z-index: 3;
+      position: relative;
+      width: 100%;
+      height: 100%;
     }
     #entryOverlay {
       position: fixed;
@@ -90,7 +90,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
+      background: var(--overlayBg);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -114,7 +114,6 @@
       0% { transform: translate(0, 0); }
       100% { transform: translate(200px, 200px); }
     }
-    /* Juice Box and Straw */
     #juiceBox {
       position: absolute;
       left: 50%;
@@ -154,7 +153,6 @@
       transition: opacity 0.7s ease-in-out;
       background: none;
     }
-    /* Main Content (Info Page) */
     #bgVideo {
       position: fixed;
       top: 0;
@@ -167,6 +165,20 @@
       transition: opacity 1s ease;
     }
     #bgAudio { display: none; }
+    #audioToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.3);
+      border: none;
+      border-radius: 50%;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: background 0.2s;
+    }
+    #audioToggle:hover { background: rgba(255,255,255,0.5); }
+    #audioToggle svg { width: 24px; height: 24px; fill: #fff; }
     #mainContent {
       display: none;
       justify-content: center;
@@ -175,60 +187,28 @@
       height: 100%;
       position: relative;
       z-index: 1;
+      opacity: 0;
+      animation: fadeInInfo 1s forwards 1s;
       background: none;
     }
-    /* Info Card Animation: starts off-screen at the bottom then flies up */
+    @keyframes fadeInInfo {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
     #cardContainer {
       position: fixed;
-      bottom: -100%;
-      left: 50%;
-      transform: translateX(-50%);
-      transition: transform 1s ease-out;
-      opacity: 0;
-      z-index: 1100;
-    }
-    /* When active, slide up and fade in */
-    #cardContainer.active {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-    /* Unfold effect for child elements */
-    .profile-card > * {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: unfold 0.5s forwards;
-    }
-    .profile-card > *:nth-child(1) { animation-delay: 0.2s; }
-    .profile-card > *:nth-child(2) { animation-delay: 0.4s; }
-    .profile-card > *:nth-child(3) { animation-delay: 0.6s; }
-    .profile-card > *:nth-child(4) { animation-delay: 0.8s; }
-    .profile-card > *:nth-child(5) { animation-delay: 1s; }
-    @keyframes unfold {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Profile Card Styles */
-    :root {
-      --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
-      --containerColor: rgba(0, 0, 0, 0.4);
-      --containerBlur: 12px;
-      --containerBorder: 2px solid #4b0082;
-      --containerRadius: 20px;
-      --containerWidth: 42rem;
-      --containerPadding: 20px 25px;
-      --textColor: #fff;
-      --textSecondary: rgba(255, 255, 255, 0.6);
-      --onlineColor: #00ff00;
-      --outlineColor: #4b0082;
-      --inputBg: rgba(0, 0, 0, 0.4);
-      --inputBorder: 2px solid #4b0082;
-      --inputRadius: 10px;
-      --glowColor: #6a0dad;
-      --buttonBg: #6a0dad;
-      --buttonHoverBg: #4e007d;
-      --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
-      /* Login modal custom styles */
-      --loginBg: linear-gradient(135deg, #1a1a1a, #000);
-      --loginGlow: 0 0 20px 5px var(--glowColor);
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
+      transform: rotateX(6.67deg) rotateY(-7.57deg);
+      animation: slideDown 1s ease-out;
     }
     .profile-card {
       width: var(--containerWidth);
@@ -245,43 +225,235 @@
       gap: 20px;
       box-sizing: border-box;
       animation: cardGlow 3s ease-in-out infinite;
+      transition: transform 0.3s ease;
     }
     @keyframes cardGlow {
       0% { box-shadow: 0 0 8px 2px var(--glowColor); }
       50% { box-shadow: 0 0 16px 4px var(--glowColor); }
       100% { box-shadow: 0 0 8px 2px var(--glowColor); }
     }
-    /* ---------------- Login Modal Styles (Clean & Rainy) ---------------- */
-    #loginModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--loginBg);
-      display: none;
-      justify-content: center;
+    .profile-head {
+      display: flex;
       align-items: center;
-      z-index: 3000;
+      gap: 20px;
+    }
+    .profile-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--glowColor);
+      box-shadow: 0 0 12px 4px var(--glowColor);
+    }
+    .profile-info { display: flex; flex-direction: column; }
+    .profile-info h1 {
+      font-weight: 600;
+      font-size: 36px;
+      line-height: 42px;
+      margin: 0;
+    }
+    .joined-line {
+      font-weight: 400;
+      font-size: 13px;
+      margin: 0;
+      color: var(--textSecondary);
+    }
+    #viewCounter {
+      position: fixed;
+      bottom: 12px;
+      left: 15px;
+      z-index: 1000;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #viewCounter svg { width: 1.5em; height: 1.5em; }
+    .server-embed {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .server-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
       overflow: hidden;
     }
-    #loginModal .modal-content {
-      background: rgba(20,20,20,0.9);
-      padding: 30px;
+    .server-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .server-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .server-details h1 { font-weight: 450; font-size: 18px; margin: 0; }
+    .server-stats {
+      font-weight: 450;
+      font-size: 12.5px;
+      color: var(--onlineColor);
+      display: flex;
+      gap: 10px;
+    }
+    .server-stats svg { width: 14px; height: 14px; margin-right: 3px; }
+    .server-details a {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 450;
+      font-size: 12px;
+      color: #fff;
+      text-decoration: none;
+      margin-top: 2px;
+      transition: background 0.3s ease;
+    }
+    .server-details a:hover { background: rgba(255,255,255,0.3); }
+    .receipt-box {
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
-      box-shadow: var(--loginGlow);
-      width: 300px;
+      background: var(--containerColor);
+      padding: 10px;
+      max-width: 300px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .receipt-box img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    .comment-card {
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      width: 45%;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .comment-card img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .comment-card p {
+      color: #fff;
+      font-size: 0.9em;
       text-align: center;
-      position: relative;
-      z-index: 3100;
-      animation: fadeIn 0.5s ease-out;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    .like-btn {
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
     }
-    #loginModal input {
+    .admin-btn {
+      background: red;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    .pin-btn {
+      background: orange;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    .comments-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .styled-btn {
+      padding: 8px 16px;
+      background: var(--buttonBg);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      box-shadow: 0 0 10px 2px var(--glowColor);
+    }
+    .styled-btn:hover { background: var(--buttonHoverBg); }
+    #editControls {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      background: var(--containerColor);
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    #editControls input {
+      padding: 10px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #editControls button {
+      grid-column: 1 / -1;
+      padding: 10px 20px;
+      background: var(--buttonBg);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+    }
+    #editControls button:hover { background: var(--buttonHoverBg); }
+    #postCommentModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px 20px;
+      display: none;
+      z-index: 1100;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+    }
+    #postCommentModal input, 
+    #postCommentModal textarea {
       width: 90%;
       padding: 10px;
       margin: 10px auto;
@@ -291,37 +463,59 @@
       background: var(--inputBg);
       color: var(--textColor);
       font-size: 1em;
+      box-sizing: border-box;
     }
-    #loginModal button {
-      width: 90%;
-      padding: 10px;
-      margin: 10px auto;
-      display: block;
+    #postCommentModal button {
+      padding: 10px 20px;
       background: var(--buttonBg);
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
+      cursor: pointer;
       font-size: 1em;
-      box-shadow: 0 0 10px 2px var(--glowColor);
       transition: background 0.3s ease;
+      margin: 10px auto;
+      display: block;
+      box-shadow: 0 0 10px 2px var(--glowColor);
     }
-    #loginModal button:hover { background: var(--buttonHoverBg); }
+    #postCommentModal button:hover { background: var(--buttonHoverBg); }
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a, #000);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+    #loginModal .modal-content {
+      background: rgba(20,20,20,0.9);
+      padding: 20px;
+      border: 2px solid #4b0082;
+      border-radius: 20px;
+      box-shadow: 0 0 20px 5px #4b0082;
+      width: 300px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
-  <!-- ---------------- Background Floating Objects ---------------- -->
   <div id="floatingContainer">
-    <!-- Generate a few random objects -->
     <div class="floating-object" style="width: 30px; height: 30px; top: 10%; left: 15%; animation-duration: 8s;"></div>
     <div class="floating-object" style="width: 20px; height: 20px; top: 40%; left: 70%; animation-duration: 12s;"></div>
     <div class="floating-object" style="width: 25px; height: 25px; top: 70%; left: 30%; animation-duration: 10s;"></div>
     <div class="floating-object" style="width: 35px; height: 35px; top: 20%; left: 80%; animation-duration: 9s;"></div>
   </div>
-  
-  <!-- ---------------- Rain Effect Overlay ---------------- -->
   <div class="rain" id="rainContainer"></div>
   <script>
-    // Create multiple raindrops for heavy rain effect
     const rainContainer = document.getElementById('rainContainer');
     const numDrops = 100;
     for (let i = 0; i < numDrops; i++) {
@@ -333,11 +527,8 @@
       rainContainer.appendChild(drop);
     }
   </script>
-  
-  <!-- ---------------- Mini-Game Container ---------------- -->
   <div id="miniGame">
     <script>
-      // Create moving glow objects for mini-game background
       for (let i = 0; i < 10; i++) {
         const glow = document.createElement('div');
         glow.className = 'glow-object';
@@ -356,8 +547,6 @@
       <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
     </div>
   </div>
-
-  <!-- ---------------- Main Content Container (Info Page) ---------------- -->
   <div id="mainContent">
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
@@ -436,11 +625,7 @@
       </div>
     </div>
   </div>
-  
-  <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
-
-  <!-- ---------------- Login Modal ---------------- -->
   <div id="loginModal">
     <div class="modal-content">
       <h2>Login</h2>
@@ -449,13 +634,10 @@
       <button id="emailSignIn">Sign In</button>
     </div>
   </div>
-
-  <!-- ---------------- Scripts ---------------- -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
   <script>
-    // Firebase Configuration & Initialization
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -468,7 +650,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-    
     const defaultSettings = {
       videoURL: "https://cdn.discordapp.com/attachments/1342706156048617504/1357830783703716002/1743802412.124489_ytshorts.savetube.me.mp4?ex=67f1a1f6&is=67f05076&hm=75d362f4d23481031dc96974ace3bed8d057d1304c8fc93da46b819aa25994d9&",
       audioURL: "",
@@ -478,8 +659,6 @@
       receiptURL: "",
       views: 37
     };
-    
-    // Listen for settings changes and update UI
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data() || {};
@@ -506,12 +685,9 @@
         document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
         document.getElementById('viewsText').innerText = settings.views + " views";
       });
-    
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => console.error("View count error:", error));
-    
-    // Login Key Sequence to display login modal (www-eeq)
     const targetSequence = ['w','w','w','e','e','q'];
     let keySequence = [];
     document.addEventListener('keydown', (e) => {
@@ -521,7 +697,6 @@
         document.getElementById('loginModal').style.display = 'flex';
       }
     });
-    
     document.getElementById('emailSignIn')?.addEventListener('click', () => {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -541,7 +716,6 @@
           alert("Error logging in. Please check your credentials.");
         });
     });
-    
     document.getElementById('saveEdits')?.addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
       const newAudioURL = document.getElementById('audioURL').value;
@@ -563,8 +737,6 @@
         })
         .catch((error) => { console.error("Update error:", error); });
     });
-    
-    // Tilt Effect for Card Container
     const cardContainer = document.getElementById('cardContainer');
     cardContainer?.addEventListener('mousemove', (e) => {
       const rect = cardContainer.getBoundingClientRect();
@@ -580,8 +752,6 @@
     cardContainer?.addEventListener('mouseleave', () => {
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
-    
-    // Custom Cursor Logic
     function enableCustomCursor() {
       const customCursor = document.getElementById("cursor");
       customCursor.style.display = "block";
@@ -600,8 +770,6 @@
       });
     }
     function showMainCursor() { enableCustomCursor(); }
-    
-    // Mini-Game Transition: Upon finishing the juice animation, transition to main content and animate info card
     function finishMiniGame() {
       const bgAudio = document.getElementById("bgAudio");
       if (bgAudio) bgAudio.pause();
@@ -627,15 +795,11 @@
                 bgAudio.play().catch(err => console.error("Audio error:", err));
               }
               showMainCursor();
-              // Animate the info card: add active class to slide it up
-              setTimeout(() => { cardContainer.classList.add("active"); }, 300);
             }, 700);
           }, 1500);
         }, 500);
       }, 500);
     }
-    
-    // Straw Dragging Logic
     let isStrawDragging = false;
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
@@ -687,8 +851,6 @@
         finishMiniGame();
       }
     }
-    
-    // Typewriter Effect for Title
     async function typewriteTitle() {
       const text = "logann";
       while (true) {
@@ -700,13 +862,10 @@
       }
     }
     typewriteTitle();
-    
-    // Post Comment Modal Logic
     const openCommentBtn = document.getElementById("openPostComment");
     const postCommentModal = document.getElementById("postCommentModal");
     const closeCommentModal = document.getElementById("closeCommentModal");
     const submitCommentBtn = document.getElementById("submitComment");
-    
     openCommentBtn.addEventListener("click", () => {
       postCommentModal.style.display = "block";
     });
