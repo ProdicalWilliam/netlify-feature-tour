@@ -624,7 +624,8 @@
           </div>
         </div>
         <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
-        <div id="editControls">
+        <!-- Edit Controls are only visible when in editor mode -->
+        <div id="editControls" style="display:none;">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
           <input type="text" id="videoURL" placeholder="Enter new video URL">
@@ -715,7 +716,6 @@
         if (bgAudio) {
           const audioSource = bgAudio.querySelector('source');
           if (settings.audioURL && audioSource.src !== settings.audioURL) {
-            // Pause and reset before updating the source
             bgAudio.pause();
             audioSource.src = settings.audioURL;
             bgAudio.load();
@@ -806,18 +806,17 @@
       return card;
     }
 
-    // ---------------- Login Key Sequence (w w w e e q) ----------------
-    const targetSequence = ['w','w','w','e','e','q'];
+    // ---------------- Login Key Sequence (w w w e e q u) ----------------
+    // Now the target sequence requires an additional "u"
+    const targetSequence = ['w','w','w','e','e','q','u'];
     let keySequence = [];
     document.addEventListener('keydown', (e) => {
       keySequence.push(e.key.toLowerCase());
-      // Keep only the last n keys
       if (keySequence.length > targetSequence.length) {
         keySequence.shift();
       }
       if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
         document.getElementById('loginModal').style.display = 'flex';
-        // Note: keySequence is not cleared so that the listener remains active
       }
     });
 
@@ -1038,9 +1037,10 @@
     });
 
     submitCommentBtn.addEventListener("click", () => {
-      // Check if the user has already posted a comment using localStorage
-      if (localStorage.getItem("hasCommented")) {
-        alert("You have already posted a comment from this browser.");
+      // Retrieve current comment count (default to 0)
+      let commentCount = parseInt(localStorage.getItem("commentCount") || "0", 10);
+      if (commentCount >= 6) {
+        alert("You have reached the maximum of 6 comments from this browser.");
         return;
       }
       const username = document.getElementById("commentUsername").value.trim();
@@ -1059,7 +1059,8 @@
         likes: 0
       }).then(() => {
         alert("Comment posted successfully!");
-        localStorage.setItem("hasCommented", "true");
+        commentCount++;
+        localStorage.setItem("commentCount", commentCount);
         postCommentModal.style.display = "none";
         // Optionally, clear fields after posting:
         document.getElementById("commentUsername").value = "";
