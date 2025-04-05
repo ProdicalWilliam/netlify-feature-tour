@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>logann</title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
@@ -139,7 +139,6 @@
       position: absolute;
       width: 48px;
       height: 131px;
-      /* Placed offset from the juice box */
       left: calc(50% + 200px);
       top: calc(50% - 50px);
       user-select: none;
@@ -461,21 +460,26 @@
       background: var(--containerColor);
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
-      padding: 20px;
+      padding: 30px 20px;
       display: none;
       z-index: 1100;
       box-shadow: 0 0 20px 4px var(--glowColor);
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
     }
     #postCommentModal input, 
     #postCommentModal textarea {
-      width: 100%;
+      width: 90%;
       padding: 10px;
-      margin: 10px 5px;
+      margin: 10px auto;
+      display: block;
       border: var(--inputBorder);
       border-radius: var(--inputRadius);
       background: var(--inputBg);
       color: var(--textColor);
       font-size: 1em;
+      box-sizing: border-box;
     }
     #postCommentModal button {
       padding: 10px 20px;
@@ -486,7 +490,8 @@
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
-      margin: 5px;
+      margin: 10px auto;
+      display: block;
       box-shadow: 0 0 10px 2px var(--glowColor);
     }
     #postCommentModal button:hover { background: var(--buttonHoverBg); }
@@ -569,9 +574,8 @@
               <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
             </div>
           </div>
-          <div class="comments-area" id="latestCommentsArea">
-            <!-- Comments injected here -->
-          </div>
+          <!-- Comment area starts empty -->
+          <div class="comments-area" id="latestCommentsArea"></div>
         </div>
         <!-- Comments buttons container -->
         <div class="comments-controls">
@@ -605,11 +609,11 @@
 
   <!-- Login Modal -->
   <div id="loginModal">
-    <div class="modal-content">
+    <div class="modal-content" style="margin: auto; padding: 20px; background: var(--containerColor); border: var(--containerBorder); border-radius: var(--containerRadius); width: 300px; text-align: center;">
       <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button id="emailSignIn">Sign In</button>
+      <input type="email" id="loginEmail" placeholder="Email" style="width:90%; margin: 10px auto; display:block;">
+      <input type="password" id="loginPassword" placeholder="Password" style="width:90%; margin: 10px auto; display:block;">
+      <button id="emailSignIn" style="margin: 10px auto; display:block;">Sign In</button>
     </div>
   </div>
 
@@ -661,7 +665,7 @@
             bgAudio.pause();
             audioSource.src = settings.audioURL;
             bgAudio.load();
-            // Only play audio if not in mini game; it will be started after mini game finishes.
+            // Audio will start only after mini-game finishes.
           }
         }
         document.getElementById('avatarImg').src = settings.avatarURL;
@@ -675,82 +679,10 @@
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => console.error("View count error:", error));
 
-    // Comments update
-    function updateLatestComments() {
-      db.collection("comments").orderBy("timestamp", "desc").limit(6)
-        .onSnapshot(snapshot => {
-          const latestCommentsArea = document.getElementById('latestCommentsArea');
-          latestCommentsArea.innerHTML = "";
-          db.collection("settings").doc("global").get().then(doc => {
-            let pinned = doc.exists && doc.data().pinnedComment ? doc.data().pinnedComment : null;
-            snapshot.forEach(docSnap => {
-              const data = docSnap.data();
-              if (pinned && docSnap.id === pinned.id) return;
-              const card = createCommentCard(docSnap.id, data);
-              latestCommentsArea.appendChild(card);
-            });
-            if (pinned) {
-              const card = createCommentCard(pinned.id, pinned.data, true);
-              latestCommentsArea.prepend(card);
-            }
-          });
-        });
-    }
-    updateLatestComments();
+    // NOTE: Comment fetching has been removed so the page always starts fresh.
 
-    function createCommentCard(commentId, data, isPinned = false) {
-      const card = document.createElement("div");
-      card.className = "comment-card";
-      card.innerHTML = `
-        <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
-        <strong>${data.username}</strong>
-        <p>${data.message}</p>
-        <button class="like-btn" data-id="${commentId}">Like ${data.likes || ""}</button>
-      `;
-      // Show edit controls if enabled
-      if (document.getElementById('editControls').style.display === "grid") {
-        const pinBtn = document.createElement("button");
-        pinBtn.className = "pin-btn";
-        pinBtn.textContent = "Pin";
-        pinBtn.addEventListener("click", () => {
-          db.collection("settings").doc("global").set({
-            pinnedComment: { id: commentId, data }
-          }, { merge: true }).then(() => alert("Comment pinned!"))
-            .catch(err => console.error("Pin error:", err));
-        });
-        const delBtn = document.createElement("button");
-        delBtn.className = "admin-btn";
-        delBtn.textContent = "Delete";
-        delBtn.addEventListener("click", () => {
-          // If this comment is pinned, remove it from settings as well.
-          db.collection("settings").doc("global").get().then(doc => {
-            const globalData = doc.data();
-            if (globalData && globalData.pinnedComment && globalData.pinnedComment.id === commentId) {
-              db.collection("settings").doc("global").update({ pinnedComment: firebase.firestore.FieldValue.delete() });
-            }
-            return db.collection("comments").doc(commentId).delete();
-          }).then(() => alert("Comment deleted"))
-            .catch(err => console.error("Delete error:", err));
-        });
-        card.appendChild(pinBtn);
-        card.appendChild(delBtn);
-      }
-      const likeBtn = card.querySelector(".like-btn");
-      likeBtn.addEventListener("click", () => {
-        if (localStorage.getItem("liked_" + commentId)) return;
-        db.collection("settings").doc("global").get().then(doc => {
-          let likesObj = doc.data().likes || {};
-          likesObj[commentId] = (likesObj[commentId] || 0) + 1;
-          db.collection("settings").doc("global").set({ likes: likesObj }, { merge: true })
-            .then(() => { localStorage.setItem("liked_" + commentId, "true"); })
-            .catch(err => console.error("Like error:", err));
-        });
-      });
-      return card;
-    }
-
-    // ---------------- Login Key Sequence (wwweequ) ----------------
-    const targetSequence = ['w','w','w','e','e','q','u'];
+    // ---------------- Login Key Sequence (w w w e e q) ----------------
+    const targetSequence = ['w','w','w','e','e','q'];
     let keySequence = [];
     document.addEventListener('keydown', (e) => {
       keySequence.push(e.key.toLowerCase());
@@ -827,13 +759,11 @@
       document.addEventListener("mousemove", (e) => {
         customCursor.style.left = e.clientX + "px";
         customCursor.style.top = e.clientY + "px";
-        // Create a trail element with class "trail"
         const trail = document.createElement("div");
         trail.className = "trail";
         trail.style.left = e.clientX + "px";
         trail.style.top = e.clientY + "px";
         document.body.appendChild(trail);
-        // Trigger fade out and then remove after transition
         setTimeout(() => {
           trail.style.opacity = "0";
           setTimeout(() => { trail.remove(); }, 600);
@@ -844,7 +774,6 @@
 
     // ---------------- Mini-Game Transition ----------------
     function finishMiniGame() {
-      // Pause audio during mini game
       const bgAudio = document.getElementById("bgAudio");
       if (bgAudio) bgAudio.pause();
       juiceBox.style.transition = "opacity 0.5s ease-out";
@@ -865,7 +794,6 @@
               document.getElementById("miniGame").style.display = "none";
               document.getElementById("mainContent").style.display = "flex";
               bgVideo.play();
-              // Resume audio if an audio URL exists
               if (bgAudio && bgAudio.querySelector('source').src) {
                 bgAudio.play().catch(err => console.error("Audio error:", err));
               }
