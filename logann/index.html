@@ -66,16 +66,18 @@
       background: url('https://cdn-icons-png.flaticon.com/512/60/60758.png') no-repeat center/contain;
       margin-bottom: 20px;
     }
-    /* Draggable key */
+    /* Draggable key as an image */
     #key {
       position: absolute;
       z-index: 2;
       width: 80px;
       height: 80px;
-      background: url('https://cdn-icons-png.flaticon.com/512/60/60745.png') no-repeat center/contain;
-      cursor: grab;
-      top: 80%;
-      left: 10%;
+      cursor: move;
+    }
+    img[draggable="true"] {
+      cursor: move;
+      /* Optional visual feedback */
+      border: 2px solid #fff;
     }
     /* Flash overlay effect */
     #flash {
@@ -91,7 +93,6 @@
       transition: opacity 0.3s ease;
     }
     /* ---------------- Main Page Styles ---------------- */
-    /* Remove body background so video shows */
     html, body {
       width: 100%;
       height: 100%;
@@ -138,7 +139,7 @@
     }
     /* Main Content Container */
     #mainContent {
-      display: none; /* hidden until mini-game finishes */
+      display: none; /* Hidden until mini-game completes */
       justify-content: center;
       align-items: center;
       width: 100%;
@@ -580,21 +581,21 @@
     </script>
     <!-- Central Lock -->
     <div id="lock"></div>
-    <!-- Draggable Key -->
-    <div id="key" draggable="true"></div>
+    <!-- Draggable Key as an image -->
+    <img id="key" src="https://cdn-icons-png.flaticon.com/512/60/60745.png" alt="Key" draggable="true">
     <p style="color: #fff; z-index:2; position:relative;">Drag the key to the lock</p>
   </div>
   <!-- Flash Overlay -->
   <div id="flash"></div>
   
-  <!-- Main Content Container (initially hidden) -->
+  <!-- Main Content Container (hidden until mini-game finishes) -->
   <div id="mainContent">
     <!-- Background Video -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-    <!-- (Insert full main page content below) -->
+    <!-- Full Main Page Content -->
     <div id="cardContainer">
       <div class="profile-card">
         <div class="profile-head">
@@ -654,10 +655,10 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
-
+  
   <script>
     // Firebase config and initialization
     const firebaseConfig = {
@@ -672,7 +673,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-
+    
     // Default settings so the page displays proper defaults
     const defaultSettings = {
       videoURL: "https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4",
@@ -682,13 +683,13 @@
       joinedLine: "joined 4 months ago",
       receiptURL: "https://via.placeholder.com/300x200?text=Receipt"
     };
-
+    
     // Listen for real-time updates on global settings
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data() || {};
         const settings = { ...defaultSettings, ...data };
-
+        
         // Update background video
         const bgVideo = document.getElementById('bgVideo');
         const videoSource = bgVideo.querySelector('source');
@@ -714,14 +715,14 @@
         const views = settings.views || 0;
         document.getElementById('viewsText').innerText = views + " views";
       });
-
+    
     // Increase view counter on page load
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => {
       console.error("Error incrementing view count:", error);
     });
-
+    
     // Listen for latest 6 comments and update comment cards
     function updateLatestComments() {
       db.collection("comments").orderBy("timestamp", "desc").limit(6)
@@ -747,7 +748,7 @@
         });
     }
     updateLatestComments();
-
+    
     // Create a comment card element
     function createCommentCard(commentId, data, isPinned = false) {
       const card = document.createElement("div");
@@ -795,7 +796,7 @@
       });
       return card;
     }
-
+    
     // Toggle Post Comment Modal
     function togglePostCommentModal() {
       const modal = document.getElementById('postCommentModal');
@@ -804,7 +805,7 @@
     document.getElementById('openPostComment').addEventListener('click', () => {
       togglePostCommentModal();
     });
-
+    
     // Post Comment Form Submission
     const postCommentForm = document.getElementById('postCommentForm');
     postCommentForm.addEventListener('submit', (e) => {
@@ -829,7 +830,7 @@
         alert("There was an error posting your comment. Please try again.");
       });
     });
-
+    
     // Key sequence detection for "wwweeq" to open login modal
     const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
@@ -841,7 +842,7 @@
         keySequence.length = 0;
       }
     });
-
+    
     // Admin Login
     document.getElementById('emailSignIn').addEventListener('click', () => {
       const email = document.getElementById('loginEmail').value;
@@ -863,7 +864,7 @@
           alert("Error logging in. Please check your credentials and try again.");
         });
     });
-
+    
     // Save edits: update global settings
     document.getElementById('saveEdits').addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
@@ -890,7 +891,7 @@
         console.error("Error updating settings:", error);
       });
     });
-
+    
     // Tilt Effect on Card Container
     const cardContainer = document.getElementById('cardContainer');
     cardContainer.addEventListener('mousemove', (e) => {
@@ -907,7 +908,7 @@
     cardContainer.addEventListener('mouseleave', () => {
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
-
+    
     // Custom Cursor & Trail
     const cursor = document.getElementById('cursor');
     let lastMouseX = 0, lastMouseY = 0;
@@ -936,17 +937,19 @@
         lastMouseY = e.clientY;
       }
     });
-
+    
     /* ---------------- Mini-Game JavaScript ---------------- */
     const keyEl = document.getElementById('key');
     const lockEl = document.getElementById('lock');
-
+    
     keyEl.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', 'key');
     });
+    
     lockEl.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
+    
     lockEl.addEventListener('drop', (e) => {
       e.preventDefault();
       const data = e.dataTransfer.getData('text/plain');
@@ -954,6 +957,7 @@
         flashAndFadeOut();
       }
     });
+    
     function flashAndFadeOut() {
       const flashEl = document.getElementById('flash');
       flashEl.style.opacity = 1;
