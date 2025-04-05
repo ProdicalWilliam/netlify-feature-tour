@@ -36,7 +36,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: none;
+      background: #000; /* fallback background */
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -225,10 +225,11 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Lower Section Container inside Profile Card */
+    /* Lower Section: Receipt and Latest Comments */
     .info-lower {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
     }
     .receipt-area {
       flex: 1;
@@ -258,7 +259,7 @@
       height: auto;
       object-fit: contain;
     }
-    /* Comment Card Styles (inside main card) */
+    /* Comment Card Styles */
     .comment-card {
       background: rgba(0,0,0,0.3);
       padding: 10px;
@@ -401,7 +402,7 @@
     #openPostComment:hover {
       background: #2a0a5e;
     }
-    /* Edit Controls (Hidden unless logged in) */
+    /* Edit Controls (for admin) */
     #editControls {
       display: none;
       flex-direction: column;
@@ -577,7 +578,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
           </svg>
-          <span>${0} views</span>
+          <span id="viewsText">0 views</span>
         </div>
         <!-- Server Embed Section (dynamic values) -->
         <div class="server-embed">
@@ -614,7 +615,7 @@
         </div>
         <!-- View All Comments Button -->
         <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
-        <!-- Edit Controls (for admin, if logged in) -->
+        <!-- Edit Controls (for admin) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
@@ -646,38 +647,63 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Increase view counter on every page load
+    // Default settings so the page doesn't turn white if no data is provided
+    const defaultSettings = {
+      videoURL: "https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4",
+      audioURL: "https://example.com/default-audio.mp3",
+      avatarURL: "https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024",
+      profileName: "Logann",
+      joinedLine: "joined 4 months ago",
+      receiptURL: "https://via.placeholder.com/300x200?text=Receipt"
+    };
+
+    // Listen for real-time updates on global settings
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data() || {};
+        const settings = { ...defaultSettings, ...data };
+
+        // Update background video
+        const bgVideo = document.getElementById('bgVideo');
+        const videoSource = bgVideo.querySelector('source');
+        if(videoSource.src !== settings.videoURL){
+          videoSource.src = settings.videoURL;
+          bgVideo.load();
+          bgVideo.play();
+        }
+        // Update background audio
+        const bgAudio = document.getElementById('bgAudio');
+        const audioSource = bgAudio.querySelector('source');
+        if(audioSource.src !== settings.audioURL){
+          audioSource.src = settings.audioURL;
+          bgAudio.load();
+          bgAudio.play();
+        }
+        // Update avatar, profile name, joined line and receipt
+        document.getElementById('avatarImg').src = settings.avatarURL;
+        document.getElementById('profileName').innerText = settings.profileName;
+        document.getElementById('joinedLine').innerText = settings.joinedLine;
+        document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
+        // Update view counter (if likes and views are updated)
+        // Assuming settings.views is updated live
+        const views = settings.views || 0;
+        document.getElementById('viewsText').innerText = views + " views";
+      });
+
+    // Increase view counter on page load
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => {
       console.error("Error incrementing view count:", error);
     });
 
-    // Listen for real-time updates on global settings (for view count and likes)
-    let globalLikes = {}; // Object mapping comment IDs to like counts
-    db.collection("settings").doc("global")
-      .onSnapshot((doc) => {
-        const data = doc.data();
-        if (data) {
-          // Update view counter display
-          const viewCounterElem = document.getElementById('viewCounter');
-          viewCounterElem.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
-            </svg><span>${data.views || 0} views</span>`;
-          // Update global likes object if present
-          if(data.likes){
-            globalLikes = data.likes;
-          }
-        }
-      });
-
-    // Listen for changes in the latest 5 comments and update comment cards
+    // Listen for latest 5 comments and update comment cards
     function updateLatestComments() {
       db.collection("comments").orderBy("timestamp", "desc").limit(5)
         .onSnapshot(snapshot => {
           const latestCommentsArea = document.getElementById('latestCommentsArea');
           latestCommentsArea.innerHTML = "";
-          // If a pinned comment exists in settings, fetch it first.
+          // Check for pinned comment in settings
           db.collection("settings").doc("global").get().then(doc => {
             let pinned = null;
             if(doc.exists && doc.data().pinnedComment){
@@ -685,12 +711,10 @@
             }
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
-              // Skip if this comment is the pinned one (it will be shown separately at the top)
               if(pinned && docSnap.id === pinned.id) return;
               const card = createCommentCard(docSnap.id, data);
               latestCommentsArea.appendChild(card);
             });
-            // If a pinned comment exists, prepend it.
             if(pinned){
               const card = createCommentCard(pinned.id, pinned.data, true);
               latestCommentsArea.prepend(card);
@@ -708,15 +732,13 @@
         <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
         <strong>${data.username}</strong>
         <p>${data.message}</p>
-        <button class="like-btn" data-id="${commentId}">Like ${globalLikes[commentId] ? globalLikes[commentId] : ""}</button>
+        <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
       `;
-      // If in editor mode, add Pin and Delete buttons.
       if(document.getElementById('editControls').style.display === "flex"){
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
         pinBtn.textContent = "Pin";
         pinBtn.addEventListener("click", () => {
-          // Save this comment as the pinned comment in global settings.
           db.collection("settings").doc("global").set({
             pinnedComment: { id: commentId, data }
           }, { merge: true }).then(() => {
@@ -738,21 +760,16 @@
       const likeBtn = card.querySelector(".like-btn");
       likeBtn.addEventListener("click", () => {
         if(localStorage.getItem("liked_" + commentId)) return;
-        // Update global likes in settings
-        const likesUpdate = {};
-        likesUpdate[commentId] = (globalLikes[commentId] || 0) + 1;
-        db.collection("settings").doc("global").update({
-          likes: firebase.firestore.FieldValue.arrayUnion() // Dummy call to trigger update; we then merge object.
-        }).then(() => {
-          // Instead, perform a merge update manually:
+        // Update global likes in settings (using a merge update)
+        db.collection("settings").doc("global").get().then(doc => {
+          let likesObj = doc.data().likes || {};
+          likesObj[commentId] = (likesObj[commentId] || 0) + 1;
           db.collection("settings").doc("global").set({
-            likes: {
-              ...globalLikes,
-              [commentId]: (globalLikes[commentId] || 0) + 1
-            }
-          }, { merge: true });
-          localStorage.setItem("liked_" + commentId, "true");
-        }).catch(err => console.error("Error updating like:", err));
+            likes: likesObj
+          }, { merge: true }).then(() => {
+            localStorage.setItem("liked_" + commentId, "true");
+          }).catch(err => console.error("Error updating like:", err));
+        });
       });
       return card;
     }
@@ -766,7 +783,7 @@
       togglePostCommentModal();
     });
 
-    // Post Comment Form Submission from Modal
+    // Post Comment Form Submission
     const postCommentForm = document.getElementById('postCommentForm');
     postCommentForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -791,7 +808,7 @@
       });
     });
 
-    // Key sequence detection for "w w w e e q" to show login modal
+    // Key sequence detection for "wwweeq" to open login modal
     const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
     document.addEventListener('keydown', (e) => {
@@ -803,7 +820,7 @@
       }
     });
 
-    // Handle Email/Password Sign-In when "Sign in" button is clicked
+    // Admin Login
     document.getElementById('emailSignIn').addEventListener('click', () => {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -812,6 +829,7 @@
           if(result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33"){
             document.getElementById('receiptBox').contentEditable = "true";
             document.getElementById('editControls').style.display = 'flex';
+            localStorage.setItem("editorMode", "true");
             alert("Edit mode enabled!");
           } else {
             alert("Your account is not authorized for global edits.");
@@ -824,7 +842,7 @@
         });
     });
 
-    // Save edits: update page settings in Firestore
+    // Save edits: update global settings
     document.getElementById('saveEdits').addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
       const newAudioURL = document.getElementById('audioURL').value;
