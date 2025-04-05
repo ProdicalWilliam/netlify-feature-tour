@@ -26,17 +26,76 @@
       --glowColor: #4b0082;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
     }
-    /* Global Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      cursor: none;
+    /* ---------------- Mini-Game Styles ---------------- */
+    #miniGame {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Gradient: purple, black, midnight neon */
+      background: linear-gradient(135deg, purple, black, #191970);
+      z-index: 9999;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 1s ease;
     }
+    .glow-object {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(138,43,226,0.7);
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: moveDiagonal 5s linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes moveDiagonal {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(200px, 200px); }
+    }
+    /* Center lock element */
+    #lock {
+      position: relative;
+      z-index: 2;
+      width: 100px;
+      height: 100px;
+      background: url('https://cdn-icons-png.flaticon.com/512/60/60758.png') no-repeat center/contain;
+      margin-bottom: 20px;
+    }
+    /* Draggable key */
+    #key {
+      position: absolute;
+      z-index: 2;
+      width: 80px;
+      height: 80px;
+      background: url('https://cdn-icons-png.flaticon.com/512/60/60745.png') no-repeat center/contain;
+      cursor: grab;
+      top: 80%;
+      left: 10%;
+    }
+    /* Flash overlay effect */
+    #flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 0;
+      z-index: 10000;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    /* ---------------- Main Page Styles ---------------- */
+    /* Remove body background so video shows */
     html, body {
       width: 100%;
       height: 100%;
-      background: none; /* Removed solid black background */
+      background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -79,13 +138,13 @@
     }
     /* Main Content Container */
     #mainContent {
-      display: flex;
+      display: none; /* hidden until mini-game finishes */
       justify-content: center;
       align-items: center;
       width: 100%;
       height: 100%;
       position: relative;
-      z-index: 2;
+      z-index: 1;
       opacity: 1;
       transition: opacity 0.8s ease;
     }
@@ -504,68 +563,40 @@
       background: #2a0a5e;
     }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body>
-  <!-- Background Video -->
-  <video id="bgVideo" autoplay loop playsinline muted preload="auto">
-    <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-  <!-- Background Audio -->
-  <audio id="bgAudio" autoplay loop preload="auto">
-    <source src="https://example.com/default-audio.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
-  <!-- Audio Toggle Button -->
-  <button id="audioToggle" title="Toggle Audio">
-    <svg id="audioIcon" viewBox="0 0 24 24">
-      <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
-      <path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path>
-      <path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>
-    </svg>
-  </button>
-
-  <!-- Login Modal -->
-  <div id="loginModal">
-    <div class="modal-content">
-      <h2>Admin Login</h2>
-      <p>Please sign in to access edit mode.</p>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button id="emailSignIn">Sign in</button>
-    </div>
+  <!-- Mini-Game Overlay -->
+  <div id="miniGame">
+    <!-- Generate several glow objects -->
+    <script>
+      for (let i = 0; i < 10; i++) {
+        const glow = document.createElement('div');
+        glow.className = 'glow-object';
+        glow.style.top = Math.random() * 100 + '%';
+        glow.style.left = Math.random() * 100 + '%';
+        glow.style.animationDuration = (3 + Math.random() * 4) + 's';
+        document.getElementById('miniGame').appendChild(glow);
+      }
+    </script>
+    <!-- Central Lock -->
+    <div id="lock"></div>
+    <!-- Draggable Key -->
+    <div id="key" draggable="true"></div>
+    <p style="color: #fff; z-index:2; position:relative;">Drag the key to the lock</p>
   </div>
-
-  <!-- Post Comment Modal -->
-  <div id="postCommentModal">
-    <div class="modal-content">
-      <h2>Post a Comment</h2>
-      <form id="postCommentForm">
-        <input type="text" id="postUsername" placeholder="Your username" required>
-        <input type="text" id="postAvatar" placeholder="Avatar URL (optional)">
-        <textarea id="postMessage" placeholder="Your comment" required></textarea>
-        <button type="submit">Submit Comment</button>
-      </form>
-      <button onclick="togglePostCommentModal()">Cancel</button>
-    </div>
-  </div>
-
-  <!-- Post Comment Button (fixed bottom right) -->
-  <button id="openPostComment">Post Comment</button>
-
-  <!-- Main Content Container -->
+  <!-- Flash Overlay -->
+  <div id="flash"></div>
+  
+  <!-- Main Content Container (initially hidden) -->
   <div id="mainContent">
-    <!-- Tilt Container -->
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay loop playsinline muted preload="auto">
+      <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <!-- (Insert full main page content below) -->
     <div id="cardContainer">
-      <!-- Profile Card -->
       <div class="profile-card">
-        <!-- Head Section -->
         <div class="profile-head">
           <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
           <div class="profile-info">
@@ -573,14 +604,12 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
-        <!-- Live View Counter -->
         <div id="viewCounter">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
           </svg>
           <span id="viewsText">0 views</span>
         </div>
-        <!-- Server Embed Section -->
         <div class="server-embed">
           <div class="server-icon">
             <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
@@ -602,7 +631,6 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Lower Section: Receipt and Latest Comments -->
         <div class="info-lower">
           <div class="receipt-area">
             <div class="receipt-box" id="receiptBox">
@@ -613,9 +641,7 @@
             <!-- Latest 6 comment cards will be injected here -->
           </div>
         </div>
-        <!-- View All Comments Button -->
         <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
-        <!-- Edit Controls (for admin) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
@@ -669,7 +695,6 @@
         if(videoSource.src !== settings.videoURL){
           videoSource.src = settings.videoURL;
           bgVideo.load();
-          // Attempt to play the video (may be blocked by autoplay policies)
           bgVideo.play().catch(err => console.error("Video playback error:", err));
         }
         // Update background audio
@@ -703,7 +728,6 @@
         .onSnapshot(snapshot => {
           const latestCommentsArea = document.getElementById('latestCommentsArea');
           latestCommentsArea.innerHTML = "";
-          // Fetch pinned comment from settings (if any)
           db.collection("settings").doc("global").get().then(doc => {
             let pinned = null;
             if(doc.exists && doc.data().pinnedComment){
@@ -734,7 +758,6 @@
         <p>${data.message}</p>
         <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
       `;
-      // Always show delete and pin buttons in editor mode on info page
       if(document.getElementById('editControls').style.display === "flex"){
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
@@ -757,7 +780,6 @@
         card.appendChild(pinBtn);
         card.appendChild(delBtn);
       }
-      // Like button handling (one like per browser)
       const likeBtn = card.querySelector(".like-btn");
       likeBtn.addEventListener("click", () => {
         if(localStorage.getItem("liked_" + commentId)) return;
@@ -914,6 +936,36 @@
         lastMouseY = e.clientY;
       }
     });
+
+    /* ---------------- Mini-Game JavaScript ---------------- */
+    const keyEl = document.getElementById('key');
+    const lockEl = document.getElementById('lock');
+
+    keyEl.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', 'key');
+    });
+    lockEl.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+    lockEl.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const data = e.dataTransfer.getData('text/plain');
+      if (data === 'key') {
+        flashAndFadeOut();
+      }
+    });
+    function flashAndFadeOut() {
+      const flashEl = document.getElementById('flash');
+      flashEl.style.opacity = 1;
+      setTimeout(() => {
+        flashEl.style.opacity = 0;
+        document.getElementById('miniGame').style.opacity = 0;
+        setTimeout(() => {
+          document.getElementById('miniGame').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'flex';
+        }, 1000);
+      }, 300);
+    }
   </script>
 </body>
 </html>
