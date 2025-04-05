@@ -36,7 +36,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000; /* fallback background */
+      background: #000;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -77,7 +77,7 @@
       height: 24px;
       fill: #fff;
     }
-    /* Main Content Container (Information Page) */
+    /* Main Content Container */
     #mainContent {
       display: flex;
       justify-content: center;
@@ -152,7 +152,7 @@
       margin: 0;
       color: var(--textSecondary);
     }
-    /* Live View Counter (Fixed Bottom Left) */
+    /* Live View Counter */
     #viewCounter {
       position: fixed;
       bottom: 12px;
@@ -580,7 +580,7 @@
           </svg>
           <span id="viewsText">0 views</span>
         </div>
-        <!-- Server Embed Section (dynamic values) -->
+        <!-- Server Embed Section -->
         <div class="server-embed">
           <div class="server-icon">
             <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
@@ -610,7 +610,7 @@
             </div>
           </div>
           <div class="comments-area" id="latestCommentsArea">
-            <!-- Latest comment cards will be injected here -->
+            <!-- Latest 6 comment cards will be injected here -->
           </div>
         </div>
         <!-- View All Comments Button -->
@@ -647,7 +647,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Default settings so the page doesn't turn white if no data is provided
+    // Default settings so the page displays proper defaults
     const defaultSettings = {
       videoURL: "https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4",
       audioURL: "https://example.com/default-audio.mp3",
@@ -669,7 +669,8 @@
         if(videoSource.src !== settings.videoURL){
           videoSource.src = settings.videoURL;
           bgVideo.load();
-          bgVideo.play();
+          // Note: Some browsers block autoplay even if muted.
+          bgVideo.play().catch(err => console.error("Video playback error:", err));
         }
         // Update background audio
         const bgAudio = document.getElementById('bgAudio');
@@ -684,8 +685,7 @@
         document.getElementById('profileName').innerText = settings.profileName;
         document.getElementById('joinedLine').innerText = settings.joinedLine;
         document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
-        // Update view counter (if likes and views are updated)
-        // Assuming settings.views is updated live
+        // Update view counter display
         const views = settings.views || 0;
         document.getElementById('viewsText').innerText = views + " views";
       });
@@ -697,13 +697,13 @@
       console.error("Error incrementing view count:", error);
     });
 
-    // Listen for latest 5 comments and update comment cards
+    // Listen for latest 6 comments and update comment cards
     function updateLatestComments() {
-      db.collection("comments").orderBy("timestamp", "desc").limit(5)
+      db.collection("comments").orderBy("timestamp", "desc").limit(6)
         .onSnapshot(snapshot => {
           const latestCommentsArea = document.getElementById('latestCommentsArea');
           latestCommentsArea.innerHTML = "";
-          // Check for pinned comment in settings
+          // Fetch pinned comment from settings (if any)
           db.collection("settings").doc("global").get().then(doc => {
             let pinned = null;
             if(doc.exists && doc.data().pinnedComment){
@@ -711,10 +711,12 @@
             }
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
+              // If there's a pinned comment, skip it in the normal list.
               if(pinned && docSnap.id === pinned.id) return;
               const card = createCommentCard(docSnap.id, data);
               latestCommentsArea.appendChild(card);
             });
+            // If a pinned comment exists, prepend it.
             if(pinned){
               const card = createCommentCard(pinned.id, pinned.data, true);
               latestCommentsArea.prepend(card);
@@ -734,6 +736,7 @@
         <p>${data.message}</p>
         <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
       `;
+      // Always show delete button in editor mode (for latest comments on info page)
       if(document.getElementById('editControls').style.display === "flex"){
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
@@ -756,11 +759,10 @@
         card.appendChild(pinBtn);
         card.appendChild(delBtn);
       }
-      // Like button handling (1 like per browser)
+      // Like button (one like per browser)
       const likeBtn = card.querySelector(".like-btn");
       likeBtn.addEventListener("click", () => {
         if(localStorage.getItem("liked_" + commentId)) return;
-        // Update global likes in settings (using a merge update)
         db.collection("settings").doc("global").get().then(doc => {
           let likesObj = doc.data().likes || {};
           likesObj[commentId] = (likesObj[commentId] || 0) + 1;
