@@ -65,18 +65,19 @@
       background: url('https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546') no-repeat center/contain;
       margin-bottom: 20px;
     }
-    /* Lowered Key */
+    /* Draggable Straw (Key) as a div */
     #key {
       position: absolute;
       z-index: 2;
-      width: 80px;
-      height: 80px;
-      top: 75%;  /* Lower the key within the miniGame container */
+      width: 40px;
+      height: 120px;
+      top: 75%;  /* Adjust vertical positioning as needed */
       cursor: move;
+      background: url('https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131') no-repeat center/contain;
     }
+    /* Remove border from draggable elements */
     img[draggable="true"] {
-      cursor: move;
-      border: 2px solid #fff;
+      border: none;
     }
     /* Flash overlay effect */
     #flash {
@@ -572,9 +573,8 @@
     </script>
     <!-- Central Lock -->
     <div id="lock" ondragover="event.preventDefault()"></div>
-    <!-- Draggable Key -->
-    <img id="key" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131" alt="Key" draggable="true">
-    <p style="color: #fff; z-index:2; position:relative;">Drag the key to the lock</p>
+    <!-- Draggable Straw (Key) Element -->
+    <div id="key" draggable="true"></div>
   </div>
   <!-- Flash Overlay -->
   <div id="flash"></div>
@@ -625,7 +625,7 @@
         </div>
         <div class="info-lower">
           <div class="receipt-area">
-            <div class="receipt-box" id="receiptBox">
+            <div class="receipt-box" id="receiptBox" style="max-width: 400px;">
               <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
             </div>
           </div>
@@ -936,6 +936,8 @@
     keyEl.addEventListener('dragstart', (e) => {
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData('text/plain', 'key');
+      // Optionally, set a custom drag image:
+      // e.dataTransfer.setDragImage(keyEl, keyEl.offsetWidth/2, keyEl.offsetHeight/2);
     });
     
     // The lock element must allow dropping by preventing the default behavior.
