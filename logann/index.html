@@ -7,23 +7,41 @@
   <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
   <!-- Favicon updated to use the full juice box image without cropping -->
-  <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
+  <link rel="icon" type="image/png" 
+    href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
+  
   <style>
-    /* Global styles; note that the default cursor is hidden only on the main (info) page */
+    /* Global Styles */
     html, body {
       width: 100%;
       height: 100%;
+      margin: 0;
+      padding: 0;
       background: none;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
-    /* Allow default cursor on mini-game page */
+    /* Mini-Game uses the system cursor; Info page hides default cursor */
     #miniGame {
       cursor: auto;
     }
-    /* Hide default cursor on the main content so that our custom crosshair appears */
     #mainContent {
       cursor: none;
+      background: none;
+    }
+    /* Custom Crosshair (for main info page) */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 90px;
+      height: 90px;
+      pointer-events: none;
+      z-index: 10000;
+      background-image: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
+      background-size: cover;
+      transform: translate(-50%, -50%);
+      display: none; /* Only shown on info page */
     }
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
@@ -38,7 +56,6 @@
       --onlineColor: #00ff00;
       --outlineColor: #4b0082;
       --cursorTrailOpacity: 0.6;
-      --cursorImage: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
       --inputBg: rgba(0, 0, 0, 0.4);
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
@@ -66,6 +83,8 @@
       transition: opacity 0.5s ease;
       overflow: hidden;
     }
+    /* Remove instructional text on mini-game */
+    #entryOverlay p { display: none; }
     .glow-object {
       position: absolute;
       width: 20px;
@@ -86,7 +105,7 @@
       max-height: 546px;
       z-index: 2;
       opacity: 1;
-      background: none;  /* No background so video can be seen behind */
+      background: none;
     }
     #straw {
       position: absolute;
@@ -173,7 +192,7 @@
       z-index: 1;
       opacity: 1;
       transition: opacity 0.8s ease;
-      background: none;  /* Remove background so video shows */
+      background: none;
     }
     #cardContainer {
       position: fixed;
@@ -491,69 +510,6 @@
     #editControls button:hover {
       background: #2a0a5e;
     }
-    /* Custom Cursor (Crosshair) */
-    .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 90px;
-      height: 90px;
-      pointer-events: none;
-      z-index: 10000;
-      background-image: var(--cursorImage);
-      background-size: cover;
-      transform: translate(-50%, -50%);
-    }
-    /* Login Modal Styles */
-    #loginModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #loginModal .modal-content {
-      background: var(--containerColor);
-      border: var(--containerBorder);
-      border-radius: var(--containerRadius);
-      padding: 30px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      color: var(--textColor);
-      font-size: 1.1em;
-      box-shadow: 0 0 20px 4px var(--glowColor);
-      animation: modalGlow 2s infinite alternate;
-    }
-    #loginModal input {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border: var(--inputBorder);
-      border-radius: var(--inputRadius);
-      background: var(--inputBg);
-      color: var(--textColor);
-      font-size: 1em;
-    }
-    #loginModal button {
-      padding: 10px 20px;
-      background: var(--outlineColor);
-      border: none;
-      border-radius: var(--inputRadius);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s ease;
-      margin-top: 15px;
-    }
-    #loginModal button:hover {
-      background: #2a0a5e;
-    }
   </style>
 </head>
 <body>
@@ -570,13 +526,12 @@
         document.body.appendChild(glow);
       }
     </script>
-    <!-- Mini-Game Overlay -->
+    <!-- Mini-Game Overlay (no text displayed) -->
     <div id="entryOverlay">
-      <!-- Juice Box (without straw) -->
+      <!-- Juice Box -->
       <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-      <!-- Straw with dragging functions -->
+      <!-- Straw -->
       <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
-      <p style="color: #fff; z-index:2; position:relative;">Drag the straw over the juice box</p>
     </div>
     <!-- Flash Overlay -->
     <div id="flash"></div>
@@ -588,7 +543,7 @@
 
   <!-- ---------------- Main Content Container ---------------- -->
   <div id="mainContent">
-    <!-- Background Video (no overlay background) -->
+    <!-- Background Video with no background overlay -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -605,7 +560,9 @@
         </div>
         <div id="viewCounter">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+            <path fill="currentColor" 
+              d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5">
+            </path>
           </svg>
           <span id="viewsText">0 views</span>
         </div>
@@ -639,7 +596,7 @@
             </div>
           </div>
           <div class="comments-area" id="latestCommentsArea">
-            <!-- Latest comments will be injected here -->
+            <!-- Comments will be injected here -->
           </div>
         </div>
         <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
@@ -656,7 +613,7 @@
     </div>
   </div>
 
-  <!-- Custom Cursor (Crosshair) for main page -->
+  <!-- Custom Cursor for Main Content -->
   <div class="cursor" id="cursor"></div>
 
   <!-- Login Modal -->
@@ -670,13 +627,283 @@
   </div>
 
   <!-- ---------------- Scripts ---------------- -->
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
   <script>
-    // ---------------- Mini-Game Logic (Straw Dragging) ----------------
-    const entryOverlay = document.getElementById("entryOverlay");
-    const juiceBox = document.getElementById("juiceBox");
-    const straw = document.getElementById("straw");
-    const fullJuiceContainer = document.getElementById("fullJuiceContainer");
-    const fullJuice = document.getElementById("fullJuice");
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.firebasestorage.app",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Default settings from Firestore
+    const defaultSettings = {
+      videoURL: "https://cdn.discordapp.com/attachments/1342706156048617504/1357830783703716002/1743802412.124489_ytshorts.savetube.me.mp4?ex=67f1a1f6&is=67f05076&hm=75d362f4d23481031dc96974ace3bed8d057d1304c8fc93da46b819aa25994d9&",
+      audioURL: "",
+      avatarURL: "",
+      joinedLine: "",
+      leagueInfo: "LMFAO",
+      profileName: "",
+      receiptURL: "",
+      viewCounter: "",
+      views: 37
+    };
+
+    // Listen for settings changes and update UI accordingly
+    db.collection("settings").doc("global")
+      .onSnapshot((doc) => {
+        const data = doc.data() || {};
+        const settings = { ...defaultSettings, ...data };
+        const bgVideo = document.getElementById('bgVideo');
+        const videoSource = bgVideo.querySelector('source');
+        if (videoSource.src !== settings.videoURL) {
+          videoSource.src = settings.videoURL;
+          bgVideo.load();
+          bgVideo.play().catch(err => console.error("Video playback error:", err));
+        }
+        const bgAudio = document.getElementById('bgAudio');
+        if (bgAudio) {
+          const audioSource = bgAudio.querySelector('source');
+          if (audioSource && audioSource.src !== settings.audioURL) {
+            audioSource.src = settings.audioURL;
+            bgAudio.load();
+            bgAudio.play();
+          }
+        }
+        document.getElementById('avatarImg').src = settings.avatarURL;
+        document.getElementById('profileName').innerText = settings.profileName;
+        document.getElementById('joinedLine').innerText = settings.joinedLine;
+        document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
+        document.getElementById('viewsText').innerText = settings.views + " views";
+      });
+
+    // Increment view counter
+    db.collection("settings").doc("global").set({
+      views: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true }).catch(error => console.error("Error incrementing view count:", error));
+
+    // Comments update
+    function updateLatestComments() {
+      db.collection("comments").orderBy("timestamp", "desc").limit(6)
+        .onSnapshot(snapshot => {
+          const latestCommentsArea = document.getElementById('latestCommentsArea');
+          latestCommentsArea.innerHTML = "";
+          db.collection("settings").doc("global").get().then(doc => {
+            let pinned = null;
+            if (doc.exists && doc.data().pinnedComment) {
+              pinned = doc.data().pinnedComment;
+            }
+            snapshot.forEach(docSnap => {
+              const data = docSnap.data();
+              if (pinned && docSnap.id === pinned.id) return;
+              const card = createCommentCard(docSnap.id, data);
+              latestCommentsArea.appendChild(card);
+            });
+            if (pinned) {
+              const card = createCommentCard(pinned.id, pinned.data, true);
+              latestCommentsArea.prepend(card);
+            }
+          });
+        });
+    }
+    updateLatestComments();
+
+    function createCommentCard(commentId, data, isPinned = false) {
+      const card = document.createElement("div");
+      card.className = "comment-card";
+      card.innerHTML = `
+        <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
+        <strong>${data.username}</strong>
+        <p>${data.message}</p>
+        <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
+      `;
+      if (document.getElementById('editControls').style.display === "flex") {
+        const pinBtn = document.createElement("button");
+        pinBtn.className = "pin-btn";
+        pinBtn.textContent = "Pin";
+        pinBtn.addEventListener("click", () => {
+          db.collection("settings").doc("global").set({
+            pinnedComment: { id: commentId, data }
+          }, { merge: true }).then(() => alert("Comment pinned!"))
+            .catch(err => console.error("Error pinning comment:", err));
+        });
+        const delBtn = document.createElement("button");
+        delBtn.className = "admin-btn";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => {
+          db.collection("comments").doc(commentId).delete().then(() => alert("Comment deleted"))
+            .catch(err => console.error("Error deleting comment:", err));
+        });
+        card.appendChild(pinBtn);
+        card.appendChild(delBtn);
+      }
+      const likeBtn = card.querySelector(".like-btn");
+      likeBtn.addEventListener("click", () => {
+        if (localStorage.getItem("liked_" + commentId)) return;
+        db.collection("settings").doc("global").get().then(doc => {
+          let likesObj = doc.data().likes || {};
+          likesObj[commentId] = (likesObj[commentId] || 0) + 1;
+          db.collection("settings").doc("global").set({
+            likes: likesObj
+          }, { merge: true }).then(() => {
+            localStorage.setItem("liked_" + commentId, "true");
+          }).catch(err => console.error("Error updating like:", err));
+        });
+      });
+      return card;
+    }
+
+    // ---------------- Login Key Sequence (w w w e e q) ----------------
+    const keySequence = [];
+    const targetSequence = ['w','w','w','e','e','q'];
+    document.addEventListener('keydown', (e) => {
+      keySequence.push(e.key.toLowerCase());
+      if (keySequence.length > targetSequence.length) keySequence.shift();
+      if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
+        document.getElementById('loginModal').style.display = 'flex';
+        keySequence.length = 0;
+      }
+    });
+
+    document.getElementById('emailSignIn')?.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then((result) => {
+          if (result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33") {
+            document.getElementById('receiptBox').contentEditable = "true";
+            document.getElementById('editControls').style.display = 'flex';
+            localStorage.setItem("editorMode", "true");
+            alert("Edit mode enabled!");
+          } else {
+            alert("Your account is not authorized for global edits.");
+          }
+          document.getElementById('loginModal').style.display = 'none';
+        })
+        .catch((error) => {
+          console.error("Error during sign-in:", error);
+          alert("Error logging in. Please check your credentials and try again.");
+        });
+    
+    });
+
+    document.getElementById('saveEdits')?.addEventListener('click', () => {
+      const newVideoURL = document.getElementById('videoURL').value;
+      const newAudioURL = document.getElementById('audioURL').value;
+      const newAvatarURL = document.getElementById('avatarURL').value;
+      const newReceiptURL = document.getElementById('receiptURL').value;
+      const newProfileName = document.getElementById('profileNameInput').value;
+      const newJoinedLine = document.getElementById('joinedLineInput').value;
+      db.collection("settings").doc("global").set({
+        videoURL: newVideoURL || "",
+        audioURL: newAudioURL || "",
+        avatarURL: newAvatarURL || "",
+        receiptURL: newReceiptURL || "",
+        profileName: newProfileName || "",
+        joinedLine: newJoinedLine || ""
+      }, { merge: true })
+        .then(() => {
+          alert("Globally Saved!");
+          document.getElementById('receiptBox').contentEditable = "false";
+          document.getElementById('editControls').style.display = "none";
+        })
+        .catch((error) => {
+          console.error("Error updating settings:", error);
+        });
+    });
+
+    // ---------------- Tilt Effect for Card Container ----------------
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer?.addEventListener('mousemove', (e) => {
+      const rect = cardContainer.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - cardX;
+      const deltaY = e.clientY - cardY;
+      const maxTilt = 6;
+      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
+      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
+      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    cardContainer?.addEventListener('mouseleave', () => {
+      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
+    });
+
+    // ---------------- Custom Cursor Trail for Main Content ----------------
+    function enableCustomCursor() {
+      const customCursor = document.getElementById("cursor");
+      customCursor.style.display = "block";
+      document.addEventListener("mousemove", customCursorHandler);
+    }
+    function customCursorHandler(e) {
+      const customCursor = document.getElementById("cursor");
+      customCursor.style.left = e.clientX + "px";
+      customCursor.style.top = e.clientY + "px";
+      // Create a black trail that fades out
+      const trail = document.createElement("div");
+      trail.style.position = "fixed";
+      trail.style.left = e.clientX + "px";
+      trail.style.top = e.clientY + "px";
+      trail.style.width = "20px";
+      trail.style.height = "20px";
+      trail.style.backgroundColor = "black";
+      trail.style.borderRadius = "50%";
+      trail.style.opacity = "0.6";
+      trail.style.transform = "translate(-50%, -50%)";
+      document.body.appendChild(trail);
+      setTimeout(() => {
+        trail.style.transition = "opacity 0.6s ease-out";
+        trail.style.opacity = "0";
+        setTimeout(() => { trail.remove(); }, 600);
+      }, 20);
+    }
+
+    // Show custom cursor only on main content after mini-game is done
+    function showMainCursor() {
+      enableCustomCursor();
+    }
+
+    // ---------------- Mini-Game Completion: Transition to Main Content ----------------
+    function finishMiniGame() {
+      // Fade out mini-game overlay, show full juice animation, then hide mini-game and display main content
+      juiceBox.style.transition = "opacity 0.5s ease-out";
+      straw.style.transition = "opacity 0.5s ease-out";
+      juiceBox.style.opacity = "0";
+      straw.style.opacity = "0";
+      setTimeout(() => {
+        entryOverlay.style.opacity = "0";
+        setTimeout(() => {
+          entryOverlay.style.display = "none";
+          fullJuiceContainer.style.display = "block";
+          fullJuice.style.opacity = "0";
+          setTimeout(() => {
+            fullJuice.style.opacity = "1";
+          }, 50);
+          setTimeout(() => {
+            fullJuice.style.opacity = "0";
+            setTimeout(() => {
+              fullJuiceContainer.style.display = "none";
+              document.getElementById("miniGame").style.display = "none";
+              document.getElementById("mainContent").style.display = "flex";
+              bgVideo.play();
+              showMainCursor();
+            }, 700);
+          }, 1500);
+        }, 500);
+      }, 500);
+    }
+
+    // ---------------- Mini-Game Straw Dragging Logic ----------------
     let isStrawDragging = false;
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
@@ -732,64 +959,8 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate fade-out then reveal full juice, then show main content.
-        juiceBox.style.transition = "opacity 0.5s ease-out";
-        straw.style.transition = "opacity 0.5s ease-out";
-        juiceBox.style.opacity = "0";
-        straw.style.opacity = "0";
-        setTimeout(() => {
-          entryOverlay.style.opacity = "0";
-          setTimeout(() => {
-            entryOverlay.style.display = "none";
-            fullJuiceContainer.style.display = "block";
-            fullJuice.style.opacity = "0";
-            setTimeout(() => {
-              fullJuice.style.opacity = "1";
-            }, 50);
-            setTimeout(() => {
-              fullJuice.style.opacity = "0";
-              setTimeout(() => {
-                fullJuiceContainer.style.display = "none";
-                // Reveal the main content after the mini-game completes.
-                document.getElementById("miniGame").style.display = "none";
-                document.getElementById("mainContent").style.display = "flex";
-                // Resume background video and enable custom cursor.
-                document.getElementById("bgVideo").play();
-                enableCustomCursor();
-              }, 700);
-            }, 1500);
-          }, 500);
-        }, 500);
+        finishMiniGame();
       }
-    }
-
-    // ---------------- Custom Cursor (Crosshair) with Black Fade Trail ----------------
-    function enableCustomCursor() {
-      const customCursor = document.getElementById("cursor");
-      customCursor.style.display = "block";
-      document.addEventListener("mousemove", customCursorHandler);
-    }
-    function customCursorHandler(e) {
-      const customCursor = document.getElementById("cursor");
-      customCursor.style.left = e.clientX + "px";
-      customCursor.style.top = e.clientY + "px";
-      // Create a black trail that fades out
-      const trail = document.createElement("div");
-      trail.style.position = "fixed";
-      trail.style.left = e.clientX + "px";
-      trail.style.top = e.clientY + "px";
-      trail.style.width = "20px";
-      trail.style.height = "20px";
-      trail.style.backgroundColor = "black";
-      trail.style.borderRadius = "50%";
-      trail.style.opacity = "0.6";
-      trail.style.transform = "translate(-50%, -50%)";
-      document.body.appendChild(trail);
-      setTimeout(() => {
-        trail.style.transition = "opacity 0.6s ease-out";
-        trail.style.opacity = "0";
-        setTimeout(() => { trail.remove(); }, 600);
-      }, 20);
     }
 
     // ---------------- Typewriter Effect for Tab Title ----------------
@@ -808,259 +979,6 @@
     }
     typewriteTitle();
 
-    // ---------------- Firebase Initialization & Updates ----------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
-      authDomain: "github-1ec60.firebaseapp.com",
-      projectId: "github-1ec60",
-      storageBucket: "github-1ec60.firebasestorage.app",
-      messagingSenderId: "370562737308",
-      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
-      measurementId: "G-JDV0KHPD7F"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const defaultSettings = {
-      videoURL: "https://cdn.discordapp.com/attachments/1342706156048617504/1357830783703716002/1743802412.124489_ytshorts.savetube.me.mp4?ex=67f1a1f6&is=67f05076&hm=75d362f4d23481031dc96974ace3bed8d057d1304c8fc93da46b819aa25994d9&",
-      audioURL: "",
-      avatarURL: "",
-      joinedLine: "",
-      leagueInfo: "LMFAO",
-      profileName: "",
-      receiptURL: "",
-      viewCounter: "",
-      views: 37
-    };
-    db.collection("settings").doc("global")
-      .onSnapshot((doc) => {
-        const data = doc.data() || {};
-        const settings = { ...defaultSettings, ...data };
-        const bgVideo = document.getElementById('bgVideo');
-        const videoSource = bgVideo.querySelector('source');
-        if(videoSource.src !== settings.videoURL){
-          videoSource.src = settings.videoURL;
-          bgVideo.load();
-          bgVideo.play().catch(err => console.error("Video playback error:", err));
-        }
-        const bgAudio = document.getElementById('bgAudio');
-        const audioSource = bgAudio ? bgAudio.querySelector('source') : null;
-        if(bgAudio && audioSource && audioSource.src !== settings.audioURL){
-          audioSource.src = settings.audioURL;
-          bgAudio.load();
-          bgAudio.play();
-        }
-        document.getElementById('avatarImg').src = settings.avatarURL;
-        document.getElementById('profileName').innerText = settings.profileName;
-        document.getElementById('joinedLine').innerText = settings.joinedLine;
-        document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
-        document.getElementById('viewsText').innerText = settings.views + " views";
-        // Additional fields like leagueInfo can be updated here if needed.
-      });
-    db.collection("settings").doc("global").set({
-      views: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true }).catch(error => {
-      console.error("Error incrementing view count:", error);
-    });
-    function updateLatestComments() {
-      db.collection("comments").orderBy("timestamp", "desc").limit(6)
-        .onSnapshot(snapshot => {
-          const latestCommentsArea = document.getElementById('latestCommentsArea');
-          latestCommentsArea.innerHTML = "";
-          db.collection("settings").doc("global").get().then(doc => {
-            let pinned = null;
-            if(doc.exists && doc.data().pinnedComment){
-              pinned = doc.data().pinnedComment;
-            }
-            snapshot.forEach(docSnap => {
-              const data = docSnap.data();
-              if(pinned && docSnap.id === pinned.id) return;
-              const card = createCommentCard(docSnap.id, data);
-              latestCommentsArea.appendChild(card);
-            });
-            if(pinned){
-              const card = createCommentCard(pinned.id, pinned.data, true);
-              latestCommentsArea.prepend(card);
-            }
-          });
-        });
-    }
-    updateLatestComments();
-    function createCommentCard(commentId, data, isPinned = false) {
-      const card = document.createElement("div");
-      card.className = "comment-card";
-      card.innerHTML = `
-             <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
-             <strong>${data.username}</strong>
-             <p>${data.message}</p>
-             <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
-           `;
-      if(document.getElementById('editControls').style.display === "flex"){
-        const pinBtn = document.createElement("button");
-        pinBtn.className = "pin-btn";
-        pinBtn.textContent = "Pin";
-        pinBtn.addEventListener("click", () => {
-          db.collection("settings").doc("global").set({
-            pinnedComment: { id: commentId, data }
-          }, { merge: true }).then(() => {
-            alert("Comment pinned!");
-          }).catch(err => console.error("Error pinning comment:", err));
-        });
-        const delBtn = document.createElement("button");
-        delBtn.className = "admin-btn";
-        delBtn.textContent = "Delete";
-        delBtn.addEventListener("click", () => {
-          db.collection("comments").doc(commentId).delete().then(() => {
-            alert("Comment deleted");
-          }).catch(err => console.error("Error deleting comment:", err));
-        });
-        card.appendChild(pinBtn);
-        card.appendChild(delBtn);
-      }
-      const likeBtn = card.querySelector(".like-btn");
-      likeBtn.addEventListener("click", () => {
-        if(localStorage.getItem("liked_" + commentId)) return;
-        db.collection("settings").doc("global").get().then(doc => {
-          let likesObj = doc.data().likes || {};
-          likesObj[commentId] = (likesObj[commentId] || 0) + 1;
-          db.collection("settings").doc("global").set({
-            likes: likesObj
-          }, { merge: true }).then(() => {
-            localStorage.setItem("liked_" + commentId, "true");
-          }).catch(err => console.error("Error updating like:", err));
-        });
-      });
-      return card;
-    }
-    function togglePostCommentModal() {
-      const modal = document.getElementById('postCommentModal');
-      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-    document.getElementById('openPostComment')?.addEventListener('click', () => {
-      togglePostCommentModal();
-    });
-    const postCommentForm = document.getElementById('postCommentForm');
-    postCommentForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('postUsername').value;
-      let avatar = document.getElementById('postAvatar').value;
-      if (!avatar) {
-        avatar = "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
-      }
-      const message = document.getElementById('postMessage').value;
-      db.collection("comments").add({
-        username,
-        avatar,
-        message,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert("Comment posted!");
-        postCommentForm.reset();
-        togglePostCommentModal();
-      }).catch((error) => {
-        console.error("Error posting comment: ", error);
-        alert("There was an error posting your comment. Please try again.");
-      });
-    });
-    // ---------------- Login Key Sequence (w w w e e q) ----------------
-    const keySequence = [];
-    const targetSequence = ['w','w','w','e','e','q'];
-    document.addEventListener('keydown', (e) => {
-      keySequence.push(e.key.toLowerCase());
-      if(keySequence.length > targetSequence.length) keySequence.shift();
-      if(JSON.stringify(keySequence) === JSON.stringify(targetSequence)){
-        document.getElementById('loginModal').style.display = 'flex';
-        keySequence.length = 0;
-      }
-    });
-    document.getElementById('emailSignIn')?.addEventListener('click', () => {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      auth.signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        if(result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33"){
-          document.getElementById('receiptBox').contentEditable = "true";
-          document.getElementById('editControls').style.display = 'flex';
-          localStorage.setItem("editorMode", "true");
-          alert("Edit mode enabled!");
-        } else {
-          alert("Your account is not authorized for global edits.");
-        }
-        document.getElementById('loginModal').style.display = 'none';
-      })
-      .catch((error) => {
-        console.error("Error during sign-in:", error);
-        alert("Error logging in. Please check your credentials and try again.");
-      });
-    });
-    document.getElementById('saveEdits')?.addEventListener('click', () => {
-      const newVideoURL = document.getElementById('videoURL').value;
-      const newAudioURL = document.getElementById('audioURL').value;
-      const newAvatarURL = document.getElementById('avatarURL').value;
-      const newReceiptURL = document.getElementById('receiptURL').value;
-      const newProfileName = document.getElementById('profileNameInput').value;
-      const newJoinedLine = document.getElementById('joinedLineInput').value;
-      db.collection("settings").doc("global").set({
-        videoURL: newVideoURL || "",
-        audioURL: newAudioURL || "",
-        avatarURL: newAvatarURL || "",
-        receiptURL: newReceiptURL || "",
-        profileName: newProfileName || "",
-        joinedLine: newJoinedLine || ""
-      }, { merge: true })
-      .then(() => {
-        alert("Globally Saved!");
-        document.getElementById('receiptBox').contentEditable = "false";
-        document.getElementById('editControls').style.display = "none";
-      })
-      .catch((error) => {
-        console.error("Error updating settings:", error);
-      });
-    });
-    // ---------------- Tilt Effect for Card Container ----------------
-    const cardContainer = document.getElementById('cardContainer');
-    cardContainer?.addEventListener('mousemove', (e) => {
-      const rect = cardContainer.getBoundingClientRect();
-      const cardX = rect.left + rect.width / 2;
-      const cardY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - cardX;
-      const deltaY = e.clientY - cardY;
-      const maxTilt = 6;
-      const rotateY = Math.max(-maxTilt, Math.min(maxTilt, deltaX / (rect.width / 2) * maxTilt));
-      const rotateX = Math.max(-maxTilt, Math.min(maxTilt, -deltaY / (rect.height / 2) * maxTilt));
-      cardContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-    cardContainer?.addEventListener('mouseleave', () => {
-      cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
-    });
-    // ---------------- Custom Cursor Trail for Main Content ----------------
-    let lastMouseX = 0, lastMouseY = 0;
-    document.addEventListener('mousemove', (e) => {
-      if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
-        const trail = document.createElement('div');
-        trail.style.position = 'fixed';
-        trail.style.left = e.clientX + 'px';
-        trail.style.top = e.clientY + 'px';
-        trail.style.width = '20px';
-        trail.style.height = '20px';
-        trail.style.backgroundColor = 'black';
-        trail.style.borderRadius = '50%';
-        trail.style.opacity = '0.6';
-        trail.style.transform = 'translate(-50%, -50%)';
-        trail.style.transition = 'opacity 0.5s ease-out';
-        document.body.appendChild(trail);
-        setTimeout(() => {
-          trail.style.opacity = '0';
-          setTimeout(() => { trail.remove(); }, 500);
-        }, 0);
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-      }
-    });
   </script>
-  <!-- ---------------- Firebase SDK Scripts ---------------- -->
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 </body>
 </html>
