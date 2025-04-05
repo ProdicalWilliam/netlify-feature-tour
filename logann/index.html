@@ -33,7 +33,6 @@
       left: 0;
       width: 100%;
       height: 100%;
-      /* Gradient: purple, black, midnight neon */
       background: linear-gradient(135deg, purple, black, #191970);
       z-index: 9999;
       overflow: hidden;
@@ -57,26 +56,26 @@
       0% { transform: translate(0, 0); }
       100% { transform: translate(200px, 200px); }
     }
-    /* Center lock element with new image URL */
+    /* Enlarged Lock */
     #lock {
       position: relative;
       z-index: 2;
-      width: 100px;
-      height: 100px;
+      width: 200px;
+      height: 200px;
       background: url('https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless&width=365&height=546') no-repeat center/contain;
       margin-bottom: 20px;
     }
-    /* Draggable key as an image with new URL */
+    /* Lowered Key */
     #key {
       position: absolute;
       z-index: 2;
       width: 80px;
       height: 80px;
+      top: 75%;  /* Lower the key within the miniGame container */
       cursor: move;
     }
     img[draggable="true"] {
       cursor: move;
-      /* Optional visual feedback */
       border: 2px solid #fff;
     }
     /* Flash overlay effect */
@@ -113,9 +112,7 @@
       transition: opacity 1s ease;
     }
     /* Background Audio */
-    #bgAudio {
-      display: none;
-    }
+    #bgAudio { display: none; }
     /* Audio Toggle Button */
     #audioToggle {
       position: fixed;
@@ -129,17 +126,11 @@
       z-index: 1001;
       transition: background 0.2s;
     }
-    #audioToggle:hover {
-      background: rgba(255,255,255,0.5);
-    }
-    #audioToggle svg {
-      width: 24px;
-      height: 24px;
-      fill: #fff;
-    }
+    #audioToggle:hover { background: rgba(255,255,255,0.5); }
+    #audioToggle svg { width: 24px; height: 24px; fill: #fff; }
     /* Main Content Container */
     #mainContent {
-      display: none; /* Hidden until mini-game completes */
+      display: none;
       justify-content: center;
       align-items: center;
       width: 100%;
@@ -568,7 +559,7 @@
 <body>
   <!-- Mini-Game Overlay -->
   <div id="miniGame">
-    <!-- Generate several glow objects -->
+    <!-- Generate glow objects -->
     <script>
       for (let i = 0; i < 10; i++) {
         const glow = document.createElement('div');
@@ -580,8 +571,8 @@
       }
     </script>
     <!-- Central Lock -->
-    <div id="lock"></div>
-    <!-- Draggable Key as an image with updated URL -->
+    <div id="lock" ondragover="event.preventDefault()"></div>
+    <!-- Draggable Key -->
     <img id="key" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless&width=48&height=131" alt="Key" draggable="true">
     <p style="color: #fff; z-index:2; position:relative;">Drag the key to the lock</p>
   </div>
@@ -943,10 +934,11 @@
     const lockEl = document.getElementById('lock');
     
     keyEl.addEventListener('dragstart', (e) => {
-      e.dataTransfer.effectAllowed = "move";  // Ensure the effect is allowed
+      e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData('text/plain', 'key');
     });
     
+    // The lock element must allow dropping by preventing the default behavior.
     lockEl.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
