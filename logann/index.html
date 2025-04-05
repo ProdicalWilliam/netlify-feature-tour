@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Logann</title>
+  <title>logan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
-  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
+  <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&=&format=webp&quality=lossless&width=365&height=546" sizes="32x32">
   <link rel="icon" type="image/png" 
     href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
-  
   <style>
     /* Global Styles */
     html, body {
@@ -20,15 +19,10 @@
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
-    /* Mini-Game uses the system cursor; Info page hides default cursor */
-    #miniGame {
-      cursor: auto;
-    }
-    #mainContent {
-      cursor: none;
-      background: none;
-    }
-    /* Custom Crosshair (for main info page) */
+    /* Mini-Game uses system cursor; info page hides default cursor */
+    #miniGame { cursor: auto; }
+    #mainContent { cursor: none; background: none; }
+    /* Custom Crosshair */
     .cursor {
       position: fixed;
       top: 0;
@@ -40,7 +34,7 @@
       background-image: url('https://osuskinner.com/elements/interface/cursor/99/861_thumb_small.png');
       background-size: cover;
       transform: translate(-50%, -50%);
-      display: none; /* Only shown on info page */
+      display: none;
     }
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
@@ -54,12 +48,28 @@
       --textSecondary: rgba(255, 255, 255, 0.6);
       --onlineColor: #00ff00;
       --outlineColor: #4b0082;
-      --cursorTrailOpacity: 0.6;
       --inputBg: rgba(0, 0, 0, 0.4);
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
       --glowColor: #4b0082;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
+    }
+    /* Flash overlay morph animation */
+    #flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 1;
+      z-index: 10000;
+      pointer-events: none;
+      animation: flashMorph 1s forwards;
+    }
+    @keyframes flashMorph {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
     }
     /* ---------------- Mini-Game Styles ---------------- */
     #miniGame {
@@ -82,7 +92,6 @@
       transition: opacity 0.5s ease;
       overflow: hidden;
     }
-    /* Remove instructional text on mini-game */
     #entryOverlay p { display: none; }
     .glow-object {
       position: absolute;
@@ -134,18 +143,6 @@
       transition: opacity 0.7s ease-in-out;
       background: none;
     }
-    #flash {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      opacity: 0;
-      z-index: 10000;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
     /* ---------------- Main Page Styles ---------------- */
     #bgVideo {
       position: fixed;
@@ -158,10 +155,7 @@
       opacity: 1;
       transition: opacity 1s ease;
     }
-    /* Added Audio element (hidden) */
-    #bgAudio {
-      display: none;
-    }
+    #bgAudio { display: none; }
     #audioToggle {
       position: fixed;
       top: 15px;
@@ -174,14 +168,8 @@
       z-index: 1001;
       transition: background 0.2s;
     }
-    #audioToggle:hover {
-      background: rgba(255,255,255,0.5);
-    }
-    #audioToggle svg {
-      width: 24px;
-      height: 24px;
-      fill: #fff;
-    }
+    #audioToggle:hover { background: rgba(255,255,255,0.5); }
+    #audioToggle svg { width: 24px; height: 24px; fill: #fff; }
     #mainContent {
       display: none;
       justify-content: center;
@@ -190,9 +178,18 @@
       height: 100%;
       position: relative;
       z-index: 1;
-      opacity: 1;
-      transition: opacity 0.8s ease;
+      opacity: 0;
+      animation: fadeInInfo 1s forwards 1s; /* wait for flash morph */
       background: none;
+    }
+    @keyframes fadeInInfo {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    /* Slide down animation for card */
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     #cardContainer {
       position: fixed;
@@ -203,6 +200,7 @@
       perspective: 1000px;
       transition: transform 700ms cubic-bezier(0.03, 0.98, 0.52, 0.99);
       transform: rotateX(6.67deg) rotateY(-7.57deg);
+      animation: slideDown 1s ease-out;
     }
     .profile-card {
       width: var(--containerWidth);
@@ -236,12 +234,10 @@
       height: 84px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid rgba(255,255,255,0.2);
+      border: 2px solid var(--glowColor); /* glowing outline */
+      box-shadow: 0 0 12px 4px var(--glowColor);
     }
-    .profile-info {
-      display: flex;
-      flex-direction: column;
-    }
+    .profile-info { display: flex; flex-direction: column; }
     .profile-info h1 {
       font-weight: 600;
       font-size: 36px;
@@ -264,10 +260,7 @@
       align-items: center;
       gap: 5px;
     }
-    #viewCounter svg {
-      width: 1.5em;
-      height: 1.5em;
-    }
+    #viewCounter svg { width: 1.5em; height: 1.5em; }
     .server-embed {
       display: flex;
       align-items: center;
@@ -292,11 +285,7 @@
       flex-direction: column;
       gap: 4px;
     }
-    .server-details h1 {
-      font-weight: 450;
-      font-size: 18px;
-      margin: 0;
-    }
+    .server-details h1 { font-weight: 450; font-size: 18px; margin: 0; }
     .server-stats {
       font-weight: 450;
       font-size: 12.5px;
@@ -304,11 +293,7 @@
       display: flex;
       gap: 10px;
     }
-    .server-stats svg {
-      width: 14px;
-      height: 14px;
-      margin-right: 3px;
-    }
+    .server-stats svg { width: 14px; height: 14px; margin-right: 3px; }
     .server-details a {
       display: inline-block;
       background: rgba(255,255,255,0.2);
@@ -322,9 +307,7 @@
       margin-top: 2px;
       transition: background 0.3s ease;
     }
-    .server-details a:hover {
-      background: rgba(255,255,255,0.3);
-    }
+    .server-details a:hover { background: rgba(255,255,255,0.3); }
     .receipt-box {
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
@@ -406,29 +389,17 @@
       font-size: 1em;
       display: block;
     }
-    /* --------- Post Comment Modal Styles --------- */
+    /* --------- Post Comment Modal (info page only) --------- */
     #postCommentModal {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #postCommentModal .modal-content {
+      bottom: 30px;
+      right: 30px;
       background: var(--containerColor);
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
-      padding: 30px;
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-      color: var(--textColor);
-      font-size: 1.1em;
+      padding: 20px;
+      display: none;
+      z-index: 1100;
       box-shadow: 0 0 20px 4px var(--glowColor);
       animation: modalGlow 2s infinite alternate;
     }
@@ -438,9 +409,9 @@
     }
     #postCommentModal input, 
     #postCommentModal textarea {
-      width: 90%;
+      width: 100%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 10px 5px;
       border: var(--inputBorder);
       border-radius: var(--inputRadius);
       background: var(--inputBg);
@@ -456,66 +427,32 @@
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
-      margin-top: 15px;
+      margin: 5px;
     }
-    #postCommentModal button:hover {
-      background: #2a0a5e;
-    }
-    /* --------- Open Comment Button --------- */
-    #openPostComment {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1100;
-      background: var(--outlineColor);
-      color: #fff;
-      border: none;
-      border-radius: var(--inputRadius);
-      padding: 10px 15px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s ease;
-    }
-    #openPostComment:hover {
-      background: #2a0a5e;
-    }
-    /* --------- Login Modal Styles (existing) --------- */
-    #loginModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
+    #postCommentModal button:hover { background: #2a0a5e; }
+    /* --------- Edit Controls (clean, stacked, glowing) --------- */
+    #editControls {
       display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #loginModal .modal-content {
-      background: var(--containerColor);
+      margin-top: 20px;
+      padding: 15px;
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
-      padding: 30px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      color: var(--textColor);
-      font-size: 1.1em;
+      background: var(--containerColor);
       box-shadow: 0 0 20px 4px var(--glowColor);
-      animation: modalGlow 2s infinite alternate;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
     }
-    #loginModal input {
-      width: 90%;
+    #editControls input {
       padding: 10px;
-      margin: 10px 0;
       border: var(--inputBorder);
       border-radius: var(--inputRadius);
       background: var(--inputBg);
       color: var(--textColor);
       font-size: 1em;
     }
-    #loginModal button {
+    #editControls button {
+      grid-column: 1 / -1;
       padding: 10px 20px;
       background: var(--outlineColor);
       border: none;
@@ -524,11 +461,9 @@
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
-      margin-top: 15px;
+      box-shadow: 0 0 20px 4px var(--glowColor);
     }
-    #loginModal button:hover {
-      background: #2a0a5e;
-    }
+    #editControls button:hover { background: #2a0a5e; }
   </style>
 </head>
 <body>
@@ -545,34 +480,27 @@
         document.body.appendChild(glow);
       }
     </script>
-    <!-- Mini-Game Overlay (no text displayed) -->
+    <!-- Mini-Game Overlay -->
     <div id="entryOverlay">
-      <!-- Juice Box -->
       <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-      <!-- Straw -->
       <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
     </div>
-    <!-- Flash Overlay -->
     <div id="flash"></div>
-    <!-- Full Juice Container -->
     <div id="fullJuiceContainer">
       <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
     </div>
   </div>
 
-  <!-- ---------------- Main Content Container ---------------- -->
+  <!-- ---------------- Main Content Container (Info Page) ---------------- -->
   <div id="mainContent">
-    <!-- Background Video -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-    <!-- Hidden Background Audio -->
     <audio id="bgAudio" loop>
       <source src="" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
-    <!-- Content: Profile Card, Server Embed, etc. -->
     <div id="cardContainer">
       <div class="profile-card">
         <div class="profile-head">
@@ -584,9 +512,7 @@
         </div>
         <div id="viewCounter">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="currentColor" 
-              d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5">
-            </path>
+            <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
           </svg>
           <span id="viewsText">0 views</span>
         </div>
@@ -624,21 +550,29 @@
           </div>
         </div>
         <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
-        <!-- Edit Controls are only visible when in editor mode -->
-        <div id="editControls" style="display:none;">
-          <input type="text" id="profileNameInput" placeholder="Enter new profile name">
-          <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
-          <input type="text" id="videoURL" placeholder="Enter new video URL">
-          <input type="text" id="audioURL" placeholder="Enter new audio URL">
-          <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
-          <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
+        <div id="editControls">
+          <input type="text" id="profileNameInput" placeholder="Profile Name">
+          <input type="text" id="joinedLineInput" placeholder="Joined Text">
+          <input type="text" id="videoURL" placeholder="Video URL">
+          <input type="text" id="audioURL" placeholder="Audio URL">
+          <input type="text" id="avatarURL" placeholder="Avatar URL">
+          <input type="text" id="receiptURL" placeholder="Receipt Image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
+        <!-- Post Comment Modal and Button (only on info page) -->
+        <div id="postCommentModal">
+          <input type="text" id="commentUsername" placeholder="Username">
+          <input type="text" id="commentAvatarURL" placeholder="Avatar URL (optional)">
+          <textarea id="commentMessage" placeholder="Your comment"></textarea>
+          <button id="submitComment">Submit Comment</button>
+          <button id="closeCommentModal">Cancel</button>
+        </div>
+        <button id="openPostComment">Post Comment</button>
       </div>
     </div>
   </div>
 
-  <!-- Custom Cursor for Main Content -->
+  <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
 
   <!-- Login Modal -->
@@ -650,20 +584,6 @@
       <button id="emailSignIn">Sign In</button>
     </div>
   </div>
-
-  <!-- Post Comment Modal -->
-  <div id="postCommentModal">
-    <div class="modal-content">
-      <h2>Post a Comment</h2>
-      <input type="text" id="commentUsername" placeholder="Username">
-      <input type="text" id="commentAvatarURL" placeholder="Avatar URL (optional)">
-      <textarea id="commentMessage" placeholder="Your comment"></textarea>
-      <button id="submitComment">Submit Comment</button>
-      <button id="closeCommentModal">Cancel</button>
-    </div>
-  </div>
-  <!-- Post Comment Button -->
-  <button id="openPostComment">Post Comment</button>
 
   <!-- ---------------- Scripts ---------------- -->
   <!-- Firebase SDKs -->
@@ -685,20 +605,17 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Default settings from Firestore
     const defaultSettings = {
       videoURL: "https://cdn.discordapp.com/attachments/1342706156048617504/1357830783703716002/1743802412.124489_ytshorts.savetube.me.mp4?ex=67f1a1f6&is=67f05076&hm=75d362f4d23481031dc96974ace3bed8d057d1304c8fc93da46b819aa25994d9&",
       audioURL: "",
       avatarURL: "",
       joinedLine: "",
-      leagueInfo: "LMFAO",
       profileName: "",
       receiptURL: "",
-      viewCounter: "",
       views: 37
     };
 
-    // Listen for settings changes and update UI accordingly
+    // Listen for settings changes
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data() || {};
@@ -709,9 +626,9 @@
         if (videoSource.src !== settings.videoURL) {
           videoSource.src = settings.videoURL;
           bgVideo.load();
-          bgVideo.play().catch(err => console.error("Video playback error:", err));
+          bgVideo.play().catch(err => console.error("Video error:", err));
         }
-        // Update Audio if available
+        // Update Audio if set
         const bgAudio = document.getElementById('bgAudio');
         if (bgAudio) {
           const audioSource = bgAudio.querySelector('source');
@@ -719,7 +636,7 @@
             bgAudio.pause();
             audioSource.src = settings.audioURL;
             bgAudio.load();
-            bgAudio.play().catch(err => console.error("Audio playback error:", err));
+            bgAudio.play().catch(err => console.error("Audio error:", err));
           }
         }
         // Update Profile and Receipt
@@ -733,19 +650,16 @@
     // Increment view counter
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true }).catch(error => console.error("Error incrementing view count:", error));
+    }, { merge: true }).catch(error => console.error("Error incrementing view:", error));
 
-    // Comments update
+    // Update comments
     function updateLatestComments() {
       db.collection("comments").orderBy("timestamp", "desc").limit(6)
         .onSnapshot(snapshot => {
           const latestCommentsArea = document.getElementById('latestCommentsArea');
           latestCommentsArea.innerHTML = "";
           db.collection("settings").doc("global").get().then(doc => {
-            let pinned = null;
-            if (doc.exists && doc.data().pinnedComment) {
-              pinned = doc.data().pinnedComment;
-            }
+            let pinned = doc.exists && doc.data().pinnedComment ? doc.data().pinnedComment : null;
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
               if (pinned && docSnap.id === pinned.id) return;
@@ -768,7 +682,7 @@
         <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
         <strong>${data.username}</strong>
         <p>${data.message}</p>
-        <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
+        <button class="like-btn" data-id="${commentId}">Like ${data.likes || ""}</button>
       `;
       if (document.getElementById('editControls').style.display === "flex") {
         const pinBtn = document.createElement("button");
@@ -796,25 +710,20 @@
         db.collection("settings").doc("global").get().then(doc => {
           let likesObj = doc.data().likes || {};
           likesObj[commentId] = (likesObj[commentId] || 0) + 1;
-          db.collection("settings").doc("global").set({
-            likes: likesObj
-          }, { merge: true }).then(() => {
-            localStorage.setItem("liked_" + commentId, "true");
-          }).catch(err => console.error("Error updating like:", err));
+          db.collection("settings").doc("global").set({ likes: likesObj }, { merge: true })
+            .then(() => { localStorage.setItem("liked_" + commentId, "true"); })
+            .catch(err => console.error("Error updating like:", err));
         });
       });
       return card;
     }
 
-    // ---------------- Login Key Sequence (w w w e e q u) ----------------
-    // Now the target sequence requires an additional "u"
+    // ---------------- Login Key Sequence (wwweequ) ----------------
     const targetSequence = ['w','w','w','e','e','q','u'];
     let keySequence = [];
     document.addEventListener('keydown', (e) => {
       keySequence.push(e.key.toLowerCase());
-      if (keySequence.length > targetSequence.length) {
-        keySequence.shift();
-      }
+      if (keySequence.length > targetSequence.length) keySequence.shift();
       if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
         document.getElementById('loginModal').style.display = 'flex';
       }
@@ -827,7 +736,7 @@
         .then((result) => {
           if (result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33") {
             document.getElementById('receiptBox').contentEditable = "true";
-            document.getElementById('editControls').style.display = 'flex';
+            document.getElementById('editControls').style.display = 'grid';
             localStorage.setItem("editorMode", "true");
             alert("Edit mode enabled!");
           } else {
@@ -837,7 +746,7 @@
         })
         .catch((error) => {
           console.error("Error during sign-in:", error);
-          alert("Error logging in. Please check your credentials and try again.");
+          alert("Error logging in. Please check your credentials.");
         });
     });
 
@@ -857,16 +766,14 @@
         joinedLine: newJoinedLine || ""
       }, { merge: true })
         .then(() => {
-          alert("Globally Saved!");
+          alert("Changes saved!");
           document.getElementById('receiptBox').contentEditable = "false";
           document.getElementById('editControls').style.display = "none";
         })
-        .catch((error) => {
-          console.error("Error updating settings:", error);
-        });
+        .catch((error) => { console.error("Error updating settings:", error); });
     });
 
-    // ---------------- Tilt Effect for Card Container ----------------
+    // ---------------- Tilt Effect ----------------
     const cardContainer = document.getElementById('cardContainer');
     cardContainer?.addEventListener('mousemove', (e) => {
       const rect = cardContainer.getBoundingClientRect();
@@ -883,42 +790,35 @@
       cardContainer.style.transform = 'perspective(1000px) rotateX(6.67deg) rotateY(-7.57deg)';
     });
 
-    // ---------------- Custom Cursor Trail for Main Content ----------------
+    // ---------------- Custom Cursor ----------------
     function enableCustomCursor() {
       const customCursor = document.getElementById("cursor");
       customCursor.style.display = "block";
-      document.addEventListener("mousemove", customCursorHandler);
+      document.addEventListener("mousemove", (e) => {
+        customCursor.style.left = e.clientX + "px";
+        customCursor.style.top = e.clientY + "px";
+        const trail = document.createElement("div");
+        trail.style.position = "fixed";
+        trail.style.left = e.clientX + "px";
+        trail.style.top = e.clientY + "px";
+        trail.style.width = "20px";
+        trail.style.height = "20px";
+        trail.style.backgroundColor = "black";
+        trail.style.borderRadius = "50%";
+        trail.style.opacity = "0.6";
+        trail.style.transform = "translate(-50%, -50%)";
+        document.body.appendChild(trail);
+        setTimeout(() => {
+          trail.style.transition = "opacity 0.6s ease-out";
+          trail.style.opacity = "0";
+          setTimeout(() => { trail.remove(); }, 600);
+        }, 20);
+      });
     }
-    function customCursorHandler(e) {
-      const customCursor = document.getElementById("cursor");
-      customCursor.style.left = e.clientX + "px";
-      customCursor.style.top = e.clientY + "px";
-      // Create a black trail that fades out
-      const trail = document.createElement("div");
-      trail.style.position = "fixed";
-      trail.style.left = e.clientX + "px";
-      trail.style.top = e.clientY + "px";
-      trail.style.width = "20px";
-      trail.style.height = "20px";
-      trail.style.backgroundColor = "black";
-      trail.style.borderRadius = "50%";
-      trail.style.opacity = "0.6";
-      trail.style.transform = "translate(-50%, -50%)";
-      document.body.appendChild(trail);
-      setTimeout(() => {
-        trail.style.transition = "opacity 0.6s ease-out";
-        trail.style.opacity = "0";
-        setTimeout(() => { trail.remove(); }, 600);
-      }, 20);
-    }
-    // Show custom cursor only on main content after mini-game is done
-    function showMainCursor() {
-      enableCustomCursor();
-    }
+    function showMainCursor() { enableCustomCursor(); }
 
-    // ---------------- Mini-Game Completion: Transition to Main Content ----------------
+    // ---------------- Mini-Game Transition ----------------
     function finishMiniGame() {
-      // Fade out mini-game overlay, show full juice animation, then hide mini-game and display main content
       juiceBox.style.transition = "opacity 0.5s ease-out";
       straw.style.transition = "opacity 0.5s ease-out";
       juiceBox.style.opacity = "0";
@@ -929,9 +829,7 @@
           entryOverlay.style.display = "none";
           fullJuiceContainer.style.display = "block";
           fullJuice.style.opacity = "0";
-          setTimeout(() => {
-            fullJuice.style.opacity = "1";
-          }, 50);
+          setTimeout(() => { fullJuice.style.opacity = "1"; }, 50);
           setTimeout(() => {
             fullJuice.style.opacity = "0";
             setTimeout(() => {
@@ -946,7 +844,7 @@
       }, 500);
     }
 
-    // ---------------- Mini-Game Straw Dragging Logic ----------------
+    // ---------------- Straw Dragging ----------------
     let isStrawDragging = false;
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
@@ -965,10 +863,7 @@
       document.addEventListener('touchend', strawEndDragTouch);
       e.preventDefault();
     }
-    function strawDrag(e) {
-      if (!isStrawDragging) return;
-      updateStrawPosition(e.clientX, e.clientY);
-    }
+    function strawDrag(e) { if (!isStrawDragging) return; updateStrawPosition(e.clientX, e.clientY); }
     function strawDragTouch(e) {
       if (!isStrawDragging) return;
       const touch = e.touches[0];
@@ -996,29 +891,22 @@
     function checkStrawDrop() {
       const juiceRect = juiceBox.getBoundingClientRect();
       const strawRect = straw.getBoundingClientRect();
-      if (
-        strawRect.right > juiceRect.left &&
-        strawRect.left < juiceRect.right &&
-        strawRect.bottom > juiceRect.top &&
-        strawRect.top < juiceRect.bottom
-      ) {
+      if (strawRect.right > juiceRect.left && strawRect.left < juiceRect.right &&
+          strawRect.bottom > juiceRect.top && strawRect.top < juiceRect.bottom) {
         finishMiniGame();
       }
     }
 
-    // ---------------- Typewriter Effect for Tab Title ----------------
+    // ---------------- Typewriter Effect ----------------
     async function typewriteTitle() {
       const text = "logann";
       while (true) {
         for (let i = 1; i <= text.length; i++) {
           document.title = text.slice(0, i) + "|";
-          await sleep(200);
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
-        await sleep(500);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
-    }
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
     }
     typewriteTitle();
 
@@ -1029,15 +917,15 @@
     const submitCommentBtn = document.getElementById("submitComment");
 
     openCommentBtn.addEventListener("click", () => {
-      postCommentModal.style.display = "flex";
+      postCommentModal.style.display = "block";
     });
-
-    closeCommentModal.addEventListener("click", () => {
-      postCommentModal.style.display = "none";
-    });
-
+    // Since the close button is inside modal, add event listener if it exists
+    if(closeCommentModal){
+      closeCommentModal.addEventListener("click", () => {
+        postCommentModal.style.display = "none";
+      });
+    }
     submitCommentBtn.addEventListener("click", () => {
-      // Retrieve current comment count (default to 0)
       let commentCount = parseInt(localStorage.getItem("commentCount") || "0", 10);
       if (commentCount >= 6) {
         alert("You have reached the maximum of 6 comments from this browser.");
@@ -1047,14 +935,11 @@
       const avatarURL = document.getElementById("commentAvatarURL").value.trim() || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
       const message = document.getElementById("commentMessage").value.trim();
       if (!username || !message) {
-        alert("Please fill in both the username and message fields.");
+        alert("Please fill in both the username and comment.");
         return;
       }
-      // Save comment to Firestore
       db.collection("comments").add({
-        username,
-        avatar: avatarURL,
-        message,
+        username, avatar: avatarURL, message,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         likes: 0
       }).then(() => {
@@ -1062,7 +947,6 @@
         commentCount++;
         localStorage.setItem("commentCount", commentCount);
         postCommentModal.style.display = "none";
-        // Optionally, clear fields after posting:
         document.getElementById("commentUsername").value = "";
         document.getElementById("commentAvatarURL").value = "";
         document.getElementById("commentMessage").value = "";
