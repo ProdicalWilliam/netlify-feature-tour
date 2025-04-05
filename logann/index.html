@@ -36,7 +36,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000;
+      background: none; /* Removed solid black background */
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
@@ -669,7 +669,7 @@
         if(videoSource.src !== settings.videoURL){
           videoSource.src = settings.videoURL;
           bgVideo.load();
-          // Note: Some browsers block autoplay even if muted.
+          // Attempt to play the video (may be blocked by autoplay policies)
           bgVideo.play().catch(err => console.error("Video playback error:", err));
         }
         // Update background audio
@@ -711,12 +711,10 @@
             }
             snapshot.forEach(docSnap => {
               const data = docSnap.data();
-              // If there's a pinned comment, skip it in the normal list.
               if(pinned && docSnap.id === pinned.id) return;
               const card = createCommentCard(docSnap.id, data);
               latestCommentsArea.appendChild(card);
             });
-            // If a pinned comment exists, prepend it.
             if(pinned){
               const card = createCommentCard(pinned.id, pinned.data, true);
               latestCommentsArea.prepend(card);
@@ -736,7 +734,7 @@
         <p>${data.message}</p>
         <button class="like-btn" data-id="${commentId}">Like ${data.likes && data.likes > 0 ? data.likes : ""}</button>
       `;
-      // Always show delete button in editor mode (for latest comments on info page)
+      // Always show delete and pin buttons in editor mode on info page
       if(document.getElementById('editControls').style.display === "flex"){
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
@@ -759,7 +757,7 @@
         card.appendChild(pinBtn);
         card.appendChild(delBtn);
       }
-      // Like button (one like per browser)
+      // Like button handling (one like per browser)
       const likeBtn = card.querySelector(".like-btn");
       likeBtn.addEventListener("click", () => {
         if(localStorage.getItem("liked_" + commentId)) return;
