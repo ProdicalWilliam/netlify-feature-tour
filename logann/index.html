@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>logann</title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
@@ -52,7 +52,7 @@
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
       --glowColor: #4b0082;
-      --buttonBg: #6a0dad; /* purple style */
+      --buttonBg: #6a0dad; /* purple button */
       --buttonHoverBg: #4e007d;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
     }
@@ -117,11 +117,13 @@
       opacity: 1;
       background: none;
     }
+    /* Reposition straw to start off with a big gap */
     #straw {
       position: absolute;
       width: 48px;
       height: 131px;
-      bottom: 20px;
+      /* Set a negative bottom so it's far away from the juice box */
+      bottom: -150px;
       right: 20px;
       user-select: none;
       z-index: 1010;
@@ -181,7 +183,7 @@
       position: relative;
       z-index: 1;
       opacity: 0;
-      animation: fadeInInfo 1s forwards 1s; /* wait for flash morph */
+      animation: fadeInInfo 1s forwards 1s;
       background: none;
     }
     @keyframes fadeInInfo {
@@ -380,14 +382,14 @@
       padding: 3px 8px;
       margin-top: 3px;
     }
-    /* Buttons container for comments controls */
+    /* Comments controls container */
     .comments-controls {
       display: flex;
       gap: 10px;
       justify-content: center;
       margin-top: 10px;
     }
-    /* Styled purple button for "View All" & "Post Comment" */
+    /* Styled buttons (purple) */
     .styled-btn {
       padding: 8px 16px;
       background: var(--buttonBg);
@@ -402,14 +404,13 @@
     .styled-btn:hover { background: var(--buttonHoverBg); }
     /* --------- Edit Controls (only visible to authorized users) --------- */
     #editControls {
-      display: none;
+      display: none; /* hidden by default */
       margin-top: 20px;
       padding: 15px;
       border: var(--containerBorder);
       border-radius: var(--containerRadius);
       background: var(--containerColor);
       box-shadow: 0 0 20px 4px var(--glowColor);
-      display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 10px;
     }
@@ -434,6 +435,44 @@
       box-shadow: 0 0 20px 4px var(--glowColor);
     }
     #editControls button:hover { background: var(--buttonHoverBg); }
+    /* --------- Post Comment Modal (centered popup) --------- */
+    #postCommentModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 20px;
+      display: none;
+      z-index: 1100;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+    }
+    #postCommentModal input, 
+    #postCommentModal textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 5px;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #postCommentModal button {
+      padding: 10px 20px;
+      background: var(--buttonBg);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.3s ease;
+      margin: 5px;
+      box-shadow: 0 0 10px 2px var(--glowColor);
+    }
+    #postCommentModal button:hover { background: var(--buttonHoverBg); }
   </style>
 </head>
 <body>
@@ -522,7 +561,7 @@
           <button id="viewAllComments" class="styled-btn" onclick="window.location.href='allcomments.html'">View All Comments</button>
           <button id="openPostComment" class="styled-btn">Post Comment</button>
         </div>
-        <!-- Edit Controls (visible only after successful login) -->
+        <!-- Edit Controls (only visible after successful login) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Profile Name">
           <input type="text" id="joinedLineInput" placeholder="Joined Text">
@@ -532,7 +571,7 @@
           <input type="text" id="receiptURL" placeholder="Receipt Image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
-        <!-- Post Comment Modal -->
+        <!-- Post Comment Modal (centered popup) -->
         <div id="postCommentModal">
           <input type="text" id="commentUsername" placeholder="Username">
           <input type="text" id="commentAvatarURL" placeholder="Avatar URL (optional)">
@@ -702,7 +741,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
           if (result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33") {
-            // Show edit controls only for authorized user
+            // Only authorized users see the edit controls
             document.getElementById('editControls').style.display = 'grid';
             localStorage.setItem("editorMode", "true");
             alert("Edit mode enabled!");
