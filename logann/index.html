@@ -159,6 +159,7 @@
       opacity: 1;
       transition: opacity 1s ease;
     }
+    /* Added Audio element (hidden) */
     #bgAudio {
       display: none;
     }
@@ -406,6 +407,7 @@
       font-size: 1em;
       display: block;
     }
+    /* --------- Post Comment Modal Styles --------- */
     #postCommentModal {
       position: fixed;
       top: 0;
@@ -460,6 +462,7 @@
     #postCommentModal button:hover {
       background: #2a0a5e;
     }
+    /* --------- Open Comment Button --------- */
     #openPostComment {
       position: fixed;
       bottom: 20px;
@@ -477,28 +480,44 @@
     #openPostComment:hover {
       background: #2a0a5e;
     }
-    #editControls {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      border: 2px solid var(--outlineColor);
-      border-radius: 10px;
-      background: var(--containerColor);
-      padding: 10px;
-      max-width: 300px;
-      margin: 20px auto;
-    }
-    #editControls input {
+    /* --------- Login Modal Styles (existing) --------- */
+    #loginModal {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 8px;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loginModal .modal-content {
+      background: var(--containerColor);
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      color: var(--textColor);
+      font-size: 1.1em;
+      box-shadow: 0 0 20px 4px var(--glowColor);
+      animation: modalGlow 2s infinite alternate;
+    }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
       border: var(--inputBorder);
       border-radius: var(--inputRadius);
       background: var(--inputBg);
       color: var(--textColor);
       font-size: 1em;
     }
-    #editControls button {
-      padding: 10px;
+    #loginModal button {
+      padding: 10px 20px;
       background: var(--outlineColor);
       border: none;
       border-radius: var(--inputRadius);
@@ -506,8 +525,9 @@
       cursor: pointer;
       font-size: 1em;
       transition: background 0.3s ease;
+      margin-top: 15px;
     }
-    #editControls button:hover {
+    #loginModal button:hover {
       background: #2a0a5e;
     }
   </style>
@@ -543,11 +563,16 @@
 
   <!-- ---------------- Main Content Container ---------------- -->
   <div id="mainContent">
-    <!-- Background Video with no background overlay -->
+    <!-- Background Video -->
     <video id="bgVideo" autoplay loop playsinline muted preload="auto">
       <source src="https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+    <!-- Hidden Background Audio -->
+    <audio id="bgAudio" loop>
+      <source src="" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
     <!-- Content: Profile Card, Server Embed, etc. -->
     <div id="cardContainer">
       <div class="profile-card">
@@ -626,6 +651,20 @@
     </div>
   </div>
 
+  <!-- Post Comment Modal -->
+  <div id="postCommentModal">
+    <div class="modal-content">
+      <h2>Post a Comment</h2>
+      <input type="text" id="commentUsername" placeholder="Username">
+      <input type="text" id="commentAvatarURL" placeholder="Avatar URL (optional)">
+      <textarea id="commentMessage" placeholder="Your comment"></textarea>
+      <button id="submitComment">Submit Comment</button>
+      <button id="closeCommentModal">Cancel</button>
+    </div>
+  </div>
+  <!-- Post Comment Button -->
+  <button id="openPostComment">Post Comment</button>
+
   <!-- ---------------- Scripts ---------------- -->
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -664,6 +703,7 @@
       .onSnapshot((doc) => {
         const data = doc.data() || {};
         const settings = { ...defaultSettings, ...data };
+        // Update Video
         const bgVideo = document.getElementById('bgVideo');
         const videoSource = bgVideo.querySelector('source');
         if (videoSource.src !== settings.videoURL) {
@@ -671,15 +711,17 @@
           bgVideo.load();
           bgVideo.play().catch(err => console.error("Video playback error:", err));
         }
+        // Update Audio if available
         const bgAudio = document.getElementById('bgAudio');
         if (bgAudio) {
           const audioSource = bgAudio.querySelector('source');
           if (audioSource && audioSource.src !== settings.audioURL) {
             audioSource.src = settings.audioURL;
             bgAudio.load();
-            bgAudio.play();
+            bgAudio.play().catch(err => console.error("Audio playback error:", err));
           }
         }
+        // Update Profile and Receipt
         document.getElementById('avatarImg').src = settings.avatarURL;
         document.getElementById('profileName').innerText = settings.profileName;
         document.getElementById('joinedLine').innerText = settings.joinedLine;
@@ -764,14 +806,17 @@
     }
 
     // ---------------- Login Key Sequence (w w w e e q) ----------------
-    const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
+    let keySequence = [];
     document.addEventListener('keydown', (e) => {
       keySequence.push(e.key.toLowerCase());
-      if (keySequence.length > targetSequence.length) keySequence.shift();
+      // Keep only the last n keys
+      if (keySequence.length > targetSequence.length) {
+        keySequence.shift();
+      }
       if (JSON.stringify(keySequence) === JSON.stringify(targetSequence)) {
         document.getElementById('loginModal').style.display = 'flex';
-        keySequence.length = 0;
+        // Do not clear keySequence so that the listener remains active
       }
     });
 
@@ -867,7 +912,6 @@
         setTimeout(() => { trail.remove(); }, 600);
       }, 20);
     }
-
     // Show custom cursor only on main content after mini-game is done
     function showMainCursor() {
       enableCustomCursor();
@@ -979,6 +1023,53 @@
     }
     typewriteTitle();
 
+    // ---------------- Post Comment Modal Logic ----------------
+    const openCommentBtn = document.getElementById("openPostComment");
+    const postCommentModal = document.getElementById("postCommentModal");
+    const closeCommentModal = document.getElementById("closeCommentModal");
+    const submitCommentBtn = document.getElementById("submitComment");
+
+    openCommentBtn.addEventListener("click", () => {
+      postCommentModal.style.display = "flex";
+    });
+
+    closeCommentModal.addEventListener("click", () => {
+      postCommentModal.style.display = "none";
+    });
+
+    submitCommentBtn.addEventListener("click", () => {
+      // Check if the user has already posted a comment using localStorage
+      if (localStorage.getItem("hasCommented")) {
+        alert("You have already posted a comment from this browser.");
+        return;
+      }
+      const username = document.getElementById("commentUsername").value.trim();
+      const avatarURL = document.getElementById("commentAvatarURL").value.trim() || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
+      const message = document.getElementById("commentMessage").value.trim();
+      if (!username || !message) {
+        alert("Please fill in both the username and message fields.");
+        return;
+      }
+      // Save comment to Firestore
+      db.collection("comments").add({
+        username,
+        avatar: avatarURL,
+        message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: 0
+      }).then(() => {
+        alert("Comment posted successfully!");
+        localStorage.setItem("hasCommented", "true");
+        postCommentModal.style.display = "none";
+        // Optionally, clear fields after posting:
+        document.getElementById("commentUsername").value = "";
+        document.getElementById("commentAvatarURL").value = "";
+        document.getElementById("commentMessage").value = "";
+      }).catch((error) => {
+        console.error("Error posting comment:", error);
+        alert("There was an error posting your comment. Please try again later.");
+      });
+    });
   </script>
 </body>
 </html>
