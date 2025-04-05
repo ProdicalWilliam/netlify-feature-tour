@@ -19,10 +19,14 @@
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
+    /* Disable default cursor on interactive elements */
+    button, input, textarea, a, .profile-card, .comments-controls, .server-embed {
+      cursor: none !important;
+    }
     /* Mini-Game uses system cursor; info page hides default cursor */
     #miniGame { cursor: auto; }
     #mainContent { cursor: none; background: none; }
-    /* Custom Crosshair */
+    /* Custom Cursor */
     .cursor {
       position: fixed;
       top: 0;
@@ -64,10 +68,13 @@
       --inputBg: rgba(0, 0, 0, 0.4);
       --inputBorder: 2px solid #4b0082;
       --inputRadius: 10px;
-      --glowColor: #4b0082;
+      --glowColor: #6a0dad;
       --buttonBg: #6a0dad;
       --buttonHoverBg: #4e007d;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
+      /* Login modal custom styles */
+      --loginBg: linear-gradient(135deg, #1a1a1a, #000);
+      --loginGlow: 0 0 20px 5px var(--glowColor);
     }
     /* Flash overlay morph animation */
     #flash {
@@ -184,7 +191,7 @@
       border: none;
       border-radius: 50%;
       padding: 10px;
-      cursor: pointer;
+      cursor: none;
       z-index: 1001;
       transition: background 0.2s;
     }
@@ -374,7 +381,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 0.8em;
       padding: 3px 8px;
     }
@@ -383,7 +390,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 0.8em;
       padding: 3px 8px;
       margin-top: 3px;
@@ -393,7 +400,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 0.8em;
       padding: 3px 8px;
       margin-top: 3px;
@@ -412,7 +419,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 1em;
       transition: background 0.3s ease;
       box-shadow: 0 0 10px 2px var(--glowColor);
@@ -445,7 +452,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 1em;
       transition: background 0.3s ease;
       box-shadow: 0 0 20px 4px var(--glowColor);
@@ -487,7 +494,7 @@
       border: none;
       border-radius: var(--inputRadius);
       color: #fff;
-      cursor: pointer;
+      cursor: none;
       font-size: 1em;
       transition: background 0.3s ease;
       margin: 10px auto;
@@ -502,12 +509,51 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background: var(--loginBg);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 2000;
     }
+    #loginModal .modal-content {
+      background: rgba(20,20,20,0.9);
+      padding: 30px;
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      box-shadow: var(--loginGlow);
+      width: 300px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    #loginModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      border: var(--inputBorder);
+      border-radius: var(--inputRadius);
+      background: var(--inputBg);
+      color: var(--textColor);
+      font-size: 1em;
+    }
+    #loginModal button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      background: var(--buttonBg);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      font-size: 1em;
+      box-shadow: 0 0 10px 2px var(--glowColor);
+      transition: background 0.3s ease;
+    }
+    #loginModal button:hover { background: var(--buttonHoverBg); }
   </style>
 </head>
 <body>
@@ -622,11 +668,11 @@
 
   <!-- Login Modal -->
   <div id="loginModal">
-    <div class="modal-content" style="margin: auto; padding: 20px; background: var(--containerColor); border: var(--containerBorder); border-radius: var(--containerRadius); width: 300px; text-align: center;">
+    <div class="modal-content">
       <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email" style="width:90%; margin: 10px auto; display:block;">
-      <input type="password" id="loginPassword" placeholder="Password" style="width:90%; margin: 10px auto; display:block;">
-      <button id="emailSignIn" style="margin: 10px auto; display:block;">Sign In</button>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign In</button>
     </div>
   </div>
 
@@ -691,7 +737,7 @@
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => console.error("View count error:", error));
 
-    // ---------------- Login Key Sequence (w w w e e q) ----------------
+    // ---------------- Login Key Sequence (www-eeq) ----------------
     const targetSequence = ['w','w','w','e','e','q'];
     let keySequence = [];
     document.addEventListener('keydown', (e) => {
