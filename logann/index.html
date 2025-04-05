@@ -234,45 +234,22 @@
       height: auto;
       object-fit: contain;
     }
-    /* Bottom Comment Section (Fixed at Bottom Center) */
+    /* Bottom Comment Section (Always Fixed at Bottom) */
     #commentBoxBottom {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      text-align: center;
-    }
-    /* "Want to Comment" Button */
-    #commentToggle {
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid var(--outlineColor);
-      border-radius: var(--containerRadius);
-      padding: 10px 20px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    #commentToggle:hover {
-      background: rgba(0, 0, 0, 0.7);
-    }
-    /* Comment Content (Hidden until hover over container) */
-    #commentContent {
-      display: none;
-      background: rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: var(--containerWidth);
+      background: var(--containerColor);
       padding: 15px;
-      border: 2px solid var(--outlineColor);
-      border-radius: var(--containerRadius);
-      margin-top: 5px;
-      max-width: 600px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
+      border-top: var(--containerBorder);
+      backdrop-filter: blur(var(--containerBlur));
+      -webkit-backdrop-filter: blur(var(--containerBlur));
     }
-    #commentBoxBottom:hover #commentContent {
-      display: block;
-    }
-    /* Comment Form */
+    /* Comment Form & List Styles */
     #commentForm {
       display: flex;
       flex-direction: column;
@@ -300,7 +277,6 @@
     #commentForm button:hover {
       background: #2a0a5e;
     }
-    /* Comments List */
     #commentList {
       max-height: 250px;
       overflow-y: auto;
@@ -324,6 +300,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
+      object-fit: cover;
     }
     .comment-content {
       flex: 1;
@@ -474,18 +451,15 @@
     </div>
   </div>
 
-  <!-- Bottom Comment Section -->
+  <!-- Bottom Comment Section (Always Visible) -->
   <div id="commentBoxBottom">
-    <div id="commentToggle">Want to Comment?</div>
-    <div id="commentContent">
-      <form id="commentForm">
-        <input type="text" id="commentUsername" placeholder="Your username" required>
-        <input type="text" id="commentAvatar" placeholder="Avatar URL (optional)">
-        <textarea id="commentMessage" placeholder="Your comment" required></textarea>
-        <button type="submit">Post Comment</button>
-      </form>
-      <div id="commentList"></div>
-    </div>
+    <form id="commentForm">
+      <input type="text" id="commentUsername" placeholder="Your username" required>
+      <input type="text" id="commentAvatar" placeholder="Avatar URL (optional)">
+      <textarea id="commentMessage" placeholder="Your comment" required></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+    <div id="commentList"></div>
   </div>
 
   <!-- Main Content Container -->
@@ -513,16 +487,14 @@
             <h1>Dazes</h1>
             <h3 class="server-stats">
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
-                </svg>
-                36 Online
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+                </svg> 36 Online
               </span>
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                  <path fill="currentColor" d="M8 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8"></path>
-                </svg>
-                162 Members
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+                </svg> 162 Members
               </span>
             </h3>
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
@@ -564,14 +536,14 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Increase view counter on every page load (everyone's view counts)
+    // Increase view counter on every page load
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
     }, { merge: true }).catch(error => {
       console.error("Error incrementing view count:", error);
     });
 
-    // Listen for real-time updates on the "settings/global" document (including live view counter updates)
+    // Listen for real-time updates on the "settings/global" document
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
@@ -607,7 +579,7 @@
           if (data.receiptURL) {
             document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
           }
-          // Update live view counter with provided SVG icon and styling (font-size: 1em to match the icon)
+          // Update live view counter with SVG icon and styling
           const viewCounterElem = document.getElementById('viewCounter');
           viewCounterElem.innerHTML = `<span style="font-weight:550;font-size:1em">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
@@ -686,7 +658,11 @@
     commentForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const username = document.getElementById('commentUsername').value;
-      const avatar = document.getElementById('commentAvatar').value || "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+      // Use the provided avatar or fall back to the default
+      let avatar = document.getElementById('commentAvatar').value;
+      if(!avatar) {
+        avatar = "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png";
+      }
       const message = document.getElementById('commentMessage').value;
       db.collection("comments").add({
         username,
