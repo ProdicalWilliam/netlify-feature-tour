@@ -75,23 +75,34 @@
       opacity: 0;
       transition: opacity 0.7s ease-in-out;
     }
+    /* (No extra styling or background added to mini‑game code) */
   </style>
 </head>
 <body>
-  <!-- Entry Overlay (Mini‑Game) -->
+  <!-- Mini-Game Overlay -->
   <div id="entryOverlay">
     <!-- Juice Box (without straw) -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
     <!-- Straw with dragging functions -->
     <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
+    <p style="color: #fff; z-index:2; position:relative;">Drag the straw over the juice box</p>
   </div>
+  <!-- Flash Overlay -->
+  <div id="flash"></div>
   <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
     <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
   </div>
   
+  <!-- Main Content (Info Page) -->
+  <div id="mainContent" style="display:none;">
+    <!-- Replace the content below with your actual info page content -->
+    <h1 style="text-align: center; color: #fff; margin-top: 40px;">Welcome to the Info Page</h1>
+    <p style="text-align: center; color: #fff;">Your content goes here.</p>
+  </div>
+  
   <script>
-    // Straw dragging using mouse and touch events
+    // Straw dragging using mouse and touch events (mini‑game code, unchanged)
     const entryOverlay = document.getElementById("entryOverlay");
     const juiceBox = document.getElementById("juiceBox");
     const straw = document.getElementById("straw");
@@ -178,7 +189,8 @@
             fullJuice.style.opacity = "0";
             setTimeout(() => {
               fullJuiceContainer.style.display = "none";
-              // Mini‑game finished; load further content as desired.
+              // After mini‑game completes, display the info page.
+              document.getElementById("mainContent").style.display = "block";
             }, 700);
           }, 1500);
         }, 500);
