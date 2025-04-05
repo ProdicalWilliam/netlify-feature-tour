@@ -158,6 +158,14 @@
       bottom: 12px;
       left: 15px;
       z-index: 1000;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #viewCounter svg {
+      width: 1.5em;
+      height: 1.5em;
     }
     /* Server Embed Section */
     .server-embed {
@@ -217,24 +225,110 @@
     .server-details a:hover {
       background: rgba(255,255,255,0.3);
     }
-    /* Receipt Box (Info Box Style) */
-    .receipt-box {
+    /* Lower Section Container inside Profile Card */
+    .info-lower {
+      display: flex;
+      gap: 20px;
+    }
+    .receipt-area {
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 2px solid var(--outlineColor);
-      border-radius: 10px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .comments-area {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .receipt-box {
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
       background: var(--containerColor);
       padding: 10px;
       max-width: 300px;
-      margin: 0 auto;
+      animation: cardGlow 3s ease-in-out infinite;
     }
     .receipt-box img {
       width: 100%;
       height: auto;
       object-fit: contain;
     }
-    /* Post Comment Modal (hidden by default) */
+    /* Comment Card Styles (inside main card) */
+    .comment-card {
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border: var(--containerBorder);
+      border-radius: var(--containerRadius);
+      width: 45%;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    .comment-card img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .comment-card p {
+      color: #fff;
+      font-size: 0.9em;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .like-btn {
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+    }
+    .admin-btn {
+      background: red;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    .pin-btn {
+      background: orange;
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8em;
+      padding: 3px 8px;
+      margin-top: 3px;
+    }
+    /* View All Comments Button */
+    #viewAllComments {
+      margin: 10px auto;
+      padding: 8px 16px;
+      background: var(--outlineColor);
+      border: none;
+      border-radius: var(--inputRadius);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1em;
+      display: block;
+    }
+    /* Post Comment Modal */
     #postCommentModal {
       position: fixed;
       top: 0;
@@ -289,67 +383,10 @@
     #postCommentModal button:hover {
       background: #2a0a5e;
     }
-    /* Bottom New Comments Section (Fixed at Bottom) */
-    #newCommentsSection {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      width: 100%;
-      max-width: var(--containerWidth);
-      display: flex;
-      justify-content: space-around;
-      gap: 10px;
-      padding: 10px;
-      background: var(--containerColor);
-      border-top: var(--containerBorder);
-      backdrop-filter: blur(var(--containerBlur));
-      -webkit-backdrop-filter: blur(var(--containerBlur));
-      overflow-x: auto;
-    }
-    .comment-card {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      border: var(--containerBorder);
-      border-radius: var(--containerRadius);
-      width: 18%;
-      min-width: 120px;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      align-items: center;
-    }
-    .comment-card img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .comment-card p {
-      color: #fff;
-      font-size: 0.9em;
-      text-align: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 100%;
-    }
-    .like-btn {
-      background: var(--outlineColor);
-      border: none;
-      border-radius: var(--inputRadius);
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.8em;
-      padding: 3px 8px;
-      margin-top: 5px;
-    }
-    /* Post Comment Button (visible in main UI) */
+    /* Post Comment Button (fixed bottom right) */
     #openPostComment {
       position: fixed;
-      bottom: 120px;
+      bottom: 20px;
       right: 20px;
       z-index: 1100;
       background: var(--outlineColor);
@@ -363,10 +400,6 @@
     }
     #openPostComment:hover {
       background: #2a0a5e;
-    }
-    /* Comments inside cards: white text */
-    .comment-card span, .comment-card strong {
-      color: #fff;
     }
     /* Edit Controls (Hidden unless logged in) */
     #editControls {
@@ -415,7 +448,7 @@
       background-size: cover;
       transform: translate(-50%, -50%);
     }
-    /* Login Modal Styles with Glow */
+    /* Login Modal Styles */
     #loginModal {
       position: fixed;
       top: 0;
@@ -497,7 +530,7 @@
     </svg>
   </button>
 
-  <!-- Login Modal (Firebase Email/Password based) -->
+  <!-- Login Modal -->
   <div id="loginModal">
     <div class="modal-content">
       <h2>Admin Login</h2>
@@ -508,7 +541,7 @@
     </div>
   </div>
 
-  <!-- Post Comment Modal (hidden by default) -->
+  <!-- Post Comment Modal -->
   <div id="postCommentModal">
     <div class="modal-content">
       <h2>Post a Comment</h2>
@@ -522,7 +555,7 @@
     </div>
   </div>
 
-  <!-- Post Comment Button (toggles comment posting modal) -->
+  <!-- Post Comment Button (fixed bottom right) -->
   <button id="openPostComment">Post Comment</button>
 
   <!-- Main Content Container -->
@@ -539,9 +572,14 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
-        <!-- Live View Counter (Updated via Firestore) -->
-        <div id="viewCounter"></div>
-        <!-- Server Embed Section -->
+        <!-- Live View Counter -->
+        <div id="viewCounter">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
+          </svg>
+          <span>${0} views</span>
+        </div>
+        <!-- Server Embed Section (dynamic values) -->
         <div class="server-embed">
           <div class="server-icon">
             <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
@@ -550,24 +588,33 @@
             <h1>Dazes</h1>
             <h3 class="server-stats">
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
-                </svg> 36 Online
+                </svg> 200 Online
               </span>
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
-                </svg> 162 Members
+                </svg> 1k Members
               </span>
             </h3>
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Receipt Box (Info Box Style) -->
-        <div class="receipt-box" id="receiptBox">
-          <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+        <!-- Lower Section: Receipt and Latest Comments -->
+        <div class="info-lower">
+          <div class="receipt-area">
+            <div class="receipt-box" id="receiptBox">
+              <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
+            </div>
+          </div>
+          <div class="comments-area" id="latestCommentsArea">
+            <!-- Latest comment cards will be injected here -->
+          </div>
         </div>
-        <!-- Edit Controls (Visible only when logged in as admin) -->
+        <!-- View All Comments Button -->
+        <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
+        <!-- Edit Controls (for admin, if logged in) -->
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
@@ -580,9 +627,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Bottom New Comments Section (5 newest comments) -->
-  <div id="newCommentsSection"></div>
 
   <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
@@ -609,51 +653,143 @@
       console.error("Error incrementing view count:", error);
     });
 
-    // Listen for real-time updates on the "settings/global" document
+    // Listen for real-time updates on global settings (for view count and likes)
+    let globalLikes = {}; // Object mapping comment IDs to like counts
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
         const data = doc.data();
         if (data) {
-          // Update video if provided
-          const bgVideo = document.getElementById('bgVideo');
-          const videoSource = bgVideo.querySelector('source');
-          if (data.videoURL && videoSource.src !== data.videoURL) {
-            videoSource.src = data.videoURL;
-            bgVideo.load();
-            bgVideo.play();
-          }
-          // Update audio if provided
-          const bgAudio = document.getElementById('bgAudio');
-          const audioSource = bgAudio.querySelector('source');
-          if (data.audioURL && audioSource.src !== data.audioURL) {
-            audioSource.src = data.audioURL;
-            bgAudio.load();
-            bgAudio.play();
-          }
-          // Update avatar if provided
-          if (data.avatarURL) {
-            document.getElementById('avatarImg').src = data.avatarURL;
-          }
-          // Update profile name and joined text if provided
-          if (data.profileName) {
-            document.getElementById('profileName').innerText = data.profileName;
-          }
-          if (data.joinedLine) {
-            document.getElementById('joinedLine').innerText = data.joinedLine;
-          }
-          // Update receipt image if provided
-          if (data.receiptURL) {
-            document.getElementById('receiptBox').querySelector('img').src = data.receiptURL;
-          }
-          // Update live view counter with SVG icon and styling
+          // Update view counter display
           const viewCounterElem = document.getElementById('viewCounter');
-          viewCounterElem.innerHTML = `<span style="font-weight:550;font-size:1em">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+          viewCounterElem.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"></path>
-            </svg> ${data.views || 0} views
-          </span>`;
+            </svg><span>${data.views || 0} views</span>`;
+          // Update global likes object if present
+          if(data.likes){
+            globalLikes = data.likes;
+          }
         }
       });
+
+    // Listen for changes in the latest 5 comments and update comment cards
+    function updateLatestComments() {
+      db.collection("comments").orderBy("timestamp", "desc").limit(5)
+        .onSnapshot(snapshot => {
+          const latestCommentsArea = document.getElementById('latestCommentsArea');
+          latestCommentsArea.innerHTML = "";
+          // If a pinned comment exists in settings, fetch it first.
+          db.collection("settings").doc("global").get().then(doc => {
+            let pinned = null;
+            if(doc.exists && doc.data().pinnedComment){
+              pinned = doc.data().pinnedComment;
+            }
+            snapshot.forEach(docSnap => {
+              const data = docSnap.data();
+              // Skip if this comment is the pinned one (it will be shown separately at the top)
+              if(pinned && docSnap.id === pinned.id) return;
+              const card = createCommentCard(docSnap.id, data);
+              latestCommentsArea.appendChild(card);
+            });
+            // If a pinned comment exists, prepend it.
+            if(pinned){
+              const card = createCommentCard(pinned.id, pinned.data, true);
+              latestCommentsArea.prepend(card);
+            }
+          });
+        });
+    }
+    updateLatestComments();
+
+    // Create a comment card element
+    function createCommentCard(commentId, data, isPinned = false) {
+      const card = document.createElement("div");
+      card.className = "comment-card";
+      card.innerHTML = `
+        <img src="${data.avatar || "https://cdn-icons-png.flaticon.com/512/17360/17360409.png"}" alt="Avatar">
+        <strong>${data.username}</strong>
+        <p>${data.message}</p>
+        <button class="like-btn" data-id="${commentId}">Like ${globalLikes[commentId] ? globalLikes[commentId] : ""}</button>
+      `;
+      // If in editor mode, add Pin and Delete buttons.
+      if(document.getElementById('editControls').style.display === "flex"){
+        const pinBtn = document.createElement("button");
+        pinBtn.className = "pin-btn";
+        pinBtn.textContent = "Pin";
+        pinBtn.addEventListener("click", () => {
+          // Save this comment as the pinned comment in global settings.
+          db.collection("settings").doc("global").set({
+            pinnedComment: { id: commentId, data }
+          }, { merge: true }).then(() => {
+            alert("Comment pinned!");
+          }).catch(err => console.error("Error pinning comment:", err));
+        });
+        const delBtn = document.createElement("button");
+        delBtn.className = "admin-btn";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => {
+          db.collection("comments").doc(commentId).delete().then(() => {
+            alert("Comment deleted");
+          }).catch(err => console.error("Error deleting comment:", err));
+        });
+        card.appendChild(pinBtn);
+        card.appendChild(delBtn);
+      }
+      // Like button handling (1 like per browser)
+      const likeBtn = card.querySelector(".like-btn");
+      likeBtn.addEventListener("click", () => {
+        if(localStorage.getItem("liked_" + commentId)) return;
+        // Update global likes in settings
+        const likesUpdate = {};
+        likesUpdate[commentId] = (globalLikes[commentId] || 0) + 1;
+        db.collection("settings").doc("global").update({
+          likes: firebase.firestore.FieldValue.arrayUnion() // Dummy call to trigger update; we then merge object.
+        }).then(() => {
+          // Instead, perform a merge update manually:
+          db.collection("settings").doc("global").set({
+            likes: {
+              ...globalLikes,
+              [commentId]: (globalLikes[commentId] || 0) + 1
+            }
+          }, { merge: true });
+          localStorage.setItem("liked_" + commentId, "true");
+        }).catch(err => console.error("Error updating like:", err));
+      });
+      return card;
+    }
+
+    // Toggle Post Comment Modal
+    function togglePostCommentModal() {
+      const modal = document.getElementById('postCommentModal');
+      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+    document.getElementById('openPostComment').addEventListener('click', () => {
+      togglePostCommentModal();
+    });
+
+    // Post Comment Form Submission from Modal
+    const postCommentForm = document.getElementById('postCommentForm');
+    postCommentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('postUsername').value;
+      let avatar = document.getElementById('postAvatar').value;
+      if (!avatar) {
+        avatar = "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
+      }
+      const message = document.getElementById('postMessage').value;
+      db.collection("comments").add({
+        username,
+        avatar,
+        message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Comment posted!");
+        postCommentForm.reset();
+        togglePostCommentModal();
+      }).catch((error) => {
+        console.error("Error posting comment: ", error);
+        alert("There was an error posting your comment. Please try again.");
+      });
+    });
 
     // Key sequence detection for "w w w e e q" to show login modal
     const keySequence = [];
@@ -673,7 +809,6 @@
       const password = document.getElementById('loginPassword').value;
       auth.signInWithEmailAndPassword(email, password)
         .then((result) => {
-          // Hardcoded admin UID check
           if(result.user.uid === "leM0g1vJ6wc36F7wtFmdU5ExGt33"){
             document.getElementById('receiptBox').contentEditable = "true";
             document.getElementById('editControls').style.display = 'flex';
@@ -689,7 +824,7 @@
         });
     });
 
-    // Save edits: update page settings in Firestore; on success, show "Globally Saved!"
+    // Save edits: update page settings in Firestore
     document.getElementById('saveEdits').addEventListener('click', () => {
       const newVideoURL = document.getElementById('videoURL').value;
       const newAudioURL = document.getElementById('audioURL').value;
@@ -708,7 +843,6 @@
       }, { merge: true })
       .then(() => {
         alert("Globally Saved!");
-        // Disable editing and hide controls
         document.getElementById('receiptBox').contentEditable = "false";
         document.getElementById('editControls').style.display = "none";
       })
@@ -716,90 +850,6 @@
         console.error("Error updating settings:", error);
       });
     });
-
-    // Toggle the Post Comment Modal
-    function togglePostCommentModal() {
-      const modal = document.getElementById('postCommentModal');
-      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    // Open Post Comment Modal when button is clicked
-    document.getElementById('openPostComment').addEventListener('click', () => {
-      togglePostCommentModal();
-    });
-
-    // Post Comment Form Submission from Modal
-    const postCommentForm = document.getElementById('postCommentForm');
-    postCommentForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('postUsername').value;
-      let avatar = document.getElementById('postAvatar').value;
-      if (!avatar) {
-        avatar = "https://cdn-icons-png.flaticon.com/512/17360/17360409.png";
-      }
-      const message = document.getElementById('postMessage').value;
-      db.collection("comments").add({
-        username,
-        avatar,
-        message,
-        likes: 0,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert("Comment posted!");
-        postCommentForm.reset();
-        togglePostCommentModal();
-      }).catch((error) => {
-        console.error("Error posting comment: ", error);
-        alert("There was an error posting your comment. Please try again.");
-      });
-    });
-
-    // Listen for newest comments (5 newest) and update bottom cards
-    function updateNewestComments() {
-      db.collection("comments").orderBy("timestamp", "desc").limit(5)
-        .onSnapshot(snapshot => {
-          const newCommentsSection = document.getElementById('newCommentsSection');
-          newCommentsSection.innerHTML = "";
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const card = document.createElement("div");
-            card.className = "comment-card";
-            card.innerHTML = `
-              <img src="${data.avatar}" alt="Avatar">
-              <strong>${data.username}</strong>
-              <p>${data.message}</p>
-              <span>Likes: ${data.likes || 0}</span>
-              <button class="like-btn" data-id="${doc.id}">Like</button>
-            `;
-            newCommentsSection.appendChild(card);
-          });
-          // Add event listeners for like buttons
-          document.querySelectorAll('.like-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const commentId = btn.getAttribute('data-id');
-              const commentRef = db.collection("comments").doc(commentId);
-              // Atomically increment the likes field
-              commentRef.update({
-                likes: firebase.firestore.FieldValue.increment(1)
-              }).catch(error => {
-                console.error("Error liking comment:", error);
-              });
-            });
-          });
-        });
-    }
-    updateNewestComments();
-
-    // Existing listener for all comments (for admin delete options) remains
-    db.collection("comments").orderBy("timestamp", "asc")
-      .onSnapshot(snapshot => {
-        // (If needed, you can extend this section for another comment display elsewhere)
-        // This listener is used by admin edit mode to add delete buttons.
-        snapshot.forEach(doc => {
-          // For admin controls inside the main content, see below.
-          // (The new comments are displayed in dedicated cards below.)
-        });
-      });
 
     // Tilt Effect on Card Container
     const cardContainer = document.getElementById('cardContainer');
