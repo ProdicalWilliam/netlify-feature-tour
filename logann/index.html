@@ -9,6 +9,15 @@
   <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
   <style>
+    /* Hide default cursor everywhere */
+    html, body {
+      cursor: none;
+      width: 100%;
+      height: 100%;
+      background: none;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
       --containerColor: rgba(0, 0, 0, 0.4);
@@ -28,20 +37,6 @@
       --inputRadius: 10px;
       --glowColor: #4b0082;
       --defaultCommentAvatar: url('https://cdn-icons-png.flaticon.com/512/17360/17360409.png');
-    }
-    /* Global Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: none;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      cursor: default;
     }
     /* ---------------- Mini-Game Styles ---------------- */
     #miniGame {
@@ -485,7 +480,7 @@
     #editControls button:hover {
       background: #2a0a5e;
     }
-    /* Custom Cursor */
+    /* Custom Cursor (Crosshair) */
     .cursor {
       position: fixed;
       top: 0;
@@ -650,8 +645,18 @@
     </div>
   </div>
 
-  <!-- Custom Cursor -->
+  <!-- Custom Cursor (Crosshair) -->
   <div class="cursor" id="cursor"></div>
+
+  <!-- Login Modal -->
+  <div id="loginModal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="emailSignIn">Sign In</button>
+    </div>
+  </div>
 
   <!-- ---------------- Scripts ---------------- -->
   <script>
@@ -747,7 +752,7 @@
       }
     }
 
-    // ---------------- Custom Cursor with Black Fade Trail ----------------
+    // ---------------- Custom Cursor (Crosshair) with Black Fade Trail ----------------
     function enableCustomCursor() {
       const customCursor = document.getElementById("cursor");
       customCursor.style.display = "block";
@@ -792,7 +797,7 @@
     }
     typewriteTitle();
 
-    // ---------------- Firebase Initialization & Info/Comments Updates ----------------
+    // ---------------- Firebase Initialization & Updates ----------------
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
       authDomain: "github-1ec60.firebaseapp.com",
@@ -806,12 +811,15 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
     const defaultSettings = {
-      videoURL: "https://cdn.discordapp.com/attachments/1186034032929144912/1357512428467785899/APPLY_YOURSELF_-_Call_of_the_night_-_AMVEdit_4K.mp4",
-      audioURL: "https://example.com/default-audio.mp3",
-      avatarURL: "https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024",
-      profileName: "Logann",
-      joinedLine: "joined 4 months ago",
-      receiptURL: "https://via.placeholder.com/300x200?text=Receipt"
+      videoURL: "",
+      audioURL: "",
+      avatarURL: "",
+      joinedLine: "",
+      leagueInfo: "",
+      profileName: "",
+      receiptURL: "",
+      viewCounter: "",
+      views: 0
     };
     db.collection("settings").doc("global")
       .onSnapshot((doc) => {
@@ -835,8 +843,8 @@
         document.getElementById('profileName').innerText = settings.profileName;
         document.getElementById('joinedLine').innerText = settings.joinedLine;
         document.getElementById('receiptBox').querySelector('img').src = settings.receiptURL;
-        const views = settings.views || 0;
-        document.getElementById('viewsText').innerText = views + " views";
+        document.getElementById('viewsText').innerText = settings.views + " views";
+        // If you wish to update other fields (like leagueInfo) into your main content, add it here.
       });
     db.collection("settings").doc("global").set({
       views: firebase.firestore.FieldValue.increment(1)
@@ -943,6 +951,7 @@
         alert("There was an error posting your comment. Please try again.");
       });
     });
+    // ---------------- Login Key Sequence (w w w e e q) ----------------
     const keySequence = [];
     const targetSequence = ['w','w','w','e','e','q'];
     document.addEventListener('keydown', (e) => {
