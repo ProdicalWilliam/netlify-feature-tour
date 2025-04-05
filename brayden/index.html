@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title></title>
+  <title>Logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon updated to use the full juice box image without cropping -->
   <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless">
@@ -29,7 +29,6 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Use default cursor during mini‑game so dragging works */
     }
     html, body {
       width: 100%;
@@ -103,7 +102,7 @@
       z-index: 2;
       opacity: 1;
     }
-    /* Straw – placed at bottom right; clicking it attaches it to your cursor */
+    /* Straw – placed at bottom right; dragging attaches it to your cursor */
     #straw {
       position: absolute;
       width: 48px;
@@ -273,7 +272,7 @@
       border-radius: 10px;
       background: var(--containerColor);
       padding: 10px;
-      max-width: 300px;
+      max-width: 400px;
       margin: 0 auto;
     }
     .receipt-box img {
@@ -281,7 +280,7 @@
       height: auto;
       object-fit: contain;
     }
-    /* Login Modal Styles (Clean & Readable) */
+    /* Login Modal Styles */
     #loginModal {
       position: fixed;
       top: 0;
@@ -329,7 +328,7 @@
     #loginModal button:hover {
       background: #2a0a5e;
     }
-    /* Edit Controls (Hidden by Default) */
+    /* Edit Controls */
     #editControls {
       display: none;
       flex-direction: column;
@@ -351,7 +350,7 @@
       color: #fff;
       cursor: pointer;
     }
-    /* Custom Cursor (enabled on info page) */
+    /* Custom Cursor (for info page) */
     #customCursor {
       position: fixed;
       width: 50px;
@@ -401,14 +400,14 @@
   <div id="entryOverlay">
     <!-- Juice Box (without straw) -->
     <img id="juiceBox" src="https://media.discordapp.net/attachments/1342706156048617504/1357555068529803325/juice-wrld-ereid-rucky-transparent_2.png?ex=67f149ee&is=67eff86e&hm=a479eacc9e6bc2a71bec0b21e2d32fa626f9b555838b22ad1165a00ff2d63af2&=&format=webp&quality=lossless" alt="Juice Box">
-    <!-- Straw with dragging functions (placed at bottom right) -->
+    <!-- Straw with dragging functions -->
     <img id="straw" draggable="false" src="https://media.discordapp.net/attachments/1342706156048617504/1357555571443896330/juice-wrld-ereid-rucky-transparent_1.png?ex=67f14a66&is=67eff8e6&hm=bfb69959038d37330dbbe81518c7f4900a4d27aaff71051dd62c8ab97665547c&=&format=webp&quality=lossless" alt="Straw">
   </div>
   <!-- Full Juice Container -->
   <div id="fullJuiceContainer">
     <img id="fullJuice" src="https://cdn.discordapp.com/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png?ex=67f141bb&is=67eff03b&hm=a24321250e9e64549c60b63282d9b16096d94bcbb733f5db854ce9c27c389efe&format=webp&quality=lossless" alt="Full Juice">
   </div>
-  <!-- Login Modal (Email/Password based) -->
+  <!-- Login Modal -->
   <div id="loginModal">
     <div class="modal-content">
       <h2>Admin Login</h2>
@@ -418,13 +417,12 @@
       <button id="emailSignIn">Sign in</button>
     </div>
   </div>
-  <!-- Main Content Container -->
+  <!-- Main Content Container (Information Page) -->
   <div id="mainContent">
     <!-- Tilt Container -->
     <div id="cardContainer">
       <!-- Profile Card -->
       <div class="profile-card">
-        <!-- Head Section -->
         <div class="profile-head">
           <img class="profile-avatar" id="avatarImg" src="https://cdn.discordapp.com/avatars/726013275149434910/ca87e53ce32eee345ffc1ee41da048d1.png?size=1024" alt="Logann Avatar">
           <div class="profile-info">
@@ -432,7 +430,6 @@
             <p class="joined-line" id="joinedLine">joined 4 months ago</p>
           </div>
         </div>
-        <!-- Server Embed Section -->
         <div class="server-embed">
           <div class="server-icon">
             <img src="https://cdn.discordapp.com/icons/1342961798168711198/f64b2193374d7d372def1731fd35de8b.webp" alt="Server Icon">
@@ -456,18 +453,16 @@
             <a href="https://discord.gg/dazes" target="_blank">Join</a>
           </div>
         </div>
-        <!-- Receipt Box (Image based) -->
         <div class="receipt-box" id="receiptBox">
           <img src="https://via.placeholder.com/300x200?text=Receipt" alt="Receipt">
         </div>
-        <!-- Edit Controls (Hidden by Default) -->
+        <button id="viewAllComments" onclick="window.location.href='allcomments.html'">View All Comments</button>
         <div id="editControls">
           <input type="text" id="profileNameInput" placeholder="Enter new profile name">
           <input type="text" id="joinedLineInput" placeholder="Enter new joined text">
           <input type="text" id="videoURL" placeholder="Enter new video URL">
           <input type="text" id="audioURL" placeholder="Enter new audio URL">
           <input type="text" id="avatarURL" placeholder="Enter new avatar URL">
-          <!-- For receipt, allow updating the receipt image -->
           <input type="text" id="receiptURL" placeholder="Enter new receipt image URL">
           <button id="saveEdits">Save Changes</button>
         </div>
@@ -480,7 +475,6 @@
   <script>
     // ---------------------------
     // 1. Typewriter Effect for Tab Title
-    // ---------------------------
     async function typewriteTitle() {
       const text = "logann";
       while (true) {
@@ -498,7 +492,6 @@
 
     // ---------------------------
     // 2. Function to Enable Custom Cursor (for info page)
-    // ---------------------------
     function enableCustomCursor() {
       document.body.classList.add("custom-cursor");
       const customCursor = document.getElementById("customCursor");
@@ -522,7 +515,7 @@
     }
 
     // ---------------------------
-    // 3. Firebase Initialization and Settings Update Listener
+    // 3. Firebase Initialization and Settings Listener
     // ---------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
@@ -628,14 +621,14 @@
     const fullJuiceContainer = document.getElementById("fullJuiceContainer");
     const fullJuice = document.getElementById("fullJuice");
     const bgVideo = document.getElementById("bgVideo");
+    // Pause background video during mini‑game
     bgVideo.pause();
-    // Use center-on-cursor dragging for the straw
+    // Straw dragging using mouse and touch events
     let isStrawDragging = false;
     straw.addEventListener('mousedown', strawStartDrag);
     straw.addEventListener('touchstart', strawStartDragTouch);
     function strawStartDrag(e) {
       isStrawDragging = true;
-      // Immediately attach straw to cursor center
       updateStrawPosition(e.clientX, e.clientY);
       document.addEventListener('mousemove', strawDrag);
       document.addEventListener('mouseup', strawEndDrag);
@@ -660,7 +653,6 @@
       e.preventDefault();
     }
     function updateStrawPosition(x, y) {
-      // Center the straw on the cursor position
       const strawWidth = straw.offsetWidth;
       const strawHeight = straw.offsetHeight;
       straw.style.left = (x - strawWidth / 2) + "px";
@@ -687,7 +679,7 @@
         strawRect.bottom > juiceRect.top &&
         strawRect.top < juiceRect.bottom
       ) {
-        // Successful drop: animate fade-out then reveal full juice
+        // Straw has been successfully dropped on the juice box.
         juiceBox.style.transition = "opacity 0.5s ease-out";
         straw.style.transition = "opacity 0.5s ease-out";
         juiceBox.style.opacity = "0";
@@ -704,13 +696,15 @@
             setTimeout(() => {
               fullJuiceContainer.style.display = "none";
               document.getElementById("mainContent").style.opacity = "1";
-              // Enable custom cursor on info page
+              // Resume background video and enable custom cursor on info page
+              bgVideo.play();
               enableCustomCursor();
             }, 700);
           }, 1500);
         }, 500);
       }
     }
+    // Audio Toggle Logic
     const bgAudio = document.getElementById("bgAudio");
     const audioToggle = document.getElementById("audioToggle");
     const audioIcon = document.getElementById("audioIcon");
@@ -722,6 +716,7 @@
         audioIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M14.5 12c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"></path><path d="M16 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c3.45-.91 6-4.18 6-8.77s-2.55-7.86-6-8.77z"></path>';
       }
     });
+    // Tilt Effect for Profile Card Container
     const cardContainer = document.getElementById("cardContainer");
     cardContainer.addEventListener("mousemove", (e) => {
       const rect = cardContainer.getBoundingClientRect();
