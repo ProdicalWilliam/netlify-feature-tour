@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Comments - Logann</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .comment {
+      border: 2px solid #4b0082;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .comment img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      vertical-align: middle;
+    }
+    .comment strong {
+      margin-left: 10px;
+    }
+    .admin-btn, .pin-btn {
+      background: #ff0000;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      padding: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .pin-btn {
+      background: orange;
+    }
+    #backBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #4b0082;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+  <!-- Firebase SDKs (same as main page) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <h1>All Comments</h1>
+  <div id="allCommentsContainer"></div>
+  <button id="backBtn" onclick="window.location.href='index.html'">Back to Home</button>
+
+  <script>
+    // Firebase initialization (same config as main page)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+      authDomain: "github-1ec60.firebaseapp.com",
+      projectId: "github-1ec60",
+      storageBucket: "github-1ec60.firebasestorage.app",
+      messagingSenderId: "370562737308",
+      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
+      measurementId: "G-JDV0KHPD7F"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Display all comments ordered by timestamp ascending
+    db.collection("comments").orderBy("timestamp", "asc")
+      .onSnapshot(snapshot => {
+        const container = document.getElementById('allCommentsContainer');
+        container.innerHTML = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.innerHTML = `<img src="${data.avatar}" alt="Avatar"><strong>${data.username}</strong><p>${data.message}</p>`;
+          // If in editor mode (for simplicity, check if a local flag is set)
+          if(localStorage.getItem("editorMode") === "true"){
+            const pinBtn = document.createElement("button");
+            pinBtn.className = "pin-btn";
+            pinBtn.textContent = "Pin";
+            pinBtn.addEventListener("click", () => {
+              db.collection("settings").doc("global").set({
+                pinnedComment: { id: doc.id, data }
+              }, { merge: true }).then(() => {
+                alert("Comment pinned!");
+              });
+            });
+            const delBtn = document.createElement("button");
+            delBtn.className = "admin-btn";
+            delBtn.textContent = "Delete";
+            delBtn.addEventListener("click", () => {
+              db.collection("comments").doc(doc.id).delete().then(() => {
+                alert("Comment deleted");
+              });
+            });
+            div.prepend(pinBtn, delBtn);
+          }
+          container.appendChild(div);
+        });
+      });
+  </script>
+</body>
+</html>
