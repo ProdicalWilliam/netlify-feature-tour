@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Logann</title>
+  <title>logann</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon -->
   <link rel="icon" href="https://media.discordapp.net/attachments/1342706156048617504/1357546263897444423/juice-wrld-ereid-rucky-transparent.png" sizes="32x32">
@@ -35,6 +35,19 @@
       background-size: cover;
       transform: translate(-50%, -50%);
       display: none;
+    }
+    /* Trail for custom cursor */
+    .trail {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background-color: black;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.6;
+      transition: opacity 0.6s ease-out;
+      pointer-events: none;
+      z-index: 9999;
     }
     :root {
       --overlayBg: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(75,0,130,0.8));
@@ -109,22 +122,26 @@
       0% { transform: translate(0, 0); }
       100% { transform: translate(200px, 200px); }
     }
+    /* Center the juice box */
     #juiceBox {
       position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       max-width: 365px;
       max-height: 546px;
       z-index: 2;
       opacity: 1;
       background: none;
     }
-    /* Reposition straw to start off with a big gap */
+    /* Position the straw to the right of the juice box */
     #straw {
       position: absolute;
       width: 48px;
       height: 131px;
-      /* Set a negative bottom so it's far away from the juice box */
-      bottom: -150px;
-      right: 20px;
+      /* Placed offset from the juice box */
+      left: calc(50% + 200px);
+      top: calc(50% - 50px);
       user-select: none;
       z-index: 1010;
       transition: transform 0.3s ease;
@@ -644,7 +661,7 @@
             bgAudio.pause();
             audioSource.src = settings.audioURL;
             bgAudio.load();
-            bgAudio.play().catch(err => console.error("Audio error:", err));
+            // Only play audio if not in mini game; it will be started after mini game finishes.
           }
         }
         document.getElementById('avatarImg').src = settings.avatarURL;
@@ -690,6 +707,7 @@
         <p>${data.message}</p>
         <button class="like-btn" data-id="${commentId}">Like ${data.likes || ""}</button>
       `;
+      // Show edit controls if enabled
       if (document.getElementById('editControls').style.display === "grid") {
         const pinBtn = document.createElement("button");
         pinBtn.className = "pin-btn";
@@ -704,7 +722,14 @@
         delBtn.className = "admin-btn";
         delBtn.textContent = "Delete";
         delBtn.addEventListener("click", () => {
-          db.collection("comments").doc(commentId).delete().then(() => alert("Comment deleted"))
+          // If this comment is pinned, remove it from settings as well.
+          db.collection("settings").doc("global").get().then(doc => {
+            const globalData = doc.data();
+            if (globalData && globalData.pinnedComment && globalData.pinnedComment.id === commentId) {
+              db.collection("settings").doc("global").update({ pinnedComment: firebase.firestore.FieldValue.delete() });
+            }
+            return db.collection("comments").doc(commentId).delete();
+          }).then(() => alert("Comment deleted"))
             .catch(err => console.error("Delete error:", err));
         });
         card.appendChild(pinBtn);
@@ -802,19 +827,14 @@
       document.addEventListener("mousemove", (e) => {
         customCursor.style.left = e.clientX + "px";
         customCursor.style.top = e.clientY + "px";
+        // Create a trail element with class "trail"
         const trail = document.createElement("div");
-        trail.style.position = "fixed";
+        trail.className = "trail";
         trail.style.left = e.clientX + "px";
         trail.style.top = e.clientY + "px";
-        trail.style.width = "20px";
-        trail.style.height = "20px";
-        trail.style.backgroundColor = "black";
-        trail.style.borderRadius = "50%";
-        trail.style.opacity = "0.6";
-        trail.style.transform = "translate(-50%, -50%)";
         document.body.appendChild(trail);
+        // Trigger fade out and then remove after transition
         setTimeout(() => {
-          trail.style.transition = "opacity 0.6s ease-out";
           trail.style.opacity = "0";
           setTimeout(() => { trail.remove(); }, 600);
         }, 20);
@@ -824,6 +844,9 @@
 
     // ---------------- Mini-Game Transition ----------------
     function finishMiniGame() {
+      // Pause audio during mini game
+      const bgAudio = document.getElementById("bgAudio");
+      if (bgAudio) bgAudio.pause();
       juiceBox.style.transition = "opacity 0.5s ease-out";
       straw.style.transition = "opacity 0.5s ease-out";
       juiceBox.style.opacity = "0";
@@ -842,6 +865,10 @@
               document.getElementById("miniGame").style.display = "none";
               document.getElementById("mainContent").style.display = "flex";
               bgVideo.play();
+              // Resume audio if an audio URL exists
+              if (bgAudio && bgAudio.querySelector('source').src) {
+                bgAudio.play().catch(err => console.error("Audio error:", err));
+              }
               showMainCursor();
             }, 700);
           }, 1500);
