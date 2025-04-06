@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify ListenAlong</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <style>
+    /* Basic Spotify-inspired styling */
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1db954;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      width: 80%;
+      margin: 20px auto;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      background: #282828;
+      color: #fff;
+    }
+    button {
+      background: #1db954;
+      cursor: pointer;
+    }
+    .chat-box {
+      border: 1px solid #282828;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      background: #181818;
+    }
+    .message {
+      margin-bottom: 10px;
+    }
+    .playback-controls {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Spotify ListenAlong</h1>
+  </header>
+  <div class="container">
+    <!-- Authentication Section -->
+    <div id="auth-section">
+      <h2>Login / Register</h2>
+      <input type="email" id="email" placeholder="Enter valid email">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <button onclick="register()">Register</button>
+    </div>
+
+    <!-- Room Creation/Joining Section -->
+    <div id="room-section" style="display:none;">
+      <h2>Create or Join Room</h2>
+      <div>
+        <h3>Create Room</h3>
+        <input type="text" id="roomName" placeholder="Room Name">
+        <input type="text" id="roomPassword" placeholder="Room Password (optional)">
+        <select id="roomVisibility">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+        <button onclick="createRoom()">Create Room</button>
+      </div>
+      <hr>
+      <div>
+        <h3>Join Room</h3>
+        <input type="text" id="joinRoomId" placeholder="Room ID">
+        <input type="text" id="joinPassword" placeholder="Room Password if Private">
+        <button onclick="joinRoom()">Join Room</button>
+      </div>
+    </div>
+
+    <!-- Chat Room Section -->
+    <div id="chat-room" style="display:none;">
+      <h2 id="room-title">Room:</h2>
+      <div class="playback-controls">
+        <input type="text" id="mediaLink" placeholder="Enter media URL (YouTube, Spotify, SoundCloud)">
+        <button onclick="updateMedia()">Update Media</button>
+      </div>
+      <div id="media-player">
+        <!-- Media player placeholder; note that embedding may require additional SDK integration -->
+        <iframe id="mediaFrame" width="560" height="315" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="chat-box" id="chatBox"></div>
+      <input type="text" id="chatMessage" placeholder="Type a message">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // Firebase configuration using your project credentials
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.appspot.com",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    let currentRoomId = null;
+
+    // ---------- Authentication Functions ----------
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('auth-section').style.display = 'none';
+          document.getElementById('room-section').style.display = 'block';
+        })
+        .catch(err => alert("Login error: " + err.message));
+    }
+
+    function register() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('auth-section').style.display = 'none';
+          document.getElementById('room-section').style.display = 'block';
+        })
+        .catch(err => alert("Registration error: " + err.message));
+    }
+
+    // ---------- Room Creation and Joining ----------
+    function createRoom() {
+      const roomName = document.getElementById('roomName').value;
+      const roomPassword = document.getElementById('roomPassword').value;
+      const roomVisibility = document.getElementById('roomVisibility').value;
+      const roomData = {
+        name: roomName,
+        password: roomPassword || null,
+        visibility: roomVisibility,
+        mediaLink: "",
+        mediaTimestamp: Date.now(), // To help with sync later
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
+      const newRoomRef = db.ref('rooms').push();
+      newRoomRef.set(roomData, function(error) {
+        if (error) {
+          alert('Error creating room: ' + error.message);
+        } else {
+          currentRoomId = newRoomRef.key;
+          joinRoomById(currentRoomId);
+        }
+      });
+    }
+
+    function joinRoom() {
+      const roomId = document.getElementById('joinRoomId').value;
+      const joinPassword = document.getElementById('joinPassword').value;
+      db.ref('rooms/' + roomId).once('value').then(snapshot => {
+        const room = snapshot.val();
+        if (room) {
+          if (room.password && room.password !== joinPassword) {
+            alert("Incorrect room password!");
+            return;
+          }
+          currentRoomId = roomId;
+          joinRoomById(roomId);
+        } else {
+          alert("Room not found!");
+        }
+      });
+    }
+
+    function joinRoomById(roomId) {
+      document.getElementById('room-section').style.display = 'none';
+      document.getElementById('chat-room').style.display = 'block';
+      document.getElementById('room-title').innerText = "Room: " + roomId;
+
+      // Listen for media link updates and update the iframe accordingly
+      db.ref('rooms/' + roomId + '/mediaLink').on('value', snapshot => {
+        const mediaLink = snapshot.val();
+        if (mediaLink) {
+          document.getElementById('mediaFrame').src = formatMediaLink(mediaLink);
+        }
+      });
+
+      // Listen for chat messages
+      db.ref('rooms/' + roomId + '/chat').on('child_added', snapshot => {
+        const messageData = snapshot.val();
+        displayMessage(messageData);
+      });
+
+      // Sync playback state if needed
+      db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
+        // In a real implementation, compare timestamps and adjust the playback position accordingly.
+        // This example is a placeholder for more advanced sync logic.
+        console.log("Media sync timestamp:", snapshot.val());
+      });
+    }
+
+    // ---------- Media & Chat Functions ----------
+    function updateMedia() {
+      const mediaLink = document.getElementById('mediaLink').value;
+      if (currentRoomId) {
+        // Update both media link and timestamp for sync
+        db.ref('rooms/' + currentRoomId).update({ 
+          mediaLink: mediaLink,
+          mediaTimestamp: Date.now()
+        });
+      }
+    }
+
+    // A basic formatter for YouTube links. Extend as needed for Spotify, SoundCloud, etc.
+    function formatMediaLink(link) {
+      if (link.includes("youtube.com") || link.includes("youtu.be")) {
+        let videoId = "";
+        try {
+          if (link.includes("youtube.com")) {
+            const urlParams = new URLSearchParams(new URL(link).search);
+            videoId = urlParams.get('v');
+          } else if (link.includes("youtu.be")) {
+            videoId = link.split('/').pop();
+          }
+          return "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
+        } catch (e) {
+          console.error("Invalid URL", e);
+          return "";
+        }
+      }
+      // For other platforms, you might need to add appropriate embed code.
+      return link;
+    }
+
+    function sendMessage() {
+      const message = document.getElementById('chatMessage').value;
+      if (message.trim() === "" || !currentRoomId) return;
+      const messageData = {
+        text: message,
+        user: auth.currentUser.email,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      };
+      db.ref('rooms/' + currentRoomId + '/chat').push(messageData);
+      document.getElementById('chatMessage').value = "";
+    }
+
+    function displayMessage(messageData) {
+      const chatBox = document.getElementById('chatBox');
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.innerText = messageData.user + ": " + messageData.text;
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
