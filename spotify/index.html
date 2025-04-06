@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Listen Along</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="spotify-container">
-    <header class="header"><h1>Listen Along</h1></header>
-    <section class="track-info">
-      <img id="album-cover" src="https://via.placeholder.com/300" alt="Album Cover" />
-      <div class="track-details">
-        <h2 id="track-title">Track Title</h2>
-        <p id="artist-name">Artist Name</p>
-      </div>
-    </section>
-    <section class="player-container">
-      <iframe id="player" width="300" height="169" frameborder="0" allowfullscreen></iframe>
-    </section>
-    <div id="user-info" class="user-info"></div>
+  <div class="container">
+    <div class="player">
+      <iframe id="player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    <div class="track-info">
+      <h2 id="track-title">Track Title</h2>
+      <p id="track-link">Original Link</p>
+    </div>
+    <div class="participants">
+      <h3>Participants</h3>
+      <ul id="participant-list"></ul>
+    </div>
+    <div class="user-settings">
+      <input type="text" id="username" placeholder="Your name">
+      <input type="text" id="avatar" placeholder="Avatar URL">
+      <button id="join-btn">Join</button>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
