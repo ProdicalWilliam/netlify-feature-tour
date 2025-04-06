@@ -1,103 +1,89 @@
-// Helper function to extract query parameters from the URL
-function getQueryParams() {
-  const params = {};
-  window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-    params[key] = value;
-  });
-  return params;
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #121212;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-const params = getQueryParams();
-const sessionId = params.session;
+.spotify-container {
+  width: 350px;
+  background: #181818;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
 
-if (!sessionId) {
-  document.body.innerHTML = '<p>No session specified in the URL.</p>';
-} else {
-  // Prompt user for a display name (or retrieve it from localStorage)
-  let displayName = localStorage.getItem("displayName");
-  if (!displayName) {
-    displayName = prompt("Enter your display name:");
-    localStorage.setItem("displayName", displayName);
-  }
+.header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
 
-  // Add the participant by calling the Cloud Function endpoint.
-  // Replace <YOUR_BACKEND_DOMAIN> with your Cloud Functions URL.
-  fetch(`https://<YOUR_BACKEND_DOMAIN>/api/session/${sessionId}/participant`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ participant: displayName })
-  })
-  .then(response => response.json())
-  .then(result => {
-    if (result.success) {
-      console.log("Participant added");
-    } else {
-      console.error("Error adding participant", result.error);
-    }
-  })
-  .catch(err => console.error("Error:", err));
+.track-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  // Listen for realtime session updates using Firestore
-  const sessionDocRef = db.collection("sessions").doc(sessionId);
-  sessionDocRef.onSnapshot(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-      // Update the participant list
-      const participantList = document.getElementById("participant-list");
-      participantList.innerHTML = "";
-      if (data.participants) {
-        data.participants.forEach(p => {
-          const li = document.createElement("li");
-          li.textContent = p;
-          participantList.appendChild(li);
-        });
-      }
-      // Optionally update track info if stored in Firestore
-      if (data.track) {
-        document.getElementById("track-info").innerHTML = `
-          <p><strong>${data.track.name}</strong> by ${data.track.artists.join(", ")}</p>
-          <img src="${data.track.albumImage}" alt="Album Art" style="max-width:200px;">
-        `;
-      }
-    }
-  });
+.track-info img {
+  width: 300px;
+  height: 300px;
+  border-radius: 4px;
+}
 
-  // Fetch the current Spotify track from your backend.
-  fetch("https://<YOUR_BACKEND_DOMAIN>/api/spotify/current")
-    .then(res => {
-      if (!res.ok) throw new Error("Not logged in");
-      return res.json();
-    })
-    .then(data => {
-      if (data && data.item) {
-        const trackInfoDiv = document.getElementById("track-info");
-        trackInfoDiv.innerHTML = `
-          <p><strong>${data.item.name}</strong> by ${data.item.artists.map(a => a.name).join(", ")}</p>
-          <img src="${data.item.album.images[0].url}" alt="Album Art" style="max-width:200px;">
-        `;
-      }
-    })
-    .catch(err => {
-      document.getElementById("track-info").innerHTML =
-        "<p>Please log in with Spotify to see your current track.</p>";
-    });
+.track-details {
+  margin-top: 15px;
+}
 
-  // Optional: Poll the current track every 10 seconds for updates.
-  setInterval(() => {
-    fetch("https://<YOUR_BACKEND_DOMAIN>/api/spotify/current")
-      .then(res => {
-        if (!res.ok) throw new Error("Not logged in");
-        return res.json();
-      })
-      .then(data => {
-        if (data && data.item) {
-          const trackInfoDiv = document.getElementById("track-info");
-          trackInfoDiv.innerHTML = `
-            <p><strong>${data.item.name}</strong> by ${data.item.artists.map(a => a.name).join(", ")}</p>
-            <img src="${data.item.album.images[0].url}" alt="Album Art" style="max-width:200px;">
-          `;
-        }
-      })
-      .catch(() => {});
-  }, 10000);
+.track-details h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.track-details p {
+  margin: 5px 0 0;
+  color: #b3b3b3;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 5px;
+  background: #404040;
+  margin: 0 10px;
+  border-radius: 2.5px;
+  overflow: hidden;
+}
+
+.progress {
+  width: 25%;  /* example progress, adjust dynamically if needed */
+  height: 100%;
+  background: #1db954;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  color: #1db954;
+}
+
+.user-info {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #b3b3b3;
 }
