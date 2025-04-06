@@ -1,4 +1,3 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,8 +14,8 @@
   <div class="container">
     <h1>ListenAlong Session</h1>
     <div id="auth">
-      <!-- If the user is not authenticated with Spotify, show a login link -->
-      <a href="/spotify/login">Log in with Spotify</a>
+      <!-- Update the href below to point to your backend's /spotify/login endpoint -->
+      <a href="https://<YOUR_BACKEND_DOMAIN>/spotify/login">Log in with Spotify</a>
     </div>
     <div id="user-info" style="display:none;">
       <p>Welcome, <span id="username"></span>!</p>
@@ -31,8 +30,24 @@
     </div>
   </div>
 
-  <!-- Include Socket.io -->
-  <script src="/socket.io/socket.io.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script>
+    // Firebase project configuration – replace with your project's values:
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.appspot.com",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
   <script src="spotify.js"></script>
 </body>
 </html>
