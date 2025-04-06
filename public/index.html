@@ -1,0 +1,38 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ListenAlong Session</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 800px; margin: auto; }
+    #participants { margin-top: 20px; }
+    #track { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ListenAlong Session</h1>
+    <div id="auth">
+      <!-- If the user is not authenticated with Spotify, show a login link -->
+      <a href="/spotify/login">Log in with Spotify</a>
+    </div>
+    <div id="user-info" style="display:none;">
+      <p>Welcome, <span id="username"></span>!</p>
+    </div>
+    <div id="track">
+      <h2>Currently Playing:</h2>
+      <div id="track-info">Loading...</div>
+    </div>
+    <div id="participants">
+      <h2>Participants:</h2>
+      <ul id="participant-list"></ul>
+    </div>
+  </div>
+
+  <!-- Include Socket.io -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="spotify.js"></script>
+</body>
+</html>
