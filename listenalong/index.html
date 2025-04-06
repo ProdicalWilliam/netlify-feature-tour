@@ -408,7 +408,6 @@
       // Ready
       spotifyPlayer.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
-        // Optionally, you could transfer playback to this device using Spotify's API.
       });
 
       // Not Ready
@@ -420,7 +419,6 @@
     };
 
     // Global Variables for Firebase/Room Management
-    // Replace "SOME_ADMIN_UID" with your actual Firebase admin UID.
     const adminUID = "1119TCpma1ajWOeI250vQ2Un1dg2"; 
     let currentRoomId = null;
     let youtubePlayer = null;
@@ -521,7 +519,7 @@
         mediaTimestamp: 0,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
         creator: user.uid,
-        banned: {}  // initialize banned list
+        banned: {}
       };
       const newRoomRef = db.ref('rooms').push();
       newRoomRef.set(roomData, error => {
@@ -536,21 +534,18 @@
 
     // ----- Join Room & Room UI -----
     function joinRoomById(roomId) {
-      // Check if user is banned in this room before joining
       db.ref('rooms/' + roomId + '/banned').once('value').then(snapshot => {
         const banned = snapshot.val() || {};
         if (banned[auth.currentUser.uid]) {
           alert("You have been banned from this room.");
           return;
         }
-        // If not banned, show room UI
         document.getElementById('server-browser').style.display = 'none';
         document.getElementById('chat-room').style.display = 'block';
         document.getElementById('room-title').innerText = "Room: " + roomId;
         db.ref('rooms/' + roomId).once('value').then(snapshot => {
           const room = snapshot.val();
           roomCreatorUID = room.creator;
-          // Show close room button for room creator or admin
           if (auth.currentUser.uid === roomCreatorUID || auth.currentUser.uid === adminUID) {
             document.getElementById('closeRoomBtn').style.display = 'block';
             document.getElementById('customControls').style.display = 'block';
@@ -589,7 +584,6 @@
       });
     }
     function closeRoom() {
-      // Only room creator or admin can close room
       if (auth.currentUser.uid !== roomCreatorUID && auth.currentUser.uid !== adminUID) return;
       if (confirm("Are you sure you want to close this room?")) {
         db.ref('rooms/' + currentRoomId).remove();
@@ -610,7 +604,6 @@
       return "other";
     }
     function loadMedia(link) {
-      // Clear previous players
       document.getElementById('ytplayer').innerHTML = "";
       document.getElementById('spotifyContainer').innerHTML = "";
       document.getElementById('soundcloudContainer').innerHTML = "";
@@ -680,7 +673,7 @@
         }, 1000);
       }
     }
-    function onPlayerStateChange(event) { /* syncing handled in interval */ }
+    function onPlayerStateChange(event) { }
     function setupCustomControls() {
       const slider = document.getElementById('seekSlider');
       const durationInterval = setInterval(() => {
@@ -755,7 +748,6 @@
           div.classList.add('participant');
           if (uid === roomCreatorUID) div.classList.add('creator');
           div.innerHTML = `<img src="${p.avatar}" alt="${p.username}"><div>${p.username}</div>`;
-          // If current user is admin or room creator and uid is not self, add kick/ban controls
           if ((auth.currentUser.uid === roomCreatorUID || auth.currentUser.uid === adminUID) && uid !== auth.currentUser.uid) {
             const controls = document.createElement('div');
             controls.classList.add('control-buttons');
@@ -773,13 +765,11 @@
         });
       }
     }
-    // Kick a participant (remove from participants list)
     function kickParticipant(uid) {
       if (confirm("Are you sure you want to kick this participant?")) {
         db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
       }
     }
-    // Ban a participant (remove and add to banned list)
     function banParticipant(uid) {
       if (confirm("Are you sure you want to ban this participant? They will not be able to rejoin.")) {
         db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
