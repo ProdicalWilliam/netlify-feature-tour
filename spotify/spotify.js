@@ -1,9 +1,7 @@
-// public/spotify.js
-
-// Helper: Get query parameters from the URL
+// Helper function to extract query parameters from the URL
 function getQueryParams() {
   const params = {};
-  window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, (m, key, value) => {
+  window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
     params[key] = value;
   });
   return params;
@@ -11,22 +9,22 @@ function getQueryParams() {
 
 const params = getQueryParams();
 const sessionId = params.session;
+
 if (!sessionId) {
   document.body.innerHTML = '<p>No session specified in the URL.</p>';
 } else {
-  // Ask user for their display name (or retrieve from localStorage)
+  // Prompt user for a display name (or retrieve it from localStorage)
   let displayName = localStorage.getItem("displayName");
   if (!displayName) {
     displayName = prompt("Enter your display name:");
     localStorage.setItem("displayName", displayName);
   }
 
-  // Post participant info to the backend Cloud Function
+  // Add the participant by calling the Cloud Function endpoint.
+  // Replace <YOUR_BACKEND_DOMAIN> with your Cloud Functions URL.
   fetch(`https://<YOUR_BACKEND_DOMAIN>/api/session/${sessionId}/participant`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ participant: displayName })
   })
   .then(response => response.json())
@@ -39,12 +37,12 @@ if (!sessionId) {
   })
   .catch(err => console.error("Error:", err));
 
-  // Listen for realtime updates in the session via Firestore
+  // Listen for realtime session updates using Firestore
   const sessionDocRef = db.collection("sessions").doc(sessionId);
   sessionDocRef.onSnapshot(doc => {
     if (doc.exists) {
       const data = doc.data();
-      // Update participants list
+      // Update the participant list
       const participantList = document.getElementById("participant-list");
       participantList.innerHTML = "";
       if (data.participants) {
@@ -54,7 +52,7 @@ if (!sessionId) {
           participantList.appendChild(li);
         });
       }
-      // (Optional) Update track info if stored in Firestore
+      // Optionally update track info if stored in Firestore
       if (data.track) {
         document.getElementById("track-info").innerHTML = `
           <p><strong>${data.track.name}</strong> by ${data.track.artists.join(", ")}</p>
@@ -64,7 +62,7 @@ if (!sessionId) {
     }
   });
 
-  // Fetch the current Spotify track from your backend (if the user is logged in)
+  // Fetch the current Spotify track from your backend.
   fetch("https://<YOUR_BACKEND_DOMAIN>/api/spotify/current")
     .then(res => {
       if (!res.ok) throw new Error("Not logged in");
@@ -84,7 +82,7 @@ if (!sessionId) {
         "<p>Please log in with Spotify to see your current track.</p>";
     });
 
-  // (Optional) Poll the current track every 10 seconds
+  // Optional: Poll the current track every 10 seconds for updates.
   setInterval(() => {
     fetch("https://<YOUR_BACKEND_DOMAIN>/api/spotify/current")
       .then(res => {
