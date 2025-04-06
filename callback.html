@@ -56,19 +56,19 @@
     <div class="spinner"></div>
   </div>
   <script>
-    // Get the URL hash and check for an access token
+    // Retrieve the URL hash
     const hash = window.location.hash;
+    // Check if the hash contains an access token
     const hasToken = hash.includes("access_token");
 
     if (hasToken) {
-      // Redirect to your main page with the access token in the hash after a short delay
+      // Redirect to your main page (adjust the URL if needed) with the token in the hash after a brief delay
       setTimeout(() => {
         window.location.href = "https://dazes.org/listenalong" + hash;
       }, 1500);
     } else {
-      // No token found; remain on this page or display a message.
+      // No token found; remain on this page or show an error message
       console.log("No access token found; staying on the callback page.");
-      // Optionally, you could show a message to the user:
       document.querySelector(".message").innerText = "Authentication token not found. Please try logging in again.";
     }
   </script>
