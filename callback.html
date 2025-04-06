@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Spotify Callback</title>
+  </head>
+  <body>
+    <div id="message">Processing...</div>
+    <script>
+      // Extract the code from the URL query parameters
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const messageEl = document.getElementById("message");
+
+      if (code) {
+        // Optionally, copy the code to clipboard automatically
+        navigator.clipboard.writeText(code)
+          .then(() => {
+            messageEl.innerHTML = `<p>Authorization code copied to clipboard!</p>
+                                   <p>If it wasn’t copied, please copy it manually: <strong>${code}</strong></p>`;
+          })
+          .catch(() => {
+            messageEl.innerHTML = `<p>Your authorization code: <strong>${code}</strong></p>
+                                   <p>Please copy this code and paste it into your app.</p>`;
+          });
+      } else {
+        messageEl.innerHTML = "<p>No authorization code found in the URL.</p>";
+      }
+    </script>
+  </body>
+</html>
