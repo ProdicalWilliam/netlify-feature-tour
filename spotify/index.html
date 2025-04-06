@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Listen Along - Spotify</title>
+  <title>Listen Along</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="spotify-container">
-    <header class="header">
-      <h1>Spotify Listen Along</h1>
-    </header>
+    <header class="header"><h1>Listen Along</h1></header>
     <section class="track-info">
       <img id="album-cover" src="https://via.placeholder.com/300" alt="Album Cover" />
       <div class="track-details">
@@ -18,18 +16,9 @@
         <p id="artist-name">Artist Name</p>
       </div>
     </section>
-    <section class="progress-bar-container">
-      <span id="current-time">0:00</span>
-      <div class="progress-bar">
-        <div id="progress" class="progress"></div>
-      </div>
-      <span id="duration">3:30</span>
+    <section class="player-container">
+      <iframe id="player" width="300" height="169" frameborder="0" allowfullscreen></iframe>
     </section>
-    <footer class="controls">
-      <button id="prev">&#9664;&#9664;</button>
-      <button id="play">&#9654;</button>
-      <button id="next">&#9654;&#9654;</button>
-    </footer>
     <div id="user-info" class="user-info"></div>
   </div>
   <script src="script.js"></script>
