@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   background: #121212;
   color: #fff;
   display: flex;
@@ -40,34 +40,8 @@ body {
   margin: 5px 0 0;
   color: #b3b3b3;
 }
-.progress-bar-container {
-  display: flex;
-  align-items: center;
-  margin: 15px 0;
-}
-.progress-bar {
-  flex: 1;
-  height: 5px;
-  background: #404040;
-  margin: 0 10px;
-  border-radius: 2.5px;
-  overflow: hidden;
-}
-.progress {
-  width: 25%;
-  height: 100%;
-  background: #1db954;
-}
-.controls button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.2rem;
-  margin: 0 10px;
-  cursor: pointer;
-}
-.controls button:hover {
-  color: #1db954;
+.player-container {
+  margin-top: 15px;
 }
 .user-info {
   margin-top: 15px;
