@@ -1,50 +1,73 @@
-function getParameterByName(name) {
-  name = name.replace(/[\[\]]/g, "\\$&");
-  const url = window.location.href;
-  const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return "";
-  return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
+// File: static/script.js
+const roomCode = new URLSearchParams(window.location.search).get('room');
+document.getElementById('roomCode').textContent = roomCode;
 
-const room = getParameterByName("room");
-
-function loadRoom() {
-  fetch(`/api/room/${room}`)
+fetch(`/api/room/${roomCode}`)
     .then(response => response.json())
     .then(data => {
-      if (data.embed_url) {
-        document.getElementById("player").src = data.embed_url;
-        document.getElementById("track-title").textContent = data.track_link;
-      }
+        document.getElementById('media-embed').src = data.embed_url;
+        updateParticipants();
+    })
+    .catch(error => {
+        console.error('Error loading room:', error);
+        alert('Room not found or invalid');
     });
+
+function updateParticipants() {
+    fetch(`/api/participants/${roomCode}`)
+        .then(response => response.json())
+        .then(participants => {
+            const participantsEl = document.getElementById('participants');
+            participantsEl.innerHTML = '';
+            
+            if (participants.length === 0) {
+                participantsEl.innerHTML = '<p>No listeners yet</p>';
+                return;
+            }
+            
+            participants.forEach(p => {
+                const participant = document.createElement('div');
+                participant.className = 'participant';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'participant-avatar';
+                
+                const img = document.createElement('img');
+                img.src = p.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+                img.alt = p.name;
+                avatar.appendChild(img);
+                
+                const name = document.createElement('div');
+                name.className = 'participant-name';
+                name.textContent = p.name;
+                
+                participant.appendChild(avatar);
+                participant.appendChild(name);
+                participantsEl.appendChild(participant);
+            });
+        });
 }
 
-function loadParticipants() {
-  fetch(`/api/participants/${room}`)
+document.getElementById('joinBtn').addEventListener('click', () => {
+    const name = document.getElementById('nameInput').value || 'Anonymous';
+    const avatar = document.getElementById('avatarInput').value || '';
+    
+    fetch('/api/participant', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            room: roomCode,
+            name: name,
+            avatar: avatar
+        })
+    })
     .then(response => response.json())
     .then(data => {
-      const list = document.getElementById("participant-list");
-      list.innerHTML = "";
-      data.forEach(p => {
-        list.innerHTML += `<li><img src="${p.avatar}" alt="${p.name}" width="30" height="30"> ${p.name}</li>`;
-      });
+        document.getElementById('joinForm').style.display = 'none';
+        updateParticipants();
+        
+        setInterval(updateParticipants, 5000);
     });
-}
-
-document.getElementById("join-btn").addEventListener("click", () => {
-  const name = document.getElementById("username").value || "Anonymous";
-  const avatar = document.getElementById("avatar").value || "https://via.placeholder.com/30";
-  fetch("/api/participant", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ room, name, avatar })
-  }).then(() => {
-    loadParticipants();
-  });
 });
-
-loadRoom();
-loadParticipants();
-setInterval(loadParticipants, 5000);
