@@ -56,16 +56,21 @@
     <div class="spinner"></div>
   </div>
   <script>
-    // Delay a moment to display the authentication process
-    setTimeout(function() {
-      if (window.location.hash) {
-        // Redirect to your main page (https://dazes.org/listenalong) with the access token hash
-        window.location.href = "https://dazes.org/listenalong" + window.location.hash;
-      } else {
-        // If no token is present, simply redirect to your main page
-        window.location.href = "https://dazes.org/listenalong";
-      }
-    }, 1500); // 1.5 seconds delay for enhanced user experience
+    // Get the URL hash and check for an access token
+    const hash = window.location.hash;
+    const hasToken = hash.includes("access_token");
+
+    if (hasToken) {
+      // Redirect to your main page with the access token in the hash after a short delay
+      setTimeout(() => {
+        window.location.href = "https://dazes.org/listenalong" + hash;
+      }, 1500);
+    } else {
+      // No token found; remain on this page or display a message.
+      console.log("No access token found; staying on the callback page.");
+      // Optionally, you could show a message to the user:
+      document.querySelector(".message").innerText = "Authentication token not found. Please try logging in again.";
+    }
   </script>
 </body>
 </html>
