@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Playback</title>
+  <title>Spotify Auth Redirect</title>
   <link rel="icon" href="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png" />
   <style>
     body {
@@ -15,70 +15,40 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      text-align: center;
     }
 
-    .container {
+    .message-box {
       background: rgba(0, 0, 0, 0.6);
       border-radius: 20px;
       padding: 2rem;
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
     }
 
     h1 {
       font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 1rem;
-      border: none;
-      background-color: #1db954;
-      color: white;
-      font-weight: bold;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #1ed760;
-    }
-
-    .switch {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .switch a {
-      color: #1db954;
-      text-decoration: none;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Login to Playback</h1>
-    <input type="email" placeholder="Email" required />
-    <input type="password" placeholder="Password" required />
-    <button>Login</button>
-    <div class="switch">
-      Don't have an account? <a href="/register">Register</a>
-    </div>
+  <div class="message-box">
+    <h1>Authorizing with Spotify...</h1>
+    <p>Please wait while we redirect you back to the app.</p>
   </div>
+
+  <script>
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+
+    if (accessToken) {
+      localStorage.setItem("spotify_access_token", accessToken);
+      window.location.href = "/";
+    } else {
+      document.querySelector('.message-box').innerHTML = "<h1>Authorization failed</h1><p>Please try logging in again.</p>";
+    }
+  </script>
 </body>
 </html>
