@@ -8,26 +8,17 @@ function getParameterByName(name) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 const userId = getParameterByName('user');
-function msToTime(duration) {
-  let seconds = Math.floor((duration / 1000) % 60),
-      minutes = Math.floor((duration / (1000 * 60)) % 60);
-  return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
-}
-function updatePlayback() {
+function updateTrack() {
   if (!userId) return;
-  fetch(`http://127.0.0.1:8888/current?user=${userId}`)
+  fetch(`http://127.0.0.1:8888/track/${userId}`)
     .then(response => response.json())
     .then(data => {
-       if (!data.error && data.item) {
-         document.getElementById('track-title').textContent = data.item.name;
-         document.getElementById('artist-name').textContent = data.item.artists.map(a => a.name).join(', ');
-         document.getElementById('album-cover').src = data.item.album.images[0].url;
-         const progress = data.progress_ms;
-         const duration = data.item.duration_ms;
-         document.getElementById('current-time').textContent = msToTime(progress);
-         document.getElementById('duration').textContent = msToTime(duration);
-         document.getElementById('progress').style.width = (progress / duration * 100) + '%';
-       }
+      if (!data.error) {
+        document.getElementById('track-title').textContent = data.title;
+        document.getElementById('artist-name').textContent = data.artist;
+        document.getElementById('album-cover').src = data.album_cover;
+        document.getElementById('player').src = data.video_url;
+      }
     });
 }
-setInterval(updatePlayback, 5000);
+setInterval(updateTrack, 5000);
