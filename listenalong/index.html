@@ -2,72 +2,131 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Spotify ListenAlong</title>
+  <title>Dazes Listen-Along</title>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <!-- YouTube IFrame API for YouTube sync -->
+  <script async src="https://www.youtube.com/iframe_api"></script>
   <style>
-    /* Basic Spotify-inspired styling */
+    /* Spotify-inspired dark UI */
     body {
       background-color: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #fff;
     }
     header {
       background-color: #1db954;
-      padding: 20px;
-      text-align: center;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+    }
+    header img.spotify-icon {
+      height: 40px;
+      margin-right: 15px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
     }
     .container {
-      width: 80%;
+      width: 90%;
+      max-width: 900px;
       margin: 20px auto;
+      background: #181818;
+      padding: 20px;
+      border-radius: 8px;
     }
     input, button, select {
       padding: 10px;
-      margin: 5px;
+      margin: 5px 0;
       border: none;
       border-radius: 4px;
       background: #282828;
       color: #fff;
+      font-size: 14px;
     }
     button {
       background: #1db954;
       cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .section {
+      margin-bottom: 20px;
     }
     .chat-box {
       border: 1px solid #282828;
+      background: #121212;
       padding: 10px;
-      height: 300px;
+      height: 200px;
       overflow-y: auto;
-      background: #181818;
+      border-radius: 4px;
     }
     .message {
       margin-bottom: 10px;
+      padding: 5px;
+      border-bottom: 1px solid #282828;
     }
-    .playback-controls {
-      margin: 10px 0;
+    .media-player {
+      margin: 15px 0;
+      text-align: center;
+    }
+    #participants {
+      display: flex;
+      flex-wrap: wrap;
+      border-top: 1px solid #282828;
+      padding-top: 10px;
+    }
+    .participant {
+      margin: 5px;
+      text-align: center;
+    }
+    .participant img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+    }
+    /* Crown overlay for room creator */
+    .creator img {
+      position: relative;
+    }
+    .creator::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 18px;
+      width: 20px;
+      height: 20px;
+      background: url('https://png.pngtree.com/png-vector/20220517/ourmid/pngtree-golden-crown-isolated-on-white-background-png-image_4656900.png') no-repeat center center;
+      background-size: contain;
     }
   </style>
 </head>
 <body>
   <header>
+    <img src="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png" class="spotify-icon" alt="Spotify Icon">
     <h1>Spotify ListenAlong</h1>
   </header>
   <div class="container">
-    <!-- Authentication Section -->
-    <div id="auth-section">
+    <!-- Authentication and Profile Setup -->
+    <div id="auth-section" class="section">
       <h2>Login / Register</h2>
       <input type="email" id="email" placeholder="Enter valid email">
       <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
+      <input type="text" id="username" placeholder="Choose a username">
+      <input type="text" id="avatar" placeholder="Avatar URL (optional)">
       <button onclick="register()">Register</button>
+      <button onclick="login()">Login</button>
     </div>
 
-    <!-- Room Creation/Joining Section -->
-    <div id="room-section" style="display:none;">
+    <!-- Room Creation/Join Section -->
+    <div id="room-section" class="section" style="display:none;">
       <h2>Create or Join Room</h2>
       <div>
         <h3>Create Room</h3>
@@ -88,25 +147,33 @@
       </div>
     </div>
 
-    <!-- Chat Room Section -->
-    <div id="chat-room" style="display:none;">
-      <h2 id="room-title">Room:</h2>
-      <div class="playback-controls">
+    <!-- Chat & Media Room Section -->
+    <div id="chat-room" class="section" style="display:none;">
+      <div style="display:flex; justify-content: space-between; align-items: center;">
+        <h2 id="room-title">Room:</h2>
+        <!-- Only the room creator sees this button -->
+        <button id="closeRoomBtn" style="display:none;" onclick="closeRoom()">Close Room</button>
+      </div>
+      <div class="media-player">
+        <!-- Media controls: Only the room creator can change the video -->
         <input type="text" id="mediaLink" placeholder="Enter media URL (YouTube, Spotify, SoundCloud)">
         <button onclick="updateMedia()">Update Media</button>
       </div>
-      <div id="media-player">
-        <!-- Media player placeholder; note that embedding may require additional SDK integration -->
-        <iframe id="mediaFrame" width="560" height="315" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div id="playerContainer" class="media-player">
+        <!-- Placeholder for embedded media -->
+        <div id="mediaPlayer"></div>
       </div>
       <div class="chat-box" id="chatBox"></div>
       <input type="text" id="chatMessage" placeholder="Type a message">
       <button onclick="sendMessage()">Send</button>
+      <div id="participants">
+        <!-- Participant avatars and usernames will be displayed here -->
+      </div>
     </div>
   </div>
 
   <script>
-    // Firebase configuration using your project credentials
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
       authDomain: "spotify-795ab.firebaseapp.com",
@@ -115,22 +182,24 @@
       messagingSenderId: "907464366407",
       appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
+    // Global variables
     let currentRoomId = null;
+    let youtubePlayer = null;
+    let mediaType = null; // "youtube", "spotify", "soundcloud", or "other"
+    let roomCreatorUID = null;
+    let currentUserProfile = { username: "", avatar: "" };
 
-    // ---------- Authentication Functions ----------
+    // ----- Authentication & Profile Setup -----
     function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('auth-section').style.display = 'none';
-          document.getElementById('room-section').style.display = 'block';
+        .then(cred => {
+          loadUserProfile(cred.user);
         })
         .catch(err => alert("Login error: " + err.message));
     }
@@ -138,26 +207,44 @@
     function register() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value || "Anonymous";
+      const avatar = document.getElementById('avatar').value || "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/129-512.png";
       auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('auth-section').style.display = 'none';
-          document.getElementById('room-section').style.display = 'block';
+        .then(cred => {
+          // Save profile info
+          db.ref('users/' + cred.user.uid).set({
+            username: username,
+            avatar: avatar
+          });
+          loadUserProfile(cred.user);
         })
         .catch(err => alert("Registration error: " + err.message));
     }
 
-    // ---------- Room Creation and Joining ----------
+    function loadUserProfile(user) {
+      db.ref('users/' + user.uid).once('value').then(snapshot => {
+        const data = snapshot.val() || {};
+        currentUserProfile.username = data.username || "Anonymous";
+        currentUserProfile.avatar = data.avatar || "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/129-512.png";
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('room-section').style.display = 'block';
+      });
+    }
+
+    // ----- Room Creation / Join / Close -----
     function createRoom() {
       const roomName = document.getElementById('roomName').value;
       const roomPassword = document.getElementById('roomPassword').value;
       const roomVisibility = document.getElementById('roomVisibility').value;
+      const user = auth.currentUser;
       const roomData = {
         name: roomName,
         password: roomPassword || null,
         visibility: roomVisibility,
         mediaLink: "",
-        mediaTimestamp: Date.now(), // To help with sync later
-        createdAt: firebase.database.ServerValue.TIMESTAMP
+        mediaTimestamp: 0,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        creator: user.uid
       };
       const newRoomRef = db.ref('rooms').push();
       newRoomRef.set(roomData, function(error) {
@@ -165,6 +252,7 @@
           alert('Error creating room: ' + error.message);
         } else {
           currentRoomId = newRoomRef.key;
+          roomCreatorUID = user.uid;
           joinRoomById(currentRoomId);
         }
       });
@@ -181,6 +269,7 @@
             return;
           }
           currentRoomId = roomId;
+          roomCreatorUID = room.creator;
           joinRoomById(roomId);
         } else {
           alert("Room not found!");
@@ -193,67 +282,167 @@
       document.getElementById('chat-room').style.display = 'block';
       document.getElementById('room-title').innerText = "Room: " + roomId;
 
-      // Listen for media link updates and update the iframe accordingly
+      // Show the Close Room button only to the creator
+      if (auth.currentUser.uid === roomCreatorUID) {
+        document.getElementById('closeRoomBtn').style.display = 'block';
+      }
+
+      // Add user to participants list
+      const uid = auth.currentUser.uid;
+      db.ref('rooms/' + roomId + '/participants/' + uid).set({
+        username: currentUserProfile.username,
+        avatar: currentUserProfile.avatar
+      });
+      // Remove participant on disconnect
+      db.ref('rooms/' + roomId + '/participants/' + uid).onDisconnect().remove();
+
+      // Listen for media link updates for sync
       db.ref('rooms/' + roomId + '/mediaLink').on('value', snapshot => {
-        const mediaLink = snapshot.val();
-        if (mediaLink) {
-          document.getElementById('mediaFrame').src = formatMediaLink(mediaLink);
+        const link = snapshot.val();
+        if (link) {
+          mediaType = detectMediaType(link);
+          loadMedia(link);
+        }
+      });
+
+      // Listen for media timestamp updates for YouTube syncing (if not creator)
+      db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
+        const ts = snapshot.val();
+        if (mediaType === "youtube" && youtubePlayer && auth.currentUser.uid !== roomCreatorUID) {
+          youtubePlayer.seekTo(ts / 1000, true);
         }
       });
 
       // Listen for chat messages
       db.ref('rooms/' + roomId + '/chat').on('child_added', snapshot => {
-        const messageData = snapshot.val();
-        displayMessage(messageData);
+        displayMessage(snapshot.val());
       });
 
-      // Sync playback state if needed
-      db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
-        // In a real implementation, compare timestamps and adjust the playback position accordingly.
-        // This example is a placeholder for more advanced sync logic.
-        console.log("Media sync timestamp:", snapshot.val());
+      // Listen for participant list changes
+      db.ref('rooms/' + roomId + '/participants').on('value', snapshot => {
+        updateParticipants(snapshot.val());
       });
     }
 
-    // ---------- Media & Chat Functions ----------
-    function updateMedia() {
-      const mediaLink = document.getElementById('mediaLink').value;
-      if (currentRoomId) {
-        // Update both media link and timestamp for sync
-        db.ref('rooms/' + currentRoomId).update({ 
-          mediaLink: mediaLink,
-          mediaTimestamp: Date.now()
-        });
+    function closeRoom() {
+      if (auth.currentUser.uid !== roomCreatorUID) return;
+      if (confirm("Are you sure you want to close this room?")) {
+        db.ref('rooms/' + currentRoomId).remove();
+        alert("Room closed.");
+        location.reload();
       }
     }
 
-    // A basic formatter for YouTube links. Extend as needed for Spotify, SoundCloud, etc.
-    function formatMediaLink(link) {
+    // ----- Media Handling & Sync -----
+    // Determine media type from the URL
+    function detectMediaType(link) {
       if (link.includes("youtube.com") || link.includes("youtu.be")) {
-        let videoId = "";
-        try {
-          if (link.includes("youtube.com")) {
-            const urlParams = new URLSearchParams(new URL(link).search);
-            videoId = urlParams.get('v');
-          } else if (link.includes("youtu.be")) {
-            videoId = link.split('/').pop();
-          }
-          return "https://www.youtube.com/embed/" + videoId + "?autoplay=1";
-        } catch (e) {
-          console.error("Invalid URL", e);
-          return "";
-        }
+        return "youtube";
+      } else if (link.includes("open.spotify.com/track")) {
+        return "spotify";
+      } else if (link.includes("soundcloud.com")) {
+        return "soundcloud";
       }
-      // For other platforms, you might need to add appropriate embed code.
-      return link;
+      return "other";
     }
 
+    // Load media according to type
+    function loadMedia(link) {
+      // Only room creator can update the video (others cannot change it)
+      if (mediaType === "youtube") {
+        // Remove any previous player
+        document.getElementById('mediaPlayer').innerHTML = '<div id="ytplayer"></div>';
+        // Create YouTube player (the API will call onYouTubeIframeAPIReady)
+        if (typeof onYouTubeIframeAPIReady === 'function') {
+          onYouTubeIframeAPIReady();
+        }
+      } else if (mediaType === "spotify") {
+        const trackId = link.split("track/")[1].split("?")[0];
+        const embedUrl = "https://open.spotify.com/embed/track/" + trackId;
+        document.getElementById('mediaPlayer').innerHTML = `<iframe src="${embedUrl}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+      } else if (mediaType === "soundcloud") {
+        const embedUrl = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(link) + "&auto_play=true";
+        document.getElementById('mediaPlayer').innerHTML = `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="${embedUrl}"></iframe>`;
+      } else {
+        document.getElementById('mediaPlayer').innerHTML = `<p>Unsupported media type</p>`;
+      }
+    }
+
+    // YouTube API callback – create or re-create the player
+    function onYouTubeIframeAPIReady() {
+      // Parse video id from link
+      let videoId = "";
+      try {
+        if (currentRoomId) {
+          let link = "";
+          db.ref('rooms/' + currentRoomId + '/mediaLink').once('value').then(snapshot => {
+            link = snapshot.val();
+            if (link.includes("youtube.com")) {
+              const urlParams = new URLSearchParams(new URL(link).search);
+              videoId = urlParams.get('v');
+            } else if (link.includes("youtu.be")) {
+              videoId = link.split('/').pop();
+            }
+            youtubePlayer = new YT.Player('ytplayer', {
+              height: '315',
+              width: '560',
+              videoId: videoId,
+              playerVars: {
+                autoplay: 1,
+                controls: 1
+              },
+              events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+              }
+            });
+          });
+        }
+      } catch (e) {
+        console.error("Error loading YouTube video", e);
+      }
+    }
+
+    function onPlayerReady(event) {
+      // If not the creator, seek to the stored timestamp
+      db.ref('rooms/' + currentRoomId + '/mediaTimestamp').once('value').then(snapshot => {
+        const ts = snapshot.val();
+        if (ts && auth.currentUser.uid !== roomCreatorUID) {
+          event.target.seekTo(ts / 1000, true);
+        }
+      });
+    }
+
+    function onPlayerStateChange(event) {
+      // If the room creator is playing the video, update timestamp for syncing
+      if (auth.currentUser.uid === roomCreatorUID && event.data === YT.PlayerState.PLAYING) {
+        const currentTime = youtubePlayer.getCurrentTime();
+        db.ref('rooms/' + currentRoomId).update({ mediaTimestamp: Date.now() - (youtubePlayer.getDuration()*1000 - currentTime*1000) });
+      }
+    }
+
+    // Called when the room creator clicks "Update Media"
+    function updateMedia() {
+      if (auth.currentUser.uid !== roomCreatorUID) {
+        alert("Only the room creator can change the media.");
+        return;
+      }
+      const link = document.getElementById('mediaLink').value;
+      // Update media link and reset timestamp
+      db.ref('rooms/' + currentRoomId).update({
+        mediaLink: link,
+        mediaTimestamp: Date.now()
+      });
+    }
+
+    // ----- Chat Functions -----
     function sendMessage() {
       const message = document.getElementById('chatMessage').value;
       if (message.trim() === "" || !currentRoomId) return;
       const messageData = {
         text: message,
-        user: auth.currentUser.email,
+        user: currentUserProfile.username,
+        avatar: currentUserProfile.avatar,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       };
       db.ref('rooms/' + currentRoomId + '/chat').push(messageData);
@@ -264,9 +453,30 @@
       const chatBox = document.getElementById('chatBox');
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
-      messageDiv.innerText = messageData.user + ": " + messageData.text;
+      messageDiv.innerHTML = `<strong>${messageData.user}:</strong> ${messageData.text}`;
       chatBox.appendChild(messageDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // ----- Participant List -----
+    function updateParticipants(participants) {
+      const partContainer = document.getElementById('participants');
+      partContainer.innerHTML = "";
+      if (participants) {
+        Object.keys(participants).forEach(uid => {
+          const p = participants[uid];
+          const div = document.createElement('div');
+          div.classList.add('participant');
+          if (uid === roomCreatorUID) {
+            div.classList.add('creator');
+          }
+          div.innerHTML = `
+            <img src="${p.avatar || "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/129-512.png"}" alt="${p.username}">
+            <div>${p.username}</div>
+          `;
+          partContainer.appendChild(div);
+        });
+      }
     }
   </script>
 </body>
