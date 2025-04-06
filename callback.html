@@ -1,31 +1,84 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Spotify Callback</title>
-  </head>
-  <body>
-    <div id="message">Processing...</div>
-    <script>
-      // Extract the code from the URL query parameters
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const messageEl = document.getElementById("message");
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Playback</title>
+  <link rel="icon" href="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1db954, #191414);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-      if (code) {
-        // Optionally, copy the code to clipboard automatically
-        navigator.clipboard.writeText(code)
-          .then(() => {
-            messageEl.innerHTML = `<p>Authorization code copied to clipboard!</p>
-                                   <p>If it wasn’t copied, please copy it manually: <strong>${code}</strong></p>`;
-          })
-          .catch(() => {
-            messageEl.innerHTML = `<p>Your authorization code: <strong>${code}</strong></p>
-                                   <p>Please copy this code and paste it into your app.</p>`;
-          });
-      } else {
-        messageEl.innerHTML = "<p>No authorization code found in the URL.</p>";
-      }
-    </script>
-  </body>
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 1rem;
+      border: none;
+      background-color: #1db954;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1ed760;
+    }
+
+    .switch {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .switch a {
+      color: #1db954;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Login to Playback</h1>
+    <input type="email" placeholder="Email" required />
+    <input type="password" placeholder="Password" required />
+    <button>Login</button>
+    <div class="switch">
+      Don't have an account? <a href="/register">Register</a>
+    </div>
+  </div>
+</body>
 </html>
