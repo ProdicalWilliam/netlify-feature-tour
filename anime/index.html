@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clean Anime Links</title>
+  <title>Anime Episode Links</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,113 +19,99 @@
     h1 {
       color: #ff4655;
     }
-    .btn {
-      padding: 10px 15px;
-      background: #ff4655;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      margin: 5px;
-      border-radius: 4px;
-    }
-    .btn:hover {
-      background: #e03d4f;
-    }
     .links {
       margin-top: 20px;
     }
-    .site-section {
-      margin-bottom: 30px;
-    }
-    .site-section h2 {
-      color: #ff4655;
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
-    }
     .anime-link {
       display: block;
-      padding: 5px 0;
+      padding: 8px 0;
       text-decoration: none;
       color: #eee;
+      border-bottom: 1px solid #333;
     }
     .anime-link:hover {
-      text-decoration: underline;
+      background: #1e1e1e;
+    }
+    .error {
+      color: #ff4655;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Anime Links Aggregator</h1>
-    <p>Fetching anime links from GogoAnime and HiAnime</p>
-    <button class="btn" id="fetchGogo">Fetch GogoAnime Links</button>
-    <button class="btn" id="fetchHi">Fetch HiAnime Links</button>
+    <h1>Anime Episode Links</h1>
+    <p>Automatically fetched from HiAnime</p>
   </header>
 
-  <section class="links">
-    <div class="site-section" id="gogoSection">
-      <h2>GogoAnime Links</h2>
-      <div id="gogoLinks">Click the button to load links.</div>
-    </div>
-    <div class="site-section" id="hiSection">
-      <h2>HiAnime Links</h2>
-      <div id="hiLinks">Click the button to load links.</div>
-    </div>
+  <section class="links" id="linksContainer">
+    <p>Loading anime episode links...</p>
   </section>
 
   <script>
-    // Using AllOrigins as a free CORS proxy. (See: https://allorigins.hexocode.repl.co/)
+    // Using AllOrigins as a free CORS proxy.
     const CORS_PROXY = 'https://api.allorigins.hexocode.repl.co/get?disableCache=true&url=';
+    const TARGET_URL = encodeURIComponent('https://hianime.to/home');
 
-    // Example URLs to scrape
-    const GOGO_URL = encodeURIComponent('https://gogoanime.by/');
-    const HI_URL = encodeURIComponent('https://hianime.tv/');
-
-    // Simple function to fetch and parse HTML from a URL
+    /**
+     * Fetch and parse HTML from the given URL using the proxy.
+     */
     async function fetchAndParse(url) {
       try {
         const response = await fetch(CORS_PROXY + url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok.');
+        }
         const data = await response.json();
         const htmlText = data.contents;
         const parser = new DOMParser();
         return parser.parseFromString(htmlText, 'text/html');
       } catch (error) {
-        console.error('Error fetching/parsing:', error);
+        console.error('Error fetching or parsing data:', error);
         return null;
       }
     }
 
-    // Example function to extract anime links.
-    // You may need to adjust selectors depending on the website's structure.
-    function extractAnimeLinks(doc) {
+    /**
+     * Extract links that look like anime episode links.
+     * Here we filter links that include "watch" or "episode" in their href.
+     */
+    function extractEpisodeLinks(doc) {
       const links = [];
-      // Example: Find all anchor tags that might represent anime titles.
-      // (Adjust the selector to match actual site structure.)
+      const regex = /\/(watch|episode)\//i;
+      // Grab all anchor elements
       doc.querySelectorAll('a').forEach(a => {
-        const href = a.href;
+        const href = a.getAttribute('href') || "";
         const text = a.textContent.trim();
-        // Simple filter: Only consider links with a non-empty title and containing "anime"
-        if (text && href && href.toLowerCase().includes('anime')) {
-          links.push({ text, href });
+        // Filter links that match the regex and have non-empty text.
+        if (regex.test(href) && text.length > 0) {
+          // Some href values might be relative, so build a full URL if needed.
+          const fullUrl = href.startsWith('http') ? href : new URL(href, 'https://hianime.to').href;
+          links.push({ text, href: fullUrl });
         }
       });
       return links;
     }
 
-    async function loadGogoAnimeLinks() {
-      const container = document.getElementById('gogoLinks');
-      container.innerHTML = 'Loading...';
-      const doc = await fetchAndParse(GOGO_URL);
+    /**
+     * Load episode links and display them.
+     */
+    async function loadAnimeEpisodeLinks() {
+      const container = document.getElementById('linksContainer');
+      container.innerHTML = '<p>Loading anime episode links...</p>';
+      const doc = await fetchAndParse(TARGET_URL);
       if (!doc) {
-        container.innerHTML = 'Error fetching data.';
+        container.innerHTML = '<p class="error">Error fetching data.</p>';
         return;
       }
-      const links = extractAnimeLinks(doc);
-      if (links.length === 0) {
-        container.innerHTML = 'No links found. (Try updating the selectors.)';
+      const episodeLinks = extractEpisodeLinks(doc);
+      if (episodeLinks.length === 0) {
+        container.innerHTML = '<p>No episode links found.</p>';
         return;
       }
+      // Clear the container and add the links.
       container.innerHTML = '';
-      links.forEach(link => {
+      episodeLinks.forEach(link => {
         const a = document.createElement('a');
         a.href = link.href;
         a.textContent = link.text;
@@ -135,32 +121,8 @@
       });
     }
 
-    async function loadHiAnimeLinks() {
-      const container = document.getElementById('hiLinks');
-      container.innerHTML = 'Loading...';
-      const doc = await fetchAndParse(HI_URL);
-      if (!doc) {
-        container.innerHTML = 'Error fetching data.';
-        return;
-      }
-      const links = extractAnimeLinks(doc);
-      if (links.length === 0) {
-        container.innerHTML = 'No links found. (Try updating the selectors.)';
-        return;
-      }
-      container.innerHTML = '';
-      links.forEach(link => {
-        const a = document.createElement('a');
-        a.href = link.href;
-        a.textContent = link.text;
-        a.target = '_blank';
-        a.className = 'anime-link';
-        container.appendChild(a);
-      });
-    }
-
-    document.getElementById('fetchGogo').addEventListener('click', loadGogoAnimeLinks);
-    document.getElementById('fetchHi').addEventListener('click', loadHiAnimeLinks);
+    // Automatically load the links on page load.
+    window.addEventListener('load', loadAnimeEpisodeLinks);
   </script>
 </body>
 </html>
