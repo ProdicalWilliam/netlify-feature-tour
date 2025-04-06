@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Spotify ListenAlong</title>
+  <!-- Set Favicon -->
+  <link rel="icon" type="image/png" href="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png">
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <!-- YouTube IFrame API -->
   <script async src="https://www.youtube.com/iframe_api"></script>
+  <!-- Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
   <style>
     /* Global Styles & Background */
     body {
@@ -215,6 +219,15 @@
       border-radius: 50%;
       border: 2px solid transparent;
     }
+    /* Kick/Ban Buttons in Participant List */
+    .control-buttons {
+      margin-top: 5px;
+    }
+    .control-buttons button {
+      font-size: 10px;
+      padding: 2px 4px;
+      margin: 0 2px;
+    }
     /* Crown overlay for room creator */
     .creator::after {
       content: "";
@@ -294,19 +307,19 @@
         <div id="ytplayer"></div>
         <!-- Spotify player container -->
         <div id="spotifyContainer" class="spotify-player"></div>
-        <!-- SoundCloud will be embedded similarly -->
+        <!-- SoundCloud container -->
         <div id="soundcloudContainer"></div>
-        <!-- Custom controls for YouTube (visible for room creator) -->
+        <!-- Custom controls for YouTube (room creator only) -->
         <div id="customControls">
           <input type="range" id="seekSlider" min="0" value="0">
           <div>
             <span id="currentTimeDisplay">0:00</span> / <span id="durationDisplay">0:00</span>
           </div>
         </div>
-        <!-- Custom controls for Spotify (simulation) -->
+        <!-- Spotify custom controls -->
         <div id="spotifyControls" class="spotify-controls" style="display:none;">
-          <button onclick="simulateSpotifyPlay()">Play</button>
-          <button onclick="simulateSpotifyPause()">Pause</button>
+          <button onclick="spotifyPlayer.resume()">Play</button>
+          <button onclick="spotifyPlayer.pause()">Pause</button>
         </div>
       </div>
       <div class="chat-box" id="chatBox"></div>
@@ -353,7 +366,62 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Global Variables
+    // Spotify OAuth and Player Setup
+    const spotifyClientId = "0a4506985ee8445e86f05ee777dd0c29";
+    const spotifyRedirectUri = "https://dazes.org/callback"; // Updated callback URI
+    const spotifyScopes = "streaming user-read-email user-read-private";
+    let spotifyPlayer = null;
+
+    // Get Spotify access token from URL hash if available
+    function getSpotifyToken() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get('access_token');
+    }
+    let spotifyToken = getSpotifyToken();
+
+    // If no token, redirect to Spotify authorization
+    if (!spotifyToken && window.location.pathname !== "/callback") {
+      window.location.href = "https://accounts.spotify.com/authorize?" +
+        "response_type=token" +
+        "&client_id=" + encodeURIComponent(spotifyClientId) +
+        "&scope=" + encodeURIComponent(spotifyScopes) +
+        "&redirect_uri=" + encodeURIComponent(spotifyRedirectUri);
+    }
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      spotifyPlayer = new Spotify.Player({
+        name: 'Spotify ListenAlong Player',
+        getOAuthToken: cb => { cb(spotifyToken); },
+        volume: 0.5
+      });
+
+      // Error handling
+      spotifyPlayer.addListener('initialization_error', ({ message }) => { console.error(message); });
+      spotifyPlayer.addListener('authentication_error', ({ message }) => { console.error(message); });
+      spotifyPlayer.addListener('account_error', ({ message }) => { console.error(message); });
+      spotifyPlayer.addListener('playback_error', ({ message }) => { console.error(message); });
+
+      // Playback status updates
+      spotifyPlayer.addListener('player_state_changed', state => { console.log(state); });
+
+      // Ready
+      spotifyPlayer.addListener('ready', ({ device_id }) => {
+        console.log('Ready with Device ID', device_id);
+        // Optionally, you could transfer playback to this device using Spotify's API.
+      });
+
+      // Not Ready
+      spotifyPlayer.addListener('not_ready', ({ device_id }) => {
+        console.log('Device ID has gone offline', device_id);
+      });
+
+      spotifyPlayer.connect();
+    };
+
+    // Global Variables for Firebase/Room Management
+    // Replace "SOME_ADMIN_UID" with your actual Firebase admin UID.
+    const adminUID = "1119TCpma1ajWOeI250vQ2Un1dg2"; 
     let currentRoomId = null;
     let youtubePlayer = null;
     let mediaType = null; // "youtube", "spotify", "soundcloud", or "other"
@@ -452,7 +520,8 @@
         mediaLink: "",
         mediaTimestamp: 0,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
-        creator: user.uid
+        creator: user.uid,
+        banned: {}  // initialize banned list
       };
       const newRoomRef = db.ref('rooms').push();
       newRoomRef.set(roomData, error => {
@@ -467,53 +536,61 @@
 
     // ----- Join Room & Room UI -----
     function joinRoomById(roomId) {
-      document.getElementById('server-browser').style.display = 'none';
-      document.getElementById('chat-room').style.display = 'block';
-      document.getElementById('room-title').innerText = "Room: " + roomId;
-      db.ref('rooms/' + roomId).once('value').then(snapshot => {
-        const room = snapshot.val();
-        roomCreatorUID = room.creator;
-        if (auth.currentUser.uid === roomCreatorUID) {
-          document.getElementById('closeRoomBtn').style.display = 'block';
-          document.getElementById('customControls').style.display = 'block';
-          // For Spotify, show simulated controls
-          document.getElementById('spotifyControls').style.display = 'flex';
+      // Check if user is banned in this room before joining
+      db.ref('rooms/' + roomId + '/banned').once('value').then(snapshot => {
+        const banned = snapshot.val() || {};
+        if (banned[auth.currentUser.uid]) {
+          alert("You have been banned from this room.");
+          return;
         }
-      });
-      currentRoomId = roomId;
-      // Add participant info
-      const uid = auth.currentUser.uid;
-      db.ref('rooms/' + roomId + '/participants/' + uid).set({
-        username: currentUserProfile.username,
-        avatar: currentUserProfile.avatar
-      });
-      db.ref('rooms/' + roomId + '/participants/' + uid).onDisconnect().remove();
-      // Media and chat listeners
-      db.ref('rooms/' + roomId + '/mediaLink').on('value', snapshot => {
-        const link = snapshot.val();
-        if (link) {
-          mediaType = detectMediaType(link);
-          loadMedia(link);
-        }
-      });
-      db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
-        const ts = snapshot.val();
-        if (mediaType === "youtube" && youtubePlayer && auth.currentUser.uid !== roomCreatorUID) {
-          const currentTime = youtubePlayer.getCurrentTime();
-          if (Math.abs(currentTime - ts/1000) > 1) {
-            youtubePlayer.seekTo(ts / 1000, true);
+        // If not banned, show room UI
+        document.getElementById('server-browser').style.display = 'none';
+        document.getElementById('chat-room').style.display = 'block';
+        document.getElementById('room-title').innerText = "Room: " + roomId;
+        db.ref('rooms/' + roomId).once('value').then(snapshot => {
+          const room = snapshot.val();
+          roomCreatorUID = room.creator;
+          // Show close room button for room creator or admin
+          if (auth.currentUser.uid === roomCreatorUID || auth.currentUser.uid === adminUID) {
+            document.getElementById('closeRoomBtn').style.display = 'block';
+            document.getElementById('customControls').style.display = 'block';
+            document.getElementById('spotifyControls').style.display = 'flex';
           }
-        }
-      });
-      db.ref('rooms/' + roomId + '/chat').on('child_added', snapshot => {
-        displayMessage(snapshot.val());
-      });
-      db.ref('rooms/' + roomId + '/participants').on('value', snapshot => {
-        updateParticipants(snapshot.val());
+        });
+        currentRoomId = roomId;
+        const uid = auth.currentUser.uid;
+        db.ref('rooms/' + roomId + '/participants/' + uid).set({
+          username: currentUserProfile.username,
+          avatar: currentUserProfile.avatar
+        });
+        db.ref('rooms/' + roomId + '/participants/' + uid).onDisconnect().remove();
+        db.ref('rooms/' + roomId + '/mediaLink').on('value', snapshot => {
+          const link = snapshot.val();
+          if (link) {
+            mediaType = detectMediaType(link);
+            loadMedia(link);
+          }
+        });
+        db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
+          const ts = snapshot.val();
+          if (mediaType === "youtube" && youtubePlayer && auth.currentUser.uid !== roomCreatorUID) {
+            const currentTime = youtubePlayer.getCurrentTime();
+            if (Math.abs(currentTime - ts/1000) > 1) {
+              youtubePlayer.seekTo(ts / 1000, true);
+            }
+          }
+        });
+        db.ref('rooms/' + roomId + '/chat').on('child_added', snapshot => {
+          displayMessage(snapshot.val());
+        });
+        db.ref('rooms/' + roomId + '/participants').on('value', snapshot => {
+          updateParticipants(snapshot.val());
+        });
       });
     }
     function closeRoom() {
-      if (auth.currentUser.uid !== roomCreatorUID) return;
+      // Only room creator or admin can close room
+      if (auth.currentUser.uid !== roomCreatorUID && auth.currentUser.uid !== adminUID) return;
       if (confirm("Are you sure you want to close this room?")) {
         db.ref('rooms/' + currentRoomId).remove();
         alert("Room closed.");
@@ -542,7 +619,6 @@
           onYouTubeIframeAPIReady(link);
         }
       } else if (mediaType === "spotify") {
-        // Extract track id and load embed
         let trackId = "";
         try {
           trackId = link.split("track/")[1].split("?")[0];
@@ -637,8 +713,8 @@
       return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
     }
     function updateMedia() {
-      if (auth.currentUser.uid !== roomCreatorUID) {
-        alert("Only the room creator can change the media.");
+      if (auth.currentUser.uid !== roomCreatorUID && auth.currentUser.uid !== adminUID) {
+        alert("Only the room creator or admin can change the media.");
         return;
       }
       const link = document.getElementById('mediaLink').value;
@@ -646,13 +722,6 @@
         mediaLink: link,
         mediaTimestamp: 0
       });
-    }
-    // ----- Simulated Spotify Controls -----
-    function simulateSpotifyPlay() {
-      alert("Simulated Play: In a full implementation, integrate Spotify Playback SDK.");
-    }
-    function simulateSpotifyPause() {
-      alert("Simulated Pause: In a full implementation, integrate Spotify Playback SDK.");
     }
     // ----- Chat Functions -----
     function sendMessage() {
@@ -675,7 +744,7 @@
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
-    // ----- Participant List -----
+    // ----- Participant List & Admin Controls -----
     function updateParticipants(participants) {
       const container = document.getElementById('participants');
       container.innerHTML = "";
@@ -686,8 +755,35 @@
           div.classList.add('participant');
           if (uid === roomCreatorUID) div.classList.add('creator');
           div.innerHTML = `<img src="${p.avatar}" alt="${p.username}"><div>${p.username}</div>`;
+          // If current user is admin or room creator and uid is not self, add kick/ban controls
+          if ((auth.currentUser.uid === roomCreatorUID || auth.currentUser.uid === adminUID) && uid !== auth.currentUser.uid) {
+            const controls = document.createElement('div');
+            controls.classList.add('control-buttons');
+            const kickBtn = document.createElement('button');
+            kickBtn.innerText = "Kick";
+            kickBtn.onclick = () => kickParticipant(uid);
+            const banBtn = document.createElement('button');
+            banBtn.innerText = "Ban";
+            banBtn.onclick = () => banParticipant(uid);
+            controls.appendChild(kickBtn);
+            controls.appendChild(banBtn);
+            div.appendChild(controls);
+          }
           container.appendChild(div);
         });
+      }
+    }
+    // Kick a participant (remove from participants list)
+    function kickParticipant(uid) {
+      if (confirm("Are you sure you want to kick this participant?")) {
+        db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
+      }
+    }
+    // Ban a participant (remove and add to banned list)
+    function banParticipant(uid) {
+      if (confirm("Are you sure you want to ban this participant? They will not be able to rejoin.")) {
+        db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
+        db.ref('rooms/' + currentRoomId + '/banned/' + uid).set(true);
       }
     }
   </script>
