@@ -1,53 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ListenAlong Session</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .container { max-width: 800px; margin: auto; }
-    #participants { margin-top: 20px; }
-    #track { margin-top: 20px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listen Along - Spotify</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>ListenAlong Session</h1>
-    <div id="auth">
-      <!-- Update the href below to point to your backend's /spotify/login endpoint -->
-      <a href="https://<YOUR_BACKEND_DOMAIN>/spotify/login">Log in with Spotify</a>
-    </div>
-    <div id="user-info" style="display:none;">
-      <p>Welcome, <span id="username"></span>!</p>
-    </div>
-    <div id="track">
-      <h2>Currently Playing:</h2>
-      <div id="track-info">Loading...</div>
-    </div>
-    <div id="participants">
-      <h2>Participants:</h2>
-      <ul id="participant-list"></ul>
-    </div>
+  <div class="spotify-container">
+    <header class="header">
+      <h1>Spotify Listen Along</h1>
+    </header>
+    <section class="track-info">
+      <img id="album-cover" src="https://via.placeholder.com/300" alt="Album Cover" />
+      <div class="track-details">
+        <h2 id="track-title">Track Title</h2>
+        <p id="artist-name">Artist Name</p>
+      </div>
+    </section>
+    <section class="progress-bar-container">
+      <span id="current-time">0:00</span>
+      <div class="progress-bar">
+        <div id="progress" class="progress"></div>
+      </div>
+      <span id="duration">3:30</span>
+    </section>
+    <footer class="controls">
+      <button id="prev">&#9664;&#9664;</button>
+      <button id="play">&#9654;</button>
+      <button id="next">&#9654;&#9654;</button>
+    </footer>
+    <div id="user-info" class="user-info"></div>
   </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-  <script>
-    // Firebase project configuration – replace with your project's values:
-    const firebaseConfig = {
-      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-      authDomain: "spotify-795ab.firebaseapp.com",
-      projectId: "spotify-795ab",
-      storageBucket: "spotify-795ab.appspot.com",
-      messagingSenderId: "907464366407",
-      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
-  <script src="spotify.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
