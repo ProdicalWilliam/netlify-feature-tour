@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dazes Dashboard</title>
+  <title>Dashboard</title>
   <!-- Favicon -->
   <link rel="icon" href="https://images.vexels.com/media/users/3/196620/isolated/preview/4f55a4467639077aefe36e0f826b114b-cool-shape-crystal-stroke-icon.png?w=360" type="image/x-icon">
   <!-- Bootstrap & Icons -->
@@ -16,7 +16,7 @@
   <style>
     :root {
       --bg-color: #000000; /* Black background */
-      --text-color: #ffffff; /* White text */
+      --text-color: #ffffff; /* White text for most elements */
       --card-bg: #1e1e1e;
       --sidebar-bg: #181818;
       --accent-color: #39FF14; /* Neon green */
@@ -26,7 +26,6 @@
     /* General Reset & Text Color */
     * {
       cursor: none !important;
-      color: var(--text-color);
     }
     body {
       background-color: var(--bg-color);
@@ -39,26 +38,43 @@
       color: var(--link-color);
       text-decoration: none;
     }
+    /* Override form controls to use white background with black text */
+    .form-control {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      border: 1px solid #ccc;
+    }
+    /* Card styling */
     .card {
       background-color: var(--card-bg);
       border: none;
       color: var(--text-color);
     }
-    /* Flex layout for sidebar and main content */
-    .row {
-      display: flex;
-      min-height: 100vh;
+    /* Flex container for dashboard */
+    .dashboard-container {
+      position: relative;
+      z-index: 1;
     }
+    /* Sidebar positioned absolute to overlay main UI */
     .sidebar {
+      position: absolute;
+      top: 0;
+      left: 0;
       background-color: var(--sidebar-bg);
       padding: 20px;
       transition: width 0.3s, padding 0.3s;
       width: 250px;
+      height: 100vh;
       overflow: hidden;
+      z-index: 1000;
     }
+    /* Collapsed state hides text and reduces width */
     .sidebar.collapsed {
       width: 60px;
       padding: 10px;
+    }
+    .sidebar.collapsed .link-text {
+      display: none;
     }
     .sidebar a {
       display: flex;
@@ -79,11 +95,11 @@
       margin-bottom: 20px;
       text-align: right;
     }
-    /* Main content */
+    /* Main content occupies full width */
     #mainContent {
-      flex-grow: 1;
       padding: 20px;
       transition: all 0.3s;
+      margin-left: 0;
     }
     /* Content Sections */
     .content-section {
@@ -124,7 +140,7 @@
       position: fixed;
       top: 10px;
       right: 10px;
-      z-index: 1000;
+      z-index: 2000;
     }
     /* Custom Cursor (64x64) */
     #customCursor {
@@ -158,14 +174,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
+      z-index: 0;
       overflow: hidden;
+      background: var(--bg-color);
     }
     .floating-sphere {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 15px rgba(255,255,255,0.5);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(255,255,255,0.8);
       animation: floatSphere 20s linear infinite;
     }
     @keyframes floatSphere {
@@ -184,7 +201,7 @@
 <body>
   <!-- Particle Background -->
   <div id="particle-background">
-    <!-- You can adjust size, position, and delay for variety -->
+    <!-- Adjust sizes, positions, and delays for variety -->
     <div class="floating-sphere" style="width: 80px; height: 80px; left: 10%; animation-delay: 0s;"></div>
     <div class="floating-sphere" style="width: 120px; height: 120px; left: 40%; animation-delay: 3s;"></div>
     <div class="floating-sphere" style="width: 60px; height: 60px; left: 70%; animation-delay: 5s;"></div>
@@ -201,7 +218,7 @@
   <img id="customCursor" src="https://osuskinner.com/elements/interface/cursor/1/10.png" alt="cursor">
 
   <!-- Login Section -->
-  <div id="loginContainer" class="container">
+  <div id="loginContainer" class="container dashboard-container">
     <div class="card shadow">
       <div class="card-body">
         <h3 class="card-title text-center mb-4">Sign In</h3>
@@ -220,137 +237,154 @@
   </div>
   
   <!-- Dashboard Section -->
-  <div id="dashboardContainer" class="container-fluid" style="display:none;">
-    <div class="row">
-      <nav id="sidebar" class="sidebar border-end">
-        <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
-        <!-- Dashboard header icon -->
-        <div class="mb-4 text-center">
-          <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
+  <div id="dashboardContainer" class="container-fluid dashboard-container" style="display:none;">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+      <div class="toggle-sidebar text-end">
+        <i class="bi bi-list" id="sidebarToggle"></i>
+      </div>
+      <!-- Dashboard header icon -->
+      <div class="mb-4 text-center">
+        <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
+      </div>
+      <a href="#" class="nav-link" data-target="generalMetrics">
+        <i class="bi bi-bar-chart-line"></i>
+        <span class="link-text">General Metrics</span>
+      </a>
+      <a href="#" class="nav-link" data-target="memberStats">
+        <i class="bi bi-people"></i>
+        <span class="link-text">Member & Channel Stats</span>
+      </a>
+      <a href="#" class="nav-link" data-target="serverInfo">
+        <i class="bi bi-server"></i>
+        <span class="link-text">Server Info</span>
+      </a>
+      <a href="#" class="nav-link" data-target="chatPanel">
+        <i class="bi bi-chat-dots"></i>
+        <span class="link-text">Chat</span>
+      </a>
+      <a href="#" class="nav-link" data-target="logsPanel">
+        <i class="bi bi-file-earmark-text"></i>
+        <span class="link-text">Logs</span>
+      </a>
+      <div class="mt-4">
+        <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <main id="mainContent">
+      <!-- Header with Stonks Image -->
+      <div class="mb-4 text-center">
+        <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
+      </div>
+      <!-- General Metrics Section with fallback sample data -->
+      <section id="generalMetrics" class="content-section active-section mb-4">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card text-white bg-primary animate__animated animate__fadeIn">
+              <div class="card-body">
+                <h5 class="card-title">Total Messages</h5>
+                <p class="card-text" id="messageCount">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card text-white bg-success animate__animated animate__fadeIn">
+              <div class="card-body">
+                <h5 class="card-title">Member Joins</h5>
+                <p class="card-text" id="memberJoinCount">0</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> <span class="link-text">General Metrics</span></a>
-        <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> <span class="link-text">Member & Channel Stats</span></a>
-        <a href="#" class="nav-link" data-target="serverInfo"><i class="bi bi-server"></i> <span class="link-text">Server Info</span></a>
-        <a href="#" class="nav-link" data-target="chatPanel"><i class="bi bi-chat-dots"></i> <span class="link-text">Chat</span></a>
-        <a href="#" class="nav-link" data-target="logsPanel"><i class="bi bi-file-earmark-text"></i> <span class="link-text">Logs</span></a>
-        <div class="mt-4">
-          <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
+      </section>
+      <!-- Member & Channel Stats Section -->
+      <section id="memberStats" class="content-section mb-4">
+        <div class="card animate__animated animate__fadeIn">
+          <div class="card-body">
+            <h5 class="card-title">Member & Channel Stats</h5>
+            <p class="card-text">
+              <strong>Online Members:</strong> <span id="onlineMembers">0</span><br>
+              <strong>Total Members:</strong> <span id="totalMembers">0</span><br>
+              <strong>Offline Members:</strong> <span id="offlineMembers">0</span><br>
+              <strong>Total Channel Messages:</strong> <span id="channelMessageCount">0</span>
+            </p>
+          </div>
         </div>
-      </nav>
-      <main class="p-4" id="mainContent">
-        <!-- Header with Stonks Image -->
-        <div class="mb-4 text-center">
-          <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
+      </section>
+      <!-- Server Info Section -->
+      <section id="serverInfo" class="content-section mb-4">
+        <div class="card animate__animated animate__fadeIn">
+          <div class="card-header">Server Info</div>
+          <div class="card-body">
+            <dl class="row server-info mb-0">
+              <dt class="col-sm-4">Server Name</dt>
+              <dd class="col-sm-8">Example Server</dd>
+              <dt class="col-sm-4">Created at</dt>
+              <dd class="col-sm-8">Feb 22, 2025 3:50 PM</dd>
+              <dt class="col-sm-4">Owner</dt>
+              <dd class="col-sm-8">iluvmads#0</dd>
+              <dt class="col-sm-4">Description</dt>
+              <dd class="col-sm-8"><a href="https://dazes.org/" target="_blank">https://dazes.org/</a></dd>
+              <dt class="col-sm-4">Boost Info</dt>
+              <dd class="col-sm-8">Level 3, 20 boosts</dd>
+              <dt class="col-sm-4">Verification Level</dt>
+              <dd class="col-sm-8">Low</dd>
+              <dt class="col-sm-4">Server Features</dt>
+              <dd class="col-sm-8">Various Features Listed</dd>
+              <dt class="col-sm-4">Members</dt>
+              <dd class="col-sm-8">985</dd>
+              <dt class="col-sm-4">Channels</dt>
+              <dd class="col-sm-8">29</dd>
+              <dt class="col-sm-4">Ban Count</dt>
+              <dd class="col-sm-8">29</dd>
+              <dt class="col-sm-4">Roles</dt>
+              <dd class="col-sm-8">95</dd>
+              <dt class="col-sm-4">Emojis</dt>
+              <dd class="col-sm-8">237</dd>
+              <dt class="col-sm-4">Server ID</dt>
+              <dd class="col-sm-8">1342961798168711198</dd>
+              <dt class="col-sm-4">Requested by</dt>
+              <dd class="col-sm-8">williamprod • Today</dd>
+            </dl>
+          </div>
         </div>
-        <!-- General Metrics Section with fallback sample data -->
-        <section id="generalMetrics" class="content-section active-section mb-4">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card text-white bg-primary animate__animated animate__fadeIn">
-                <div class="card-body">
-                  <h5 class="card-title">Total Messages</h5>
-                  <p class="card-text" id="messageCount">0</p>
-                </div>
-              </div>
+      </section>
+      <!-- Chat Panel Section -->
+      <section id="chatPanel" class="content-section mb-4">
+        <div class="card animate__animated animate__fadeIn">
+          <div class="card-header">Chat Panel</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="channelSelect" class="form-label">Select Channel</label>
+              <select id="channelSelect" class="form-select"></select>
             </div>
-            <div class="col-md-6">
-              <div class="card text-white bg-success animate__animated animate__fadeIn">
-                <div class="card-body">
-                  <h5 class="card-title">Member Joins</h5>
-                  <p class="card-text" id="memberJoinCount">0</p>
-                </div>
-              </div>
+            <div class="chat-messages mb-3" id="chatMessages">No chat messages yet.</div>
+            <form id="chatForm">
+              <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
+              <button type="submit" class="btn btn-success">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+      <!-- Logs Panel Section -->
+      <section id="logsPanel" class="content-section mb-4">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card animate__animated animate__fadeIn">
+              <div class="card-header">Channel Updates Log</div>
+              <div class="card-body log-messages" id="channelUpdatesLog">No updates available.</div>
             </div>
           </div>
-        </section>
-        <!-- Member & Channel Stats Section -->
-        <section id="memberStats" class="content-section mb-4">
-          <div class="card animate__animated animate__fadeIn">
-            <div class="card-body">
-              <h5 class="card-title">Member & Channel Stats</h5>
-              <p class="card-text">
-                <strong>Online Members:</strong> <span id="onlineMembers">0</span><br>
-                <strong>Total Members:</strong> <span id="totalMembers">0</span><br>
-                <strong>Offline Members:</strong> <span id="offlineMembers">0</span><br>
-                <strong>Total Channel Messages:</strong> <span id="channelMessageCount">0</span>
-              </p>
+          <div class="col-md-6">
+            <div class="card animate__animated animate__fadeIn">
+              <div class="card-header">Moderation Log</div>
+              <div class="card-body log-messages" id="modLogs">No moderation logs available.</div>
             </div>
           </div>
-        </section>
-        <!-- Server Info Section -->
-        <section id="serverInfo" class="content-section mb-4">
-          <div class="card animate__animated animate__fadeIn">
-            <div class="card-header">Server Info</div>
-            <div class="card-body">
-              <dl class="row server-info mb-0">
-                <dt class="col-sm-4">Server Name</dt>
-                <dd class="col-sm-8">Example Server</dd>
-                <dt class="col-sm-4">Created at</dt>
-                <dd class="col-sm-8">Feb 22, 2025 3:50 PM</dd>
-                <dt class="col-sm-4">Owner</dt>
-                <dd class="col-sm-8">iluvmads#0</dd>
-                <dt class="col-sm-4">Description</dt>
-                <dd class="col-sm-8"><a href="https://dazes.org/" target="_blank">https://dazes.org/</a></dd>
-                <dt class="col-sm-4">Boost Info</dt>
-                <dd class="col-sm-8">Level 3, 20 boosts</dd>
-                <dt class="col-sm-4">Verification Level</dt>
-                <dd class="col-sm-8">Low</dd>
-                <dt class="col-sm-4">Server Features</dt>
-                <dd class="col-sm-8">Various Features Listed</dd>
-                <dt class="col-sm-4">Members</dt>
-                <dd class="col-sm-8">985</dd>
-                <dt class="col-sm-4">Channels</dt>
-                <dd class="col-sm-8">29</dd>
-                <dt class="col-sm-4">Ban Count</dt>
-                <dd class="col-sm-8">29</dd>
-                <dt class="col-sm-4">Roles</dt>
-                <dd class="col-sm-8">95</dd>
-                <dt class="col-sm-4">Emojis</dt>
-                <dd class="col-sm-8">237</dd>
-                <dt class="col-sm-4">Server ID</dt>
-                <dd class="col-sm-8">1342961798168711198</dd>
-                <dt class="col-sm-4">Requested by</dt>
-                <dd class="col-sm-8">williamprod • Today</dd>
-              </dl>
-            </div>
-          </div>
-        </section>
-        <!-- Chat Panel Section -->
-        <section id="chatPanel" class="content-section mb-4">
-          <div class="card animate__animated animate__fadeIn">
-            <div class="card-header">Chat Panel</div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label for="channelSelect" class="form-label">Select Channel</label>
-                <select id="channelSelect" class="form-select"></select>
-              </div>
-              <div class="chat-messages mb-3" id="chatMessages">No chat messages yet.</div>
-              <form id="chatForm">
-                <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
-                <button type="submit" class="btn btn-success">Send</button>
-              </form>
-            </div>
-          </div>
-        </section>
-        <!-- Logs Panel Section -->
-        <section id="logsPanel" class="content-section mb-4">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card animate__animated animate__fadeIn">
-                <div class="card-header">Channel Updates Log</div>
-                <div class="card-body log-messages" id="channelUpdatesLog">No updates available.</div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card animate__animated animate__fadeIn">
-                <div class="card-header">Moderation Log</div>
-                <div class="card-body log-messages" id="modLogs">No moderation logs available.</div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
+        </div>
+      </section>
+    </main>
   </div>
   
   <script>
@@ -416,7 +450,7 @@
       });
     });
     
-    // Sidebar collapse using flex layout (no margin adjustments needed)
+    // Toggle sidebar collapse (overlay behavior; main UI remains full width)
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('collapsed');
     });
