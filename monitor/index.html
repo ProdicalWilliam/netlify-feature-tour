@@ -2,96 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Discord Bot Metrics Dashboard</title>
+  <title>Discord Bot Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
-    body { margin: 20px; }
-    .card { margin-bottom: 20px; }
-    .log { height: 200px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
-    .log-entry { font-size: 0.9rem; margin-bottom: 5px; }
-    .server-info dt { font-weight: bold; }
+    :root {
+      --bg-color: #f8f9fa;
+      --text-color: #212529;
+      --card-bg: #ffffff;
+      --sidebar-bg: #ffffff;
+      --link-color: #212529;
+    }
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --card-bg: #1e1e1e;
+      --sidebar-bg: #1e1e1e;
+      --link-color: #e0e0e0;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .card {
+      background-color: var(--card-bg);
+      transition: background-color 0.3s ease;
+    }
+    .sidebar {
+      background-color: var(--sidebar-bg);
+      min-height: 100vh;
+      padding: 20px;
+      transition: background-color 0.3s ease;
+    }
+    .sidebar a {
+      color: var(--link-color);
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      transition: color 0.3s ease;
+    }
+    .sidebar a:hover {
+      color: #0d6efd;
+    }
+    .toggle-btn {
+      cursor: pointer;
+    }
+    .content-section {
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1 class="mb-4">Discord Bot Metrics Dashboard</h1>
+<body data-theme="light">
+  <div class="container-fluid">
     <div class="row">
-      <div class="col-md-6">
-        <div class="card text-white bg-primary">
-          <div class="card-body">
-            <h5 class="card-title">Total Messages</h5>
-            <p class="card-text" id="messageCount">Loading...</p>
-          </div>
+      <nav class="col-md-2 sidebar border-end">
+        <h3 class="mb-4">Dashboard</h3>
+        <a href="#generalMetrics" class="nav-link">General Metrics</a>
+        <a href="#memberStats" class="nav-link">Member & Channel Stats</a>
+        <a href="#serverInfo" class="nav-link">Server Info</a>
+        <a href="#activityLog" class="nav-link">Activity Log</a>
+        <div class="mt-4">
+          <span class="toggle-btn badge bg-secondary p-2" id="themeToggle">Toggle Theme</span>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card text-white bg-success">
-          <div class="card-body">
-            <h5 class="card-title">Member Joins</h5>
-            <p class="card-text" id="memberJoinCount">Loading...</p>
+      </nav>
+      <main class="col-md-10 p-4">
+        <section id="generalMetrics" class="content-section mb-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card text-white bg-primary animate__animated animate__fadeIn">
+                <div class="card-body">
+                  <h5 class="card-title">Total Messages</h5>
+                  <p class="card-text" id="messageCount">Loading...</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card text-white bg-success animate__animated animate__fadeIn">
+                <div class="card-body">
+                  <h5 class="card-title">Member Joins</h5>
+                  <p class="card-text" id="memberJoinCount">Loading...</p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card text-dark bg-light">
-          <div class="card-body">
-            <h5 class="card-title">Member & Channel Stats</h5>
-            <p class="card-text">
-              <strong>Online Members:</strong> <span id="onlineMembers">Loading...</span><br>
-              <strong>Total Members:</strong> <span id="totalMembers">Loading...</span><br>
-              <strong>Offline Members:</strong> <span id="offlineMembers">Loading...</span><br>
-              <strong>Total Channel Messages:</strong> <span id="channelMessageCount">Loading...</span>
-            </p>
+        </section>
+        <section id="memberStats" class="content-section mb-4">
+          <div class="card animate__animated animate__fadeIn">
+            <div class="card-body">
+              <h5 class="card-title">Member & Channel Stats</h5>
+              <p class="card-text">
+                <strong>Online Members:</strong> <span id="onlineMembers">Loading...</span><br>
+                <strong>Total Members:</strong> <span id="totalMembers">Loading...</span><br>
+                <strong>Offline Members:</strong> <span id="offlineMembers">Loading...</span><br>
+                <strong>Total Channel Messages:</strong> <span id="channelMessageCount">Loading...</span>
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">Server Info</div>
-      <div class="card-body">
-        <dl class="row server-info mb-0">
-          <dt class="col-sm-4">Server Name</dt>
-          <dd class="col-sm-8">ৎ 𓂃 /dazes</dd>
-          <dt class="col-sm-4">Created at</dt>
-          <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM (2 months ago)</dd>
-          <dt class="col-sm-4">Owner</dt>
-          <dd class="col-sm-8">iluvmads#0</dd>
-          <dt class="col-sm-4">Description</dt>
-          <dd class="col-sm-8"><a href="https://dazes.org/" target="_blank">https://dazes.org/</a></dd>
-          <dt class="col-sm-4">Boost Info</dt>
-          <dd class="col-sm-8">Level 3, 20 boosts</dd>
-          <dt class="col-sm-4">Verification Level</dt>
-          <dd class="col-sm-8">Low</dd>
-          <dt class="col-sm-4">Server Features</dt>
-          <dd class="col-sm-8">
-            Vanity Url, Animated Icon, Role Icons, Seven Day Thread Archive, Private Threads, Community,<br>
-            Soundboard, Invite Splash, News, Banner, Three Day Thread Archive, Animated Banner, Member Profiles
-          </dd>
-          <dt class="col-sm-4">Members</dt>
-          <dd class="col-sm-8">985</dd>
-          <dt class="col-sm-4">Channels</dt>
-          <dd class="col-sm-8">Total: 29, Text: 18, Voice: 3, Categories: 7</dd>
-          <dt class="col-sm-4">Ban Count</dt>
-          <dd class="col-sm-8">29</dd>
-          <dt class="col-sm-4">Roles</dt>
-          <dd class="col-sm-8">95</dd>
-          <dt class="col-sm-4">Emojis</dt>
-          <dd class="col-sm-8">237</dd>
-          <dt class="col-sm-4">Server ID</dt>
-          <dd class="col-sm-8">1342961798168711198</dd>
-          <dt class="col-sm-4">Requested by</dt>
-          <dd class="col-sm-8">williamprod • Today at 9:43 PM</dd>
-        </dl>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">Activity Log</div>
-      <div class="card-body log" id="activityLog"></div>
+        </section>
+        <section id="serverInfo" class="content-section mb-4">
+          <div class="card animate__animated animate__fadeIn">
+            <div class="card-header">Server Info</div>
+            <div class="card-body">
+              <dl class="row server-info mb-0">
+                <dt class="col-sm-4">Server Name</dt>
+                <dd class="col-sm-8">ৎ 𓂃 /dazes</dd>
+                <dt class="col-sm-4">Created at</dt>
+                <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM (2 months ago)</dd>
+                <dt class="col-sm-4">Owner</dt>
+                <dd class="col-sm-8">iluvmads#0</dd>
+                <dt class="col-sm-4">Description</dt>
+                <dd class="col-sm-8"><a href="https://dazes.org/" target="_blank">https://dazes.org/</a></dd>
+                <dt class="col-sm-4">Boost Info</dt>
+                <dd class="col-sm-8">Level 3, 20 boosts</dd>
+                <dt class="col-sm-4">Verification Level</dt>
+                <dd class="col-sm-8">Low</dd>
+                <dt class="col-sm-4">Server Features</dt>
+                <dd class="col-sm-8">
+                  Vanity Url, Animated Icon, Role Icons, Seven Day Thread Archive, Private Threads, Community,<br>
+                  Soundboard, Invite Splash, News, Banner, Three Day Thread Archive, Animated Banner, Member Profiles
+                </dd>
+                <dt class="col-sm-4">Members</dt>
+                <dd class="col-sm-8">985</dd>
+                <dt class="col-sm-4">Channels</dt>
+                <dd class="col-sm-8">Total: 29, Text: 18, Voice: 3, Categories: 7</dd>
+                <dt class="col-sm-4">Ban Count</dt>
+                <dd class="col-sm-8">29</dd>
+                <dt class="col-sm-4">Roles</dt>
+                <dd class="col-sm-8">95</dd>
+                <dt class="col-sm-4">Emojis</dt>
+                <dd class="col-sm-8">237</dd>
+                <dt class="col-sm-4">Server ID</dt>
+                <dd class="col-sm-8">1342961798168711198</dd>
+                <dt class="col-sm-4">Requested by</dt>
+                <dd class="col-sm-8">williamprod • Today at 9:43 PM</dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+        <section id="activityLog" class="content-section">
+          <div class="card animate__animated animate__fadeIn">
+            <div class="card-header">Activity Log</div>
+            <div class="card-body log"></div>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
   
@@ -126,7 +188,7 @@
             });
           }
           document.getElementById('channelMessageCount').innerText = channelMessageCount;
-          const logElement = document.getElementById('activityLog');
+          const logElement = document.querySelector('#activityLog .log') || document.querySelector('.log');
           const logEntry = document.createElement('div');
           logEntry.className = 'log-entry';
           const now = new Date().toLocaleTimeString();
@@ -135,6 +197,11 @@
           logElement.scrollTop = logElement.scrollHeight;
         }, (error) => { console.error(error); });
       }
+    });
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', newTheme);
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
