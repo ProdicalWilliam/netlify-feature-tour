@@ -1,30 +1,75 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Discord Bot Metrics Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #333; }
-    .metric { margin: 10px 0; font-size: 1.2em; }
+    body { margin: 20px; }
+    .card { margin-bottom: 20px; }
+    .log { height: 200px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
+    .log-entry { font-size: 0.9rem; margin-bottom: 5px; }
   </style>
 </head>
 <body>
-  <h1>Discord Bot Metrics Dashboard</h1>
-  <div class="metric">
-    Total Messages: <span id="messageCount">Loading...</span>
+  <div class="container">
+    <h1 class="mb-4">Discord Bot Metrics Dashboard</h1>
+    <div class="row">
+      <!-- Total Messages Card -->
+      <div class="col-md-6">
+        <div class="card text-white bg-primary">
+          <div class="card-body">
+            <h5 class="card-title">Total Messages</h5>
+            <p class="card-text" id="messageCount">Loading...</p>
+          </div>
+        </div>
+      </div>
+      <!-- Member Joins Card -->
+      <div class="col-md-6">
+        <div class="card text-white bg-success">
+          <div class="card-body">
+            <h5 class="card-title">Member Joins</h5>
+            <p class="card-text" id="memberJoinCount">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Additional Metrics Card -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card text-dark bg-light">
+          <div class="card-body">
+            <h5 class="card-title">Member & Channel Stats</h5>
+            <p class="card-text">
+              <strong>Online Members:</strong> <span id="onlineMembers">Loading...</span><br>
+              <strong>Total Members:</strong> <span id="totalMembers">Loading...</span><br>
+              <strong>Offline Members:</strong> <span id="offlineMembers">Loading...</span><br>
+              <strong>Total Channel Messages:</strong> <span id="channelMessageCount">Loading...</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Activity Log Card -->
+    <div class="card">
+      <div class="card-header">
+        Activity Log
+      </div>
+      <div class="card-body log" id="activityLog">
+        <!-- Log entries will appear here -->
+      </div>
+    </div>
   </div>
-  <div class="metric">
-    Member Joins: <span id="memberJoinCount">Loading...</span>
-  </div>
-
+  
   <script>
-    // Firebase configuration using your provided values.
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
       authDomain: "spotify-795ab.firebaseapp.com",
@@ -46,16 +91,46 @@
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         console.log("User authenticated anonymously:", user.uid);
-
         const database = firebase.database();
         const metricsRef = database.ref('metrics');
 
-        // Listen for realtime updates with an error callback.
+        // Listen for realtime updates to metrics
         metricsRef.on('value', (snapshot) => {
           const data = snapshot.val();
-          console.log("Snapshot received:", data);
-          document.getElementById('messageCount').innerText = data ? data.message_count : 0;
-          document.getElementById('memberJoinCount').innerText = data ? data.member_join_count : 0;
+          
+          // Update main metrics
+          const messageCount = data ? data.message_count : 0;
+          const memberJoinCount = data ? data.member_join_count : 0;
+          document.getElementById('messageCount').innerText = messageCount;
+          document.getElementById('memberJoinCount').innerText = memberJoinCount;
+          
+          // Update additional metrics
+          const onlineMembers = data ? data.online_members : 0;
+          const totalMembers = data ? data.total_members : 0;
+          const offlineMembers = data ? data.offline_members : 0;
+          document.getElementById('onlineMembers').innerText = onlineMembers;
+          document.getElementById('totalMembers').innerText = totalMembers;
+          document.getElementById('offlineMembers').innerText = offlineMembers;
+          
+          // Calculate total channel messages for the specified channels
+          let channelMessageCount = 0;
+          const channelIds = ["1342976939488710727", "1342978737733500959", "1343041689949831169"];
+          if (data && data.channel_messages) {
+            channelIds.forEach(id => {
+              channelMessageCount += Number(data.channel_messages[id] || 0);
+            });
+          }
+          document.getElementById('channelMessageCount').innerText = channelMessageCount;
+
+          // Append a log entry
+          const logElement = document.getElementById('activityLog');
+          const logEntry = document.createElement('div');
+          logEntry.className = 'log-entry';
+          const now = new Date().toLocaleTimeString();
+          logEntry.innerText = `[${now}] Metrics updated - Messages: ${messageCount}, Joins: ${memberJoinCount}, Online: ${onlineMembers}, Total: ${totalMembers}, Offline: ${offlineMembers}, ChannelMsgs: ${channelMessageCount}`;
+          logElement.appendChild(logEntry);
+          // Auto-scroll log to bottom
+          logElement.scrollTop = logElement.scrollHeight;
         }, (error) => {
           console.error("Error reading metrics:", error);
         });
@@ -64,5 +139,7 @@
       }
     });
   </script>
+  <!-- Bootstrap Bundle JS (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
