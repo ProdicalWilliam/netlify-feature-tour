@@ -24,6 +24,7 @@
       color: var(--text-color);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
+      /* Hide default cursor */
       cursor: none;
     }
     a { color: var(--link-color); }
@@ -93,28 +94,22 @@
       background-color: var(--card-bg);
       color: var(--text-color);
     }
-    /* Background changer */
+    /* Background Color Picker */
     .bg-picker {
       position: fixed;
       top: 10px;
       right: 10px;
       z-index: 1000;
     }
-    /* Custom cursor trail */
-    .cursor-trail {
+    /* Custom Cursor */
+    #customCursor {
       position: fixed;
-      width: 20px;
-      height: 20px;
-      background: url('https://osuskinner.com/elements/interface/cursor/1/10.png') center center no-repeat;
       pointer-events: none;
-      opacity: 0.7;
+      z-index: 10000;
+      width: 40px;
+      height: 40px;
+      opacity: 0.6;
       transform: translate(-50%, -50%);
-      animation: fadeTrail 0.5s forwards;
-      z-index: 9999;
-    }
-    @keyframes fadeTrail {
-      from { opacity: 0.7; }
-      to { opacity: 0; }
     }
   </style>
 </head>
@@ -123,6 +118,9 @@
   <div class="bg-picker">
     <input type="color" id="bgColorPicker" value="#121212">
   </div>
+
+  <!-- Custom Cursor -->
+  <img id="customCursor" src="https://osuskinner.com/elements/interface/cursor/1/10.png" alt="cursor">
 
   <div id="loginContainer" class="container">
     <div class="card shadow">
@@ -146,9 +144,9 @@
     <div class="row">
       <nav id="sidebar" class="col-md-2 sidebar border-end">
         <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
-        <!-- Dashboard header replaced with custom emoji image -->
+        <!-- Dashboard header replaced with new asset -->
         <div class="mb-4 text-center">
-          <img src="https://www.freeiconspng.com/uploads/cool-icon-13.png" alt="Dashboard" style="max-width: 50px;">
+          <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
         </div>
         <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> General Metrics</a>
         <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> Member & Channel Stats</a>
@@ -159,7 +157,7 @@
           <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
         </div>
       </nav>
-      <main class="col-md-10 p-4" id="mainContent">
+      <main class="col-md-10 p-4" id="mainContent" style="margin-left:270px;">
         <!-- Header with Stonks image -->
         <div class="mb-4 text-center">
           <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
@@ -335,7 +333,6 @@
     
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('collapsed');
-      // Adjust main content margin based on sidebar width
       if(document.getElementById('sidebar').classList.contains('collapsed')){
         document.getElementById('mainContent').style.marginLeft = "70px";
       } else {
@@ -440,32 +437,11 @@
       });
     }
     
-    // Custom cursor trail
+    // Custom cursor that follows mouse
     document.addEventListener('mousemove', function(e){
-      const trail = document.createElement('div');
-      trail.className = 'cursor-trail';
-      trail.style.left = e.pageX + 'px';
-      trail.style.top = e.pageY + 'px';
-      document.body.appendChild(trail);
-      setTimeout(() => {
-        trail.remove();
-      }, 500);
-    });
-    
-    // Show custom cursor image in place of default pointer
-    document.addEventListener('DOMContentLoaded', () => {
-      const customCursor = document.createElement('img');
-      customCursor.src = 'https://osuskinner.com/elements/interface/cursor/1/10.png';
-      customCursor.style.position = 'fixed';
-      customCursor.style.pointerEvents = 'none';
-      customCursor.style.zIndex = '10000';
-      customCursor.style.width = '20px';
-      customCursor.style.height = '20px';
-      document.body.appendChild(customCursor);
-      document.addEventListener('mousemove', e => {
-        customCursor.style.left = e.pageX + 'px';
-        customCursor.style.top = e.pageY + 'px';
-      });
+      const cursor = document.getElementById('customCursor');
+      cursor.style.left = e.pageX + 'px';
+      cursor.style.top = e.pageY + 'px';
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
