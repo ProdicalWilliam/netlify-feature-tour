@@ -12,6 +12,7 @@
     .card { margin-bottom: 20px; }
     .log { height: 200px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
     .log-entry { font-size: 0.9rem; margin-bottom: 5px; }
+    .server-info dt { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -51,6 +52,44 @@
       </div>
     </div>
     <div class="card">
+      <div class="card-header">Server Info</div>
+      <div class="card-body">
+        <dl class="row server-info mb-0">
+          <dt class="col-sm-4">Server Name</dt>
+          <dd class="col-sm-8">ৎ 𓂃 /dazes</dd>
+          <dt class="col-sm-4">Created at</dt>
+          <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM (2 months ago)</dd>
+          <dt class="col-sm-4">Owner</dt>
+          <dd class="col-sm-8">iluvmads#0</dd>
+          <dt class="col-sm-4">Description</dt>
+          <dd class="col-sm-8"><a href="https://dazes.org/" target="_blank">https://dazes.org/</a></dd>
+          <dt class="col-sm-4">Boost Info</dt>
+          <dd class="col-sm-8">Level 3, 20 boosts</dd>
+          <dt class="col-sm-4">Verification Level</dt>
+          <dd class="col-sm-8">Low</dd>
+          <dt class="col-sm-4">Server Features</dt>
+          <dd class="col-sm-8">
+            Vanity Url, Animated Icon, Role Icons, Seven Day Thread Archive, Private Threads, Community,<br>
+            Soundboard, Invite Splash, News, Banner, Three Day Thread Archive, Animated Banner, Member Profiles
+          </dd>
+          <dt class="col-sm-4">Members</dt>
+          <dd class="col-sm-8">985</dd>
+          <dt class="col-sm-4">Channels</dt>
+          <dd class="col-sm-8">Total: 29, Text: 18, Voice: 3, Categories: 7</dd>
+          <dt class="col-sm-4">Ban Count</dt>
+          <dd class="col-sm-8">29</dd>
+          <dt class="col-sm-4">Roles</dt>
+          <dd class="col-sm-8">95</dd>
+          <dt class="col-sm-4">Emojis</dt>
+          <dd class="col-sm-8">237</dd>
+          <dt class="col-sm-4">Server ID</dt>
+          <dd class="col-sm-8">1342961798168711198</dd>
+          <dt class="col-sm-4">Requested by</dt>
+          <dd class="col-sm-8">williamprod • Today at 9:43 PM</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-header">Activity Log</div>
       <div class="card-body log" id="activityLog"></div>
     </div>
@@ -67,7 +106,7 @@
       appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
     };
     firebase.initializeApp(firebaseConfig);
-    firebase.auth().signInAnonymously().catch((error) => { console.error("Auth error:", error); });
+    firebase.auth().signInAnonymously().catch((error) => { console.error(error); });
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         const db = firebase.database();
@@ -94,7 +133,7 @@
           logEntry.innerText = `[${now}] Msgs: ${data.message_count || 0}, Joins: ${data.member_join_count || 0}, Online: ${data.online_members || 0}, Total: ${data.total_members || 0}, Offline: ${data.offline_members || 0}, ChMsg: ${channelMessageCount}`;
           logElement.appendChild(logEntry);
           logElement.scrollTop = logElement.scrollHeight;
-        }, (error) => { console.error("DB error:", error); });
+        }, (error) => { console.error(error); });
       }
     });
   </script>
