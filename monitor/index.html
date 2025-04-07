@@ -9,7 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <!-- Firebase -->
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -22,13 +22,15 @@
       --accent-color: #43b581;
       --link-color: #ffffff;
     }
+    /* Hide native cursor everywhere */
+    * {
+      cursor: none !important;
+    }
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      /* Hide the system cursor so only the custom one is visible */
-      cursor: none;
     }
     a {
       color: var(--link-color);
@@ -106,7 +108,7 @@
       right: 10px;
       z-index: 1000;
     }
-    /* Main custom cursor image */
+    /* Custom Cursor (64x64) */
     #customCursor {
       position: fixed;
       pointer-events: none;
@@ -116,7 +118,7 @@
       opacity: 0.8;
       transform: translate(-50%, -50%);
     }
-    /* Cursor trail copies */
+    /* Cursor Trail */
     .cursor-trail {
       position: fixed;
       width: 64px;
@@ -128,8 +130,8 @@
       z-index: 9999;
     }
     @keyframes fadeTrail {
-      0%   { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0;   transform: translate(-50%, -50%) scale(0.8); }
+      0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     }
   </style>
 </head>
@@ -139,9 +141,10 @@
     <input type="color" id="bgColorPicker" value="#121212">
   </div>
 
-  <!-- Main Custom Cursor -->
+  <!-- Custom Cursor -->
   <img id="customCursor" src="https://osuskinner.com/elements/interface/cursor/1/10.png" alt="cursor">
 
+  <!-- Login Section -->
   <div id="loginContainer" class="container">
     <div class="card shadow">
       <div class="card-body">
@@ -160,11 +163,12 @@
     </div>
   </div>
   
+  <!-- Dashboard Section -->
   <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
       <nav id="sidebar" class="col-md-2 sidebar border-end">
         <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
-        <!-- Dashboard header replaced with new asset -->
+        <!-- Dashboard header icon -->
         <div class="mb-4 text-center">
           <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
         </div>
@@ -178,17 +182,18 @@
         </div>
       </nav>
       <main class="col-md-10 p-4" id="mainContent" style="margin-left:270px;">
-        <!-- Header with Stonks image -->
+        <!-- Header with Stonks Image -->
         <div class="mb-4 text-center">
           <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
         </div>
+        <!-- General Metrics Section with fallback sample data -->
         <section id="generalMetrics" class="content-section active-section mb-4">
           <div class="row">
             <div class="col-md-6">
               <div class="card text-white bg-primary animate__animated animate__fadeIn">
                 <div class="card-body">
                   <h5 class="card-title">Total Messages</h5>
-                  <p class="card-text" id="messageCount">Loading...</p>
+                  <p class="card-text" id="messageCount">0</p>
                 </div>
               </div>
             </div>
@@ -196,34 +201,36 @@
               <div class="card text-white bg-success animate__animated animate__fadeIn">
                 <div class="card-body">
                   <h5 class="card-title">Member Joins</h5>
-                  <p class="card-text" id="memberJoinCount">Loading...</p>
+                  <p class="card-text" id="memberJoinCount">0</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
+        <!-- Member & Channel Stats Section -->
         <section id="memberStats" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-body">
               <h5 class="card-title">Member & Channel Stats</h5>
               <p class="card-text">
-                <strong>Online Members:</strong> <span id="onlineMembers">Loading...</span><br>
-                <strong>Total Members:</strong> <span id="totalMembers">Loading...</span><br>
-                <strong>Offline Members:</strong> <span id="offlineMembers">Loading...</span><br>
-                <strong>Total Channel Messages:</strong> <span id="channelMessageCount">Loading...</span>
+                <strong>Online Members:</strong> <span id="onlineMembers">0</span><br>
+                <strong>Total Members:</strong> <span id="totalMembers">0</span><br>
+                <strong>Offline Members:</strong> <span id="offlineMembers">0</span><br>
+                <strong>Total Channel Messages:</strong> <span id="channelMessageCount">0</span>
               </p>
             </div>
           </div>
         </section>
+        <!-- Server Info Section -->
         <section id="serverInfo" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-header">Server Info</div>
             <div class="card-body">
               <dl class="row server-info mb-0">
                 <dt class="col-sm-4">Server Name</dt>
-                <dd class="col-sm-8">ৎ 𓂃 /dazes</dd>
+                <dd class="col-sm-8">Example Server</dd>
                 <dt class="col-sm-4">Created at</dt>
-                <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM</dd>
+                <dd class="col-sm-8">Feb 22, 2025 3:50 PM</dd>
                 <dt class="col-sm-4">Owner</dt>
                 <dd class="col-sm-8">iluvmads#0</dd>
                 <dt class="col-sm-4">Description</dt>
@@ -233,14 +240,11 @@
                 <dt class="col-sm-4">Verification Level</dt>
                 <dd class="col-sm-8">Low</dd>
                 <dt class="col-sm-4">Server Features</dt>
-                <dd class="col-sm-8">
-                  Vanity Url, Animated Icon, Role Icons, Seven Day Thread Archive, Private Threads, Community,<br>
-                  Soundboard, Invite Splash, News, Banner, Three Day Thread Archive, Animated Banner, Member Profiles
-                </dd>
+                <dd class="col-sm-8">Various Features Listed</dd>
                 <dt class="col-sm-4">Members</dt>
                 <dd class="col-sm-8">985</dd>
                 <dt class="col-sm-4">Channels</dt>
-                <dd class="col-sm-8">Total: 29, Text: 18, Voice: 3, Categories: 7</dd>
+                <dd class="col-sm-8">29</dd>
                 <dt class="col-sm-4">Ban Count</dt>
                 <dd class="col-sm-8">29</dd>
                 <dt class="col-sm-4">Roles</dt>
@@ -255,6 +259,7 @@
             </div>
           </div>
         </section>
+        <!-- Chat Panel Section -->
         <section id="chatPanel" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-header">Chat Panel</div>
@@ -263,7 +268,7 @@
                 <label for="channelSelect" class="form-label">Select Channel</label>
                 <select id="channelSelect" class="form-select"></select>
               </div>
-              <div class="chat-messages mb-3" id="chatMessages">Loading chat...</div>
+              <div class="chat-messages mb-3" id="chatMessages">No chat messages yet.</div>
               <form id="chatForm">
                 <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
                 <button type="submit" class="btn btn-success">Send</button>
@@ -271,18 +276,19 @@
             </div>
           </div>
         </section>
+        <!-- Logs Panel Section -->
         <section id="logsPanel" class="content-section mb-4">
           <div class="row">
             <div class="col-md-6">
               <div class="card animate__animated animate__fadeIn">
                 <div class="card-header">Channel Updates Log</div>
-                <div class="card-body log-messages" id="channelUpdatesLog">Loading channel updates...</div>
+                <div class="card-body log-messages" id="channelUpdatesLog">No updates available.</div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="card animate__animated animate__fadeIn">
                 <div class="card-header">Moderation Log</div>
-                <div class="card-body log-messages" id="modLogs">Loading moderation logs...</div>
+                <div class="card-body log-messages" id="modLogs">No moderation logs available.</div>
               </div>
             </div>
           </div>
@@ -292,6 +298,7 @@
   </div>
   
   <script>
+    // Firebase config
     const ALLOWED_UID = "5sqOkI7gM7XYdsg4o0WEGqZPFBQ2";
     const firebaseConfig = {
       apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
@@ -304,6 +311,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     
+    // Login handling
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
@@ -341,6 +349,7 @@
       firebase.auth().signOut();
     });
     
+    // Sidebar navigation
     const navLinks = document.querySelectorAll('.sidebar a.nav-link');
     navLinks.forEach(link => {
       link.addEventListener('click', e => {
@@ -351,6 +360,7 @@
       });
     });
     
+    // Sidebar collapse
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('collapsed');
       if(document.getElementById('sidebar').classList.contains('collapsed')){
@@ -360,10 +370,12 @@
       }
     });
     
+    // Background color picker
     document.getElementById('bgColorPicker').addEventListener('input', (e) => {
       document.body.style.backgroundColor = e.target.value;
     });
     
+    // Dashboard metrics
     function initDashboard() {
       const dbRef = firebase.database().ref('metrics');
       dbRef.on('value', snapshot => {
@@ -379,6 +391,7 @@
       });
     }
     
+    // Populate channel select and load chat
     function initChannels() {
       const channelsSelect = document.getElementById('channelSelect');
       const channelsRef = firebase.database().ref('channels');
@@ -395,6 +408,7 @@
       });
     }
     
+    // Chat handling
     function initChat() {
       const chatMessagesEl = document.getElementById('chatMessages');
       const channelSelect = document.getElementById('channelSelect');
@@ -434,6 +448,7 @@
       loadChat(channelSelect.value);
     }
     
+    // Logs handling
     function initLogs() {
       const channelUpdatesEl = document.getElementById('channelUpdatesLog');
       const modLogsEl = document.getElementById('modLogs');
@@ -457,13 +472,13 @@
       });
     }
     
-    // Update main cursor position and create a trail effect
+    // Custom cursor and trail effect
     document.addEventListener('mousemove', function(e){
       const cursor = document.getElementById('customCursor');
       cursor.style.left = e.pageX + 'px';
       cursor.style.top = e.pageY + 'px';
       
-      // Create a trail copy
+      // Create a fading trail copy
       const trail = document.createElement('img');
       trail.src = cursor.src;
       trail.className = 'cursor-trail';
@@ -473,7 +488,6 @@
       setTimeout(() => { trail.remove(); }, 400);
     });
   </script>
-  <!-- Bootstrap Bundle JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
