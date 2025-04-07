@@ -15,22 +15,25 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
     :root {
-      --bg-color: #121212;
-      --text-color: #ffffff;
+      --bg-color: #000000; /* Black background */
+      --text-color: #ffffff; /* White text */
       --card-bg: #1e1e1e;
       --sidebar-bg: #181818;
-      --accent-color: #43b581;
+      --accent-color: #39FF14; /* Neon green */
+      --secondary-accent: #5D3FD3; /* Midnight purple */
       --link-color: #ffffff;
     }
-    /* Hide native cursor everywhere */
+    /* General Reset & Text Color */
     * {
       cursor: none !important;
+      color: var(--text-color);
     }
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
+      position: relative;
+      overflow-x: hidden;
     }
     a {
       color: var(--link-color);
@@ -39,13 +42,19 @@
     .card {
       background-color: var(--card-bg);
       border: none;
+      color: var(--text-color);
+    }
+    /* Flex layout for sidebar and main content */
+    .row {
+      display: flex;
+      min-height: 100vh;
     }
     .sidebar {
       background-color: var(--sidebar-bg);
-      min-height: 100vh;
       padding: 20px;
       transition: width 0.3s, padding 0.3s;
       width: 250px;
+      overflow: hidden;
     }
     .sidebar.collapsed {
       width: 60px;
@@ -56,6 +65,7 @@
       align-items: center;
       padding: 10px 0;
       color: var(--link-color);
+      white-space: nowrap;
     }
     .sidebar a:hover {
       color: var(--accent-color);
@@ -69,6 +79,13 @@
       margin-bottom: 20px;
       text-align: right;
     }
+    /* Main content */
+    #mainContent {
+      flex-grow: 1;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    /* Content Sections */
     .content-section {
       display: none;
       animation: fadeIn 0.5s;
@@ -80,6 +97,7 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* Login Styles */
     #loginContainer {
       max-width: 400px;
       margin: 100px auto;
@@ -133,12 +151,50 @@
       0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
       100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     }
+    /* Floating Spheres Background */
+    #particle-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .floating-sphere {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 15px rgba(255,255,255,0.5);
+      animation: floatSphere 20s linear infinite;
+    }
+    @keyframes floatSphere {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+      }
+      50% {
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        transform: translateY(-100vh) scale(0.5);
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Particle Background -->
+  <div id="particle-background">
+    <!-- You can adjust size, position, and delay for variety -->
+    <div class="floating-sphere" style="width: 80px; height: 80px; left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-sphere" style="width: 120px; height: 120px; left: 40%; animation-delay: 3s;"></div>
+    <div class="floating-sphere" style="width: 60px; height: 60px; left: 70%; animation-delay: 5s;"></div>
+    <div class="floating-sphere" style="width: 100px; height: 100px; left: 20%; animation-delay: 2s;"></div>
+    <div class="floating-sphere" style="width: 90px; height: 90px; left: 80%; animation-delay: 4s;"></div>
+  </div>
+
   <!-- Background Color Picker -->
   <div class="bg-picker">
-    <input type="color" id="bgColorPicker" value="#121212">
+    <input type="color" id="bgColorPicker" value="#000000">
   </div>
 
   <!-- Custom Cursor -->
@@ -166,22 +222,22 @@
   <!-- Dashboard Section -->
   <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
-      <nav id="sidebar" class="col-md-2 sidebar border-end">
+      <nav id="sidebar" class="sidebar border-end">
         <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
         <!-- Dashboard header icon -->
         <div class="mb-4 text-center">
           <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
         </div>
-        <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> General Metrics</a>
-        <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> Member & Channel Stats</a>
-        <a href="#" class="nav-link" data-target="serverInfo"><i class="bi bi-server"></i> Server Info</a>
-        <a href="#" class="nav-link" data-target="chatPanel"><i class="bi bi-chat-dots"></i> Chat</a>
-        <a href="#" class="nav-link" data-target="logsPanel"><i class="bi bi-file-earmark-text"></i> Logs</a>
+        <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> <span class="link-text">General Metrics</span></a>
+        <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> <span class="link-text">Member & Channel Stats</span></a>
+        <a href="#" class="nav-link" data-target="serverInfo"><i class="bi bi-server"></i> <span class="link-text">Server Info</span></a>
+        <a href="#" class="nav-link" data-target="chatPanel"><i class="bi bi-chat-dots"></i> <span class="link-text">Chat</span></a>
+        <a href="#" class="nav-link" data-target="logsPanel"><i class="bi bi-file-earmark-text"></i> <span class="link-text">Logs</span></a>
         <div class="mt-4">
           <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
         </div>
       </nav>
-      <main class="col-md-10 p-4" id="mainContent" style="margin-left:270px;">
+      <main class="p-4" id="mainContent">
         <!-- Header with Stonks Image -->
         <div class="mb-4 text-center">
           <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
@@ -360,14 +416,9 @@
       });
     });
     
-    // Sidebar collapse
+    // Sidebar collapse using flex layout (no margin adjustments needed)
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('collapsed');
-      if(document.getElementById('sidebar').classList.contains('collapsed')){
-        document.getElementById('mainContent').style.marginLeft = "70px";
-      } else {
-        document.getElementById('mainContent').style.marginLeft = "270px";
-      }
     });
     
     // Background color picker
