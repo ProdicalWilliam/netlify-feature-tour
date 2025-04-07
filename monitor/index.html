@@ -527,17 +527,18 @@
       const chatInput = document.getElementById('chatInput');
       
       function loadChat(channelId) {
-        const chatRef = firebase.database().ref('chatMessages/' + channelId);
-        chatRef.off();
-        chatRef.on('value', snapshot => {
-          const messages = snapshot.val() || {};
-          chatMessagesEl.innerHTML = '';
-          Object.values(messages).forEach(msg => {
-            chatMessagesEl.innerHTML += `<div><strong>${msg.username || 'Unknown'}</strong> (${msg.timestamp || 'No Time'}): ${msg.content || ''}</div>`;
-          });
-          chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        });
-      }
+  // Retrieve only the last 50 messages to avoid performance issues.
+  const chatRef = firebase.database().ref('chatMessages/' + channelId).limitToLast(50);
+  chatRef.off();
+  chatRef.on('value', snapshot => {
+    const messages = snapshot.val() || {};
+    chatMessagesEl.innerHTML = '';
+    Object.values(messages).forEach(msg => {
+      chatMessagesEl.innerHTML += `<div><strong>${msg.username || 'Unknown'}</strong> (${msg.timestamp || 'No Time'}): ${msg.content || ''}</div>`;
+    });
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  });
+}
       
       chatForm.addEventListener('submit', e => {
         e.preventDefault();
