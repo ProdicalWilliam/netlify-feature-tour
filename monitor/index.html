@@ -10,32 +10,85 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
     :root {
-      --bg-color: #f8f9fa;
+      --bg-color: #ffffff;
       --text-color: #212529;
       --card-bg: #ffffff;
-      --sidebar-bg: #ffffff;
+      --sidebar-bg: #f1f1f1;
+      --accent-color: #43b581; /* Discord green accent */
       --link-color: #212529;
     }
     [data-theme="dark"] {
-      --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --card-bg: #1e1e1e;
-      --sidebar-bg: #1e1e1e;
-      --link-color: #e0e0e0;
+      --bg-color: #2f3136;
+      --text-color: #d1d1d1;
+      --card-bg: #36393f;
+      --sidebar-bg: #202225;
+      --link-color: #d1d1d1;
     }
-    body { background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
-    .card { background-color: var(--card-bg); transition: background-color 0.3s; }
-    .sidebar { background-color: var(--sidebar-bg); min-height: 100vh; padding: 20px; transition: background-color 0.3s; }
-    .sidebar a { color: var(--link-color); text-decoration: none; display: block; padding: 10px 0; transition: color 0.3s; }
-    .sidebar a:hover { color: #0d6efd; }
-    .toggle-btn { cursor: pointer; }
-    .content-section { display: none; animation: fadeIn 0.5s; }
-    .active-section { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    #loginContainer { max-width: 400px; margin: 100px auto; }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: none;
+      transition: background-color 0.3s;
+    }
+    .sidebar {
+      background-color: var(--sidebar-bg);
+      min-height: 100vh;
+      padding: 20px;
+      transition: background-color 0.3s;
+    }
+    .sidebar a {
+      color: var(--link-color);
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      transition: color 0.3s;
+    }
+    .sidebar a:hover {
+      color: var(--accent-color);
+    }
+    .toggle-btn {
+      cursor: pointer;
+    }
+    .content-section {
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+    .active-section {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #loginContainer {
+      max-width: 400px;
+      margin: 100px auto;
+    }
+    .chat-messages, .log-messages {
+      height: 300px;
+      overflow-y: auto;
+      background-color: var(--card-bg);
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .chat-input {
+      width: 100%;
+      resize: none;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
   </style>
 </head>
 <body data-theme="light">
+  <!-- Login Container -->
   <div id="loginContainer" class="container">
     <div class="card shadow">
       <div class="card-body">
@@ -54,6 +107,7 @@
     </div>
   </div>
   
+  <!-- Dashboard Container -->
   <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
       <nav class="col-md-2 sidebar border-end">
@@ -61,7 +115,8 @@
         <a href="#" class="nav-link" data-target="generalMetrics">General Metrics</a>
         <a href="#" class="nav-link" data-target="memberStats">Member & Channel Stats</a>
         <a href="#" class="nav-link" data-target="serverInfo">Server Info</a>
-        <a href="#" class="nav-link" data-target="activityLog">Activity Log</a>
+        <a href="#" class="nav-link" data-target="chatPanel">Chat</a>
+        <a href="#" class="nav-link" data-target="logsPanel">Logs</a>
         <div class="mt-4">
           <span class="toggle-btn badge bg-secondary p-2" id="themeToggle">Toggle Theme</span>
         </div>
@@ -70,6 +125,7 @@
         </div>
       </nav>
       <main class="col-md-10 p-4">
+        <!-- General Metrics Section -->
         <section id="generalMetrics" class="content-section active-section mb-4">
           <div class="row">
             <div class="col-md-6">
@@ -90,6 +146,7 @@
             </div>
           </div>
         </section>
+        <!-- Member & Channel Stats Section -->
         <section id="memberStats" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-body">
@@ -103,6 +160,7 @@
             </div>
           </div>
         </section>
+        <!-- Server Info Section -->
         <section id="serverInfo" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-header">Server Info</div>
@@ -143,10 +201,42 @@
             </div>
           </div>
         </section>
-        <section id="activityLog" class="content-section">
+        <!-- Chat Panel Section -->
+        <section id="chatPanel" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
-            <div class="card-header">Activity Log</div>
-            <div class="card-body log"></div>
+            <div class="card-header">Chat Panel</div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="channelSelect" class="form-label">Select Channel</label>
+                <select id="channelSelect" class="form-select">
+                  <option value="1342976939488710727">Channel 1</option>
+                  <option value="1342978737733500959">Channel 2</option>
+                  <option value="1343041689949831169">Channel 3</option>
+                </select>
+              </div>
+              <div class="chat-messages mb-3" id="chatMessages">Loading chat...</div>
+              <form id="chatForm">
+                <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
+                <button type="submit" class="btn btn-success">Send</button>
+              </form>
+            </div>
+          </div>
+        </section>
+        <!-- Logs Panel Section -->
+        <section id="logsPanel" class="content-section mb-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card animate__animated animate__fadeIn">
+                <div class="card-header">Channel Updates Log</div>
+                <div class="card-body log-messages" id="channelUpdatesLog">Loading channel updates...</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card animate__animated animate__fadeIn">
+                <div class="card-header">Moderation Log</div>
+                <div class="card-body log-messages" id="modLogs">Loading moderation logs...</div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -166,6 +256,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     
+    // Login functionality
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
@@ -190,6 +281,8 @@
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('dashboardContainer').style.display = 'block';
         initDashboard();
+        initChat();
+        initLogs();
       } else {
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('dashboardContainer').style.display = 'none';
@@ -215,6 +308,7 @@
       });
     });
     
+    // Dashboard metrics
     function initDashboard() {
       const db = firebase.database();
       const metricsRef = db.ref('metrics');
@@ -233,13 +327,78 @@
           });
         }
         document.getElementById('channelMessageCount').innerText = channelMessageCount;
-        const logElement = document.querySelector('#activityLog .log');
-        const logEntry = document.createElement('div');
-        logEntry.className = 'log-entry';
-        const now = new Date().toLocaleTimeString();
-        logEntry.innerText = `[${now}] Msgs: ${data.message_count || 0}, Joins: ${data.member_join_count || 0}, Online: ${data.online_members || 0}, Total: ${data.total_members || 0}, Offline: ${data.offline_members || 0}, ChMsg: ${channelMessageCount}`;
-        logElement.appendChild(logEntry);
-        logElement.scrollTop = logElement.scrollHeight;
+      });
+    }
+    
+    // Chat panel functionality
+    function initChat() {
+      const db = firebase.database();
+      const chatMessagesEl = document.getElementById('chatMessages');
+      const chatForm = document.getElementById('chatForm');
+      const chatInput = document.getElementById('chatInput');
+      const channelSelect = document.getElementById('channelSelect');
+      
+      function loadChat(channelId) {
+        const chatRef = db.ref('chatMessages/' + channelId);
+        chatRef.off();
+        chatRef.on('value', snapshot => {
+          const messages = snapshot.val() || {};
+          chatMessagesEl.innerHTML = '';
+          Object.values(messages).forEach(msg => {
+            const div = document.createElement('div');
+            div.innerText = msg;
+            chatMessagesEl.appendChild(div);
+          });
+          chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        });
+      }
+      
+      channelSelect.addEventListener('change', () => {
+        loadChat(channelSelect.value);
+      });
+      
+      chatForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const channelId = channelSelect.value;
+        const chatRef = db.ref('chatMessages/' + channelId);
+        const newMsg = chatInput.value;
+        chatRef.push(newMsg);
+        chatInput.value = '';
+      });
+      
+      loadChat(channelSelect.value);
+    }
+    
+    // Logs functionality
+    function initLogs() {
+      const db = firebase.database();
+      const channelUpdatesEl = document.getElementById('channelUpdatesLog');
+      const modLogsEl = document.getElementById('modLogs');
+      
+      // Channel updates listener
+      const channelUpdatesRef = db.ref('channelUpdates');
+      channelUpdatesRef.on('value', snapshot => {
+        const updates = snapshot.val() || {};
+        channelUpdatesEl.innerHTML = '';
+        Object.values(updates).forEach(update => {
+          const div = document.createElement('div');
+          div.innerText = update;
+          channelUpdatesEl.appendChild(div);
+        });
+        channelUpdatesEl.scrollTop = channelUpdatesEl.scrollHeight;
+      });
+      
+      // Moderation logs listener
+      const modLogsRef = db.ref('modLogs');
+      modLogsRef.on('value', snapshot => {
+        const logs = snapshot.val() || {};
+        modLogsEl.innerHTML = '';
+        Object.values(logs).forEach(log => {
+          const div = document.createElement('div');
+          div.innerText = log;
+          modLogsEl.appendChild(div);
+        });
+        modLogsEl.scrollTop = modLogsEl.scrollHeight;
       });
     }
   </script>
