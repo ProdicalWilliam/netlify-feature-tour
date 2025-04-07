@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Discord Bot Dashboard</title>
+  <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -205,10 +206,7 @@
                 <select id="channelSelect" class="form-select"></select>
               </div>
               <div class="chat-messages mb-3" id="chatMessages">Loading chat...</div>
-              <form id="chatForm">
-                <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
-                <button type="submit" class="btn btn-success">Send</button>
-              </form>
+              <!-- Chat submission disabled; messages come solely from the Discord bot -->
             </div>
           </div>
         </section>
@@ -333,8 +331,6 @@
     
     function initChat() {
       const chatMessagesEl = document.getElementById('chatMessages');
-      const chatForm = document.getElementById('chatForm');
-      const chatInput = document.getElementById('chatInput');
       const channelSelect = document.getElementById('channelSelect');
       
       function loadChat(channelId) {
@@ -344,9 +340,11 @@
           const messages = snapshot.val() || {};
           chatMessagesEl.innerHTML = '';
           Object.values(messages).forEach(msg => {
-            const div = document.createElement('div');
-            div.innerHTML = `<strong>${msg.username}</strong> (${msg.timestamp}): ${msg.content}`;
-            chatMessagesEl.appendChild(div);
+            if(typeof msg === 'object'){
+              chatMessagesEl.innerHTML += `<div><strong>${msg.username || 'Unknown'}</strong> (${msg.timestamp || 'No Time'}): ${msg.content || ''}</div>`;
+            } else {
+              chatMessagesEl.innerHTML += `<div>${msg}</div>`;
+            }
           });
           chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         });
@@ -354,14 +352,6 @@
       
       channelSelect.addEventListener('change', () => {
         loadChat(channelSelect.value);
-      });
-      
-      chatForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const channelId = channelSelect.value;
-        const chatRef = firebase.database().ref('chatMessages/' + channelId);
-        chatRef.push(chatInput.value);
-        chatInput.value = '';
       });
       
       loadChat(channelSelect.value);
@@ -376,9 +366,7 @@
         const updates = snapshot.val() || {};
         channelUpdatesEl.innerHTML = '';
         Object.values(updates).forEach(update => {
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${update.username}</strong> in <em>${update.channel}</em> at ${update.timestamp}: Edited from "${update.before}" to "${update.after}"`;
-          channelUpdatesEl.appendChild(div);
+          channelUpdatesEl.innerHTML += `<div><strong>${update.username || 'Unknown'}</strong> in <em>${update.channel || 'Unknown Channel'}</em> at ${update.timestamp || 'No Time'}: Edited from "${update.before || ''}" to "${update.after || ''}"</div>`;
         });
         channelUpdatesEl.scrollTop = channelUpdatesEl.scrollHeight;
       });
@@ -388,9 +376,7 @@
         const logs = snapshot.val() || {};
         modLogsEl.innerHTML = '';
         Object.values(logs).forEach(log => {
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${log.username}</strong> performed <em>${log.action}</em> on ${log.target || ''} at ${log.timestamp} ${log.reason ? 'with reason: ' + log.reason : ''}`;
-          modLogsEl.appendChild(div);
+          modLogsEl.innerHTML += `<div><strong>${log.username || 'Unknown'}</strong> performed <em>${log.action || 'an action'}</em> on ${log.target || ''} at ${log.timestamp || 'No Time'}${log.reason ? ' with reason: ' + log.reason : ''}</div>`;
         });
         modLogsEl.scrollTop = modLogsEl.scrollHeight;
       });
