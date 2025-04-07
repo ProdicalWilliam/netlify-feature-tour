@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for cross-origin requests from your frontend
+CORS(app)  # Enable CORS for scross-origin requests from your frontend
 
 # Global variable to store current media info
 current_track = {}
