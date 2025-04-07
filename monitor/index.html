@@ -14,7 +14,7 @@
       --text-color: #212529;
       --card-bg: #ffffff;
       --sidebar-bg: #f1f1f1;
-      --accent-color: #43b581; /* Discord green accent */
+      --accent-color: #43b581;
       --link-color: #212529;
     }
     [data-theme="dark"] {
@@ -88,7 +88,6 @@
   </style>
 </head>
 <body data-theme="light">
-  <!-- Login Container -->
   <div id="loginContainer" class="container">
     <div class="card shadow">
       <div class="card-body">
@@ -107,7 +106,6 @@
     </div>
   </div>
   
-  <!-- Dashboard Container -->
   <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
       <nav class="col-md-2 sidebar border-end">
@@ -125,7 +123,6 @@
         </div>
       </nav>
       <main class="col-md-10 p-4">
-        <!-- General Metrics Section -->
         <section id="generalMetrics" class="content-section active-section mb-4">
           <div class="row">
             <div class="col-md-6">
@@ -146,7 +143,6 @@
             </div>
           </div>
         </section>
-        <!-- Member & Channel Stats Section -->
         <section id="memberStats" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-body">
@@ -160,7 +156,6 @@
             </div>
           </div>
         </section>
-        <!-- Server Info Section -->
         <section id="serverInfo" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-header">Server Info</div>
@@ -201,18 +196,13 @@
             </div>
           </div>
         </section>
-        <!-- Chat Panel Section -->
         <section id="chatPanel" class="content-section mb-4">
           <div class="card animate__animated animate__fadeIn">
             <div class="card-header">Chat Panel</div>
             <div class="card-body">
               <div class="mb-3">
                 <label for="channelSelect" class="form-label">Select Channel</label>
-                <select id="channelSelect" class="form-select">
-                  <option value="1342976939488710727">Channel 1</option>
-                  <option value="1342978737733500959">Channel 2</option>
-                  <option value="1343041689949831169">Channel 3</option>
-                </select>
+                <select id="channelSelect" class="form-select"></select>
               </div>
               <div class="chat-messages mb-3" id="chatMessages">Loading chat...</div>
               <form id="chatForm">
@@ -222,7 +212,6 @@
             </div>
           </div>
         </section>
-        <!-- Logs Panel Section -->
         <section id="logsPanel" class="content-section mb-4">
           <div class="row">
             <div class="col-md-6">
@@ -256,7 +245,6 @@
     };
     firebase.initializeApp(firebaseConfig);
     
-    // Login functionality
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
@@ -281,6 +269,7 @@
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('dashboardContainer').style.display = 'block';
         initDashboard();
+        initChannels();
         initChat();
         initLogs();
       } else {
@@ -308,11 +297,9 @@
       });
     });
     
-    // Dashboard metrics
     function initDashboard() {
-      const db = firebase.database();
-      const metricsRef = db.ref('metrics');
-      metricsRef.on('value', snapshot => {
+      const dbRef = firebase.database().ref('metrics');
+      dbRef.on('value', snapshot => {
         const data = snapshot.val() || {};
         document.getElementById('messageCount').innerText = data.message_count || 0;
         document.getElementById('memberJoinCount').innerText = data.member_join_count || 0;
@@ -320,33 +307,45 @@
         document.getElementById('totalMembers').innerText = data.total_members || 0;
         document.getElementById('offlineMembers').innerText = data.offline_members || 0;
         let channelMessageCount = 0;
-        const channelIds = ["1342976939488710727", "1342978737733500959", "1343041689949831169"];
-        if(data.channel_messages){
-          channelIds.forEach(id => {
-            channelMessageCount += Number(data.channel_messages[id] || 0);
-          });
-        }
+        const channelIds = Object.keys(data.channel_messages || {});
+        channelIds.forEach(id => {
+          channelMessageCount += Number(data.channel_messages[id] || 0);
+        });
         document.getElementById('channelMessageCount').innerText = channelMessageCount;
       });
     }
     
-    // Chat panel functionality
+    function initChannels() {
+      const channelsSelect = document.getElementById('channelSelect');
+      const channelsRef = firebase.database().ref('channels');
+      channelsRef.on('value', snapshot => {
+        const channels = snapshot.val() || {};
+        channelsSelect.innerHTML = '';
+        for (const id in channels) {
+          const option = document.createElement('option');
+          option.value = id;
+          option.text = `${channels[id].guild} - #${channels[id].name}`;
+          channelsSelect.appendChild(option);
+        }
+        loadChat(channelsSelect.value);
+      });
+    }
+    
     function initChat() {
-      const db = firebase.database();
       const chatMessagesEl = document.getElementById('chatMessages');
       const chatForm = document.getElementById('chatForm');
       const chatInput = document.getElementById('chatInput');
       const channelSelect = document.getElementById('channelSelect');
       
       function loadChat(channelId) {
-        const chatRef = db.ref('chatMessages/' + channelId);
+        const chatRef = firebase.database().ref('chatMessages/' + channelId);
         chatRef.off();
         chatRef.on('value', snapshot => {
           const messages = snapshot.val() || {};
           chatMessagesEl.innerHTML = '';
           Object.values(messages).forEach(msg => {
             const div = document.createElement('div');
-            div.innerText = msg;
+            div.innerHTML = `<strong>${msg.username}</strong> (${msg.timestamp}): ${msg.content}`;
             chatMessagesEl.appendChild(div);
           });
           chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
@@ -360,42 +359,37 @@
       chatForm.addEventListener('submit', e => {
         e.preventDefault();
         const channelId = channelSelect.value;
-        const chatRef = db.ref('chatMessages/' + channelId);
-        const newMsg = chatInput.value;
-        chatRef.push(newMsg);
+        const chatRef = firebase.database().ref('chatMessages/' + channelId);
+        chatRef.push(chatInput.value);
         chatInput.value = '';
       });
       
       loadChat(channelSelect.value);
     }
     
-    // Logs functionality
     function initLogs() {
-      const db = firebase.database();
       const channelUpdatesEl = document.getElementById('channelUpdatesLog');
       const modLogsEl = document.getElementById('modLogs');
       
-      // Channel updates listener
-      const channelUpdatesRef = db.ref('channelUpdates');
+      const channelUpdatesRef = firebase.database().ref('channelUpdates');
       channelUpdatesRef.on('value', snapshot => {
         const updates = snapshot.val() || {};
         channelUpdatesEl.innerHTML = '';
         Object.values(updates).forEach(update => {
           const div = document.createElement('div');
-          div.innerText = update;
+          div.innerHTML = `<strong>${update.username}</strong> in <em>${update.channel}</em> at ${update.timestamp}: Edited from "${update.before}" to "${update.after}"`;
           channelUpdatesEl.appendChild(div);
         });
         channelUpdatesEl.scrollTop = channelUpdatesEl.scrollHeight;
       });
       
-      // Moderation logs listener
-      const modLogsRef = db.ref('modLogs');
+      const modLogsRef = firebase.database().ref('modLogs');
       modLogsRef.on('value', snapshot => {
         const logs = snapshot.val() || {};
         modLogsEl.innerHTML = '';
         Object.values(logs).forEach(log => {
           const div = document.createElement('div');
-          div.innerText = log;
+          div.innerHTML = `<strong>${log.username}</strong> performed <em>${log.action}</em> on ${log.target || ''} at ${log.timestamp} ${log.reason ? 'with reason: ' + log.reason : ''}`;
           modLogsEl.appendChild(div);
         });
         modLogsEl.scrollTop = modLogsEl.scrollHeight;
