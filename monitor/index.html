@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Discord Bot Dashboard</title>
   <!-- Favicon -->
   <link rel="icon" href="https://images.vexels.com/media/users/3/196620/isolated/preview/4f55a4467639077aefe36e0f826b114b-cool-shape-crystal-stroke-icon.png?w=360" type="image/x-icon">
   <!-- Bootstrap & Icons -->
@@ -16,12 +16,14 @@
   <style>
     :root {
       --bg-color: #000000; /* Black background */
-      --text-color: #ffffff; /* White text for most elements */
+      --text-color: #ffffff; /* White text */
       --card-bg: #1e1e1e;
       --sidebar-bg: #181818;
       --accent-color: #39FF14; /* Neon green */
       --secondary-accent: #5D3FD3; /* Midnight purple */
       --link-color: #ffffff;
+      --expanded-sidebar-width: 250px;
+      --collapsed-sidebar-width: 60px;
     }
     /* General Reset & Text Color */
     * {
@@ -50,12 +52,12 @@
       border: none;
       color: var(--text-color);
     }
-    /* Flex container for dashboard */
+    /* Dashboard container (z-index higher than background) */
     .dashboard-container {
       position: relative;
       z-index: 1;
     }
-    /* Sidebar positioned absolute to overlay main UI */
+    /* Sidebar styling */
     .sidebar {
       position: absolute;
       top: 0;
@@ -63,17 +65,18 @@
       background-color: var(--sidebar-bg);
       padding: 20px;
       transition: width 0.3s, padding 0.3s;
-      width: 250px;
+      width: var(--expanded-sidebar-width);
       height: 100vh;
       overflow: hidden;
       z-index: 1000;
     }
-    /* Collapsed state hides text and reduces width */
+    /* When collapsed, sidebar becomes narrower and hides text */
     .sidebar.collapsed {
-      width: 60px;
+      width: var(--collapsed-sidebar-width);
       padding: 10px;
     }
-    .sidebar.collapsed .link-text {
+    .sidebar.collapsed .link-text,
+    .sidebar.collapsed .sidebar-header {
       display: none;
     }
     .sidebar a {
@@ -89,17 +92,34 @@
     .sidebar i {
       margin-right: 10px;
     }
+    /* Sidebar header (for the dashboard icon) */
+    .sidebar-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    /* Sidebar footer for Sign Out button */
+    .sidebar-footer {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+    }
     .toggle-sidebar {
       cursor: pointer;
       font-size: 1.2rem;
       margin-bottom: 20px;
       text-align: right;
     }
-    /* Main content occupies full width */
+    /* Main content styling */
     #mainContent {
       padding: 20px;
-      transition: all 0.3s;
-      margin-left: 0;
+      transition: margin-left 0.3s;
+      margin-left: var(--expanded-sidebar-width);
+    }
+    /* When sidebar is collapsed, adjust main content margin */
+    body.sidebar-collapsed #mainContent {
+      margin-left: var(--collapsed-sidebar-width);
     }
     /* Content Sections */
     .content-section {
@@ -243,8 +263,7 @@
       <div class="toggle-sidebar text-end">
         <i class="bi bi-list" id="sidebarToggle"></i>
       </div>
-      <!-- Dashboard header icon -->
-      <div class="mb-4 text-center">
+      <div class="sidebar-header text-center">
         <img src="https://cdn-icons-png.freepik.com/512/8899/8899687.png" alt="Dashboard" style="max-width: 50px;">
       </div>
       <a href="#" class="nav-link" data-target="generalMetrics">
@@ -267,7 +286,8 @@
         <i class="bi bi-file-earmark-text"></i>
         <span class="link-text">Logs</span>
       </a>
-      <div class="mt-4">
+      <!-- Sidebar footer with Sign Out button -->
+      <div class="sidebar-footer">
         <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
       </div>
     </nav>
@@ -277,7 +297,7 @@
       <div class="mb-4 text-center">
         <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
       </div>
-      <!-- General Metrics Section with fallback sample data -->
+      <!-- General Metrics Section -->
       <section id="generalMetrics" class="content-section active-section mb-4">
         <div class="row">
           <div class="col-md-6">
@@ -450,9 +470,15 @@
       });
     });
     
-    // Toggle sidebar collapse (overlay behavior; main UI remains full width)
+    // Toggle sidebar collapse and adjust main content margin
     document.getElementById('sidebarToggle').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('collapsed');
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+      if (sidebar.classList.contains('collapsed')) {
+        document.body.classList.add('sidebar-collapsed');
+      } else {
+        document.body.classList.remove('sidebar-collapsed');
+      }
     });
     
     // Background color picker
