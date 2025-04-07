@@ -43,18 +43,21 @@
       console.error("Authentication error:", error);
     });
 
-    // Once authentication is complete, set up the database listener
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        // User is signed in.
+        console.log("User authenticated anonymously:", user.uid);
+
         const database = firebase.database();
         const metricsRef = database.ref('metrics');
 
-        // Listen for realtime updates
+        // Listen for realtime updates with an error callback.
         metricsRef.on('value', (snapshot) => {
           const data = snapshot.val();
+          console.log("Snapshot received:", data);
           document.getElementById('messageCount').innerText = data ? data.message_count : 0;
           document.getElementById('memberJoinCount').innerText = data ? data.member_join_count : 0;
+        }, (error) => {
+          console.error("Error reading metrics:", error);
         });
       } else {
         console.log("User is signed out.");
