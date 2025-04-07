@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Discord Bot Dashboard</title>
-  <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="https://images.vexels.com/media/users/3/196620/isolated/preview/4f55a4467639077aefe36e0f826b114b-cool-shape-crystal-stroke-icon.png?w=360" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -13,27 +13,30 @@
   <style>
     :root {
       --bg-color: #121212;
-      --text-color: #e0e0e0;
+      --text-color: #ffffff;
       --card-bg: #1e1e1e;
       --sidebar-bg: #181818;
       --accent-color: #43b581;
-      --link-color: #e0e0e0;
+      --link-color: #ffffff;
     }
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      cursor: none;
     }
+    a { color: var(--link-color); }
     .card {
       background-color: var(--card-bg);
       border: none;
-      transition: background-color 0.3s;
     }
     .sidebar {
       background-color: var(--sidebar-bg);
       min-height: 100vh;
       padding: 20px;
-      transition: all 0.3s;
+      transition: width 0.3s, padding 0.3s;
+      width: 250px;
     }
     .sidebar.collapsed {
       width: 60px;
@@ -56,6 +59,7 @@
       cursor: pointer;
       font-size: 1.2rem;
       margin-bottom: 20px;
+      text-align: right;
     }
     .content-section {
       display: none;
@@ -89,9 +93,37 @@
       background-color: var(--card-bg);
       color: var(--text-color);
     }
+    /* Background changer */
+    .bg-picker {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    /* Custom cursor trail */
+    .cursor-trail {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: url('https://osuskinner.com/elements/interface/cursor/1/10.png') center center no-repeat;
+      pointer-events: none;
+      opacity: 0.7;
+      transform: translate(-50%, -50%);
+      animation: fadeTrail 0.5s forwards;
+      z-index: 9999;
+    }
+    @keyframes fadeTrail {
+      from { opacity: 0.7; }
+      to { opacity: 0; }
+    }
   </style>
 </head>
 <body>
+  <!-- Background Color Picker -->
+  <div class="bg-picker">
+    <input type="color" id="bgColorPicker" value="#121212">
+  </div>
+
   <div id="loginContainer" class="container">
     <div class="card shadow">
       <div class="card-body">
@@ -114,7 +146,10 @@
     <div class="row">
       <nav id="sidebar" class="col-md-2 sidebar border-end">
         <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
-        <h3 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h3>
+        <!-- Dashboard header replaced with custom emoji image -->
+        <div class="mb-4 text-center">
+          <img src="https://www.freeiconspng.com/uploads/cool-icon-13.png" alt="Dashboard" style="max-width: 50px;">
+        </div>
         <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> General Metrics</a>
         <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> Member & Channel Stats</a>
         <a href="#" class="nav-link" data-target="serverInfo"><i class="bi bi-server"></i> Server Info</a>
@@ -124,7 +159,11 @@
           <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
         </div>
       </nav>
-      <main class="col-md-10 p-4">
+      <main class="col-md-10 p-4" id="mainContent">
+        <!-- Header with Stonks image -->
+        <div class="mb-4 text-center">
+          <img src="https://static.vecteezy.com/system/resources/thumbnails/010/161/536/small_2x/good-progress-asset-investment-3d-render-png.png" alt="Stonks" style="max-width: 200px;">
+        </div>
         <section id="generalMetrics" class="content-section active-section mb-4">
           <div class="row">
             <div class="col-md-6">
@@ -296,6 +335,16 @@
     
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('collapsed');
+      // Adjust main content margin based on sidebar width
+      if(document.getElementById('sidebar').classList.contains('collapsed')){
+        document.getElementById('mainContent').style.marginLeft = "70px";
+      } else {
+        document.getElementById('mainContent').style.marginLeft = "270px";
+      }
+    });
+    
+    document.getElementById('bgColorPicker').addEventListener('input', (e) => {
+      document.body.style.backgroundColor = e.target.value;
     });
     
     function initDashboard() {
@@ -390,6 +439,34 @@
         modLogsEl.scrollTop = modLogsEl.scrollHeight;
       });
     }
+    
+    // Custom cursor trail
+    document.addEventListener('mousemove', function(e){
+      const trail = document.createElement('div');
+      trail.className = 'cursor-trail';
+      trail.style.left = e.pageX + 'px';
+      trail.style.top = e.pageY + 'px';
+      document.body.appendChild(trail);
+      setTimeout(() => {
+        trail.remove();
+      }, 500);
+    });
+    
+    // Show custom cursor image in place of default pointer
+    document.addEventListener('DOMContentLoaded', () => {
+      const customCursor = document.createElement('img');
+      customCursor.src = 'https://osuskinner.com/elements/interface/cursor/1/10.png';
+      customCursor.style.position = 'fixed';
+      customCursor.style.pointerEvents = 'none';
+      customCursor.style.zIndex = '10000';
+      customCursor.style.width = '20px';
+      customCursor.style.height = '20px';
+      document.body.appendChild(customCursor);
+      document.addEventListener('mousemove', e => {
+        customCursor.style.left = e.pageX + 'px';
+        customCursor.style.top = e.pageY + 'px';
+      });
+    });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
