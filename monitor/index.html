@@ -5,25 +5,19 @@
   <title>Discord Bot Dashboard</title>
   <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
     :root {
-      --bg-color: #ffffff;
-      --text-color: #212529;
-      --card-bg: #ffffff;
-      --sidebar-bg: #f1f1f1;
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --card-bg: #1e1e1e;
+      --sidebar-bg: #181818;
       --accent-color: #43b581;
-      --link-color: #212529;
-    }
-    [data-theme="dark"] {
-      --bg-color: #2f3136;
-      --text-color: #d1d1d1;
-      --card-bg: #36393f;
-      --sidebar-bg: #202225;
-      --link-color: #d1d1d1;
+      --link-color: #e0e0e0;
     }
     body {
       background-color: var(--bg-color);
@@ -39,20 +33,29 @@
       background-color: var(--sidebar-bg);
       min-height: 100vh;
       padding: 20px;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+    }
+    .sidebar.collapsed {
+      width: 60px;
+      padding: 10px;
     }
     .sidebar a {
       color: var(--link-color);
       text-decoration: none;
-      display: block;
+      display: flex;
+      align-items: center;
       padding: 10px 0;
-      transition: color 0.3s;
     }
     .sidebar a:hover {
       color: var(--accent-color);
     }
-    .toggle-btn {
+    .sidebar i {
+      margin-right: 10px;
+    }
+    .toggle-sidebar {
       cursor: pointer;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
     }
     .content-section {
       display: none;
@@ -73,22 +76,22 @@
       height: 300px;
       overflow-y: auto;
       background-color: var(--card-bg);
-      border: 1px solid #ccc;
+      border: 1px solid #444;
       padding: 10px;
       border-radius: 5px;
     }
     .chat-input {
       width: 100%;
       resize: none;
-      border: 1px solid #ccc;
+      border: 1px solid #444;
       border-radius: 5px;
       padding: 10px;
-      background-color: var(--bg-color);
+      background-color: var(--card-bg);
       color: var(--text-color);
     }
   </style>
 </head>
-<body data-theme="light">
+<body>
   <div id="loginContainer" class="container">
     <div class="card shadow">
       <div class="card-body">
@@ -109,16 +112,14 @@
   
   <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
-      <nav class="col-md-2 sidebar border-end">
-        <h3 class="mb-4">Dashboard</h3>
-        <a href="#" class="nav-link" data-target="generalMetrics">General Metrics</a>
-        <a href="#" class="nav-link" data-target="memberStats">Member & Channel Stats</a>
-        <a href="#" class="nav-link" data-target="serverInfo">Server Info</a>
-        <a href="#" class="nav-link" data-target="chatPanel">Chat</a>
-        <a href="#" class="nav-link" data-target="logsPanel">Logs</a>
-        <div class="mt-4">
-          <span class="toggle-btn badge bg-secondary p-2" id="themeToggle">Toggle Theme</span>
-        </div>
+      <nav id="sidebar" class="col-md-2 sidebar border-end">
+        <div class="toggle-sidebar text-end"><i class="bi bi-list" id="sidebarToggle"></i></div>
+        <h3 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h3>
+        <a href="#" class="nav-link" data-target="generalMetrics"><i class="bi bi-bar-chart-line"></i> General Metrics</a>
+        <a href="#" class="nav-link" data-target="memberStats"><i class="bi bi-people"></i> Member & Channel Stats</a>
+        <a href="#" class="nav-link" data-target="serverInfo"><i class="bi bi-server"></i> Server Info</a>
+        <a href="#" class="nav-link" data-target="chatPanel"><i class="bi bi-chat-dots"></i> Chat</a>
+        <a href="#" class="nav-link" data-target="logsPanel"><i class="bi bi-file-earmark-text"></i> Logs</a>
         <div class="mt-4">
           <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
         </div>
@@ -165,7 +166,7 @@
                 <dt class="col-sm-4">Server Name</dt>
                 <dd class="col-sm-8">ৎ 𓂃 /dazes</dd>
                 <dt class="col-sm-4">Created at</dt>
-                <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM (2 months ago)</dd>
+                <dd class="col-sm-8">Saturday, February 22, 2025 3:50 PM</dd>
                 <dt class="col-sm-4">Owner</dt>
                 <dd class="col-sm-8">iluvmads#0</dd>
                 <dt class="col-sm-4">Description</dt>
@@ -192,7 +193,7 @@
                 <dt class="col-sm-4">Server ID</dt>
                 <dd class="col-sm-8">1342961798168711198</dd>
                 <dt class="col-sm-4">Requested by</dt>
-                <dd class="col-sm-8">williamprod • Today at 9:43 PM</dd>
+                <dd class="col-sm-8">williamprod • Today</dd>
               </dl>
             </div>
           </div>
@@ -206,7 +207,10 @@
                 <select id="channelSelect" class="form-select"></select>
               </div>
               <div class="chat-messages mb-3" id="chatMessages">Loading chat...</div>
-              <!-- Chat submission disabled; messages come solely from the Discord bot -->
+              <form id="chatForm">
+                <textarea id="chatInput" class="chat-input mb-2" rows="3" placeholder="Type a message..."></textarea>
+                <button type="submit" class="btn btn-success">Send</button>
+              </form>
             </div>
           </div>
         </section>
@@ -280,11 +284,6 @@
       firebase.auth().signOut();
     });
     
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const currentTheme = document.body.getAttribute('data-theme');
-      document.body.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
-    });
-    
     const navLinks = document.querySelectorAll('.sidebar a.nav-link');
     navLinks.forEach(link => {
       link.addEventListener('click', e => {
@@ -293,6 +292,10 @@
         document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active-section'));
         document.getElementById(target).classList.add('active-section');
       });
+    });
+    
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('collapsed');
     });
     
     function initDashboard() {
@@ -305,10 +308,7 @@
         document.getElementById('totalMembers').innerText = data.total_members || 0;
         document.getElementById('offlineMembers').innerText = data.offline_members || 0;
         let channelMessageCount = 0;
-        const channelIds = Object.keys(data.channel_messages || {});
-        channelIds.forEach(id => {
-          channelMessageCount += Number(data.channel_messages[id] || 0);
-        });
+        Object.values(data.channel_messages || {}).forEach(val => channelMessageCount += Number(val));
         document.getElementById('channelMessageCount').innerText = channelMessageCount;
       });
     }
@@ -332,6 +332,8 @@
     function initChat() {
       const chatMessagesEl = document.getElementById('chatMessages');
       const channelSelect = document.getElementById('channelSelect');
+      const chatForm = document.getElementById('chatForm');
+      const chatInput = document.getElementById('chatInput');
       
       function loadChat(channelId) {
         const chatRef = firebase.database().ref('chatMessages/' + channelId);
@@ -340,15 +342,24 @@
           const messages = snapshot.val() || {};
           chatMessagesEl.innerHTML = '';
           Object.values(messages).forEach(msg => {
-            if(typeof msg === 'object'){
-              chatMessagesEl.innerHTML += `<div><strong>${msg.username || 'Unknown'}</strong> (${msg.timestamp || 'No Time'}): ${msg.content || ''}</div>`;
-            } else {
-              chatMessagesEl.innerHTML += `<div>${msg}</div>`;
-            }
+            chatMessagesEl.innerHTML += `<div><strong>${msg.username || 'Unknown'}</strong> (${msg.timestamp || 'No Time'}): ${msg.content || ''}</div>`;
           });
           chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         });
       }
+      
+      chatForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const channelId = channelSelect.value;
+        const content = chatInput.value.trim();
+        if(content === '') return;
+        const outRef = firebase.database().ref('dashboardChatOut');
+        outRef.push({
+          content: content,
+          sender: firebase.auth().currentUser.email || "Dashboard"
+        });
+        chatInput.value = '';
+      });
       
       channelSelect.addEventListener('change', () => {
         loadChat(channelSelect.value);
@@ -361,22 +372,20 @@
       const channelUpdatesEl = document.getElementById('channelUpdatesLog');
       const modLogsEl = document.getElementById('modLogs');
       
-      const channelUpdatesRef = firebase.database().ref('channelUpdates');
-      channelUpdatesRef.on('value', snapshot => {
+      firebase.database().ref('channelUpdates').on('value', snapshot => {
         const updates = snapshot.val() || {};
         channelUpdatesEl.innerHTML = '';
         Object.values(updates).forEach(update => {
-          channelUpdatesEl.innerHTML += `<div><strong>${update.username || 'Unknown'}</strong> in <em>${update.channel || 'Unknown Channel'}</em> at ${update.timestamp || 'No Time'}: Edited from "${update.before || ''}" to "${update.after || ''}"</div>`;
+          channelUpdatesEl.innerHTML += `<div>${update.username || 'Unknown'} in ${update.channel || 'Unknown'} at ${update.timestamp || 'No Time'}: Edited from "${update.before || ''}" to "${update.after || ''}"</div>`;
         });
         channelUpdatesEl.scrollTop = channelUpdatesEl.scrollHeight;
       });
       
-      const modLogsRef = firebase.database().ref('modLogs');
-      modLogsRef.on('value', snapshot => {
+      firebase.database().ref('modLogs').on('value', snapshot => {
         const logs = snapshot.val() || {};
         modLogsEl.innerHTML = '';
         Object.values(logs).forEach(log => {
-          modLogsEl.innerHTML += `<div><strong>${log.username || 'Unknown'}</strong> performed <em>${log.action || 'an action'}</em> on ${log.target || ''} at ${log.timestamp || 'No Time'}${log.reason ? ' with reason: ' + log.reason : ''}</div>`;
+          modLogsEl.innerHTML += `<div>${log.username || 'Unknown'} performed ${log.action || 'an action'} on ${log.target || ''} at ${log.timestamp || 'No Time'}${log.reason ? ' with reason: ' + log.reason : ''}</div>`;
         });
         modLogsEl.scrollTop = modLogsEl.scrollHeight;
       });
