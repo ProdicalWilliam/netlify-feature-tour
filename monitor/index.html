@@ -23,58 +23,53 @@
       --sidebar-bg: #1e1e1e;
       --link-color: #e0e0e0;
     }
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    .card {
-      background-color: var(--card-bg);
-      transition: background-color 0.3s ease;
-    }
-    .sidebar {
-      background-color: var(--sidebar-bg);
-      min-height: 100vh;
-      padding: 20px;
-      transition: background-color 0.3s ease;
-    }
-    .sidebar a {
-      color: var(--link-color);
-      text-decoration: none;
-      display: block;
-      padding: 10px 0;
-      transition: color 0.3s ease;
-    }
-    .sidebar a:hover {
-      color: #0d6efd;
-    }
-    .toggle-btn {
-      cursor: pointer;
-    }
-    .content-section {
-      animation: fadeIn 0.5s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    body { background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+    .card { background-color: var(--card-bg); transition: background-color 0.3s; }
+    .sidebar { background-color: var(--sidebar-bg); min-height: 100vh; padding: 20px; transition: background-color 0.3s; }
+    .sidebar a { color: var(--link-color); text-decoration: none; display: block; padding: 10px 0; transition: color 0.3s; }
+    .sidebar a:hover { color: #0d6efd; }
+    .toggle-btn { cursor: pointer; }
+    .content-section { display: none; animation: fadeIn 0.5s; }
+    .active-section { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    #loginContainer { max-width: 400px; margin: 100px auto; }
   </style>
 </head>
 <body data-theme="light">
-  <div class="container-fluid">
+  <div id="loginContainer" class="container">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">Sign In</h3>
+        <form id="loginForm">
+          <div class="mb-3">
+            <input type="email" id="email" class="form-control" placeholder="Email" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" id="password" class="form-control" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div id="dashboardContainer" class="container-fluid" style="display:none;">
     <div class="row">
       <nav class="col-md-2 sidebar border-end">
         <h3 class="mb-4">Dashboard</h3>
-        <a href="#generalMetrics" class="nav-link">General Metrics</a>
-        <a href="#memberStats" class="nav-link">Member & Channel Stats</a>
-        <a href="#serverInfo" class="nav-link">Server Info</a>
-        <a href="#activityLog" class="nav-link">Activity Log</a>
+        <a href="#" class="nav-link" data-target="generalMetrics">General Metrics</a>
+        <a href="#" class="nav-link" data-target="memberStats">Member & Channel Stats</a>
+        <a href="#" class="nav-link" data-target="serverInfo">Server Info</a>
+        <a href="#" class="nav-link" data-target="activityLog">Activity Log</a>
         <div class="mt-4">
           <span class="toggle-btn badge bg-secondary p-2" id="themeToggle">Toggle Theme</span>
         </div>
+        <div class="mt-4">
+          <button id="signOutBtn" class="btn btn-sm btn-outline-danger">Sign Out</button>
+        </div>
       </nav>
       <main class="col-md-10 p-4">
-        <section id="generalMetrics" class="content-section mb-4">
+        <section id="generalMetrics" class="content-section active-section mb-4">
           <div class="row">
             <div class="col-md-6">
               <div class="card text-white bg-primary animate__animated animate__fadeIn">
@@ -168,41 +163,74 @@
       appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
     };
     firebase.initializeApp(firebaseConfig);
-    firebase.auth().signInAnonymously().catch((error) => { console.error(error); });
-    firebase.auth().onAuthStateChanged((user) => {
+    
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => loginForm.reset())
+        .catch(error => alert(error.message));
+    });
+    
+    firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        const db = firebase.database();
-        const metricsRef = db.ref('metrics');
-        metricsRef.on('value', (snapshot) => {
-          const data = snapshot.val() || {};
-          document.getElementById('messageCount').innerText = data.message_count || 0;
-          document.getElementById('memberJoinCount').innerText = data.member_join_count || 0;
-          document.getElementById('onlineMembers').innerText = data.online_members || 0;
-          document.getElementById('totalMembers').innerText = data.total_members || 0;
-          document.getElementById('offlineMembers').innerText = data.offline_members || 0;
-          let channelMessageCount = 0;
-          const channelIds = ["1342976939488710727", "1342978737733500959", "1343041689949831169"];
-          if (data.channel_messages) {
-            channelIds.forEach(id => {
-              channelMessageCount += Number(data.channel_messages[id] || 0);
-            });
-          }
-          document.getElementById('channelMessageCount').innerText = channelMessageCount;
-          const logElement = document.querySelector('#activityLog .log') || document.querySelector('.log');
-          const logEntry = document.createElement('div');
-          logEntry.className = 'log-entry';
-          const now = new Date().toLocaleTimeString();
-          logEntry.innerText = `[${now}] Msgs: ${data.message_count || 0}, Joins: ${data.member_join_count || 0}, Online: ${data.online_members || 0}, Total: ${data.total_members || 0}, Offline: ${data.offline_members || 0}, ChMsg: ${channelMessageCount}`;
-          logElement.appendChild(logEntry);
-          logElement.scrollTop = logElement.scrollHeight;
-        }, (error) => { console.error(error); });
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'block';
+        initDashboard();
+      } else {
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('dashboardContainer').style.display = 'none';
       }
     });
+    
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      firebase.auth().signOut();
+    });
+    
     document.getElementById('themeToggle').addEventListener('click', () => {
       const currentTheme = document.body.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      document.body.setAttribute('data-theme', newTheme);
+      document.body.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
     });
+    
+    const navLinks = document.querySelectorAll('.sidebar a.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = link.getAttribute('data-target');
+        document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active-section'));
+        document.getElementById(target).classList.add('active-section');
+      });
+    });
+    
+    function initDashboard() {
+      const db = firebase.database();
+      const metricsRef = db.ref('metrics');
+      metricsRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        document.getElementById('messageCount').innerText = data.message_count || 0;
+        document.getElementById('memberJoinCount').innerText = data.member_join_count || 0;
+        document.getElementById('onlineMembers').innerText = data.online_members || 0;
+        document.getElementById('totalMembers').innerText = data.total_members || 0;
+        document.getElementById('offlineMembers').innerText = data.offline_members || 0;
+        let channelMessageCount = 0;
+        const channelIds = ["1342976939488710727", "1342978737733500959", "1343041689949831169"];
+        if(data.channel_messages){
+          channelIds.forEach(id => {
+            channelMessageCount += Number(data.channel_messages[id] || 0);
+          });
+        }
+        document.getElementById('channelMessageCount').innerText = channelMessageCount;
+        const logElement = document.querySelector('#activityLog .log');
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        const now = new Date().toLocaleTimeString();
+        logEntry.innerText = `[${now}] Msgs: ${data.message_count || 0}, Joins: ${data.member_join_count || 0}, Online: ${data.online_members || 0}, Total: ${data.total_members || 0}, Offline: ${data.offline_members || 0}, ChMsg: ${channelMessageCount}`;
+        logElement.appendChild(logEntry);
+        logElement.scrollTop = logElement.scrollHeight;
+      });
+    }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
