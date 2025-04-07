@@ -1,0 +1,52 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Discord Bot Metrics Dashboard</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    .metric { margin: 10px 0; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Discord Bot Metrics Dashboard</h1>
+  <div class="metric">
+    Total Messages: <span id="messageCount">Loading...</span>
+  </div>
+  <div class="metric">
+    Member Joins: <span id="memberJoinCount">Loading...</span>
+  </div>
+
+  <script>
+    // Firebase configuration using your provided values.
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      databaseURL: "https://spotify-795ab.firebaseio.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.appspot.com",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
+    };
+
+    // Initialize Firebase.
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Reference the "metrics" node.
+    const metricsRef = database.ref('metrics');
+
+    // Listen for realtime updates.
+    metricsRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      document.getElementById('messageCount').innerText = data ? data.message_count : 0;
+      document.getElementById('memberJoinCount').innerText = data ? data.member_join_count : 0;
+    });
+  </script>
+</body>
+</html>
