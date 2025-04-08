@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mixing Calculator Extract</title>
+
+  <!-- 
+    To preserve the styling, you need Tailwind (or your own CSS). 
+    If you have Tailwind set up, keep this link (or use your own build):
+  -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Basic style overrides (optional) -->
+  <style>
+    /* Minimal example overrides. 
+       Feel free to adjust or remove if you have your own CSS. */
+    .bg-card { background-color: #fff; }
+    .text-card-foreground { color: #333; }
+    .ring-offset-background { /* no-op */ }
+    .border-input { border-color: #ccc; }
+    .text-muted-foreground { color: #777; }
+    .bg-background { background-color: #fafafa; }
+    .text-primary-foreground { color: #fff; }
+    .bg-primary { background-color: #4f46e5; } /* Example primary color */
+    .hover\:bg-primary\/90:hover { background-color: rgba(79,70,229,0.9); }
+    .focus\:outline-none:focus { outline: none; }
+    .focus\:ring-2:focus { box-shadow: 0 0 0 2px rgba(79,70,229,0.3); }
+  </style>
+</head>
+<body class="p-4 bg-gray-50">
+
+<!-- Mixing Calculator START -->
+<div class="rounded-lg border bg-card text-card-foreground shadow-sm max-w-xl mx-auto">
+  <!-- Title -->
+  <div class="flex flex-col space-y-1.5 p-6">
+    <div class="text-2xl font-semibold leading-none tracking-tight">
+      <h2 class="text-2xl font-bold">Mixing Calculator</h2>
+    </div>
+  </div>
+
+  <!-- Base Product & Substances -->
+  <div class="p-6 pt-0 space-y-4">
+    <!-- Base Product Select -->
+    <h3 class="font-medium mb-2">Base Product</h3>
+    <select
+      id="baseProductSelect"
+      class="flex h-10 w-full items-center justify-between rounded-md
+             border border-input bg-background px-3 py-2 text-sm
+             ring-offset-background placeholder:text-muted-foreground
+             focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+             disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <option disabled selected>Select a base product</option>
+    </select>
+
+    <!-- Substances -->
+    <div class="mt-4">
+      <h3 class="font-medium mb-2">Substances</h3>
+
+      <!-- Pills/tags for chosen substances get appended here -->
+      <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
+
+      <!-- Substances dropdown to add them -->
+      <select
+        id="substancesSelect"
+        class="flex h-10 w-full items-center justify-between rounded-md
+               border border-input bg-background px-3 py-2 text-sm
+               ring-offset-background placeholder:text-muted-foreground
+               focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+               disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <option disabled selected value="">Substances</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Mix Button -->
+  <div class="flex items-center p-6 pt-0">
+    <button
+      id="mixButton"
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap
+             rounded-md text-sm font-medium ring-offset-background transition-colors
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+             focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
+             bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+      disabled
+    >
+      Mix
+    </button>
+  </div>
+</div>
+<!-- Mixing Calculator END -->
+
+
+<!--  ========== JavaScript for Functionality ==========  -->
+<script>
+  /**************************************************
+   * Example data sets (from your original code).
+   * You can adjust or replace these with the real data
+   * or load them from an external file.
+   **************************************************/
+  const productTypes = {
+    "OG Kush":        { basePrice: 35, baseEffects: ["Calming"] },
+    "Sour Diesel":    { basePrice: 35, baseEffects: ["Refreshing"] },
+    "Green Crack":    { basePrice: 35, baseEffects: ["Energizing"] },
+    "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
+    "Cocaine":        { basePrice: 150, baseEffects: [] },
+    "Meth":           { basePrice: 70, baseEffects: [] },
+  };
+
+  const substancesData = {
+    "Cuke":         { defaultEffect: "Energizing", price: 2 },
+    "Banana":       { defaultEffect: "Gingeritis", price: 2 },
+    "Paracetamol":  { defaultEffect: "Sneaky",     price: 3 },
+    "Donut":        { defaultEffect: "Calorie-Dense", price: 3 },
+    "Viagra":       { defaultEffect: "Tropic Thunder", price: 4 },
+    "Mouth Wash":   { defaultEffect: "Balding",    price: 4 },
+    "Flu Medicine": { defaultEffect: "Sedating",   price: 5 },
+    "Gasoline":     { defaultEffect: "Toxic",      price: 5 },
+    "Energy Drink": { defaultEffect: "Athletic",   price: 6 },
+    "Motor Oil":    { defaultEffect: "Slippery",   price: 6 },
+    "Mega Bean":    { defaultEffect: "Foggy",      price: 7 },
+    "Chili":        { defaultEffect: "Spicy",      price: 7 },
+    "Battery":      { defaultEffect: "Bright-Eyed", price: 8 },
+    "Iodine":       { defaultEffect: "Jennerising", price: 8 },
+    "Addy":         { defaultEffect: "Thought-Provoking", price: 9 },
+    "Horse Semen":  { defaultEffect: "Long Faced", price: 9 },
+  };
+
+  // For demonstration, no advanced “interactionRules” or “effectMultipliers” included
+  // to keep snippet simpler. You can add them if needed.
+
+  // DOM elements
+  const baseProductSelect   = document.getElementById('baseProductSelect');
+  const substancesSelect    = document.getElementById('substancesSelect');
+  const substancesContainer = document.getElementById('substancesContainer');
+  const mixButton           = document.getElementById('mixButton');
+
+  // Keep track of user selections
+  let selectedBaseProduct = null;
+  let selectedSubstances = [];
+
+  /**************************************************
+   * Initialization: Populate dropdowns
+   **************************************************/
+  // Populate base product dropdown
+  Object.keys(productTypes).forEach(productName => {
+    const option = document.createElement('option');
+    option.value = productName;
+    option.text  = productName;
+    baseProductSelect.appendChild(option);
+  });
+
+  // Populate substances dropdown
+  Object.keys(substancesData).forEach(substanceName => {
+    const option = document.createElement('option');
+    option.value = substanceName;
+    option.text  = substanceName;
+    substancesSelect.appendChild(option);
+  });
+
+  /**************************************************
+   * Event Listeners
+   **************************************************/
+  // Base product selection
+  baseProductSelect.addEventListener('change', (e) => {
+    selectedBaseProduct = e.target.value;
+    checkIfMixReady();
+  });
+
+  // Substances selection
+  substancesSelect.addEventListener('change', (e) => {
+    const substanceName = e.target.value;
+    if (substanceName && !selectedSubstances.includes(substanceName)) {
+      selectedSubstances.push(substanceName);
+      // Reset selection to "Substances"
+      e.target.selectedIndex = 0;
+      // Update UI tags
+      renderSubstanceTags();
+      checkIfMixReady();
+    }
+  });
+
+  // “Mix” button
+  mixButton.addEventListener('click', () => {
+    if (!selectedBaseProduct) return;
+    if (!selectedSubstances.length) return;
+
+    // Example mix logic:
+    const baseInfo = productTypes[selectedBaseProduct];
+    let totalCost = baseInfo.basePrice;
+    let effects = [...(baseInfo.baseEffects || [])];
+
+    selectedSubstances.forEach(name => {
+      totalCost += substancesData[name].price;
+      effects.push(substancesData[name].defaultEffect);
+    });
+
+    alert(
+      'Your Mix:\n\n' +
+      `Base Product: ${selectedBaseProduct}\n` +
+      `Substances: ${selectedSubstances.join(', ')}\n` +
+      `Total Cost: $${totalCost}\n` +
+      `Effects: ${effects.join(', ')}`
+    );
+  });
+
+  /**************************************************
+   * Helper UI Functions
+   **************************************************/
+  function renderSubstanceTags() {
+    substancesContainer.innerHTML = ''; // Clear existing
+    selectedSubstances.forEach(sub => {
+      const tag = document.createElement('span');
+      tag.className = `
+        inline-flex items-center rounded-full bg-green-100 text-green-800
+        px-2 py-0.5 text-xs font-medium
+      `;
+      tag.textContent = sub;
+
+      // Add an “X” to remove the substance
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.className = 'ml-2 text-red-600 hover:text-red-900';
+      removeBtn.addEventListener('click', () => {
+        selectedSubstances = selectedSubstances.filter(s => s !== sub);
+        renderSubstanceTags();
+        checkIfMixReady();
+      });
+
+      tag.appendChild(removeBtn);
+      substancesContainer.appendChild(tag);
+    });
+  }
+
+  // Enable/disable the “Mix” button based on selections
+  function checkIfMixReady() {
+    if (selectedBaseProduct && selectedSubstances.length) {
+      mixButton.disabled = false;
+    } else {
+      mixButton.disabled = true;
+    }
+  }
+</script>
+</body>
+</html>
