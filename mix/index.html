@@ -1,349 +1,483 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1491475615360477"
+     crossorigin="anonymous"></script>
+<script>
+function loadGoogleAnalytics() {
+  const ga = document.createElement('script');
+  ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-GQJV75X3BT';
+  ga.async = true;
+  document.head.appendChild(ga);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-GQJV75X3BT');
+}
+
+function loadClarity() {
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r); t.async=1; t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "qtvkhffiph");
+}
+
+function initTracking() {
+  if (localStorage.getItem('cookieConsent') === 'accepted') {
+    loadGoogleAnalytics();
+    loadClarity();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initTracking);
+document.getElementById('acceptCookies')?.addEventListener('click', () => {
+  loadGoogleAnalytics();
+  loadClarity();
+});
+</script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
-  <title>Schduel 1 Mix Calculator</title>
-  <!-- Import React, ReactDOM, and Babel -->
-  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    /* Global styles and dark theme with green accents */
-    body, html {
-      margin: 0;
-      padding: 0;
-      background-color: #1a1a1a;
-      min-height: 100vh;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    .app-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    
-    .card {
-      background-color: #2c2c2c;
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      text-align: center;
-      width: 360px;
-      color: #ffffff;
-    }
-    
-    .card h1 {
-      margin-bottom: 1.5rem;
-    }
-    
-    .dropdown {
-      background-color: #2c2c2c;
-      color: #ffffff;
-      border: 2px solid #00ff00;
-      border-radius: 50px;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      width: 100%;
-      appearance: none;
-      outline: none;
-      transition: border 0.3s ease;
-      margin-bottom: 1.5rem;
-    }
-    
-    .dropdown:focus {
-      border-color: #66ff66;
-    }
-    
-    .result {
-      background-color: #3a3a3a;
-      padding: 1rem;
-      border-radius: 15px;
-      text-align: left;
-    }
-    
-    .result p {
-      margin: 0.5rem 0;
-    }
-    
-    .result ul {
-      margin: 0;
-      padding-left: 1.25rem;
-    }
-    
-    .result li {
-      list-style: disc;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule1-Calculator</title>
+  <!-- Bootstrap CSS (for JS components) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles_new.css?v=1744078772"> 
+
 </head>
-<body>
-  <div id="root"></div>
-  
-  <script type="text/babel">
-    const { useState } = React;
-    
-    // Combined data object based on your provided source code:
-    const data = {
-      productTypes: {
-        "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
-        "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
-        "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
-        "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
-        "Cocaine": { basePrice: 150, baseEffects: [] },
-        "Meth": { basePrice: 70, baseEffects: [] }
-      },
-      substances: {
-        "Cuke": { defaultEffect: "Energizing", price: 2 },
-        "Banana": { defaultEffect: "Gingeritis", price: 2 },
-        "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
-        "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
-        "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
-        "Mouth Wash": { defaultEffect: "Balding", price: 4 },
-        "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
-        "Gasoline": { defaultEffect: "Toxic", price: 5 },
-        "Energy Drink": { defaultEffect: "Athletic", price: 6 },
-        "Motor Oil": { defaultEffect: "Slippery", price: 6 },
-        "Mega Bean": { defaultEffect: "Foggy", price: 7 },
-        "Chili": { defaultEffect: "Spicy", price: 7 },
-        "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
-        "Iodine": { defaultEffect: "Jennerising", price: 8 },
-        "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
-        "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
-      },
-      effectMultipliers: {
-        "Anti-Gravity": { value: 0.54, color: "#c39bd3" },
-        "Athletic": { value: 0.32, color: "#d2b4de" },
-        "Balding": { value: 0.3, color: "#a9cce3" },
-        "Bright-Eyed": { value: 0.4, color: "#aed6f1" },
-        "Calming": { value: 0.1, color: "#a3e4d7" },
-        "Calorie-Dense": { value: 0.28, color: "#a2d9ce" },
-        "Cyclopean": { value: 0.56, color: "#a9dfbf" },
-        "Disorienting": { value: 0, color: "#abebc6" },
-        "Electrifying": { value: 0.5, color: "#f1c40f" },
-        "Energizing": { value: 0.22, color: "#fad7a0" },
-        "Euphoric": { value: 0.18, color: "#f0b27a" },
-        "Explosive": { value: 0, color: "#e59866" },
-        "Focused": { value: 0.16, color: "#aeb6bf" },
-        "Foggy": { value: 0.36, color: "#abb2b9" },
-        "Gingeritis": { value: 0.2, color: "#af7ac5" },
-        "Glowing": { value: 0.48, color: "#5499c7" },
-        "Jennerising": { value: 0.42, color: "#5dade2" },
-        "Laxative": { value: 0, color: "#48c9b0" },
-        "Long Faced": { value: 0.52, color: "#34495e" },
-        "Munchies": { value: 0.12, color: "#58d68d" },
-        "Paranoia": { value: 0, color: "#f4d03f" },
-        "Refreshing": { value: 0.14, color: "#f5b041" },
-        "Schizophrenia": { value: 0, color: "#eb984e" },
-        "Sedating": { value: 0.26, color: "#aab7b8" },
-        "Seizure-Inducing": { value: 0, color: "#99a3a4" },
-        "Shrinking": { value: 0.6, color: "#566573" },
-        "Slippery": { value: 0.34, color: "#76448a" },
-        "Smelly": { value: 0, color: "#6c3483" },
-        "Sneaky": { value: 0.24, color: "#9a7d0a" },
-        "Spicy": { value: 0.38, color: "#117864" },
-        "Thought-Provoking": { value: 0.44, color: "#fcf3cf" },
-        "Toxic": { value: 0, color: "#f4d03f" },
-        "Tropic Thunder": { value: 0.46, color: "#e67e22" },
-        "Zombifying": { value: 0.58, color: "#17a589" }
-      },
-      interactionRules: {
-        Cuke: [
-          { ifPresent: "Toxic", replace: "Toxic", with: "Euphoric" },
-          { ifPresent: "Slippery", replace: "Slippery", with: "Munchies" },
-          { ifPresent: "Sneaky", replace: "Sneaky", with: "Paranoia" },
-          { ifPresent: "Foggy", replace: "Foggy", with: "Cyclopean" },
-          { ifPresent: "Gingeritis", replace: "Gingeritis", with: "Thought-Provoking" },
-          { ifPresent: "Munchies", replace: "Munchies", with: "Athletic" },
-          { ifPresent: "Euphoric", replace: "Euphoric", with: "Laxative" }
-        ],
-        Paracetamol: [
-          { ifPresent: "Energizing", replace: "Energizing", with: "Paranoia" },
-          { ifPresent: "Calming", replace: "Calming", with: "Slippery" },
-          { ifPresent: "Toxic", replace: "Toxic", with: "Tropic Thunder" },
-          { ifPresent: "Spicy", replace: "Spicy", with: "Bright-Eyed" },
-          { ifPresent: "Glowing", replace: "Glowing", with: "Toxic" },
-          { ifPresent: "Foggy", replace: "Foggy", with: "Calming" },
-          { ifPresent: "Munchies", replace: "Munchies", with: "Anti-Gravity" },
-          { ifPresent: "Paranoia", replace: "Paranoia", with: "Balding" },
-          { ifPresent: "Electrifying", replace: "Electrifying", with: "Athletic" },
-          { ifPresent: "Focused", replace: "Focused", with: "Gingeritis" }
-        ],
-        Banana: [
-          { ifPresent: "Energizing", replace: "Energizing", with: "Thought-Provoking" },
-          { ifPresent: "Calming", replace: "Calming", with: "Sneaky" },
-          { ifPresent: "Toxic", replace: "Toxic", with: "Smelly" },
-          { ifPresent: "Long Faced", replace: "Long Faced", with: "Refreshing" },
-          { ifPresent: "Cyclopean", replace: "Cyclopean", with: "Thought-Provoking" },
-          { ifPresent: "Disorienting", replace: "Disorienting", with: "Focused" },
-          { ifPresent: "Focused", replace: "Focused", with: "Seizure-Inducing" },
-          { ifPresent: "Paranoia", replace: "Paranoia", with: "Jennerising" },
-          { ifPresent: "Smelly", replace: "Smelly", with: "Anti-Gravity" }
-        ],
-        // Additional rules for other substances can be added here...
-      },
-      specialMixes: [
-        {
-          name: "Coca Super Mix",
-          product: "Cocaine",
-          substances: ["Cuke", "Paracetamol", "Banana", "Gasoline", "Cuke", "Mega Bean", "Battery", "Banana"],
-          effects: ["Jennerising", "Tropic Thunder", "Anti-Gravity", "Zombifying", "Glowing", "Foggy", "Bright-Eyed", "Gingeritis"],
-          cost: 31,
-          sellPrice: 666
-        },
-        {
-          name: "Base 1 substance recipe of Coca",
-          product: "Cocaine",
-          substances: ["Indica"],
-          effects: ["Jennerising"],
-          Addictiveness: 74,
-          cost: 8,
-          sellPrice: 213
-        },
-        {
-          name: "Base 1 substance recipe of Sour Diesel",
-          product: "Sour Diesel",
-          substances: ["Horse Semen"],
-          effects: ["Energizing", "Long-Faced"],
-          Addictiveness: 99,
-          cost: 9,
-          sellPrice: 58
-        },
-        {
-          name: "Coca Super Mix 2",
-          product: "Cocaine",
-          substances: ["Motor Oil", "Cuke", "Paracetamol", "Gasoline", "Cuke", "Battery", "Horse Semen", "mega bean"],
-          effects: ["Anti-Gravity", "Glowing", "Tropic Thunder", "Zombifying", "Cyclopean", "Bright-Eyed", "Long Faced", "Foggy"],
-          cost: 42,
-          sellPrice: 735
-        },
-        {
-          name: "One of best Meth Mix Recipe",
-          product: "Meth",
-          substances: ["Banana", "Cuke", "Paracetamol", "Gasoline", "Cuke", "Battery", "Horse Semen", "mega bean"],
-          effects: ["Electrifying", "Glowing", "Tropic Thunder", "Zombifying", "Cyclopean", "Bright-Eyed", "Long Faced", "Foggy"],
-          cost: 38,
-          sellPrice: 340
-        },
-        {
-          name: "OG Mix 140 Revenue",
-          product: "Cocaine",
-          substances: ["Banana", "Gasoline", "Paracetamol", "Cuke", "Mega Bean", "Battery", "Banana", "Cuke"],
-          effects: ["Tropic Thunder", "Anti-Gravity", "Zombifying", "Jennerising", "Glowing", "Cyclopean", "Bright-Eyed", "Thought-Provoking"],
-          cost: 31,
-          sellPrice: 171
-        },
-        {
-          name: "beginner-friendly for OG Kush",
-          product: "OG Kush",
-          substances: ["Banana"],
-          effects: ["Sneaky", "Gingeritis"],
-          cost: 2,
-          sellPrice: 50
-        },
-        {
-          name: "beginner-friendly for Sour Diesel",
-          product: "Sour Diesel",
-          substances: ["Battery"],
-          effects: ["Refreshing", "Bright-Eyed"],
-          cost: 8,
-          sellPrice: 53
-        },
-        {
-          name: "beginner-friendly for Green Crack",
-          product: "Green Crack",
-          substances: ["Chili"],
-          effects: ["Energizing", "Spicy"],
-          cost: 7,
-          sellPrice: 56
-        },
-        {
-          name: "beginner-friendly for Grandaddy Purple",
-          product: "Grandaddy Purple",
-          substances: ["Horse Semen"],
-          effects: ["Sedating", " Long-Faced"],
-          cost: 9,
-          sellPrice: 62
-        }
-      ]
-    };
-    
-    // Calculate mix cost: product base price plus the sum of substance prices.
-    function calculateCost(mix) {
-      const baseCost = data.productTypes[mix.product] ? data.productTypes[mix.product].basePrice : 0;
-      const substancesCost = mix.substances.reduce((total, substance) => {
-        return total + (data.substances[substance] ? data.substances[substance].price : 0);
-      }, 0);
-      return baseCost + substancesCost;
-    }
-    
-    // Calculate profit as sellPrice minus the calculated cost.
-    function calculateProfit(mix) {
-      return mix.sellPrice - calculateCost(mix);
-    }
-    
-    // Calculate final effects by starting with the mix effects and applying interaction rules.
-    function calculateMixOutcome(mix, interactionRules) {
-      let finalEffects = [...mix.effects];
-      
-      mix.substances.forEach(substance => {
-        if (interactionRules[substance]) {
-          interactionRules[substance].forEach(rule => {
-            if (finalEffects.includes(rule.ifPresent)) {
-              finalEffects = finalEffects.map(effect =>
-                effect === rule.ifPresent ? rule.with : effect
-              );
-            }
-          });
-        }
-      });
-      
-      return finalEffects;
-    }
-    
-    function App() {
-      const [selectedMix, setSelectedMix] = useState(null);
-      const [outcome, setOutcome] = useState([]);
-      const [calculatedCost, setCalculatedCost] = useState(0);
-    
-      const handleSelect = (e) => {
-        const selectedName = e.target.value;
-        const mix = data.specialMixes.find(m => m.name === selectedName);
-        setSelectedMix(mix);
-        if (mix) {
-          setCalculatedCost(calculateCost(mix));
-          setOutcome(calculateMixOutcome(mix, data.interactionRules));
-        }
+<body class="text-foreground" style="background-color: hsl(var(--background));">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<header class="sticky top-0 z-50 w-full border-b border-border/10 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20">
+  <div class="container mx-auto flex h-16 items-center justify-between px-6">
+    <!-- Brand -->
+    <a href="index.php" class="text-2xl font-bold">
+      <span class="navspan">Schedule1</span>-Calculator
+    </a>
+
+    <!-- MOBILE Version Selector -->
+    <div class="d-md-none ms-3">
+      <select id="versionSelectMobile" class="form-select form-select-sm"
+              onchange="fetch('', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'version='+this.value}).then(()=>location.reload())">
+        <option value="BETA" > Demo</option>
+        <option value="CURRENT" selected> Current Version</option>
+      </select>
+    </div>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+      <a href="calc.php" class="hover:text-primary">Mixing Calculator</a>
+      <a href="reverse.php" class="hover:text-primary">Reverse Calculator</a>
+      <a href="howitworks.php" class="hover:text-primary">How Mixing Works</a>
+      <a href="all_seeds.php" class="hover:text-primary">All Seeds</a>
+      <a href="all_users.php" class="hover:text-primary">All Users</a>
+    </nav>
+
+    <!-- Actions (Desktop) -->
+    <div class="hidden md:flex items-center space-x-4">
+      <!-- Donate Button (with modal trigger) -->
+      <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#donationModal">
+        <img src="img/Ko-fi_COIN.gif" alt="Ko‑fi Coin" class="btn-icon mr-2">Donate
+      </button>
+      <div class="relative">
+        <button id="versionDropdownButton" class="flex items-center px-4 py-1 bg-secondary rounded hover:bg-primary/10">
+          Version: <span id="currentVersion"> Current</span>
+          <i class="fa-solid fa-chevron-down ml-2"></i>
+        </button>
+        <ul id="versionDropdownMenu" class="hidden absolute right-0 mt-2 w-40 bg-card border rounded shadow-lg">
+          <li><a href="#" class="block px-4 py-2 version-option" data-version="BETA">Demo</a></li>
+          <li><a href="#" class="block px-4 py-2 version-option" data-version="CURRENT">Current</a></li>
+        </ul>
+      </div>
+
+            <a href="login.php" class="px-4 py-1 bg-success rounded">Login</a>
+      <a href="register.php" class="px-4 py-1 bg-primary rounded">Register</a>
+          </div>
+
+    <!-- Mobile Toggle -->
+    <button id="mobile-menu-button" class="md:hidden p-2 rounded hover:bg-primary/10">
+      <i class="fa-solid fa-bars text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden bg-background/90 border-t border-border">
+    <nav class="flex flex-col px-6 py-4 space-y-2 text-sm font-medium">
+      <a href="calc.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-calculator mr-2"></i>Mixing Calculator</a>
+      <a href="reverse.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-rotate-left mr-2"></i>Reverse Calculator</a>
+      <a href="howitworks.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-info-circle mr-2"></i>How Mixing Works</a>
+      <a href="all_seeds.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-seedling mr-2"></i>All Seeds</a>
+      <a href="all_users.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-seedling mr-2"></i>All Users</a>
+      <hr>
+      <a href="https://ko-fi.com/S6S31BYL3L" class="hover:bg-secondary/20 rounded px-3 py-2 text-warning"  data-bs-toggle="modal" data-bs-target="#donationModal"><img src="img/Ko-fi_COIN.gif" class="btn-icon mr-2">Donate</a>
+              <a href="login.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-sign-in-alt mr-2"></i>Login</a>
+        <a href="register.php" class="hover:bg-secondary/20 rounded px-3 py-2"><i class="fa-solid fa-user-plus mr-2"></i>Register</a>
+          </nav>
+  </div>
+
+
+
+<script>
+    ['mobile-menu-button','versionDropdownButton','userMenuButton'].forEach(id=>{
+      const btn=document.getElementById(id);
+      if(btn) btn.onclick=()=>{
+        const menu=document.getElementById(id==='mobile-menu-button'?'mobile-menu':id==='versionDropdownButton'?'versionDropdownMenu':'userDropdown');
+        menu.classList.toggle('hidden');
       };
-    
-      return (
-        <div className="app-container">
-          <div className="card">
-            <h1>Schduel 1 Mix Calculator</h1>
-            <select className="dropdown" onChange={handleSelect} defaultValue="">
-              <option value="" disabled>Select a Special Mix...</option>
-              {data.specialMixes.map(mix => (
-                <option key={mix.name} value={mix.name}>{mix.name}</option>
-              ))}
-            </select>
-            {selectedMix && (
-              <div className="result">
-                <p><strong>Product:</strong> {selectedMix.product}</p>
-                <p><strong>Calculated Cost:</strong> ${calculatedCost}</p>
-                <p><strong>Sell Price:</strong> ${selectedMix.sellPrice}</p>
-                <p><strong>Profit:</strong> ${calculateProfit(selectedMix)}</p>
-                <p><strong>Final Effects (after interactions):</strong></p>
-                <ul>
-                  {outcome.map((effect, i) => <li key={i}>{effect}</li>)}
-                </ul>
+    });
+    document.addEventListener('click',e=>{
+      ['versionDropdownMenu','userDropdown','mobile-menu'].forEach(menuId=>{
+        const menu=document.getElementById(menuId);
+        const btn=document.getElementById(menuId==='versionDropdownMenu'?'versionDropdownButton': menuId==='userDropdown'?'userMenuButton':'mobile-menu-button');
+        if(menu && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.add('hidden');
+      });
+    });
+    document.querySelectorAll(".version-option").forEach(item=>{
+      item.onclick=e=>{
+        e.preventDefault();
+        const ver=item.dataset.version;
+        document.getElementById("currentVersion").innerText = ver==='CURRENT'?'CURRENT':'BETA';
+        fetch("",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"version="+ver})
+          .then(()=>location.reload());
+      };
+    });
+  </script>
+
+</header>
+<div class="p-4 rounded shadow text-center" style="background-color: hsl(var(--warning)); color: hsl(var(--warning-foreground));">
+  I would like to thank those that were initially running scripts and bots through the website. It has been noticable that most of you have ceased doing so. Unfortunately, this does not mean this current website will receive updates yet.<br>
+  We are focusing hard on preparing the overhauled version of the website; which features a better backend, faster algorithms and tighter security. For those of you that were running scripts and bots, the new page will feature scripts and data: Open Source.<br>
+  Thanks for using Schedule1-Calculator.<br> IF YOU HAVE NOT RECEIVED DONOR STATUS AFTER DONATING CONTACT ME VIA DISCORD. @shibkuh
+</div>
+
+  <header class="text-center mb-5">
+    <h1 class="display-4 navspan">Mixing Calculator</h1>
+    <p class="lead">
+      Select a <span class="font-semibold">Product Type</span>, then pick substances one at a time — a new dropdown appears automatically after each selection.  
+      Click <span class="font-semibold">Mix!</span> to calculate your batch’s Effects, Cost, and Sell Price.<br>  
+      When you’re done adding ingredients, press <span class="font-semibold">Finalize Mix</span> to lock in your result and generate a shareable seed.
+    </p>
+
+  </header>
+
+  <!-- Alert Section (if CURRENT version) -->
+    <section class="container mx-auto px-4 my-8">
+    <div class="p-4 rounded shadow" style="background-color: hsl(var(--warning)); color: hsl(var(--warning-foreground));">
+      With the full release among us, the rules are still iffy. We spent the past 14+ days scouring every inch of the mixing process to try and get this as perfect as possible.
+      If you encounter a mix that <strong>Does Not</strong> match the in-game mix, please copy your seed and DM it to @Shibkuh on Discord. Or, use the
+      <span class="underline">Contact Us</span> link at the bottom of this page. Thanks for using Schedule1-Calculator!
+    </div>
+  </section>
+  
+  <!-- Seed Input Section -->
+  <section class="container mx-auto px-4 my-8">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <input type="text" id="seedInput" placeholder="Enter Mix Seed" class="w-full sm:w-1/2 p-3 rounded border" style="border-color: hsl(var(--border)); background-color: hsl(var(--input)); color: hsl(var(--foreground));" 
+             onfocus="this.style.outline='none'; this.style.boxShadow='0 0 0 2px hsl(var(--ring))'">
+      <button class="px-6 py-3 btn-custom bg-success" onclick="loadMixFromSeed()">Load Mix</button>
+    </div>
+  </section>
+
+  <!-- Mixing Forms Section -->
+    <section id="mix-section" class="w-full bg-card p-4">
+      <div id="mix-forms" class="flex flex-col gap-4">
+      </div>
+    </section>
+
+
+  <!-- Control Buttons Section -->
+  <section class="container mx-auto px-4 my-8">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <button id="addMixButton" class="px-6 py-3 btn-custom" style="background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));" onclick="addMixForm()">+ Add Mix</button>
+      <button class="px-6 py-3 btn-custom" style="background-color: hsl(var(--destructive)); color: hsl(var(--destructive-foreground));" onclick="confirmReset()">Start Over</button>
+      <button id="finalizeMixButton" class="px-6 py-3 btn-custom bg-success" onclick="finalizeMix(mixCount)">Finalize Mix</button>
+    </div>
+  </section>
+
+  
+
+  <!-- Color Legend Section -->
+  <section class="container mx-auto px-4 my-8">
+    <div class="p-4 rounded shadow" style="background-color: hsl(var(--card));">
+      <h4 class="text-2xl font-bold text-center mb-4">What do the colors mean?</h4>
+      <ul class="list-disc list-inside text-lg">
+        <li><span class="font-bold" style="color: hsl(var(--primary));">Green</span> – The Substance was used and modified the overall Effects.</li>
+        <li>
+          <span class="font-bold" style="color: orange;">Orange</span> – The Substance was used and did NOT modify the overall Effects.
+          <small class="block text-sm" style="color: hsl(var(--muted-foreground));">These substances are still added, and this is reflected in the cost.</small>
+        </li>
+        <li><span class="font-bold" style="color: hsl(var(--destructive));">Red</span> – These products were either duplicates, performed no changes, or could not be added due to the 8 effect limit.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Disclaimer Section -->
+  <section class="container mx-auto px-4 my-8">
+    <div class="p-4 rounded shadow" style="background-color: hsl(var(--warning)); color: hsl(var(--warning-foreground));">
+      <p>
+        This website is an independent fan project inspired by the video game <strong>"Schedule 1."</strong> While some contributors from the original development team are involved, this site is not an official extension of the game and is intended solely for community engagement.
+        We do not promote, condone, or encourage the use, possession, or handling of any illegal substances.
+      </p>
+    </div>
+  </section>
+  
+  <!-- Donation Modal -->
+<div class="modal fade" id="donationModal" tabindex="-1" aria-labelledby="donationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title navspan" id="donationModalLabel">Important Donation Information! Please Read before donating!</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To ensure your donation processes properly, please make sure you have an account on the Schedule1-Calculator website.</p>
+        <p>Additionally, use the same email address for both your Schedule1-Calculator account and Ko-fi account for seamless integration.</p>
+        <p>If you encounter any issues, feel free to reach out to <strong>@shibkuh</strong> on Discord for assistance.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="proceedToKoFi">Proceed to Ko-fi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="seedModal" tabindex="-1" aria-labelledby="seedModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: hsl(var(--card)); color: hsl(var(--card-foreground));">
+      <div class="modal-header border-b" style="border-color: hsl(var(--border));">
+        <h5 class="modal-title text-lg font-semibold" id="seedModalLabel">Mix Seed</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+      </div>
+      <div class="modal-body">
+        <p id="seedContent" class="break-words"></p>
+        <p class="mt-3">
+          Share this seed with others by creating an account or logging in and uploading your seed.
+        </p>
+      </div>
+      <div class="modal-footer border-t" style="border-color: hsl(var(--border));">
+        <a id="viewSeedBtn" class="px-4 py-2 btn-custom" style="background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));" href="" target="_blank">Show me in calculator</a>
+        <button id="copySeedBtn" type="button" class="px-4 py-2 btn-custom" style="background-color: hsl(var(--accent)); color: hsl(var(--accent-foreground));">Copy</button>
+                <a id="uploadSeedBtn" class="px-4 py-2 btn-custom cursor-not-allowed" style="background-color: hsl(var(--accent)); color: hsl(var(--accent-foreground));" disabled title="Log in to upload seed">Upload Seed</a>
               </div>
-            )}
+    </div>
+  </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: hsl(var(--card)); color: hsl(var(--card-foreground));">
+      
+      <!-- Normal form post to php/contact.php -->
+      <form method="POST" action="php/contact.php">
+        <div class="modal-header border-b" style="border-color: hsl(var(--border));">
+          <h5 class="modal-title text-lg font-semibold" id="contactModalLabel">Contact Us</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+        </div>
+        <div class="modal-body space-y-4">
+          <div>
+            <label for="name" class="block mb-1 font-medium">Your Name</label>
+            <input type="text"
+                   class="w-full p-2 rounded border"
+                   style="border-color: hsl(var(--border)); background-color: hsl(var(--input)); color: hsl(var(--foreground));"
+                   id="name" name="name" required>
+          </div>
+          <div>
+            <label for="email" class="block mb-1 font-medium">Your Email</label>
+            <input type="email"
+                   class="w-full p-2 rounded border"
+                   style="border-color: hsl(var(--border)); background-color: hsl(var(--input)); color: hsl(var(--foreground));"
+                   id="email" name="email" required>
+          </div>
+          <div>
+            <label for="reason" class="block mb-1 font-medium">Subject / Reason</label>
+            <select class="w-full p-2 rounded border"
+                    style="border-color: hsl(var(--border)); background-color: hsl(var(--input)); color: hsl(var(--foreground));"
+                    id="reason" name="reason" required>
+              <option value="bug_report">Bug Report</option>
+              <option value="website_issues">Website Issues</option>
+              <option value="login_issues">Login Issues</option>
+              <option value="seed_issues">Seed Issues</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="message" class="block mb-1 font-medium">Your Message</label>
+            <textarea class="w-full p-2 rounded border"
+                      style="border-color: hsl(var(--border)); background-color: hsl(var(--input)); color: hsl(var(--foreground));"
+                      id="message" name="message" rows="4" required></textarea>
           </div>
         </div>
-      );
+        <div class="modal-footer border-t pt-3" style="border-color: hsl(var(--border));">
+          <!-- name="submit" so contact.php sees $_POST['submit'] -->
+          <button type="submit" name="submit"
+                  class="px-4 py-2 btn-custom"
+                  style="background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));">
+            Send Message
+          </button>
+          <button type="button" class="px-4 py-2 btn-custom"
+                  style="background-color: hsl(var(--muted)); color: hsl(var(--muted-foreground));"
+                  data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" class="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4 flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 transition-transform duration-300">
+  <p class="flex-1 text-center md:text-left">
+    We use cookies to improve your experience. By clicking “Accept” you consent to our use of cookies. 
+    <a href="privacy.php#cookies" class="underline">Learn more</a>.
+  </p>
+  <div class="flex gap-2">
+    <button id="denyCookies" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700">Deny</button>
+    <button id="acceptCookies" class="px-4 py-2 bg-green-600 rounded hover:bg-green-700">Accept</button>
+  </div>
+</div>
+
+<footer class="bg-card text-card-foreground py-8 border-t border-border">
+  <div class="container mx-auto px-4 space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h5 class="font-semibold text-lg mb-2">About</h5>
+        <p>A fan project inspired by Schedule 1.</p>
+      </div>
+      <div>
+        <h5 class="font-semibold text-lg mb-2">Quick Links</h5>
+        <ul class="space-y-1">
+          <li><a href="terms.php" class="hover:underline">Terms of Service</a></li>
+          <li><a href="privacy.php" class="hover:underline">Privacy Policy</a></li>
+          <li><a href="#" class="hover:underline" data-bs-toggle="modal" data-bs-target="#contactModal">Contact Us</a> (This works again...)</li>
+          <li><a id="cookieSettingsBtn" class="hover:underline">Cookie Settings</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-semibold text-lg mb-2">Credits</h5>
+        <ul class="list-disc pl-5 space-y-1 text-sm">
+          <li><strong><a href="user.php?userid=2">@Shibka</a> (Shane R)</strong> — Creator, Mix Specialist</li>
+          <li><strong><a href="user.php?userid=3">@dangdoopdewc</a></strong> — Spreadsheet Master, Mix Specialist</li>
+          <li><strong><a href="user.php?userid=36">@TMafono</a></strong> — In-Game Mixing, Mix Specialist</li>
+          <li><strong>@King ToasterBath</strong> - In-Game Mixing</li>
+          <li><strong>@froggy</strong> — Modder, Pricing Equations/Formulas</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="border-border">
+    <p class="text-center text-sm">&copy; <span id="currentYear"></span> Schedule1‑Calculator. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const banner = document.getElementById('cookieBanner');
+const acceptBtn = document.getElementById('acceptCookies');
+const denyBtn = document.getElementById('denyCookies');
+const settingsBtn = document.getElementById('cookieSettingsBtn');
+
+function hideBanner() {
+  banner.style.transform = 'translateY(100%)';
+}
+
+function setConsent(value) {
+  localStorage.setItem('cookieConsent', value);
+  hideBanner();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const consent = localStorage.getItem('cookieConsent');
+  if (!consent) return; // first‑time: show banner
+  hideBanner();
+});
+
+acceptBtn.addEventListener('click', () => setConsent('accepted'));
+denyBtn.addEventListener('click', () => setConsent('denied'));
+settingsBtn.addEventListener('click', () => banner.style.transform = 'translateY(0)');
+
+document.getElementById('proceedToKoFi').addEventListener('click', function() {
+  var koFiUrl = "https://ko-fi.com/S6S31BYL3L"; // Replace with your Ko-fi link
+  window.location.href = koFiUrl;
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const contactForm = document.getElementById("contactForm");
+  const contactModal = document.getElementById("contactModal");
+  const bootstrapModal = new bootstrap.Modal(contactModal); 
+  // We'll use this to hide the modal programmatically
+
+  contactForm.addEventListener("submit", async (event) => {
+    event.preventDefault(); // Stop the full page reload
+
+    // 1) Hide the modal right away (or wait until the request finishes if you prefer)
+    bootstrapModal.hide();
+
+    // 2) Gather form data
+    const formData = new FormData(contactForm);
+    // Our script checks for $_POST['submit'], so let's ensure that's set
+    formData.append("submit", "true");
+
+    try {
+      const response = await fetch("php/contact.php", {
+        method: "POST",
+        body: formData
+      });
+
+      // If contact.php returns a text success or prints out HTML, we can parse it:
+      const resultText = await response.text();
+      console.log("Server responded with:", resultText);
+
+      if (response.ok) {
+        // Show a success message
+        alert("Message sent successfully!");
+        contactForm.reset();
+      } else {
+        // Show an error
+        alert("Failed to send message. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error sending contact form:", error);
+      alert("Error: Could not send form. Please try again later.");
     }
-    
-    ReactDOM.render(<App />, document.getElementById('root'));
+  });
+});
+</script>
+
+
+  
+
+  <!-- Bootstrap JS (for modal functionality) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- LZ-String -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+  <script>
+    var sessionVersion = "CURRENT";
+    var jsonFile = (sessionVersion === "CURRENT") ? "mix_effects_dataV0.4.json" : "mix_effects_data.json";
+    console.log("sessionVersion:", sessionVersion);
+    console.log("jsonFile:", jsonFile);
   </script>
+  
+<script src="mix_script_current.js?v=1744078772"></script>
+
+
+  <script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1491475615360477" crossorigin="anonymous"></script>
 </body>
 </html>
