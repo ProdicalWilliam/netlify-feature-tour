@@ -1,34 +1,57 @@
-import os
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+/* Global container styling */
+.app-container {
+  background-color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for scross-origin requests from your frontend
+/* Card container to hold the interactive UI */
+.card {
+  background-color: #2c2c2c;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 320px;
+}
 
-# Global variable to store current media info
-current_track = {}
+/* Heading styling */
+.card h1 {
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+}
 
-@app.route('/update_media', methods=['POST'])
-def update_media():
-    """
-    Receives a JSON payload with a 'media_url', sets it as the current track,
-    and returns a success response.
-    """
-    data = request.get_json()
-    media_url = data.get('media_url')
-    if not media_url:
-        return jsonify({"error": "No media URL provided"}), 400
-    
-    # Store the media URL (or additional media data if needed)
-    current_track['media_url'] = media_url
-    return jsonify({"success": True, "media_url": media_url})
+/* Dropdown menu styling with a round (pill-shaped) design */
+.dropdown {
+  background-color: #2c2c2c;
+  color: #ffffff;
+  border: 2px solid #00ff00;
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  width: 100%;
+  appearance: none;
+  outline: none;
+  transition: border 0.3s ease;
+  margin-bottom: 1.5rem;
+}
 
-@app.route('/current_media', methods=['GET'])
-def get_current_media():
-    """Returns the currently stored media info."""
-    return jsonify(current_track)
+.dropdown:focus {
+  border-color: #66ff66;
+}
 
-if __name__ == '__main__':
-    # Bind to the address 0.0.0.0 and the PORT provided in the environment
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+/* Result area styling */
+.result {
+  background-color: #3a3a3a;
+  padding: 1rem;
+  border-radius: 15px;
+  color: #ffffff;
+  text-align: left;
+}
+
+.result p {
+  margin: 0.5rem 0;
+}
