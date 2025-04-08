@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Schedule 1 Calculator</title>
+  <title>Schedule 1 Calculator - Dark Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
   <!-- Tailwind CSS (via CDN) -->
@@ -11,33 +11,34 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   
   <style>
-    /* Base styling */
+    /* Global dark theme */
     body {
-      background-color: #f9fafb;
+      background-color: #000;
+      color: #e5e7eb;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
-    /* Card styling with subtle shadow and rounded corners */
+    /* Card styling with dark background, subtle purple border and shadow */
     .custom-card {
-      background: white;
+      background: #1f1f1f;
       border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #6b21a8; /* purple accent */
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
     }
-    /* Button styling */
+    /* Button styling with green accent */
     .mix-button {
-      background-color: #c7e4c7;
-      color: #5a5a5a;
+      background-color: #065f46; /* dark green */
+      color: #e5e7eb;
       border-radius: 8px;
       transition: background-color 0.2s ease;
     }
     .mix-button:hover:not(:disabled) {
-      background-color: #b7d4b7;
+      background-color: #047857;
     }
     .mix-button:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
     }
-    /* Effect tags */
+    /* Effect tags with dark background and accent outlines */
     .effect-tag {
       display: inline-flex;
       padding: 0.25rem 0.75rem;
@@ -48,31 +49,58 @@
       margin-bottom: 0.25rem;
     }
     .effect-sedating {
-      background-color: rgba(160, 174, 192, 0.2);
-      color: #4a5568;
+      background-color: rgba(107, 33, 168, 0.2);
+      color: #a78bfa;
     }
     .effect-refreshing {
-      background-color: rgba(246, 173, 85, 0.2);
-      color: #dd6b20;
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
     }
     .effect-jennerising {
-      background-color: rgba(144, 205, 244, 0.2);
-      color: #2b6cb0;
+      background-color: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
     }
-    /* Login page custom styling (Spotify‑inspired) */
+    /* Login page custom styling (Spotify‑inspired but dark) */
     .login-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(31, 41, 55, 0.85);
       backdrop-filter: blur(8px);
       border-radius: 12px;
     }
-    /* Custom select styling removed so native select shows options properly */
+    /* Custom select styling for dark mode */
     .custom-select {
-      /* Use native appearance */
       appearance: auto;
       padding: 0.5rem 0.75rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid #6b7280;
       border-radius: 0.375rem;
-      background-color: white;
+      background-color: #1f1f1f;
+      color: #e5e7eb;
+    }
+    .custom-select:focus {
+      outline: none;
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 1px #a78bfa;
+    }
+    /* Center the mixing calculator card */
+    #calculatorContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 80px);
+      padding: 20px;
+    }
+    /* Mixing showcase horizontal scroll styling */
+    .mix-showcase {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .mix-showcase::-webkit-scrollbar {
+      height: 8px;
+    }
+    .mix-showcase::-webkit-scrollbar-thumb {
+      background-color: #6b21a8;
+      border-radius: 9999px;
     }
   </style>
 
@@ -86,17 +114,17 @@
 <body>
 
 <!-- Login Overlay (must log in first) -->
-<div id="loginOverlay" class="fixed inset-0 flex items-center justify-center bg-gray-50 z-50">
+<div id="loginOverlay" class="fixed inset-0 flex items-center justify-center bg-black z-50">
   <div class="w-full max-w-md p-6">
     <div class="login-card custom-card p-6">
-      <h2 class="text-xl font-bold mb-6 text-center">Schedule 1 Calculator - Login</h2>
+      <h2 class="text-xl font-bold mb-6 text-center text-white">Schedule 1 Calculator - Login</h2>
       <form id="loginForm" class="space-y-4">
         <input id="emailInput" type="email" placeholder="Email address" required
-               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500" />
+               class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-1 focus:ring-purple-600" />
         <input id="passwordInput" type="password" placeholder="Password" required
-               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500" />
+               class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-1 focus:ring-purple-600" />
         <button type="submit"
-                class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                class="w-full bg-purple-700 text-white py-2 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
           Log In
         </button>
       </form>
@@ -109,16 +137,16 @@
   <div class="max-w-5xl mx-auto px-4">
     <!-- Header Navigation -->
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold">Schedule 1 Calculator</h1>
-      <button id="logoutBtn" class="text-red-600 hover:text-red-800 text-sm font-medium">
+      <h1 class="text-2xl font-bold text-white">Schedule 1 Calculator</h1>
+      <button id="logoutBtn" class="text-red-500 hover:text-red-400 text-sm font-medium">
         Logout
       </button>
     </div>
     
-    <!-- Layout: Two columns on large screens -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Centered Calculator Container -->
+    <div id="calculatorContainer">
       <!-- Left: Calculator and Results -->
-      <div>
+      <div class="w-full lg:w-2/3">
         <div class="custom-card p-6 mb-4">
           <h2 class="text-xl font-bold mb-4">Mixing Calculator</h2>
           <div class="space-y-4">
@@ -142,90 +170,78 @@
         </div>
         <!-- Mixing Results (hidden until mix made) -->
         <div id="resultCard" class="custom-card p-6 mb-4 hidden animate__animated">
-          <!-- Use animate__fadeInDown for smooth drop-down -->
+          <!-- Animated with fadeInDown for smooth effect -->
           <h3 class="font-bold text-lg mb-2" id="resultTitle"></h3>
           <div id="effectsContainer" class="flex flex-wrap mb-4"></div>
           <div class="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p class="text-gray-500 text-xs mb-1">Cost:</p>
-              <p id="costDisplay" class="font-bold text-gray-600"></p>
+              <p class="text-gray-400 text-xs mb-1">Cost:</p>
+              <p id="costDisplay" class="font-bold text-gray-200"></p>
             </div>
             <div>
-              <p class="text-gray-500 text-xs mb-1">Price:</p>
-              <p id="priceDisplay" class="font-bold text-gray-600"></p>
+              <p class="text-gray-400 text-xs mb-1">Price:</p>
+              <p id="priceDisplay" class="font-bold text-gray-200"></p>
             </div>
             <div>
-              <p class="text-gray-500 text-xs mb-1">Profit:</p>
-              <p id="profitDisplay" class="font-bold text-green-600"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Right: How to Use and Featured Recipes (Horizontal layout) -->
-      <div>
-        <div class="custom-card p-6 mb-4">
-          <div class="flex items-center mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2 -3 3 -3 3"></path>
-              <path d="M12 17h.01"></path>
-            </svg>
-            <h2 class="text-lg font-bold">How to Use</h2>
-          </div>
-          <ol class="list-decimal list-inside space-y-1 text-sm text-gray-700">
-            <li>Select a base product from the dropdown menu.</li>
-            <li>Add different substances to create unique effects.</li>
-            <li>Click "Mix" to see results.</li>
-            <li>Check the effects, cost, and potential profit.</li>
-            <li>Remove substances or try different combinations.</li>
-          </ol>
-        </div>
-        <!-- Featured Recipes (horizontal scroll on small screens) -->
-        <div>
-          <h2 class="text-lg font-bold mb-3">Mixing ShowCase</h2>
-          <div class="flex overflow-x-auto gap-4 pb-2">
-            <!-- Recipe Card Template -->
-            <div class="custom-card p-4 min-w-[220px] hover:shadow-md transition-shadow">
-              <h3 class="font-medium text-base mb-1">beginner-friendly for Grandaddy Purple</h3>
-              <p class="text-xs text-gray-500 mb-1">Based on: Grandaddy Purple</p>
-              <div class="flex flex-wrap gap-1 mb-2">
-                <span class="effect-tag effect-sedating">Sedating</span>
-                <span class="effect-tag effect-sedating">Long-Faced</span>
-              </div>
-              <p class="text-green-600 text-sm font-medium">Profit: $53.00</p>
-            </div>
-            <div class="custom-card p-4 min-w-[220px] hover:shadow-md transition-shadow">
-              <h3 class="font-medium text-base mb-1">Base 1 recipe of Coca</h3>
-              <p class="text-xs text-gray-500 mb-1">Based on: Cocaine</p>
-              <div class="flex flex-wrap gap-1 mb-2">
-                <span class="effect-tag effect-jennerising">Jennerising</span>
-              </div>
-              <p class="text-green-600 text-sm font-medium">Profit: $205.00</p>
-            </div>
-            <div class="custom-card p-4 min-w-[220px] hover:shadow-md transition-shadow">
-              <h3 class="font-medium text-base mb-1">beginner-friendly for Sour Diesel</h3>
-              <p class="text-xs text-gray-500 mb-1">Based on: Sour Diesel</p>
-              <div class="flex flex-wrap gap-1 mb-2">
-                <span class="effect-tag effect-refreshing">Refreshing</span>
-                <span class="effect-tag effect-sedating">Bright-Eyed</span>
-              </div>
-              <p class="text-green-600 text-sm font-medium">Profit: $45.00</p>
-            </div>
-            <div class="custom-card p-4 min-w-[220px] hover:shadow-md transition-shadow">
-              <h3 class="font-medium text-base mb-1">Coca Super Mix</h3>
-              <p class="text-xs text-gray-500 mb-1">Based on: Cocaine</p>
-              <div class="flex flex-wrap gap-1 mb-2">
-                <span class="effect-tag effect-jennerising">Jennerising</span>
-                <span class="effect-tag effect-sedating">Bright-Eyed</span>
-                <span class="effect-tag effect-refreshing">+2 more</span>
-              </div>
-              <p class="text-green-600 text-sm font-medium">Profit: $635.00</p>
+              <p class="text-gray-400 text-xs mb-1">Profit:</p>
+              <p id="profitDisplay" class="font-bold text-green-400"></p>
             </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <!-- Mixing Showcase -->
+    <div class="custom-card p-6">
+      <div class="flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2 -3 3 -3 3"></path>
+          <path d="M12 17h.01"></path>
+        </svg>
+        <h2 class="text-lg font-bold text-white">Mixing Showcase</h2>
+      </div>
+      <div class="mix-showcase">
+        <!-- Recipe Card Template -->
+        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
+          <h3 class="font-medium text-base mb-1 text-white">beginner-friendly for Grandaddy Purple</h3>
+          <p class="text-xs text-gray-400 mb-1">Based on: Grandaddy Purple</p>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <span class="effect-tag effect-sedating">Sedating</span>
+            <span class="effect-tag effect-sedating">Long-Faced</span>
+          </div>
+          <p class="text-green-400 text-sm font-medium">Profit: $53.00</p>
+        </div>
+        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
+          <h3 class="font-medium text-base mb-1 text-white">Base 1 recipe of Coca</h3>
+          <p class="text-xs text-gray-400 mb-1">Based on: Cocaine</p>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <span class="effect-tag effect-jennerising">Jennerising</span>
+          </div>
+          <p class="text-green-400 text-sm font-medium">Profit: $205.00</p>
+        </div>
+        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
+          <h3 class="font-medium text-base mb-1 text-white">beginner-friendly for Sour Diesel</h3>
+          <p class="text-xs text-gray-400 mb-1">Based on: Sour Diesel</p>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <span class="effect-tag effect-refreshing">Refreshing</span>
+            <span class="effect-tag effect-sedating">Bright-Eyed</span>
+          </div>
+          <p class="text-green-400 text-sm font-medium">Profit: $45.00</p>
+        </div>
+        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
+          <h3 class="font-medium text-base mb-1 text-white">Coca Super Mix</h3>
+          <p class="text-xs text-gray-400 mb-1">Based on: Cocaine</p>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <span class="effect-tag effect-jennerising">Jennerising</span>
+            <span class="effect-tag effect-sedating">Bright-Eyed</span>
+            <span class="effect-tag effect-refreshing">+2 more</span>
+          </div>
+          <p class="text-green-400 text-sm font-medium">Profit: $635.00</p>
+        </div>
+      </div>
+    </div>
+    
   </div>
 </div>
 
@@ -366,7 +382,7 @@
     effectsContainer.innerHTML = "";
     effects.forEach((eff) => {
       const effChip = document.createElement('span');
-      // Use different class if needed based on effect types (for demo, using sedating style)
+      // For demo purposes all effects use the sedating style; modify per effect if needed
       effChip.className = "effect-tag effect-sedating";
       effChip.textContent = eff;
       effectsContainer.appendChild(effChip);
@@ -384,12 +400,12 @@
     substancesContainer.innerHTML = "";
     selectedSubstances.forEach((sub) => {
       const tag = document.createElement('div');
-      tag.className = "inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full";
+      tag.className = "inline-flex items-center px-2 py-1 bg-green-900 text-green-200 text-xs rounded-full";
       const textSpan = document.createElement('span');
       textSpan.textContent = sub;
       tag.appendChild(textSpan);
       const removeBtn = document.createElement('button');
-      removeBtn.className = "ml-1 text-green-600 hover:text-green-800";
+      removeBtn.className = "ml-1 text-green-400 hover:text-green-300";
       removeBtn.textContent = "×";
       removeBtn.addEventListener('click', () => {
         selectedSubstances = selectedSubstances.filter((x) => x !== sub);
