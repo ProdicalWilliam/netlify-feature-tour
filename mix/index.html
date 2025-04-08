@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Schduel 1 Mix Calculator</title>
-  <!-- Import React, ReactDOM, and Babel from CDNs -->
+  <!-- Import React, ReactDOM, and Babel -->
   <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    /* Global container styling */
+    /* Global styles and dark theme with green accents */
     body, html {
       margin: 0;
       padding: 0;
@@ -24,23 +24,20 @@
       min-height: 100vh;
     }
     
-    /* Card container to hold the interactive UI */
     .card {
       background-color: #2c2c2c;
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       text-align: center;
-      width: 320px;
+      width: 360px;
       color: #ffffff;
     }
     
-    /* Heading styling */
     .card h1 {
       margin-bottom: 1.5rem;
     }
     
-    /* Dropdown menu styling with a round (pill-shaped) design */
     .dropdown {
       background-color: #2c2c2c;
       color: #ffffff;
@@ -59,7 +56,6 @@
       border-color: #66ff66;
     }
     
-    /* Result area styling */
     .result {
       background-color: #3a3a3a;
       padding: 1rem;
@@ -87,8 +83,105 @@
   <script type="text/babel">
     const { useState } = React;
     
-    // Sample data based on your JSON snippet for Schduel 1 game
+    // Combined data object based on your provided source code:
     const data = {
+      productTypes: {
+        "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
+        "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
+        "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
+        "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
+        "Cocaine": { basePrice: 150, baseEffects: [] },
+        "Meth": { basePrice: 70, baseEffects: [] }
+      },
+      substances: {
+        "Cuke": { defaultEffect: "Energizing", price: 2 },
+        "Banana": { defaultEffect: "Gingeritis", price: 2 },
+        "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
+        "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
+        "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
+        "Mouth Wash": { defaultEffect: "Balding", price: 4 },
+        "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
+        "Gasoline": { defaultEffect: "Toxic", price: 5 },
+        "Energy Drink": { defaultEffect: "Athletic", price: 6 },
+        "Motor Oil": { defaultEffect: "Slippery", price: 6 },
+        "Mega Bean": { defaultEffect: "Foggy", price: 7 },
+        "Chili": { defaultEffect: "Spicy", price: 7 },
+        "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
+        "Iodine": { defaultEffect: "Jennerising", price: 8 },
+        "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
+        "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
+      },
+      effectMultipliers: {
+        "Anti-Gravity": { value: 0.54, color: "#c39bd3" },
+        "Athletic": { value: 0.32, color: "#d2b4de" },
+        "Balding": { value: 0.3, color: "#a9cce3" },
+        "Bright-Eyed": { value: 0.4, color: "#aed6f1" },
+        "Calming": { value: 0.1, color: "#a3e4d7" },
+        "Calorie-Dense": { value: 0.28, color: "#a2d9ce" },
+        "Cyclopean": { value: 0.56, color: "#a9dfbf" },
+        "Disorienting": { value: 0, color: "#abebc6" },
+        "Electrifying": { value: 0.5, color: "#f1c40f" },
+        "Energizing": { value: 0.22, color: "#fad7a0" },
+        "Euphoric": { value: 0.18, color: "#f0b27a" },
+        "Explosive": { value: 0, color: "#e59866" },
+        "Focused": { value: 0.16, color: "#aeb6bf" },
+        "Foggy": { value: 0.36, color: "#abb2b9" },
+        "Gingeritis": { value: 0.2, color: "#af7ac5" },
+        "Glowing": { value: 0.48, color: "#5499c7" },
+        "Jennerising": { value: 0.42, color: "#5dade2" },
+        "Laxative": { value: 0, color: "#48c9b0" },
+        "Long Faced": { value: 0.52, color: "#34495e" },
+        "Munchies": { value: 0.12, color: "#58d68d" },
+        "Paranoia": { value: 0, color: "#f4d03f" },
+        "Refreshing": { value: 0.14, color: "#f5b041" },
+        "Schizophrenia": { value: 0, color: "#eb984e" },
+        "Sedating": { value: 0.26, color: "#aab7b8" },
+        "Seizure-Inducing": { value: 0, color: "#99a3a4" },
+        "Shrinking": { value: 0.6, color: "#566573" },
+        "Slippery": { value: 0.34, color: "#76448a" },
+        "Smelly": { value: 0, color: "#6c3483" },
+        "Sneaky": { value: 0.24, color: "#9a7d0a" },
+        "Spicy": { value: 0.38, color: "#117864" },
+        "Thought-Provoking": { value: 0.44, color: "#fcf3cf" },
+        "Toxic": { value: 0, color: "#f4d03f" },
+        "Tropic Thunder": { value: 0.46, color: "#e67e22" },
+        "Zombifying": { value: 0.58, color: "#17a589" }
+      },
+      interactionRules: {
+        Cuke: [
+          { ifPresent: "Toxic", replace: "Toxic", with: "Euphoric" },
+          { ifPresent: "Slippery", replace: "Slippery", with: "Munchies" },
+          { ifPresent: "Sneaky", replace: "Sneaky", with: "Paranoia" },
+          { ifPresent: "Foggy", replace: "Foggy", with: "Cyclopean" },
+          { ifPresent: "Gingeritis", replace: "Gingeritis", with: "Thought-Provoking" },
+          { ifPresent: "Munchies", replace: "Munchies", with: "Athletic" },
+          { ifPresent: "Euphoric", replace: "Euphoric", with: "Laxative" }
+        ],
+        Paracetamol: [
+          { ifPresent: "Energizing", replace: "Energizing", with: "Paranoia" },
+          { ifPresent: "Calming", replace: "Calming", with: "Slippery" },
+          { ifPresent: "Toxic", replace: "Toxic", with: "Tropic Thunder" },
+          { ifPresent: "Spicy", replace: "Spicy", with: "Bright-Eyed" },
+          { ifPresent: "Glowing", replace: "Glowing", with: "Toxic" },
+          { ifPresent: "Foggy", replace: "Foggy", with: "Calming" },
+          { ifPresent: "Munchies", replace: "Munchies", with: "Anti-Gravity" },
+          { ifPresent: "Paranoia", replace: "Paranoia", with: "Balding" },
+          { ifPresent: "Electrifying", replace: "Electrifying", with: "Athletic" },
+          { ifPresent: "Focused", replace: "Focused", with: "Gingeritis" }
+        ],
+        Banana: [
+          { ifPresent: "Energizing", replace: "Energizing", with: "Thought-Provoking" },
+          { ifPresent: "Calming", replace: "Calming", with: "Sneaky" },
+          { ifPresent: "Toxic", replace: "Toxic", with: "Smelly" },
+          { ifPresent: "Long Faced", replace: "Long Faced", with: "Refreshing" },
+          { ifPresent: "Cyclopean", replace: "Cyclopean", with: "Thought-Provoking" },
+          { ifPresent: "Disorienting", replace: "Disorienting", with: "Focused" },
+          { ifPresent: "Focused", replace: "Focused", with: "Seizure-Inducing" },
+          { ifPresent: "Paranoia", replace: "Paranoia", with: "Jennerising" },
+          { ifPresent: "Smelly", replace: "Smelly", with: "Anti-Gravity" }
+        ],
+        // Additional rules for other substances can be added here...
+      },
       specialMixes: [
         {
           name: "Coca Super Mix",
@@ -172,34 +265,24 @@
           cost: 9,
           sellPrice: 62
         }
-      ],
-      // Sample old calculation parameters (you can replace these with your full datasets)
-      effectMultipliers: {
-        "Anti-Gravity": { value: 0.54, color: "#c39bd3" },
-        "Bright-Eyed": { value: 0.4, color: "#aed6f1" },
-        "Calming": { value: 0.1, color: "#a3e4d7" }
-        // ...add all multipliers as needed
-      },
-      interactionRules: {
-        Cuke: [
-          { ifPresent: "Toxic", replace: "Toxic", with: "Euphoric" },
-          { ifPresent: "Slippery", replace: "Slippery", with: "Munchies" }
-          // ...add additional rules here
-        ],
-        Paracetamol: [
-          { ifPresent: "Energizing", replace: "Energizing", with: "Paranoia" }
-          // ...additional rules
-        ]
-        // ...rules for other substances if needed
-      }
+      ]
     };
     
-    // Basic profit calculation function
-    function calculateProfit(mix) {
-      return mix.sellPrice - mix.cost;
+    // Calculate mix cost: product base price plus the sum of substance prices.
+    function calculateCost(mix) {
+      const baseCost = data.productTypes[mix.product] ? data.productTypes[mix.product].basePrice : 0;
+      const substancesCost = mix.substances.reduce((total, substance) => {
+        return total + (data.substances[substance] ? data.substances[substance].price : 0);
+      }, 0);
+      return baseCost + substancesCost;
     }
     
-    // Placeholder for Schduel 1 style mix outcome calculation (apply interaction rules)
+    // Calculate profit as sellPrice minus the calculated cost.
+    function calculateProfit(mix) {
+      return mix.sellPrice - calculateCost(mix);
+    }
+    
+    // Calculate final effects by starting with the mix effects and applying interaction rules.
     function calculateMixOutcome(mix, interactionRules) {
       let finalEffects = [...mix.effects];
       
@@ -221,17 +304,18 @@
     function App() {
       const [selectedMix, setSelectedMix] = useState(null);
       const [outcome, setOutcome] = useState([]);
-      
+      const [calculatedCost, setCalculatedCost] = useState(0);
+    
       const handleSelect = (e) => {
         const selectedName = e.target.value;
         const mix = data.specialMixes.find(m => m.name === selectedName);
         setSelectedMix(mix);
         if (mix) {
-          const newOutcome = calculateMixOutcome(mix, data.interactionRules);
-          setOutcome(newOutcome);
+          setCalculatedCost(calculateCost(mix));
+          setOutcome(calculateMixOutcome(mix, data.interactionRules));
         }
       };
-      
+    
       return (
         <div className="app-container">
           <div className="card">
@@ -239,15 +323,13 @@
             <select className="dropdown" onChange={handleSelect} defaultValue="">
               <option value="" disabled>Select a Special Mix...</option>
               {data.specialMixes.map(mix => (
-                <option key={mix.name} value={mix.name}>
-                  {mix.name}
-                </option>
+                <option key={mix.name} value={mix.name}>{mix.name}</option>
               ))}
             </select>
             {selectedMix && (
               <div className="result">
                 <p><strong>Product:</strong> {selectedMix.product}</p>
-                <p><strong>Cost:</strong> ${selectedMix.cost}</p>
+                <p><strong>Calculated Cost:</strong> ${calculatedCost}</p>
                 <p><strong>Sell Price:</strong> ${selectedMix.sellPrice}</p>
                 <p><strong>Profit:</strong> ${calculateProfit(selectedMix)}</p>
                 <p><strong>Final Effects (after interactions):</strong></p>
