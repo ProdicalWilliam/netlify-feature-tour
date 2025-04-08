@@ -2,248 +2,256 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mixing Calculator Extract</title>
-
-  <!-- 
-    To preserve the styling, you need Tailwind (or your own CSS). 
-    If you have Tailwind set up, keep this link (or use your own build):
-  -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css"
-    rel="stylesheet"
-  />
-
-  <!-- Basic style overrides (optional) -->
+  <title>Mix Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <!-- Firebase Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <style>
-    /* Minimal example overrides. 
-       Feel free to adjust or remove if you have your own CSS. */
-    .bg-card { background-color: #fff; }
-    .text-card-foreground { color: #333; }
-    .ring-offset-background { /* no-op */ }
-    .border-input { border-color: #ccc; }
-    .text-muted-foreground { color: #777; }
-    .bg-background { background-color: #fafafa; }
-    .text-primary-foreground { color: #fff; }
-    .bg-primary { background-color: #4f46e5; } /* Example primary color */
-    .hover\:bg-primary\/90:hover { background-color: rgba(79,70,229,0.9); }
-    .focus\:outline-none:focus { outline: none; }
-    .focus\:ring-2:focus { box-shadow: 0 0 0 2px rgba(79,70,229,0.3); }
+    /* Watermark in bottom left */
+    .watermark {
+      position: fixed;
+      bottom: 8px;
+      left: 8px;
+      font-size: 0.75rem;
+      color: rgba(0,0,0,0.5);
+    }
   </style>
 </head>
-<body class="p-4 bg-gray-50">
+<body class="bg-gray-100">
 
-<!-- Mixing Calculator START -->
-<div class="rounded-lg border bg-card text-card-foreground shadow-sm max-w-xl mx-auto">
-  <!-- Title -->
-  <div class="flex flex-col space-y-1.5 p-6">
-    <div class="text-2xl font-semibold leading-none tracking-tight">
-      <h2 class="text-2xl font-bold">Mixing Calculator</h2>
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate__animated animate__fadeIn">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+      <h2 class="text-2xl font-bold mb-4">Login</h2>
+      <button id="googleLoginBtn" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">
+        Sign in with Google
+      </button>
     </div>
   </div>
 
-  <!-- Base Product & Substances -->
-  <div class="p-6 pt-0 space-y-4">
-    <!-- Base Product Select -->
-    <h3 class="font-medium mb-2">Base Product</h3>
-    <select
-      id="baseProductSelect"
-      class="flex h-10 w-full items-center justify-between rounded-md
-             border border-input bg-background px-3 py-2 text-sm
-             ring-offset-background placeholder:text-muted-foreground
-             focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-             disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      <option disabled selected>Select a base product</option>
-    </select>
+  <!-- Main App UI -->
+  <div id="app" class="hidden">
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Mix Calculator</h1>
+      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200">Logout</button>
+    </header>
 
-    <!-- Substances -->
-    <div class="mt-4">
-      <h3 class="font-medium mb-2">Substances</h3>
+    <main class="p-6 space-y-8">
+      <!-- Mixing Calculator Card -->
+      <div class="rounded-lg border bg-white shadow-lg max-w-3xl mx-auto animate__animated animate__fadeIn">
+        <div class="p-6 border-b">
+          <h2 class="text-2xl font-bold">Mixing Calculator</h2>
+        </div>
+        <div class="p-6 space-y-4">
+          <label class="block font-medium mb-2">Base Product</label>
+          <select id="baseProductSelect" class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+            <option disabled selected>Select a base product</option>
+          </select>
+          <label class="block font-medium mb-2">Substances</label>
+          <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
+          <select id="substancesSelect" class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+            <option disabled selected value="">Substances</option>
+          </select>
+          <button id="mixButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition duration-200" disabled>Mix</button>
+        </div>
+      </div>
 
-      <!-- Pills/tags for chosen substances get appended here -->
-      <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
+      <!-- Results Card -->
+      <div id="resultCard" class="max-w-3xl mx-auto p-6 bg-white border rounded shadow-lg animate__animated animate__fadeIn hidden">
+        <h3 class="text-xl font-bold mb-4">Your Mix</h3>
+        <div id="resultContent" class="space-y-2"></div>
+      </div>
 
-      <!-- Substances dropdown to add them -->
-      <select
-        id="substancesSelect"
-        class="flex h-10 w-full items-center justify-between rounded-md
-               border border-input bg-background px-3 py-2 text-sm
-               ring-offset-background placeholder:text-muted-foreground
-               focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-               disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <option disabled selected value="">Substances</option>
-      </select>
-    </div>
+      <!-- Recipes Carousel -->
+      <div class="max-w-3xl mx-auto p-6 bg-white border rounded shadow-lg relative overflow-hidden animate__animated animate__fadeIn">
+        <h2 class="text-2xl font-bold mb-4">Top Recipes</h2>
+        <div id="recipesContainer" class="flex transition-transform duration-700"></div>
+        <div class="absolute bottom-4 right-4 flex space-x-1">
+          <span id="recipeRating" class="text-yellow-500"></span>
+        </div>
+      </div>
+    </main>
   </div>
 
-  <!-- Mix Button -->
-  <div class="flex items-center p-6 pt-0">
-    <button
-      id="mixButton"
-      class="inline-flex items-center justify-center gap-2 whitespace-nowrap
-             rounded-md text-sm font-medium ring-offset-background transition-colors
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-             focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
-             bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
-      disabled
-    >
-      Mix
-    </button>
-  </div>
-</div>
-<!-- Mixing Calculator END -->
+  <!-- Watermark -->
+  <div class="watermark">@William Mix Calculator 2025</div>
 
+  <script>
+    // Firebase config and initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.appspot.com",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-<!--  ========== JavaScript for Functionality ==========  -->
-<script>
-  /**************************************************
-   * Example data sets (from your original code).
-   * You can adjust or replace these with the real data
-   * or load them from an external file.
-   **************************************************/
-  const productTypes = {
-    "OG Kush":        { basePrice: 35, baseEffects: ["Calming"] },
-    "Sour Diesel":    { basePrice: 35, baseEffects: ["Refreshing"] },
-    "Green Crack":    { basePrice: 35, baseEffects: ["Energizing"] },
-    "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
-    "Cocaine":        { basePrice: 150, baseEffects: [] },
-    "Meth":           { basePrice: 70, baseEffects: [] },
-  };
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const loginModal = document.getElementById('loginModal');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const appDiv = document.getElementById('app');
 
-  const substancesData = {
-    "Cuke":         { defaultEffect: "Energizing", price: 2 },
-    "Banana":       { defaultEffect: "Gingeritis", price: 2 },
-    "Paracetamol":  { defaultEffect: "Sneaky",     price: 3 },
-    "Donut":        { defaultEffect: "Calorie-Dense", price: 3 },
-    "Viagra":       { defaultEffect: "Tropic Thunder", price: 4 },
-    "Mouth Wash":   { defaultEffect: "Balding",    price: 4 },
-    "Flu Medicine": { defaultEffect: "Sedating",   price: 5 },
-    "Gasoline":     { defaultEffect: "Toxic",      price: 5 },
-    "Energy Drink": { defaultEffect: "Athletic",   price: 6 },
-    "Motor Oil":    { defaultEffect: "Slippery",   price: 6 },
-    "Mega Bean":    { defaultEffect: "Foggy",      price: 7 },
-    "Chili":        { defaultEffect: "Spicy",      price: 7 },
-    "Battery":      { defaultEffect: "Bright-Eyed", price: 8 },
-    "Iodine":       { defaultEffect: "Jennerising", price: 8 },
-    "Addy":         { defaultEffect: "Thought-Provoking", price: 9 },
-    "Horse Semen":  { defaultEffect: "Long Faced", price: 9 },
-  };
-
-  // For demonstration, no advanced “interactionRules” or “effectMultipliers” included
-  // to keep snippet simpler. You can add them if needed.
-
-  // DOM elements
-  const baseProductSelect   = document.getElementById('baseProductSelect');
-  const substancesSelect    = document.getElementById('substancesSelect');
-  const substancesContainer = document.getElementById('substancesContainer');
-  const mixButton           = document.getElementById('mixButton');
-
-  // Keep track of user selections
-  let selectedBaseProduct = null;
-  let selectedSubstances = [];
-
-  /**************************************************
-   * Initialization: Populate dropdowns
-   **************************************************/
-  // Populate base product dropdown
-  Object.keys(productTypes).forEach(productName => {
-    const option = document.createElement('option');
-    option.value = productName;
-    option.text  = productName;
-    baseProductSelect.appendChild(option);
-  });
-
-  // Populate substances dropdown
-  Object.keys(substancesData).forEach(substanceName => {
-    const option = document.createElement('option');
-    option.value = substanceName;
-    option.text  = substanceName;
-    substancesSelect.appendChild(option);
-  });
-
-  /**************************************************
-   * Event Listeners
-   **************************************************/
-  // Base product selection
-  baseProductSelect.addEventListener('change', (e) => {
-    selectedBaseProduct = e.target.value;
-    checkIfMixReady();
-  });
-
-  // Substances selection
-  substancesSelect.addEventListener('change', (e) => {
-    const substanceName = e.target.value;
-    if (substanceName && !selectedSubstances.includes(substanceName)) {
-      selectedSubstances.push(substanceName);
-      // Reset selection to "Substances"
-      e.target.selectedIndex = 0;
-      // Update UI tags
-      renderSubstanceTags();
-      checkIfMixReady();
-    }
-  });
-
-  // “Mix” button
-  mixButton.addEventListener('click', () => {
-    if (!selectedBaseProduct) return;
-    if (!selectedSubstances.length) return;
-
-    // Example mix logic:
-    const baseInfo = productTypes[selectedBaseProduct];
-    let totalCost = baseInfo.basePrice;
-    let effects = [...(baseInfo.baseEffects || [])];
-
-    selectedSubstances.forEach(name => {
-      totalCost += substancesData[name].price;
-      effects.push(substancesData[name].defaultEffect);
+    googleLoginBtn.addEventListener('click', () => {
+      auth.signInWithPopup(googleProvider);
+    });
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+    });
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginModal.classList.add('hidden');
+        appDiv.classList.remove('hidden');
+      } else {
+        loginModal.classList.remove('hidden');
+        appDiv.classList.add('hidden');
+      }
     });
 
-    alert(
-      'Your Mix:\n\n' +
-      `Base Product: ${selectedBaseProduct}\n` +
-      `Substances: ${selectedSubstances.join(', ')}\n` +
-      `Total Cost: $${totalCost}\n` +
-      `Effects: ${effects.join(', ')}`
-    );
-  });
+    // Data for products and substances
+    const productTypes = {
+      "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
+      "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
+      "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
+      "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
+      "Cocaine": { basePrice: 150, baseEffects: [] },
+      "Meth": { basePrice: 70, baseEffects: [] }
+    };
+    const substancesData = {
+      "Cuke": { defaultEffect: "Energizing", price: 2 },
+      "Banana": { defaultEffect: "Gingeritis", price: 2 },
+      "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
+      "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
+      "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
+      "Mouth Wash": { defaultEffect: "Balding", price: 4 },
+      "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
+      "Gasoline": { defaultEffect: "Toxic", price: 5 },
+      "Energy Drink": { defaultEffect: "Athletic", price: 6 },
+      "Motor Oil": { defaultEffect: "Slippery", price: 6 },
+      "Mega Bean": { defaultEffect: "Foggy", price: 7 },
+      "Chili": { defaultEffect: "Spicy", price: 7 },
+      "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
+      "Iodine": { defaultEffect: "Jennerising", price: 8 },
+      "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
+      "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
+    };
 
-  /**************************************************
-   * Helper UI Functions
-   **************************************************/
-  function renderSubstanceTags() {
-    substancesContainer.innerHTML = ''; // Clear existing
-    selectedSubstances.forEach(sub => {
-      const tag = document.createElement('span');
-      tag.className = `
-        inline-flex items-center rounded-full bg-green-100 text-green-800
-        px-2 py-0.5 text-xs font-medium
-      `;
-      tag.textContent = sub;
+    // DOM elements for calculator
+    const baseProductSelect = document.getElementById('baseProductSelect');
+    const substancesSelect = document.getElementById('substancesSelect');
+    const substancesContainer = document.getElementById('substancesContainer');
+    const mixButton = document.getElementById('mixButton');
+    const resultCard = document.getElementById('resultCard');
+    const resultContent = document.getElementById('resultContent');
 
-      // Add an “X” to remove the substance
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = '×';
-      removeBtn.className = 'ml-2 text-red-600 hover:text-red-900';
-      removeBtn.addEventListener('click', () => {
-        selectedSubstances = selectedSubstances.filter(s => s !== sub);
+    let selectedBaseProduct = null;
+    let selectedSubstances = [];
+
+    Object.keys(productTypes).forEach(productName => {
+      const option = document.createElement('option');
+      option.value = productName;
+      option.text  = productName;
+      baseProductSelect.appendChild(option);
+    });
+    Object.keys(substancesData).forEach(substanceName => {
+      const option = document.createElement('option');
+      option.value = substanceName;
+      option.text  = substanceName;
+      substancesSelect.appendChild(option);
+    });
+
+    baseProductSelect.addEventListener('change', (e) => {
+      selectedBaseProduct = e.target.value;
+      checkIfMixReady();
+    });
+
+    substancesSelect.addEventListener('change', (e) => {
+      const substanceName = e.target.value;
+      if (substanceName && !selectedSubstances.includes(substanceName)) {
+        selectedSubstances.push(substanceName);
+        e.target.selectedIndex = 0;
         renderSubstanceTags();
         checkIfMixReady();
-      });
-
-      tag.appendChild(removeBtn);
-      substancesContainer.appendChild(tag);
+      }
     });
-  }
 
-  // Enable/disable the “Mix” button based on selections
-  function checkIfMixReady() {
-    if (selectedBaseProduct && selectedSubstances.length) {
-      mixButton.disabled = false;
-    } else {
-      mixButton.disabled = true;
+    mixButton.addEventListener('click', () => {
+      if (!selectedBaseProduct || !selectedSubstances.length) return;
+      const baseInfo = productTypes[selectedBaseProduct];
+      let totalCost = baseInfo.basePrice;
+      let effects = [...baseInfo.baseEffects];
+      selectedSubstances.forEach(name => {
+        totalCost += substancesData[name].price;
+        effects.push(substancesData[name].defaultEffect);
+      });
+      resultContent.innerHTML = `
+        <p><strong>Base Product:</strong> ${selectedBaseProduct}</p>
+        <p><strong>Substances:</strong> ${selectedSubstances.join(', ')}</p>
+        <p><strong>Total Cost:</strong> $${totalCost}</p>
+        <p><strong>Effects:</strong> ${effects.join(', ')}</p>
+      `;
+      resultCard.classList.remove('hidden');
+      resultCard.classList.add('animate__fadeIn');
+    });
+
+    function renderSubstanceTags() {
+      substancesContainer.innerHTML = '';
+      selectedSubstances.forEach(sub => {
+        const tag = document.createElement('span');
+        tag.className = "inline-flex items-center rounded-full bg-green-100 text-green-800 px-2 py-1 text-xs font-medium";
+        tag.textContent = sub;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '×';
+        removeBtn.className = "ml-1 text-red-600 hover:text-red-900";
+        removeBtn.addEventListener('click', () => {
+          selectedSubstances = selectedSubstances.filter(s => s !== sub);
+          renderSubstanceTags();
+          checkIfMixReady();
+        });
+        tag.appendChild(removeBtn);
+        substancesContainer.appendChild(tag);
+      });
     }
-  }
-</script>
+    function checkIfMixReady() {
+      mixButton.disabled = !(selectedBaseProduct && selectedSubstances.length);
+    }
+
+    // Recipes Carousel: sample 5 recipes with star ratings
+    const recipes = [
+      { name: "Coca Super Mix", rating: 5 },
+      { name: "Base 1 Recipe of Coca", rating: 4 },
+      { name: "Sour Diesel Starter", rating: 4.5 },
+      { name: "OG Mix 140 Revenue", rating: 5 },
+      { name: "Green Crack Boost", rating: 4 }
+    ];
+    let currentRecipeIndex = 0;
+    const recipesContainer = document.getElementById('recipesContainer');
+    const recipeRating = document.getElementById('recipeRating');
+
+    function renderRecipe(index) {
+      const recipe = recipes[index];
+      recipesContainer.innerHTML = `
+        <div class="w-full p-4">
+          <h3 class="text-xl font-bold">${recipe.name}</h3>
+        </div>
+      `;
+      const stars = '★'.repeat(Math.floor(recipe.rating)) + (recipe.rating % 1 !== 0 ? '½' : '');
+      recipeRating.textContent = stars;
+    }
+    renderRecipe(currentRecipeIndex);
+    setInterval(() => {
+      currentRecipeIndex = (currentRecipeIndex + 1) % recipes.length;
+      renderRecipe(currentRecipeIndex);
+    }, 5000);
+  </script>
 </body>
 </html>
