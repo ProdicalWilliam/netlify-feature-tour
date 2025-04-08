@@ -11,10 +11,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <!-- YouTube IFrame API -->
   <script async src="https://www.youtube.com/iframe_api"></script>
-  <!-- Spotify Web Playback SDK (old Spotify UI and callback mechanism remain as before) -->
+  <!-- Spotify Web Playback SDK (old UI and callback remain intact) -->
   <script src="https://sdk.scdn.co/spotify-player.js"></script>
   <style>
-    /* Global Styles & Background (existing styling) */
+    /* Global Styles */
     body {
       margin: 0;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -41,7 +41,51 @@
       color: #fff;
       text-shadow: 0 0 8px #1db954;
     }
+    /* Centered Login Form */
+    #login-wrapper {
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      background: #121212;
+    }
+    #auth-section {
+      background: rgba(18,18,18,0.95);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.9);
+      text-align: center;
+      width: 300px;
+    }
+    #auth-section input, #auth-section button {
+      width: 90%;
+      margin: 10px auto;
+      display: block;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+    }
+    #auth-section input {
+      background: rgba(40,40,40,0.8);
+      color: #fff;
+      border: 1px solid rgba(29,185,84,0.7);
+    }
+    #auth-section button {
+      background: #1db954;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+      margin-top: 15px;
+    }
+    #auth-section button:hover {
+      background: #17a44d;
+      box-shadow: 0 0 10px #1db954;
+    }
+    /* Main container for the rest of the UI (hidden until login) */
     .container {
+      display: none;
       width: 95%;
       max-width: 1000px;
       margin: 30px auto;
@@ -51,27 +95,90 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.9);
       backdrop-filter: blur(5px);
     }
-    /* (Other existing CSS for forms, buttons, modals etc.) */
-    /* Custom container for direct audio playback */
+    /* Clean button styling for room-related buttons */
+    button, input, select {
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+    }
+    button {
+      background: #1db954;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover {
+      background: #17a44d;
+      box-shadow: 0 0 10px #1db954;
+    }
+    /* Room List Styling */
+    .room-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .room-item {
+      background: rgba(40,40,40,0.8);
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .room-item:hover {
+      background: rgba(29,185,84,0.7);
+    }
+    .room-details h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #1db954;
+    }
+    .room-details p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    /* Audio container styling */
     #audioContainer {
       margin: 15px 0;
       text-align: center;
     }
-    /* Hide the YouTube player visually while keeping it active */
+    /* Hide the YouTube player visually */
     .invisible-player {
       width: 0;
       height: 0;
       overflow: hidden;
     }
+    /* Additional styling for modals */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal-content {
+      background: #222;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(29,185,84,0.9);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png" class="spotify-icon" alt="Spotify Icon">
-    <h1>Spotify ListenAlong</h1>
-  </header>
-  <div class="container">
-    <!-- Authentication Section (remains unchanged) -->
+  <!-- Login Page Wrapper -->
+  <div id="login-wrapper">
     <div id="auth-section">
       <div class="section-title">Welcome</div>
       <input type="email" id="email" placeholder="Email">
@@ -81,7 +188,15 @@
       <button onclick="register()">Register</button>
       <button onclick="login()">Login</button>
     </div>
-    <!-- Server Browser Section (unchanged) -->
+  </div>
+  
+  <!-- Main Container (hidden until user logs in) -->
+  <div class="container" id="mainUI">
+    <header>
+      <img src="https://static.vecteezy.com/system/resources/previews/023/986/494/non_2x/spotify-logo-spotify-logo-transparent-spotify-icon-transparent-free-free-png.png" class="spotify-icon" alt="Spotify Icon">
+      <h1>Spotify ListenAlong</h1>
+    </header>
+    <!-- Server Browser Section -->
     <div id="server-browser">
       <div class="section-title">Available Rooms</div>
       <ul id="roomList" class="room-list"></ul>
@@ -94,21 +209,19 @@
         <button id="closeRoomBtn" style="display:none;" onclick="closeRoom()">Close Room</button>
       </div>
       <div class="media-player">
-        <!-- Input accepts YouTube, Spotify, SoundCloud and direct audio links -->
-        <input type="text" id="mediaLink" placeholder="Enter media URL (YouTube, Spotify, SoundCloud, direct mp3)">
+        <input type="text" id="mediaLink" placeholder="Enter media URL (YouTube, Spotify, SoundCloud, direct audio)">
         <button onclick="updateMedia()">Update Media</button>
       </div>
-      <!-- Player container where different players are loaded -->
       <div id="playerContainer" class="media-player">
-        <!-- YouTube Player container. When a YouTube link is used, we hide this by applying .invisible-player -->
+        <!-- YouTube (invisible, for audio playback) -->
         <div id="ytplayer"></div>
-        <!-- Direct audio container for mp3/wav files -->
+        <!-- Direct audio container -->
         <div id="audioContainer"></div>
-        <!-- Spotify container keeps the original Spotify embed when needed -->
+        <!-- Spotify container to keep the old Spotify embed -->
         <div id="spotifyContainer" class="spotify-player"></div>
         <!-- SoundCloud container -->
         <div id="soundcloudContainer"></div>
-        <!-- Custom controls for YouTube syncing (visible only if you are room creator/admin) -->
+        <!-- Custom controls for YouTube syncing -->
         <div id="customControls">
           <input type="range" id="seekSlider" min="0" value="0">
           <div>
@@ -126,27 +239,27 @@
       <button onclick="sendMessage()">Send</button>
       <div id="participants"></div>
     </div>
-  </div>
-  
-  <!-- Modal for Private Room Password (unchanged) -->
-  <div id="passwordModal" class="modal">
-    <div class="modal-content">
-      <div class="section-title">Enter Room Password</div>
-      <input type="password" id="modalRoomPassword" placeholder="Password">
-      <button onclick="joinPrivateRoom()">Join Room</button>
+    
+    <!-- Modal for Private Room Password -->
+    <div id="passwordModal" class="modal">
+      <div class="modal-content">
+        <div class="section-title">Enter Room Password</div>
+        <input type="password" id="modalRoomPassword" placeholder="Password">
+        <button onclick="joinPrivateRoom()">Join Room</button>
+      </div>
     </div>
-  </div>
-  <!-- Modal for Creating a Room (unchanged) -->
-  <div id="createRoomModal" class="modal">
-    <div class="modal-content">
-      <div class="section-title">Create Room</div>
-      <input type="text" id="newRoomName" placeholder="Room Name">
-      <input type="text" id="newRoomPassword" placeholder="Room Password (optional)">
-      <select id="newRoomVisibility">
-        <option value="public">Public</option>
-        <option value="private">Private</option>
-      </select>
-      <button onclick="createRoom()">Create Room</button>
+    <!-- Modal for Creating a Room -->
+    <div id="createRoomModal" class="modal">
+      <div class="modal-content">
+        <div class="section-title">Create Room</div>
+        <input type="text" id="newRoomName" placeholder="Room Name">
+        <input type="text" id="newRoomPassword" placeholder="Room Password (optional)">
+        <select id="newRoomVisibility">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+        <button onclick="createRoom()">Create Room</button>
+      </div>
     </div>
   </div>
   
@@ -164,10 +277,9 @@
     const auth = firebase.auth();
     const db = firebase.database();
     
-    // Spotify OAuth and Player Setup
-    // (These parts are left unchanged so that your old Spotify UI and callback continue to work.)
+    // Spotify OAuth and Player Setup (old Spotify UI and callback remain intact)
     const spotifyClientId = "0a4506985ee8445e86f05ee777dd0c29";
-    const spotifyRedirectUri = "https://dazes.org/callback.html"; // Old callback URI retained
+    const spotifyRedirectUri = "https://dazes.org/callback.html"; // Old callback URI remains
     const spotifyScopes = "streaming user-read-email user-read-private";
     let spotifyPlayer = null;
     
@@ -200,8 +312,8 @@
       spotifyPlayer.connect();
     };
     
-    // Global variables for Firebase and room management
-    const adminUID = "1119TCpma1ajWOeI250vQ2Un1dg2"; 
+    // Global variables for room management
+    const adminUID = "1119TCpma1ajWOeI250vQ2Un1dg2";
     let currentRoomId = null;
     let youtubePlayer = null;
     let mediaType = null; // "youtube", "spotify", "soundcloud", "audio", or "other"
@@ -235,7 +347,9 @@
         const data = snapshot.val() || {};
         currentUserProfile.username = data.username || "Anonymous";
         currentUserProfile.avatar = data.avatar || "https://cdn4.iconfinder.com/data/icons/social-messaging-ui-color-and-shapes-3/177800/129-512.png";
-        document.getElementById('auth-section').style.display = 'none';
+        // Hide the login page and show main UI after login
+        document.getElementById('login-wrapper').style.display = 'none';
+        document.getElementById('mainUI').style.display = 'block';
         showServerBrowser();
       });
     }
@@ -350,7 +464,6 @@
         });
         db.ref('rooms/' + roomId + '/mediaTimestamp').on('value', snapshot => {
           const ts = snapshot.val();
-          // Sync YouTube if necessary
           if (mediaType === "youtube" && youtubePlayer && auth.currentUser.uid !== roomCreatorUID) {
             const currentTime = youtubePlayer.getCurrentTime();
             if (Math.abs(currentTime - ts / 1000) > 1) {
@@ -376,8 +489,10 @@
     }
     
     // ----- Media Handling -----
+    // Updated detectMediaType function to allow audio links with query parameters.
     function detectMediaType(link) {
-      if (link.match(/\.(mp3|wav|ogg)$/i)) {
+      // Test if there's an audio extension (.mp3, .wav, .ogg) before a query parameter or end-of-string.
+      if (link.match(/\.(mp3|wav|ogg)(\?.*)?$/i)) {
         return "audio";
       } else if (link.includes("youtube.com") || link.includes("youtu.be")) {
         return "youtube";
@@ -397,13 +512,11 @@
       document.getElementById('soundcloudContainer').innerHTML = "";
       
       if (mediaType === "youtube") {
-        // Load YouTube video using invisible player for audio-only playback
         const ytContainer = document.getElementById('ytplayer');
         ytContainer.classList.add('invisible-player');
         onYouTubeIframeAPIReady(link);
       } else if (mediaType === "spotify") {
-        // For Spotify, retain the old UI but override by fetching track info and then searching YouTube.
-        // (Your existing Spotify embed UI remains available if needed.)
+        // Keep old Spotify UI but convert track by fetching info and searching YouTube.
         fetchSpotifyTrackInfo(link)
           .then(query => {
             searchYouTubeAndLoad(query);
@@ -412,14 +525,12 @@
             console.error("Spotify track info error:", e);
           });
       } else if (mediaType === "audio") {
-        // Use HTML5 audio element for direct audio links
         const audio = new Audio(link);
         audio.id = "directAudioPlayer";
         audio.controls = true;
         audio.style.width = "100%";
         document.getElementById('audioContainer').appendChild(audio);
         audio.play();
-        // Sync from room creator
         audio.addEventListener('timeupdate', function() {
           if (auth.currentUser.uid === roomCreatorUID) {
             db.ref('rooms/' + currentRoomId).update({ mediaTimestamp: Math.floor(audio.currentTime * 1000) });
@@ -439,7 +550,6 @@
       }
     }
     
-    // Modified YouTube Iframe API loader that accepts a link and creates an invisible video for audio-only playback
     function onYouTubeIframeAPIReady(link) {
       let videoId = "";
       try {
@@ -467,6 +577,7 @@
         console.error("Error loading YouTube video", e);
       }
     }
+    
     function onPlayerReady(event) {
       db.ref('rooms/' + currentRoomId + '/mediaTimestamp').once('value').then(snapshot => {
         const ts = snapshot.val();
@@ -486,7 +597,8 @@
         }, 1000);
       }
     }
-    function onPlayerStateChange(event) { /* Additional state handling if needed */ }
+    
+    function onPlayerStateChange(event) { }
     
     function setupCustomControls() {
       const slider = document.getElementById('seekSlider');
@@ -506,6 +618,7 @@
         db.ref('rooms/' + currentRoomId).update({ mediaTimestamp: Math.floor(slider.value * 1000) });
       });
     }
+    
     function updateSlider() {
       const slider = document.getElementById('seekSlider');
       if (slider && youtubePlayer && youtubePlayer.getDuration() > 0) {
@@ -513,12 +626,14 @@
         document.getElementById('currentTimeDisplay').innerText = formatTime(youtubePlayer.getCurrentTime());
       }
     }
+    
     function formatTime(seconds) {
       seconds = Math.floor(seconds);
       let minutes = Math.floor(seconds / 60);
       seconds = seconds % 60;
       return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
     }
+    
     function updateMedia() {
       if (auth.currentUser.uid !== roomCreatorUID && auth.currentUser.uid !== adminUID) {
         alert("Only the room creator or admin can change the media.");
@@ -532,14 +647,11 @@
     }
     
     // ----- Spotify Integration: Convert Spotify link to YouTube search -----
-    // Your existing Spotify UI and callback remain in place.
-    // The following functions add the new conversion logic.
     function fetchSpotifyTrackInfo(link) {
       return new Promise((resolve, reject) => {
         try {
           const trackId = link.split("track/")[1].split("?")[0];
-          // For a production app, call the Spotify API using your token here.
-          // For demo purposes, use dummy data:
+          // For production, call Spotify API with your token.
           const dummyQuery = "Example Song Title - Example Artist";
           resolve(dummyQuery);
         } catch(e) {
@@ -547,10 +659,9 @@
         }
       });
     }
+    
     function searchYouTubeAndLoad(query) {
-      // In production, you would use the YouTube Data API.
       console.log("Searching YouTube for: " + query);
-      // Use a fallback YouTube link; adjust as needed.
       const dummyYouTubeLink = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
       mediaType = "youtube";
       loadMedia(dummyYouTubeLink);
@@ -569,6 +680,7 @@
       db.ref('rooms/' + currentRoomId + '/chat').push(messageData);
       document.getElementById('chatMessage').value = "";
     }
+    
     function displayMessage(messageData) {
       const chatBox = document.getElementById('chatBox');
       const div = document.createElement('div');
@@ -606,11 +718,13 @@
         });
       }
     }
+    
     function kickParticipant(uid) {
       if (confirm("Are you sure you want to kick this participant?")) {
         db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
       }
     }
+    
     function banParticipant(uid) {
       if (confirm("Are you sure you want to ban this participant? They will not be able to rejoin.")) {
         db.ref('rooms/' + currentRoomId + '/participants/' + uid).remove();
