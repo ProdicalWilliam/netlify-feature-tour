@@ -1,424 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Schedule 1 Calculator - Dark Edition</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Tailwind CSS (via CDN) -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
-  <!-- Animate.css for smooth animations -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  
+  <meta charset="UTF-8">
+  <title>Schduel 1 Mix Calculator</title>
+  <!-- Import React, ReactDOM, and Babel from CDNs -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    /* Global dark theme */
-    body {
-      background-color: #000;
-      color: #e5e7eb;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    /* Global container styling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      background-color: #1a1a1a;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    /* Card styling with dark background, subtle purple border and shadow */
-    .custom-card {
-      background: #1f1f1f;
-      border-radius: 12px;
-      border: 1px solid #6b21a8; /* purple accent */
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
-    }
-    /* Button styling with green accent */
-    .mix-button {
-      background-color: #065f46; /* dark green */
-      color: #e5e7eb;
-      border-radius: 8px;
-      transition: background-color 0.2s ease;
-    }
-    .mix-button:hover:not(:disabled) {
-      background-color: #047857;
-    }
-    .mix-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    /* Effect tags with dark background and accent outlines */
-    .effect-tag {
-      display: inline-flex;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      margin-right: 0.25rem;
-      margin-bottom: 0.25rem;
-    }
-    .effect-sedating {
-      background-color: rgba(107, 33, 168, 0.2);
-      color: #a78bfa;
-    }
-    .effect-refreshing {
-      background-color: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-    }
-    .effect-jennerising {
-      background-color: rgba(168, 85, 247, 0.2);
-      color: #c084fc;
-    }
-    /* Login page custom styling (Spotify‑inspired but dark) */
-    .login-card {
-      background: rgba(31, 41, 55, 0.85);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-    }
-    /* Custom select styling for dark mode */
-    .custom-select {
-      appearance: auto;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid #6b7280;
-      border-radius: 0.375rem;
-      background-color: #1f1f1f;
-      color: #e5e7eb;
-    }
-    .custom-select:focus {
-      outline: none;
-      border-color: #a78bfa;
-      box-shadow: 0 0 0 1px #a78bfa;
-    }
-    /* Center the mixing calculator card */
-    #calculatorContainer {
+    
+    .app-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: calc(100vh - 80px);
-      padding: 20px;
+      min-height: 100vh;
     }
-    /* Mixing showcase horizontal scroll styling */
-    .mix-showcase {
-      display: flex;
-      gap: 1rem;
-      overflow-x: auto;
-      padding-bottom: 1rem;
+    
+    /* Card container to hold the interactive UI */
+    .card {
+      background-color: #2c2c2c;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 320px;
+      color: #ffffff;
     }
-    .mix-showcase::-webkit-scrollbar {
-      height: 8px;
+    
+    /* Heading styling */
+    .card h1 {
+      margin-bottom: 1.5rem;
     }
-    .mix-showcase::-webkit-scrollbar-thumb {
-      background-color: #6b21a8;
-      border-radius: 9999px;
+    
+    /* Dropdown menu styling with a round (pill-shaped) design */
+    .dropdown {
+      background-color: #2c2c2c;
+      color: #ffffff;
+      border: 2px solid #00ff00;
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      width: 100%;
+      appearance: none;
+      outline: none;
+      transition: border 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+    
+    .dropdown:focus {
+      border-color: #66ff66;
+    }
+    
+    /* Result area styling */
+    .result {
+      background-color: #3a3a3a;
+      padding: 1rem;
+      border-radius: 15px;
+      text-align: left;
+    }
+    
+    .result p {
+      margin: 0.5rem 0;
+    }
+    
+    .result ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    
+    .result li {
+      list-style: disc;
     }
   </style>
-
-  <!-- Favicon -->
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4819/4819604.png" type="image/png" />
-
-  <!-- Firebase scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-
-<!-- Login Overlay (must log in first) -->
-<div id="loginOverlay" class="fixed inset-0 flex items-center justify-center bg-black z-50">
-  <div class="w-full max-w-md p-6">
-    <div class="login-card custom-card p-6">
-      <h2 class="text-xl font-bold mb-6 text-center text-white">Schedule 1 Calculator - Login</h2>
-      <form id="loginForm" class="space-y-4">
-        <input id="emailInput" type="email" placeholder="Email address" required
-               class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-1 focus:ring-purple-600" />
-        <input id="passwordInput" type="password" placeholder="Password" required
-               class="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-1 focus:ring-purple-600" />
-        <button type="submit"
-                class="w-full bg-purple-700 text-white py-2 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
-          Log In
-        </button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Main App (Hidden until login succeeds) -->
-<div id="mainApp" class="hidden py-8">
-  <div class="max-w-5xl mx-auto px-4">
-    <!-- Header Navigation -->
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-white">Schedule 1 Calculator</h1>
-      <button id="logoutBtn" class="text-red-500 hover:text-red-400 text-sm font-medium">
-        Logout
-      </button>
-    </div>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState } = React;
     
-    <!-- Centered Calculator Container -->
-    <div id="calculatorContainer">
-      <!-- Left: Calculator and Results -->
-      <div class="w-full lg:w-2/3">
-        <div class="custom-card p-6 mb-4">
-          <h2 class="text-xl font-bold mb-4">Mixing Calculator</h2>
-          <div class="space-y-4">
-            <div>
-              <label class="font-medium block mb-1">Base Product</label>
-              <select id="baseProductSelect" class="custom-select w-full">
-                <option disabled selected>Select a base product</option>
-              </select>
-            </div>
-            <div>
-              <label class="font-medium block mb-1">Substances</label>
-              <div id="substancesContainer" class="flex flex-wrap gap-1 mb-2 min-h-[20px]"></div>
-              <select id="substancesSelect" class="custom-select w-full">
-                <option disabled selected value="">Substances</option>
-              </select>
-            </div>
-            <button id="mixButton" class="mix-button w-full py-3 font-medium" disabled>
-              Mix
-            </button>
-          </div>
-        </div>
-        <!-- Mixing Results (hidden until mix made) -->
-        <div id="resultCard" class="custom-card p-6 mb-4 hidden animate__animated">
-          <!-- Animated with fadeInDown for smooth effect -->
-          <h3 class="font-bold text-lg mb-2" id="resultTitle"></h3>
-          <div id="effectsContainer" class="flex flex-wrap mb-4"></div>
-          <div class="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p class="text-gray-400 text-xs mb-1">Cost:</p>
-              <p id="costDisplay" class="font-bold text-gray-200"></p>
-            </div>
-            <div>
-              <p class="text-gray-400 text-xs mb-1">Price:</p>
-              <p id="priceDisplay" class="font-bold text-gray-200"></p>
-            </div>
-            <div>
-              <p class="text-gray-400 text-xs mb-1">Profit:</p>
-              <p id="profitDisplay" class="font-bold text-green-400"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    // Sample data based on your JSON snippet for Schduel 1 game
+    const data = {
+      specialMixes: [
+        {
+          name: "Coca Super Mix",
+          product: "Cocaine",
+          substances: ["Cuke", "Paracetamol", "Banana", "Gasoline", "Cuke", "Mega Bean", "Battery", "Banana"],
+          effects: ["Jennerising", "Tropic Thunder", "Anti-Gravity", "Zombifying", "Glowing", "Foggy", "Bright-Eyed", "Gingeritis"],
+          cost: 31,
+          sellPrice: 666
+        },
+        {
+          name: "Base 1 substance recipe of Coca",
+          product: "Cocaine",
+          substances: ["Indica"],
+          effects: ["Jennerising"],
+          Addictiveness: 74,
+          cost: 8,
+          sellPrice: 213
+        },
+        {
+          name: "Base 1 substance recipe of Sour Diesel",
+          product: "Sour Diesel",
+          substances: ["Horse Semen"],
+          effects: ["Energizing", "Long-Faced"],
+          Addictiveness: 99,
+          cost: 9,
+          sellPrice: 58
+        },
+        {
+          name: "Coca Super Mix 2",
+          product: "Cocaine",
+          substances: ["Motor Oil", "Cuke", "Paracetamol", "Gasoline", "Cuke", "Battery", "Horse Semen", "mega bean"],
+          effects: ["Anti-Gravity", "Glowing", "Tropic Thunder", "Zombifying", "Cyclopean", "Bright-Eyed", "Long Faced", "Foggy"],
+          cost: 42,
+          sellPrice: 735
+        },
+        {
+          name: "One of best Meth Mix Recipe",
+          product: "Meth",
+          substances: ["Banana", "Cuke", "Paracetamol", "Gasoline", "Cuke", "Battery", "Horse Semen", "mega bean"],
+          effects: ["Electrifying", "Glowing", "Tropic Thunder", "Zombifying", "Cyclopean", "Bright-Eyed", "Long Faced", "Foggy"],
+          cost: 38,
+          sellPrice: 340
+        },
+        {
+          name: "OG Mix 140 Revenue",
+          product: "Cocaine",
+          substances: ["Banana", "Gasoline", "Paracetamol", "Cuke", "Mega Bean", "Battery", "Banana", "Cuke"],
+          effects: ["Tropic Thunder", "Anti-Gravity", "Zombifying", "Jennerising", "Glowing", "Cyclopean", "Bright-Eyed", "Thought-Provoking"],
+          cost: 31,
+          sellPrice: 171
+        },
+        {
+          name: "beginner-friendly for OG Kush",
+          product: "OG Kush",
+          substances: ["Banana"],
+          effects: ["Sneaky", "Gingeritis"],
+          cost: 2,
+          sellPrice: 50
+        },
+        {
+          name: "beginner-friendly for Sour Diesel",
+          product: "Sour Diesel",
+          substances: ["Battery"],
+          effects: ["Refreshing", "Bright-Eyed"],
+          cost: 8,
+          sellPrice: 53
+        },
+        {
+          name: "beginner-friendly for Green Crack",
+          product: "Green Crack",
+          substances: ["Chili"],
+          effects: ["Energizing", "Spicy"],
+          cost: 7,
+          sellPrice: 56
+        },
+        {
+          name: "beginner-friendly for Grandaddy Purple",
+          product: "Grandaddy Purple",
+          substances: ["Horse Semen"],
+          effects: ["Sedating", " Long-Faced"],
+          cost: 9,
+          sellPrice: 62
+        }
+      ],
+      // Sample old calculation parameters (you can replace these with your full datasets)
+      effectMultipliers: {
+        "Anti-Gravity": { value: 0.54, color: "#c39bd3" },
+        "Bright-Eyed": { value: 0.4, color: "#aed6f1" },
+        "Calming": { value: 0.1, color: "#a3e4d7" }
+        // ...add all multipliers as needed
+      },
+      interactionRules: {
+        Cuke: [
+          { ifPresent: "Toxic", replace: "Toxic", with: "Euphoric" },
+          { ifPresent: "Slippery", replace: "Slippery", with: "Munchies" }
+          // ...add additional rules here
+        ],
+        Paracetamol: [
+          { ifPresent: "Energizing", replace: "Energizing", with: "Paranoia" }
+          // ...additional rules
+        ]
+        // ...rules for other substances if needed
+      }
+    };
     
-    <!-- Mixing Showcase -->
-    <div class="custom-card p-6">
-      <div class="flex items-center mb-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2 -3 3 -3 3"></path>
-          <path d="M12 17h.01"></path>
-        </svg>
-        <h2 class="text-lg font-bold text-white">Mixing Showcase</h2>
-      </div>
-      <div class="mix-showcase">
-        <!-- Recipe Card Template -->
-        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
-          <h3 class="font-medium text-base mb-1 text-white">beginner-friendly for Grandaddy Purple</h3>
-          <p class="text-xs text-gray-400 mb-1">Based on: Grandaddy Purple</p>
-          <div class="flex flex-wrap gap-1 mb-2">
-            <span class="effect-tag effect-sedating">Sedating</span>
-            <span class="effect-tag effect-sedating">Long-Faced</span>
-          </div>
-          <p class="text-green-400 text-sm font-medium">Profit: $53.00</p>
-        </div>
-        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
-          <h3 class="font-medium text-base mb-1 text-white">Base 1 recipe of Coca</h3>
-          <p class="text-xs text-gray-400 mb-1">Based on: Cocaine</p>
-          <div class="flex flex-wrap gap-1 mb-2">
-            <span class="effect-tag effect-jennerising">Jennerising</span>
-          </div>
-          <p class="text-green-400 text-sm font-medium">Profit: $205.00</p>
-        </div>
-        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
-          <h3 class="font-medium text-base mb-1 text-white">beginner-friendly for Sour Diesel</h3>
-          <p class="text-xs text-gray-400 mb-1">Based on: Sour Diesel</p>
-          <div class="flex flex-wrap gap-1 mb-2">
-            <span class="effect-tag effect-refreshing">Refreshing</span>
-            <span class="effect-tag effect-sedating">Bright-Eyed</span>
-          </div>
-          <p class="text-green-400 text-sm font-medium">Profit: $45.00</p>
-        </div>
-        <div class="custom-card p-4 min-w-[220px] hover:shadow-lg transition-shadow">
-          <h3 class="font-medium text-base mb-1 text-white">Coca Super Mix</h3>
-          <p class="text-xs text-gray-400 mb-1">Based on: Cocaine</p>
-          <div class="flex flex-wrap gap-1 mb-2">
-            <span class="effect-tag effect-jennerising">Jennerising</span>
-            <span class="effect-tag effect-sedating">Bright-Eyed</span>
-            <span class="effect-tag effect-refreshing">+2 more</span>
-          </div>
-          <p class="text-green-400 text-sm font-medium">Profit: $635.00</p>
-        </div>
-      </div>
-    </div>
-    
-  </div>
-</div>
-
-<!-- Scripts -->
-<script>
-  // Firebase configuration and initialization
-  const firebaseConfig = {
-    apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-    authDomain: "spotify-795ab.firebaseapp.com",
-    databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
-    projectId: "spotify-795ab",
-    storageBucket: "spotify-795ab.firebasestorage.app",
-    messagingSenderId: "907464366407",
-    appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
-    measurementId: "G-R6R08XWLMF"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  // DOM Elements
-  const loginOverlay = document.getElementById('loginOverlay');
-  const mainApp = document.getElementById('mainApp');
-  const loginForm = document.getElementById('loginForm');
-  const emailInput = document.getElementById('emailInput');
-  const passwordInput = document.getElementById('passwordInput');
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  const baseProductSelect = document.getElementById('baseProductSelect');
-  const substancesSelect = document.getElementById('substancesSelect');
-  const substancesContainer = document.getElementById('substancesContainer');
-  const mixButton = document.getElementById('mixButton');
-
-  const resultCard = document.getElementById('resultCard');
-  const resultTitle = document.getElementById('resultTitle');
-  const effectsContainer = document.getElementById('effectsContainer');
-  const costDisplay = document.getElementById('costDisplay');
-  const priceDisplay = document.getElementById('priceDisplay');
-  const profitDisplay = document.getElementById('profitDisplay');
-
-  // Data for products and substances
-  const productTypes = {
-    "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
-    "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
-    "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
-    "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
-    "Cocaine": { basePrice: 150, baseEffects: [] },
-    "Meth": { basePrice: 70, baseEffects: [] }
-  };
-  const substancesData = {
-    "Banana": { defaultEffect: "Gingeritis", price: 2 },
-    "Cuke": { defaultEffect: "Energizing", price: 2 },
-    "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
-    "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
-    "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
-    "Mouth Wash": { defaultEffect: "Balding", price: 4 },
-    "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
-    "Gasoline": { defaultEffect: "Toxic", price: 5 },
-    "Energy Drink": { defaultEffect: "Athletic", price: 6 },
-    "Motor Oil": { defaultEffect: "Slippery", price: 6 },
-    "Mega Bean": { defaultEffect: "Foggy", price: 7 },
-    "Chili": { defaultEffect: "Spicy", price: 7 },
-    "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
-    "Iodine": { defaultEffect: "Jennerising", price: 8 },
-    "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
-    "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
-  };
-
-  // App state
-  let selectedBaseProduct = null;
-  let selectedSubstances = [];
-
-  // Populate dropdowns
-  Object.keys(productTypes).forEach((productName) => {
-    const opt = document.createElement('option');
-    opt.value = productName;
-    opt.textContent = productName;
-    baseProductSelect.appendChild(opt);
-  });
-  Object.keys(substancesData).forEach((subName) => {
-    const opt = document.createElement('option');
-    opt.value = subName;
-    opt.textContent = subName;
-    substancesSelect.appendChild(opt);
-  });
-
-  // Authentication
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = emailInput.value;
-    const pass = passwordInput.value;
-    firebase.auth().signInWithEmailAndPassword(email, pass)
-      .then(() => {})
-      .catch(() => {
-        // Create account if login fails
-        firebase.auth().createUserWithEmailAndPassword(email, pass)
-          .then(() => {})
-          .catch((error) => { alert(error.message); });
-      });
-  });
-  logoutBtn.addEventListener('click', () => { firebase.auth().signOut(); });
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      loginOverlay.classList.add('hidden');
-      mainApp.classList.remove('hidden');
-    } else {
-      loginOverlay.classList.remove('hidden');
-      mainApp.classList.add('hidden');
-      if (loginForm) loginForm.reset();
+    // Basic profit calculation function
+    function calculateProfit(mix) {
+      return mix.sellPrice - mix.cost;
     }
-  });
-
-  // Calculator functionality
-  baseProductSelect.addEventListener('change', () => {
-    selectedBaseProduct = baseProductSelect.value;
-    checkIfMixReady();
-  });
-  substancesSelect.addEventListener('change', () => {
-    const sub = substancesSelect.value;
-    if (sub && !selectedSubstances.includes(sub)) {
-      selectedSubstances.push(sub);
-      substancesSelect.selectedIndex = 0;
-      renderSubstanceTags();
-      checkIfMixReady();
-    }
-  });
-  mixButton.addEventListener('click', () => {
-    if (!selectedBaseProduct || !selectedSubstances.length) return;
-    const baseInfo = productTypes[selectedBaseProduct];
-    let totalCost = baseInfo.basePrice;
-    let effects = [...(baseInfo.baseEffects || [])];
-    selectedSubstances.forEach((s) => {
-      totalCost += substancesData[s].price;
-      effects.push(substancesData[s].defaultEffect);
-    });
-    const price = totalCost + 150;
-    const profit = price - totalCost;
-    resultTitle.textContent = `Mix: ${selectedBaseProduct} + [${selectedSubstances.join(", ")}]`;
-    effectsContainer.innerHTML = "";
-    effects.forEach((eff) => {
-      const effChip = document.createElement('span');
-      // For demo purposes all effects use the sedating style; modify per effect if needed
-      effChip.className = "effect-tag effect-sedating";
-      effChip.textContent = eff;
-      effectsContainer.appendChild(effChip);
-    });
-    costDisplay.textContent = "$" + totalCost.toFixed(2);
-    priceDisplay.textContent = "$" + price.toFixed(2);
-    profitDisplay.textContent = "$" + profit.toFixed(2);
-    // Animate the result card with a smooth downward fadeIn
-    resultCard.classList.remove('hidden');
-    resultCard.classList.remove('animate__fadeOut');
-    resultCard.classList.add('animate__fadeInDown');
-  });
-
-  function renderSubstanceTags() {
-    substancesContainer.innerHTML = "";
-    selectedSubstances.forEach((sub) => {
-      const tag = document.createElement('div');
-      tag.className = "inline-flex items-center px-2 py-1 bg-green-900 text-green-200 text-xs rounded-full";
-      const textSpan = document.createElement('span');
-      textSpan.textContent = sub;
-      tag.appendChild(textSpan);
-      const removeBtn = document.createElement('button');
-      removeBtn.className = "ml-1 text-green-400 hover:text-green-300";
-      removeBtn.textContent = "×";
-      removeBtn.addEventListener('click', () => {
-        selectedSubstances = selectedSubstances.filter((x) => x !== sub);
-        renderSubstanceTags();
-        checkIfMixReady();
+    
+    // Placeholder for Schduel 1 style mix outcome calculation (apply interaction rules)
+    function calculateMixOutcome(mix, interactionRules) {
+      let finalEffects = [...mix.effects];
+      
+      mix.substances.forEach(substance => {
+        if (interactionRules[substance]) {
+          interactionRules[substance].forEach(rule => {
+            if (finalEffects.includes(rule.ifPresent)) {
+              finalEffects = finalEffects.map(effect =>
+                effect === rule.ifPresent ? rule.with : effect
+              );
+            }
+          });
+        }
       });
-      tag.appendChild(removeBtn);
-      substancesContainer.appendChild(tag);
-    });
-  }
-  function checkIfMixReady() {
-    mixButton.disabled = !(selectedBaseProduct && selectedSubstances.length);
-  }
-</script>
+      
+      return finalEffects;
+    }
+    
+    function App() {
+      const [selectedMix, setSelectedMix] = useState(null);
+      const [outcome, setOutcome] = useState([]);
+      
+      const handleSelect = (e) => {
+        const selectedName = e.target.value;
+        const mix = data.specialMixes.find(m => m.name === selectedName);
+        setSelectedMix(mix);
+        if (mix) {
+          const newOutcome = calculateMixOutcome(mix, data.interactionRules);
+          setOutcome(newOutcome);
+        }
+      };
+      
+      return (
+        <div className="app-container">
+          <div className="card">
+            <h1>Schduel 1 Mix Calculator</h1>
+            <select className="dropdown" onChange={handleSelect} defaultValue="">
+              <option value="" disabled>Select a Special Mix...</option>
+              {data.specialMixes.map(mix => (
+                <option key={mix.name} value={mix.name}>
+                  {mix.name}
+                </option>
+              ))}
+            </select>
+            {selectedMix && (
+              <div className="result">
+                <p><strong>Product:</strong> {selectedMix.product}</p>
+                <p><strong>Cost:</strong> ${selectedMix.cost}</p>
+                <p><strong>Sell Price:</strong> ${selectedMix.sellPrice}</p>
+                <p><strong>Profit:</strong> ${calculateProfit(selectedMix)}</p>
+                <p><strong>Final Effects (after interactions):</strong></p>
+                <ul>
+                  {outcome.map((effect, i) => <li key={i}>{effect}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
 </body>
 </html>
