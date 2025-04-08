@@ -2,256 +2,351 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mix Calculator</title>
+  <title>Dark Neon Mix Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4819/4819604.png" type="image/png" />
+
   <!-- Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
   <!-- Animate.css for animations -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <!-- Firebase App (the core Firebase SDK) -->
+  
+  <!-- Firebase App, Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <!-- Firebase Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
   <style>
-    /* Watermark in bottom left */
-    .watermark {
-      position: fixed;
-      bottom: 8px;
-      left: 8px;
-      font-size: 0.75rem;
-      color: rgba(0,0,0,0.5);
+    body {
+      background: linear-gradient(to bottom, #000000, #2b0b44);
+      color: #d2d2d2;
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
     }
+    .neon-accent {
+      color: #A3FFA3;
+    }
+    .neon-accent-bg {
+      background-color: rgba(163,255,163,0.07);
+    }
+    .trans-card {
+      background-color: rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px);
+    }
+    .rounded-xl { border-radius: 1rem; }
   </style>
 </head>
-<body class="bg-gray-100">
+<body class="flex flex-col">
 
-  <!-- Login Modal -->
-  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate__animated animate__fadeIn">
-    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
-      <h2 class="text-2xl font-bold mb-4">Login</h2>
-      <button id="googleLoginBtn" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">
-        Sign in with Google
+<!-- Firebase Config -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+    authDomain: "spotify-795ab.firebaseapp.com",
+    databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+    projectId: "spotify-795ab",
+    storageBucket: "spotify-795ab.firebasestorage.app",
+    messagingSenderId: "907464366407",
+    appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
+    measurementId: "G-R6R08XWLMF"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+</script>
+
+<!-- Login Overlay -->
+<div id="loginOverlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 p-4">
+  <div class="trans-card rounded-xl p-6 w-full max-w-md animate__animated animate__fadeInDown">
+    <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
+    <form id="loginForm" class="flex flex-col space-y-4">
+      <input
+        id="emailInput"
+        type="email"
+        placeholder="Email"
+        class="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
+        required
+      />
+      <input
+        id="passwordInput"
+        type="password"
+        placeholder="Password"
+        class="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
+        required
+      />
+      <button
+        id="loginBtn"
+        type="submit"
+        class="bg-purple-600 hover:bg-purple-800 text-white py-2 rounded transition duration-200 font-semibold"
+      >
+        Login
       </button>
-    </div>
+    </form>
   </div>
+</div>
 
-  <!-- Main App UI -->
-  <div id="app" class="hidden">
-    <header class="bg-white shadow p-4 flex justify-between items-center">
-      <h1 class="text-3xl font-bold">Mix Calculator</h1>
-      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200">Logout</button>
-    </header>
+<!-- Main App -->
+<div id="mainApp" class="hidden flex-1 flex flex-col animate__animated animate__fadeInUp">
+  <!-- Header -->
+  <header class="flex justify-between items-center p-4 neon-accent-bg">
+    <h1 class="text-3xl font-bold neon-accent">Dark Neon Mix Calculator</h1>
+    <button
+      id="logoutBtn"
+      class="bg-purple-700 hover:bg-purple-900 text-white px-4 py-2 rounded font-medium"
+    >
+      Logout
+    </button>
+  </header>
 
-    <main class="p-6 space-y-8">
-      <!-- Mixing Calculator Card -->
-      <div class="rounded-lg border bg-white shadow-lg max-w-3xl mx-auto animate__animated animate__fadeIn">
-        <div class="p-6 border-b">
-          <h2 class="text-2xl font-bold">Mixing Calculator</h2>
+  <!-- Content -->
+  <main class="p-4 space-y-6">
+    <!-- Display Some Example Recipes -->
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold neon-accent-bg p-2 inline-block rounded">Featured Recipes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <!-- Each Recipe Card -->
+        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
+          <h3 class="text-lg font-semibold mb-1">beginner-friendly for Sour Diesel</h3>
+          <p class="text-sm mb-1"><strong>Based on:</strong> Sour Diesel</p>
+          <p class="text-sm mb-1"><strong>Effects:</strong> Refreshing, Bright-Eyed</p>
+          <p class="text-sm"><strong>Profit:</strong> $45.00</p>
         </div>
-        <div class="p-6 space-y-4">
-          <label class="block font-medium mb-2">Base Product</label>
-          <select id="baseProductSelect" class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-            <option disabled selected>Select a base product</option>
-          </select>
-          <label class="block font-medium mb-2">Substances</label>
-          <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
-          <select id="substancesSelect" class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-            <option disabled selected value="">Substances</option>
-          </select>
-          <button id="mixButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition duration-200" disabled>Mix</button>
+        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
+          <h3 class="text-lg font-semibold mb-1">Base 1 substance recipe of Coca</h3>
+          <p class="text-sm mb-1"><strong>Based on:</strong> Cocaine</p>
+          <p class="text-sm mb-1"><strong>Effects:</strong> Jennerising</p>
+          <p class="text-sm"><strong>Profit:</strong> $205.00</p>
+        </div>
+        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
+          <h3 class="text-lg font-semibold mb-1">beginner-friendly for OG Kush</h3>
+          <p class="text-sm mb-1"><strong>Based on:</strong> OG Kush</p>
+          <p class="text-sm mb-1"><strong>Effects:</strong> Sneaky, Gingeritis</p>
+          <p class="text-sm"><strong>Profit:</strong> $48.00</p>
+        </div>
+        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
+          <h3 class="text-lg font-semibold mb-1">beginner-friendly for Green Crack</h3>
+          <p class="text-sm mb-1"><strong>Based on:</strong> Green Crack</p>
+          <p class="text-sm mb-1"><strong>Effects:</strong> Energizing, Spicy</p>
+          <p class="text-sm"><strong>Profit:</strong> $49.00</p>
         </div>
       </div>
+    </section>
 
-      <!-- Results Card -->
-      <div id="resultCard" class="max-w-3xl mx-auto p-6 bg-white border rounded shadow-lg animate__animated animate__fadeIn hidden">
-        <h3 class="text-xl font-bold mb-4">Your Mix</h3>
-        <div id="resultContent" class="space-y-2"></div>
+    <!-- Mixing Calculator -->
+    <section class="trans-card rounded-xl p-6">
+      <h2 class="text-xl font-semibold mb-4">Mixing Calculator</h2>
+      <label class="block font-medium mb-2">Base Product</label>
+      <select
+        id="baseProductSelect"
+        class="w-full mb-4 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
+      >
+        <option disabled selected>Select a base product</option>
+      </select>
+      <label class="block font-medium mb-2">Substances</label>
+      <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
+      <select
+        id="substancesSelect"
+        class="w-full mb-4 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
+      >
+        <option disabled selected value="">Substances</option>
+      </select>
+      <button
+        id="mixButton"
+        class="bg-green-600 hover:bg-green-800 text-white py-2 w-full rounded font-medium disabled:bg-gray-600 transition duration-200"
+        disabled
+      >
+        Mix
+      </button>
+    </section>
+
+    <!-- Mix Results Card -->
+    <section id="resultCard" class="hidden trans-card rounded-xl p-6 space-y-4 animate__animated animate__fadeIn">
+      <div class="mb-3">
+        <h3 id="resultTitle" class="text-xl font-bold"></h3>
+        <p id="resultSub" class="text-sm"></p>
       </div>
-
-      <!-- Recipes Carousel -->
-      <div class="max-w-3xl mx-auto p-6 bg-white border rounded shadow-lg relative overflow-hidden animate__animated animate__fadeIn">
-        <h2 class="text-2xl font-bold mb-4">Top Recipes</h2>
-        <div id="recipesContainer" class="flex transition-transform duration-700"></div>
-        <div class="absolute bottom-4 right-4 flex space-x-1">
-          <span id="recipeRating" class="text-yellow-500"></span>
+      <div id="effectsContainer" class="flex flex-wrap gap-2"></div>
+      <div class="grid grid-cols-3 text-center gap-2 mt-3">
+        <div>
+          <p class="text-sm">Cost:</p>
+          <p id="costDisplay" class="font-bold text-gray-100"></p>
+        </div>
+        <div>
+          <p class="text-sm">Price:</p>
+          <p id="priceDisplay" class="font-bold text-gray-100"></p>
+        </div>
+        <div>
+          <p class="text-sm">Profit:</p>
+          <p id="profitDisplay" class="font-bold text-green-400"></p>
         </div>
       </div>
-    </main>
-  </div>
+    </section>
+  </main>
+</div>
 
-  <!-- Watermark -->
-  <div class="watermark">@William Mix Calculator 2025</div>
+<script>
+  // Login with Email/Password
+  const loginOverlay = document.getElementById('loginOverlay');
+  const mainApp = document.getElementById('mainApp');
+  const loginForm = document.getElementById('loginForm');
+  const emailInput = document.getElementById('emailInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
 
-  <script>
-    // Firebase config and initialization
-    const firebaseConfig = {
-      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-      authDomain: "spotify-795ab.firebaseapp.com",
-      projectId: "spotify-795ab",
-      storageBucket: "spotify-795ab.appspot.com",
-      messagingSenderId: "907464366407",
-      appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = emailInput.value;
+    const pass = passwordInput.value;
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then(() => {})
+      .catch((err) => {
+        // If user doesn't exist, attempt signUp
+        firebase.auth().createUserWithEmailAndPassword(email, pass)
+          .then(() => {})
+          .catch((error) => {
+            alert(error.message);
+          });
+      });
+  });
 
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-    const loginModal = document.getElementById('loginModal');
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const appDiv = document.getElementById('app');
+  logoutBtn.addEventListener('click', () => {
+    firebase.auth().signOut();
+  });
 
-    googleLoginBtn.addEventListener('click', () => {
-      auth.signInWithPopup(googleProvider);
-    });
-    logoutBtn.addEventListener('click', () => {
-      auth.signOut();
-    });
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        loginModal.classList.add('hidden');
-        appDiv.classList.remove('hidden');
-      } else {
-        loginModal.classList.remove('hidden');
-        appDiv.classList.add('hidden');
-      }
-    });
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      loginOverlay.classList.add('hidden');
+      mainApp.classList.remove('hidden');
+    } else {
+      loginOverlay.classList.remove('hidden');
+      mainApp.classList.add('hidden');
+    }
+  });
 
-    // Data for products and substances
-    const productTypes = {
-      "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
-      "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
-      "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
-      "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
-      "Cocaine": { basePrice: 150, baseEffects: [] },
-      "Meth": { basePrice: 70, baseEffects: [] }
-    };
-    const substancesData = {
-      "Cuke": { defaultEffect: "Energizing", price: 2 },
-      "Banana": { defaultEffect: "Gingeritis", price: 2 },
-      "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
-      "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
-      "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
-      "Mouth Wash": { defaultEffect: "Balding", price: 4 },
-      "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
-      "Gasoline": { defaultEffect: "Toxic", price: 5 },
-      "Energy Drink": { defaultEffect: "Athletic", price: 6 },
-      "Motor Oil": { defaultEffect: "Slippery", price: 6 },
-      "Mega Bean": { defaultEffect: "Foggy", price: 7 },
-      "Chili": { defaultEffect: "Spicy", price: 7 },
-      "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
-      "Iodine": { defaultEffect: "Jennerising", price: 8 },
-      "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
-      "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
-    };
+  // Data
+  const productTypes = {
+    "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
+    "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
+    "Green Crack": { basePrice: 35, baseEffects: ["Energizing"] },
+    "Granddaddy Purple": { basePrice: 35, baseEffects: ["Sedating"] },
+    "Cocaine": { basePrice: 150, baseEffects: [] },
+    "Meth": { basePrice: 70, baseEffects: [] }
+  };
+  const substancesData = {
+    "Banana": { defaultEffect: "Gingeritis", price: 2 },
+    "Cuke": { defaultEffect: "Energizing", price: 2 },
+    "Paracetamol": { defaultEffect: "Sneaky", price: 3 },
+    "Donut": { defaultEffect: "Calorie-Dense", price: 3 },
+    "Viagra": { defaultEffect: "Tropic Thunder", price: 4 },
+    "Mouth Wash": { defaultEffect: "Balding", price: 4 },
+    "Flu Medicine": { defaultEffect: "Sedating", price: 5 },
+    "Gasoline": { defaultEffect: "Toxic", price: 5 },
+    "Energy Drink": { defaultEffect: "Athletic", price: 6 },
+    "Motor Oil": { defaultEffect: "Slippery", price: 6 },
+    "Mega Bean": { defaultEffect: "Foggy", price: 7 },
+    "Chili": { defaultEffect: "Spicy", price: 7 },
+    "Battery": { defaultEffect: "Bright-Eyed", price: 8 },
+    "Iodine": { defaultEffect: "Jennerising", price: 8 },
+    "Addy": { defaultEffect: "Thought-Provoking", price: 9 },
+    "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
+  };
 
-    // DOM elements for calculator
-    const baseProductSelect = document.getElementById('baseProductSelect');
-    const substancesSelect = document.getElementById('substancesSelect');
-    const substancesContainer = document.getElementById('substancesContainer');
-    const mixButton = document.getElementById('mixButton');
-    const resultCard = document.getElementById('resultCard');
-    const resultContent = document.getElementById('resultContent');
+  // Calculator
+  const baseProductSelect = document.getElementById('baseProductSelect');
+  const substancesSelect = document.getElementById('substancesSelect');
+  const substancesContainer = document.getElementById('substancesContainer');
+  const mixButton = document.getElementById('mixButton');
+  const resultCard = document.getElementById('resultCard');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultSub = document.getElementById('resultSub');
+  const effectsContainer = document.getElementById('effectsContainer');
+  const costDisplay = document.getElementById('costDisplay');
+  const priceDisplay = document.getElementById('priceDisplay');
+  const profitDisplay = document.getElementById('profitDisplay');
 
-    let selectedBaseProduct = null;
-    let selectedSubstances = [];
+  let selectedBaseProduct = null;
+  let selectedSubstances = [];
 
-    Object.keys(productTypes).forEach(productName => {
-      const option = document.createElement('option');
-      option.value = productName;
-      option.text  = productName;
-      baseProductSelect.appendChild(option);
-    });
-    Object.keys(substancesData).forEach(substanceName => {
-      const option = document.createElement('option');
-      option.value = substanceName;
-      option.text  = substanceName;
-      substancesSelect.appendChild(option);
-    });
+  Object.keys(productTypes).forEach((productName) => {
+    const opt = document.createElement('option');
+    opt.value = productName;
+    opt.textContent = productName;
+    baseProductSelect.appendChild(opt);
+  });
+  Object.keys(substancesData).forEach((subName) => {
+    const opt = document.createElement('option');
+    opt.value = subName;
+    opt.textContent = subName;
+    substancesSelect.appendChild(opt);
+  });
 
-    baseProductSelect.addEventListener('change', (e) => {
-      selectedBaseProduct = e.target.value;
+  baseProductSelect.addEventListener('change', (e) => {
+    selectedBaseProduct = e.target.value;
+    checkIfMixReady();
+  });
+  substancesSelect.addEventListener('change', (e) => {
+    const sub = e.target.value;
+    if (!selectedSubstances.includes(sub) && sub) {
+      selectedSubstances.push(sub);
+      e.target.selectedIndex = 0;
+      renderSubstanceTags();
       checkIfMixReady();
-    });
+    }
+  });
 
-    substancesSelect.addEventListener('change', (e) => {
-      const substanceName = e.target.value;
-      if (substanceName && !selectedSubstances.includes(substanceName)) {
-        selectedSubstances.push(substanceName);
-        e.target.selectedIndex = 0;
+  mixButton.addEventListener('click', () => {
+    if (!selectedBaseProduct || !selectedSubstances.length) return;
+    const baseInfo = productTypes[selectedBaseProduct];
+    let totalCost = baseInfo.basePrice;
+    let effects = [...(baseInfo.baseEffects || [])];
+    selectedSubstances.forEach((s) => {
+      totalCost += substancesData[s].price;
+      effects.push(substancesData[s].defaultEffect);
+    });
+    // Example logic: Price is cost + markup
+    const price = totalCost + 150;
+    const profit = price - totalCost;
+
+    resultTitle.textContent = "Your Mix Results";
+    resultSub.textContent = selectedBaseProduct + " Mix";
+    effectsContainer.innerHTML = "";
+    effects.forEach((eff) => {
+      const effChip = document.createElement('span');
+      effChip.className = "inline-flex items-center rounded-full bg-purple-600 text-white px-3 py-1 text-sm font-semibold";
+      effChip.textContent = eff;
+      effectsContainer.appendChild(effChip);
+    });
+    costDisplay.textContent = "$" + totalCost;
+    priceDisplay.textContent = "$" + price;
+    profitDisplay.textContent = "$" + profit;
+
+    resultCard.classList.remove('hidden');
+    resultCard.classList.remove('animate__fadeOut');
+    resultCard.classList.add('animate__fadeIn');
+  });
+
+  function renderSubstanceTags() {
+    substancesContainer.innerHTML = "";
+    selectedSubstances.forEach((sub) => {
+      const tag = document.createElement('span');
+      tag.className = "inline-flex items-center rounded-full bg-green-600 text-white px-3 py-1 text-sm font-semibold";
+      tag.textContent = sub;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = "×";
+      removeBtn.className = "ml-2 text-red-300 hover:text-red-500";
+      removeBtn.addEventListener('click', () => {
+        selectedSubstances = selectedSubstances.filter((x) => x !== sub);
         renderSubstanceTags();
         checkIfMixReady();
-      }
-    });
-
-    mixButton.addEventListener('click', () => {
-      if (!selectedBaseProduct || !selectedSubstances.length) return;
-      const baseInfo = productTypes[selectedBaseProduct];
-      let totalCost = baseInfo.basePrice;
-      let effects = [...baseInfo.baseEffects];
-      selectedSubstances.forEach(name => {
-        totalCost += substancesData[name].price;
-        effects.push(substancesData[name].defaultEffect);
       });
-      resultContent.innerHTML = `
-        <p><strong>Base Product:</strong> ${selectedBaseProduct}</p>
-        <p><strong>Substances:</strong> ${selectedSubstances.join(', ')}</p>
-        <p><strong>Total Cost:</strong> $${totalCost}</p>
-        <p><strong>Effects:</strong> ${effects.join(', ')}</p>
-      `;
-      resultCard.classList.remove('hidden');
-      resultCard.classList.add('animate__fadeIn');
+      tag.appendChild(removeBtn);
+      substancesContainer.appendChild(tag);
     });
-
-    function renderSubstanceTags() {
-      substancesContainer.innerHTML = '';
-      selectedSubstances.forEach(sub => {
-        const tag = document.createElement('span');
-        tag.className = "inline-flex items-center rounded-full bg-green-100 text-green-800 px-2 py-1 text-xs font-medium";
-        tag.textContent = sub;
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '×';
-        removeBtn.className = "ml-1 text-red-600 hover:text-red-900";
-        removeBtn.addEventListener('click', () => {
-          selectedSubstances = selectedSubstances.filter(s => s !== sub);
-          renderSubstanceTags();
-          checkIfMixReady();
-        });
-        tag.appendChild(removeBtn);
-        substancesContainer.appendChild(tag);
-      });
-    }
-    function checkIfMixReady() {
-      mixButton.disabled = !(selectedBaseProduct && selectedSubstances.length);
-    }
-
-    // Recipes Carousel: sample 5 recipes with star ratings
-    const recipes = [
-      { name: "Coca Super Mix", rating: 5 },
-      { name: "Base 1 Recipe of Coca", rating: 4 },
-      { name: "Sour Diesel Starter", rating: 4.5 },
-      { name: "OG Mix 140 Revenue", rating: 5 },
-      { name: "Green Crack Boost", rating: 4 }
-    ];
-    let currentRecipeIndex = 0;
-    const recipesContainer = document.getElementById('recipesContainer');
-    const recipeRating = document.getElementById('recipeRating');
-
-    function renderRecipe(index) {
-      const recipe = recipes[index];
-      recipesContainer.innerHTML = `
-        <div class="w-full p-4">
-          <h3 class="text-xl font-bold">${recipe.name}</h3>
-        </div>
-      `;
-      const stars = '★'.repeat(Math.floor(recipe.rating)) + (recipe.rating % 1 !== 0 ? '½' : '');
-      recipeRating.textContent = stars;
-    }
-    renderRecipe(currentRecipeIndex);
-    setInterval(() => {
-      currentRecipeIndex = (currentRecipeIndex + 1) % recipes.length;
-      renderRecipe(currentRecipeIndex);
-    }, 5000);
-  </script>
+  }
+  function checkIfMixReady() {
+    mixButton.disabled = !(selectedBaseProduct && selectedSubstances.length);
+  }
+</script>
 </body>
 </html>
