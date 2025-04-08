@@ -2,44 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dark Neon Mix Calculator</title>
+  <title>Schedule 1)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Favicon -->
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4819/4819604.png" type="image/png" />
-
-  <!-- Tailwind CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet" />
-  <!-- Animate.css for animations -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   
-  <!-- Firebase App, Auth -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
+  <!-- Tailwind CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <!-- Animate.css for subtle transitions -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+  <!-- For blur/transparency support (Safari) -->
   <style>
-    body {
-      background: linear-gradient(to bottom, #000000, #2b0b44);
-      color: #d2d2d2;
-      font-family: "Inter", sans-serif;
-      min-height: 100vh;
+    .bg-blur {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
     }
-    .neon-accent {
-      color: #A3FFA3;
-    }
-    .neon-accent-bg {
-      background-color: rgba(163,255,163,0.07);
-    }
-    .trans-card {
-      background-color: rgba(255,255,255,0.05);
+    .bg-card {
+      background-color: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(6px);
     }
-    .rounded-xl { border-radius: 1rem; }
+    /* Spotify-like accent color: #1db954 */
+    .spotify-accent {
+      background-color: #1db954;
+      color: white;
+    }
+    .spotify-accent:hover {
+      background-color: #1ed760;
+    }
+    /* Improve inputs on light backgrounds */
+    .dark-input::placeholder {
+      color: #6b7280; /* Tailwind gray-400 */
+    }
   </style>
+  
+  <!-- Firebase (if you wish to use the same config from previous) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
-<body class="flex flex-col">
+<body class="bg-[#f9fafb] font-sans text-gray-900">
 
-<!-- Firebase Config -->
+<!-- 
+  Firebase config. If you want real auth to work, enable Email/Password 
+  in the Firebase console, or adapt to your needs. 
+-->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
@@ -55,129 +64,233 @@
   const auth = firebase.auth();
 </script>
 
-<!-- Login Overlay -->
-<div id="loginOverlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 p-4">
-  <div class="trans-card rounded-xl p-6 w-full max-w-md animate__animated animate__fadeInDown">
-    <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
+<!-- 
+  LOGIN PAGE (Spotify-inspired)
+  This overlay is visible until user logs in. 
+-->
+<div
+  id="loginOverlay"
+  class="fixed inset-0 flex items-center justify-center bg-[url('https://schedule1-calculator.net/logo.png')] bg-cover bg-center bg-no-repeat p-4 z-50"
+>
+  <!-- Semi-transparent dark overlay for readability -->
+  <div class="absolute inset-0 bg-black/60"></div>
+
+  <!-- Content Box -->
+  <div class="relative max-w-md w-full bg-blur rounded-xl p-6 animate__animated animate__fadeInDown">
+    <div class="mb-6 text-center">
+      <img
+        src="https://schedule1-calculator.net/logo.png"
+        alt="Schedule 1 Logo"
+        class="mx-auto h-14 mb-2"
+      />
+      <h2 class="text-2xl font-bold text-gray-800">Schedule 1 Calculator</h2>
+      <p class="text-sm text-gray-600">
+        (Spotify-like Login)
+      </p>
+    </div>
     <form id="loginForm" class="flex flex-col space-y-4">
       <input
         id="emailInput"
         type="email"
-        placeholder="Email"
-        class="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
+        placeholder="Email address"
         required
+        class="dark-input w-full rounded-md p-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1db954]"
       />
       <input
         id="passwordInput"
         type="password"
         placeholder="Password"
-        class="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
         required
+        class="dark-input w-full rounded-md p-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1db954]"
       />
       <button
-        id="loginBtn"
         type="submit"
-        class="bg-purple-600 hover:bg-purple-800 text-white py-2 rounded transition duration-200 font-semibold"
+        class="spotify-accent w-full py-3 rounded-md text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#1db954] transition-colors"
       >
-        Login
+        LOG IN
       </button>
     </form>
   </div>
 </div>
 
-<!-- Main App -->
-<div id="mainApp" class="hidden flex-1 flex flex-col animate__animated animate__fadeInUp">
-  <!-- Header -->
-  <header class="flex justify-between items-center p-4 neon-accent-bg">
-    <h1 class="text-3xl font-bold neon-accent">Dark Neon Mix Calculator</h1>
-    <button
-      id="logoutBtn"
-      class="bg-purple-700 hover:bg-purple-900 text-white px-4 py-2 rounded font-medium"
-    >
-      Logout
-    </button>
+<!-- MAIN PAGE -->
+<div id="mainApp" class="hidden animate__animated animate__fadeIn">
+  <!-- NAVIGATION / HEADER -->
+  <nav class="bg-white shadow p-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-2">
+        <img
+          src="https://schedule1-calculator.net/logo.png"
+          alt="Schedule 1 Logo"
+          class="h-8 w-8"
+        />
+        <span class="text-lg font-bold">Schedule 1 Calculator</span>
+      </a>
+      <button
+        id="logoutBtn"
+        class="border border-red-500 text-red-500 rounded-md px-4 py-2 hover:bg-red-50 font-medium"
+      >
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO / INTRO -->
+  <header class="bg-white py-16 text-center">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold">Schedule 1 Calculator</h1>
+      <p class="mt-4 text-gray-600 max-w-xl mx-auto">
+        Advanced mixing calculator that analyzes your batch’s effects, calculates cost, sell prices, and profits.
+      </p>
+    </div>
   </header>
 
-  <!-- Content -->
-  <main class="p-4 space-y-6">
-    <!-- Display Some Example Recipes -->
-    <section class="space-y-4">
-      <h2 class="text-2xl font-bold neon-accent-bg p-2 inline-block rounded">Featured Recipes</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <!-- Each Recipe Card -->
-        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
-          <h3 class="text-lg font-semibold mb-1">beginner-friendly for Sour Diesel</h3>
-          <p class="text-sm mb-1"><strong>Based on:</strong> Sour Diesel</p>
-          <p class="text-sm mb-1"><strong>Effects:</strong> Refreshing, Bright-Eyed</p>
-          <p class="text-sm"><strong>Profit:</strong> $45.00</p>
+  <!-- MAIN CONTENT -->
+  <main class="pb-24">
+    <!-- Calculator Section -->
+    <section class="py-8">
+      <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+        <!-- Calculator Card -->
+        <div class="md:col-span-2 bg-card rounded-xl shadow p-6">
+          <div class="mb-4">
+            <h2 class="text-2xl font-bold mb-2">Mixing Calculator</h2>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <label class="font-medium block mb-1">Base Product</label>
+              <select
+                id="baseProductSelect"
+                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#1db954]"
+              >
+                <option disabled selected>Select a base product</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-medium block mb-1">Substances</label>
+              <div
+                id="substancesContainer"
+                class="flex flex-wrap gap-2 mb-2"
+              ></div>
+              <select
+                id="substancesSelect"
+                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#1db954]"
+              >
+                <option disabled selected value="">Substances</option>
+              </select>
+            </div>
+
+            <div>
+              <button
+                id="mixButton"
+                class="spotify-accent w-full p-3 rounded font-semibold transition-colors disabled:opacity-50"
+                disabled
+              >
+                Mix
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
-          <h3 class="text-lg font-semibold mb-1">Base 1 substance recipe of Coca</h3>
-          <p class="text-sm mb-1"><strong>Based on:</strong> Cocaine</p>
-          <p class="text-sm mb-1"><strong>Effects:</strong> Jennerising</p>
-          <p class="text-sm"><strong>Profit:</strong> $205.00</p>
-        </div>
-        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
-          <h3 class="text-lg font-semibold mb-1">beginner-friendly for OG Kush</h3>
-          <p class="text-sm mb-1"><strong>Based on:</strong> OG Kush</p>
-          <p class="text-sm mb-1"><strong>Effects:</strong> Sneaky, Gingeritis</p>
-          <p class="text-sm"><strong>Profit:</strong> $48.00</p>
-        </div>
-        <div class="trans-card rounded-xl p-4 hover:scale-105 transition transform duration-300">
-          <h3 class="text-lg font-semibold mb-1">beginner-friendly for Green Crack</h3>
-          <p class="text-sm mb-1"><strong>Based on:</strong> Green Crack</p>
-          <p class="text-sm mb-1"><strong>Effects:</strong> Energizing, Spicy</p>
-          <p class="text-sm"><strong>Profit:</strong> $49.00</p>
+
+        <!-- "How to Use" Card -->
+        <div class="bg-card rounded-xl shadow p-6">
+          <div class="flex items-center mb-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-gray-700 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2 -3 3 -3 3"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
+            <h2 class="text-2xl font-bold">How to Use</h2>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-sm text-gray-800">
+            <li>Select a base product from the dropdown menu.</li>
+            <li>Add different substances to create unique effects.</li>
+            <li>Click “Mix” to see results.</li>
+            <li>Check the effects, cost, and potential profit.</li>
+            <li>Remove substances or try different combinations.</li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- Mixing Calculator -->
-    <section class="trans-card rounded-xl p-6">
-      <h2 class="text-xl font-semibold mb-4">Mixing Calculator</h2>
-      <label class="block font-medium mb-2">Base Product</label>
-      <select
-        id="baseProductSelect"
-        class="w-full mb-4 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
-      >
-        <option disabled selected>Select a base product</option>
-      </select>
-      <label class="block font-medium mb-2">Substances</label>
-      <div id="substancesContainer" class="flex flex-wrap gap-2 mb-2"></div>
-      <select
-        id="substancesSelect"
-        class="w-full mb-4 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-purple-400"
-      >
-        <option disabled selected value="">Substances</option>
-      </select>
-      <button
-        id="mixButton"
-        class="bg-green-600 hover:bg-green-800 text-white py-2 w-full rounded font-medium disabled:bg-gray-600 transition duration-200"
-        disabled
-      >
-        Mix
-      </button>
+    <!-- Results Section -->
+    <section class="max-w-5xl mx-auto px-4">
+      <div id="resultCard" class="hidden bg-card rounded-xl shadow p-6 mb-8 animate__animated">
+        <h3 class="text-2xl font-semibold mb-2">Your Mix Results</h3>
+        <p id="resultTitle" class="text-sm text-gray-700 mb-4"></p>
+        <div id="effectsContainer" class="flex flex-wrap gap-2 mb-6"></div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <p class="text-gray-500 text-sm">Cost:</p>
+            <p id="costDisplay" class="text-lg font-bold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Price:</p>
+            <p id="priceDisplay" class="text-lg font-bold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Profit:</p>
+            <p id="profitDisplay" class="text-lg font-bold text-green-600"></p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Mix Results Card -->
-    <section id="resultCard" class="hidden trans-card rounded-xl p-6 space-y-4 animate__animated animate__fadeIn">
-      <div class="mb-3">
-        <h3 id="resultTitle" class="text-xl font-bold"></h3>
-        <p id="resultSub" class="text-sm"></p>
-      </div>
-      <div id="effectsContainer" class="flex flex-wrap gap-2"></div>
-      <div class="grid grid-cols-3 text-center gap-2 mt-3">
-        <div>
-          <p class="text-sm">Cost:</p>
-          <p id="costDisplay" class="font-bold text-gray-100"></p>
+    <!-- Showcase Recipes Section -->
+    <section class="py-16 bg-[#f9fafb]">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="mb-6 text-center">
+          <h2 class="text-3xl font-bold">Mixing ShowCase</h2>
+          <p class="mt-2 text-gray-600">Explore the most popular mixing recipes from Schedule 1</p>
         </div>
-        <div>
-          <p class="text-sm">Price:</p>
-          <p id="priceDisplay" class="font-bold text-gray-100"></p>
-        </div>
-        <div>
-          <p class="text-sm">Profit:</p>
-          <p id="profitDisplay" class="font-bold text-green-400"></p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Card 1 -->
+          <div class="bg-card rounded-xl shadow p-4 hover:shadow-md transition">
+            <h3 class="font-bold text-lg mb-2">beginner-friendly for Grandaddy Purple</h3>
+            <p class="text-sm text-gray-700 mb-1">Based on: Grandaddy Purple</p>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Sedating</span>
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Long-Faced</span>
+            </div>
+            <p class="font-medium text-green-600">Profit: $60.00</p>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-card rounded-xl shadow p-4 hover:shadow-md transition">
+            <h3 class="font-bold text-lg mb-2">Base 1 substance recipe of Coca</h3>
+            <p class="text-sm text-gray-700 mb-1">Based on: Cocaine</p>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Jennerising</span>
+            </div>
+            <p class="font-medium text-green-600">Profit: $205.00</p>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-card rounded-xl shadow p-4 hover:shadow-md transition">
+            <h3 class="font-bold text-lg mb-2">beginner-friendly for Sour Diesel</h3>
+            <p class="text-sm text-gray-700 mb-1">Based on: Sour Diesel</p>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Refreshing</span>
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Bright-Eyed</span>
+            </div>
+            <p class="font-medium text-green-600">Profit: $45.00</p>
+          </div>
+          <!-- Card 4 -->
+          <div class="bg-card rounded-xl shadow p-4 hover:shadow-md transition">
+            <h3 class="font-bold text-lg mb-2">Coca Super Mix</h3>
+            <p class="text-sm text-gray-700 mb-1">Based on: Cocaine</p>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Zombifying</span>
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Glowing</span>
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-xs">Bright-Eyed</span>
+            </div>
+            <p class="font-medium text-green-600">Profit: $300.00</p>
+          </div>
         </div>
       </div>
     </section>
@@ -185,13 +298,12 @@
 </div>
 
 <script>
-  // Login with Email/Password
+  // Auth login logic
   const loginOverlay = document.getElementById('loginOverlay');
   const mainApp = document.getElementById('mainApp');
   const loginForm = document.getElementById('loginForm');
   const emailInput = document.getElementById('emailInput');
   const passwordInput = document.getElementById('passwordInput');
-  const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
   loginForm.addEventListener('submit', (e) => {
@@ -200,8 +312,8 @@
     const pass = passwordInput.value;
     firebase.auth().signInWithEmailAndPassword(email, pass)
       .then(() => {})
-      .catch((err) => {
-        // If user doesn't exist, attempt signUp
+      .catch(() => {
+        // Attempt to create an account if none
         firebase.auth().createUserWithEmailAndPassword(email, pass)
           .then(() => {})
           .catch((error) => {
@@ -209,11 +321,9 @@
           });
       });
   });
-
   logoutBtn.addEventListener('click', () => {
     firebase.auth().signOut();
   });
-
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       loginOverlay.classList.add('hidden');
@@ -224,7 +334,7 @@
     }
   });
 
-  // Data
+  // Calculator Data
   const productTypes = {
     "Sour Diesel": { basePrice: 35, baseEffects: ["Refreshing"] },
     "OG Kush": { basePrice: 35, baseEffects: ["Calming"] },
@@ -252,14 +362,13 @@
     "Horse Semen": { defaultEffect: "Long Faced", price: 9 }
   };
 
-  // Calculator
   const baseProductSelect = document.getElementById('baseProductSelect');
   const substancesSelect = document.getElementById('substancesSelect');
   const substancesContainer = document.getElementById('substancesContainer');
   const mixButton = document.getElementById('mixButton');
+
   const resultCard = document.getElementById('resultCard');
   const resultTitle = document.getElementById('resultTitle');
-  const resultSub = document.getElementById('resultSub');
   const effectsContainer = document.getElementById('effectsContainer');
   const costDisplay = document.getElementById('costDisplay');
   const priceDisplay = document.getElementById('priceDisplay');
@@ -268,6 +377,7 @@
   let selectedBaseProduct = null;
   let selectedSubstances = [];
 
+  // Populate dropdowns
   Object.keys(productTypes).forEach((productName) => {
     const opt = document.createElement('option');
     opt.value = productName;
@@ -281,20 +391,19 @@
     substancesSelect.appendChild(opt);
   });
 
-  baseProductSelect.addEventListener('change', (e) => {
-    selectedBaseProduct = e.target.value;
+  baseProductSelect.addEventListener('change', () => {
+    selectedBaseProduct = baseProductSelect.value;
     checkIfMixReady();
   });
-  substancesSelect.addEventListener('change', (e) => {
-    const sub = e.target.value;
-    if (!selectedSubstances.includes(sub) && sub) {
+  substancesSelect.addEventListener('change', () => {
+    const sub = substancesSelect.value;
+    if (sub && !selectedSubstances.includes(sub)) {
       selectedSubstances.push(sub);
-      e.target.selectedIndex = 0;
+      substancesSelect.selectedIndex = 0;
       renderSubstanceTags();
       checkIfMixReady();
     }
   });
-
   mixButton.addEventListener('click', () => {
     if (!selectedBaseProduct || !selectedSubstances.length) return;
     const baseInfo = productTypes[selectedBaseProduct];
@@ -304,23 +413,20 @@
       totalCost += substancesData[s].price;
       effects.push(substancesData[s].defaultEffect);
     });
-    // Example logic: Price is cost + markup
     const price = totalCost + 150;
     const profit = price - totalCost;
-
-    resultTitle.textContent = "Your Mix Results";
-    resultSub.textContent = selectedBaseProduct + " Mix";
+    resultTitle.textContent = selectedBaseProduct + " Mix";
     effectsContainer.innerHTML = "";
+
     effects.forEach((eff) => {
       const effChip = document.createElement('span');
-      effChip.className = "inline-flex items-center rounded-full bg-purple-600 text-white px-3 py-1 text-sm font-semibold";
+      effChip.className = "inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700";
       effChip.textContent = eff;
       effectsContainer.appendChild(effChip);
     });
     costDisplay.textContent = "$" + totalCost;
     priceDisplay.textContent = "$" + price;
     profitDisplay.textContent = "$" + profit;
-
     resultCard.classList.remove('hidden');
     resultCard.classList.remove('animate__fadeOut');
     resultCard.classList.add('animate__fadeIn');
@@ -330,11 +436,11 @@
     substancesContainer.innerHTML = "";
     selectedSubstances.forEach((sub) => {
       const tag = document.createElement('span');
-      tag.className = "inline-flex items-center rounded-full bg-green-600 text-white px-3 py-1 text-sm font-semibold";
+      tag.className = "inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700";
       tag.textContent = sub;
       const removeBtn = document.createElement('button');
+      removeBtn.className = "ml-2 text-red-400 hover:text-red-600";
       removeBtn.textContent = "×";
-      removeBtn.className = "ml-2 text-red-300 hover:text-red-500";
       removeBtn.addEventListener('click', () => {
         selectedSubstances = selectedSubstances.filter((x) => x !== sub);
         renderSubstanceTags();
@@ -344,6 +450,7 @@
       substancesContainer.appendChild(tag);
     });
   }
+
   function checkIfMixReady() {
     mixButton.disabled = !(selectedBaseProduct && selectedSubstances.length);
   }
