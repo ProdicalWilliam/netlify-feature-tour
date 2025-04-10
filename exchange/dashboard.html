@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DazesX</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
@@ -231,7 +232,7 @@
         feeRates = {"paypal-paypal":0.00,"paypal-cashapp":0.00,"paypal-crypto":0.05,"paypal-apple-pay":0.05,"cashapp-paypal":0.00,"cashapp-cashapp":0.00,"cashapp-crypto":0.03,"cashapp-apple-pay":0.03,"crypto-paypal":0.00,"crypto-cashapp":0.00,"crypto-crypto":0,"crypto-apple-pay":0.02,"apple-pay-paypal":0.05,"apple-pay-cashapp":0.05,"apple-pay-crypto":0.05,"apple-pay-apple-pay":0.05};
     currencyButtons.forEach(btn=>{ btn.addEventListener('click',()=>{ currencyButtons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentCurrency.code = btn.dataset.currency; currentCurrency.symbol = btn.dataset.symbol; currentCurrency.rate = exchangeRates[currentCurrency.code]; updateExchangeDisplay(); });});
     function updateExchangeDisplay(){ const base=0, conv=base*currentCurrency.rate; exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
-    // Generate or retrieve order code from URL hash
+    // Generate or retrieve order code from URL hash.
     function generateOrderCode() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let code = '';
@@ -250,15 +251,11 @@
         return code;
       }
     }
-    // On page load, check order code and maintain in localStorage.
     let currentOrder = getOrderCode();
-    // (Optional) Poll order status from your server/Discord bot.
+    // Optional: Poll order status from backend (replace with your endpoint).
     function pollOrderStatus(){
-      // Replace this with a real fetch/WS call
-      // Example: if (order approved) { update status message }
       setTimeout(()=>{
-        // For demonstration, we simulate no change.
-        // statusMsg.textContent = "Your transaction has been approved and processed.";
+        // Replace this with your fetch/WS call to update status.
       }, 30000);
     }
     pollOrderStatus();
@@ -312,7 +309,6 @@
         showAlert(errorAlert,'Please complete all fields');
         return;
       }
-      // Do not update "You've Exchanged" counter.
       exchangeForm.style.display='none';
       paymentInstructions.style.display='block';
       uploadArea.style.display='block';
@@ -374,9 +370,7 @@
                 type: 2,
                 label: "Approve Transaction",
                 style: 3,
-                custom_id: "approve_transaction_" + orderCode,
-                // Note: Your Discord bot must check that only authorized IDs (795004905344729098, 726013275149434910)
-                // can press this button.
+                custom_id: "approve_transaction_" + orderCode
               }
             ]
           }
