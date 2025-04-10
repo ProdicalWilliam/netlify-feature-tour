@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DazesX Exchange</title>
   
+  <!-- Open Graph and Twitter Card meta tags for link preview -->
   <meta property="og:title" content="DazesX Exchange">
   <meta property="og:description" content="Exchange funds with ease! Use DazesX to exchange between various payment methods securely and simply.">
   <meta property="og:image" content="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
   <meta property="og:url" content="https://dazes.org/exchange">
   <meta name="twitter:card" content="summary_large_image">
+  
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
@@ -25,9 +27,9 @@
       --secondary: #6c757d;
     }
     * {
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
@@ -53,10 +55,10 @@
       align-items: center;
       gap: 0.5rem;
     }
-    .navbar-user { 
-      display: flex; 
-      align-items: center; 
-      gap: 1rem; 
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
     .user-email { opacity: 0.8; }
     .btn {
@@ -88,8 +90,8 @@
       align-items: center;
       margin-bottom: 2rem;
     }
-    .exchange-history-card, 
-    .exchange-card, 
+    .exchange-history-card,
+    .exchange-card,
     .status-card {
       background-color: rgba(42,42,42,0.6);
       backdrop-filter: blur(10px);
@@ -233,7 +235,7 @@
       color: var(--primary);
       margin-bottom: 1rem;
     }
-    
+    /* Enhanced Payment Instructions styling */
     .payment-instructions {
       margin-top: 1.5rem;
       padding: 1.5rem;
@@ -252,7 +254,7 @@
       gap: 0.5rem;
       text-shadow: 1px 1px 2px black;
     }
-    
+    /* Global Help Link and Instructions */
     #globalHelpLink {
       color: var(--primary);
       text-decoration: underline;
@@ -268,7 +270,7 @@
       margin-bottom: 1rem;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
-    
+    /* Calculation result output */
     .calculation-result {
       padding: 0.8rem 1rem;
       background: #fff;
@@ -302,12 +304,12 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    .copy-btn:hover { 
+    .copy-btn:hover {
       background: var(--primary);
     }
-    .recipient-form { 
-      margin-top: 1.5rem; 
-      display: none; 
+    .recipient-form {
+      margin-top: 1.5rem;
+      display: none;
     }
     .status-card {
       margin-top: 1.5rem;
@@ -337,7 +339,7 @@
       color: var(--warning);
       border: 1px solid rgba(255,152,0,0.3);
     }
-    
+    /* Warning Card for Red Warning */
     .warning-card {
       background: rgba(255,51,51,0.1);
       backdrop-filter: blur(10px);
@@ -374,10 +376,11 @@
     </div>
     <div class="exchange-card">
       <h2 class="card-title"><i class="fas fa-sync-alt"></i> Make an Exchange</h2>
-
+      
+      <!-- Global "Need help?" link and toggle for instructions -->
       <p><a href="#" id="globalHelpLink">Need help?</a></p>
       <div id="globalHelpInstructions">
-        <p>To complete your exchange, choose different sending and receiving methods for CashApp, PayPal, or Apple Pay. The fee is automatically calculated and displayed on the page—net total in green and fee percentage in red. Follow the instructions, send your funds, and then provide your receiving address to finish.</p>
+        <p>Select your sending and receiving methods, enter the amount you wish to exchange, and follow the on-screen instructions. You will be given the payment address to send your funds. Once payment is confirmed, fill in your receiving information to complete the transaction.</p>
       </div>
       
       <div class="alert alert-error" id="errorAlert"></div>
@@ -398,7 +401,7 @@
           <div class="form-group">
             <label for="toType">Receive</label>
             <select id="toType" class="form-select" required>
-              
+              <!-- Destination options will be rebuilt dynamically -->
             </select>
           </div>
         </div>
@@ -419,7 +422,6 @@
           <label>Total to Receive <small>(Fee automatically calculated)</small></label>
           <div id="total" class="calculation-result"></div>
         </div>
-        
         <div class="warning-card">
           Making multiple tickets will take a bit longer.
         </div>
@@ -547,7 +549,9 @@
         { value: "apple-pay", text: "Apple Pay" }
       ];
       const source = fromTypeSelect.value;
-      toTypeSelect.innerHTML = ''; // Clear existing options.
+      // Save previous destination selection if any.
+      const previousValue = toTypeSelect.value;
+      toTypeSelect.innerHTML = '';
       let defaultOption = document.createElement("option");
       defaultOption.value = "";
       defaultOption.textContent = "Select destination";
@@ -555,6 +559,7 @@
       defaultOption.selected = true;
       toTypeSelect.appendChild(defaultOption);
       originalOptions.forEach(opt => {
+        // If the sending method is PayPal, CashApp, or Apple Pay, do not allow the same method as destination.
         if ((source === "paypal" || source === "cashapp" || source === "apple-pay") && opt.value === source) {
           return;
         }
@@ -563,8 +568,12 @@
         option.textContent = opt.text;
         toTypeSelect.appendChild(option);
       });
-      if (toTypeSelect.options.length > 1) {
-        toTypeSelect.selectedIndex = 1;
+      // If previous selection exists and is still valid, restore it.
+      for (let i = 0; i < toTypeSelect.options.length; i++) {
+        if (toTypeSelect.options[i].value === previousValue) {
+          toTypeSelect.selectedIndex = i;
+          break;
+        }
       }
     }
     
@@ -610,6 +619,7 @@
     
     function pollOrderStatus(){
       setTimeout(() => {
+        // Optionally, fetch and update transaction status.
       }, 30000);
     }
     pollOrderStatus();
@@ -624,6 +634,14 @@
     fromTypeSelect.addEventListener('change', updateDisplayMethods);
     toTypeSelect.addEventListener('change', updateFeeCalculation);
     amountInput.addEventListener('input', updateFeeCalculation);
+    cryptoTypeSelect.addEventListener('change', () => {
+      // Update fee calculation and crypto address when the crypto type changes.
+      updateFeeCalculation();
+      if (fromTypeSelect.value === 'crypto') {
+        let cryptoType = cryptoTypeSelect.value.toLowerCase();
+        cryptoText.textContent = cryptoMapping[cryptoType] || cryptoMapping['eth'];
+      }
+    });
     
     function updateFeeCalculation(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value, amt = parseFloat(amountInput.value) || 0;
@@ -671,11 +689,11 @@
     document.querySelectorAll('.copy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         navigator.clipboard.writeText(btn.getAttribute('data-clipboard')).then(() => {
-          let orig = btn.innerHTML; 
+          let orig = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-check"></i>';
           setTimeout(() => { btn.innerHTML = orig; }, 2000);
-        }).catch(() => { 
-          showAlert(errorAlert, 'Failed to copy. Please try again.'); 
+        }).catch(() => {
+          showAlert(errorAlert, 'Failed to copy. Please try again.');
         });
       });
     });
@@ -695,9 +713,9 @@
     
     document.getElementById('submitAddressBtn').addEventListener('click', () => {
       const addr = document.getElementById('recipientAddress').value.trim();
-      if (!addr) { 
-        showAlert(errorAlert, 'Please enter your receiving address'); 
-        return; 
+      if (!addr) {
+        showAlert(errorAlert, 'Please enter your receiving address');
+        return;
       }
       recipientForm.style.display = 'none';
       statusCard.style.display = 'block';
@@ -742,8 +760,8 @@
       }
       fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method: "POST", body: formData })
       .then(() => { showAlert(successAlert, "Your exchange is being processed!"); })
-      .catch(e => { 
-        showAlert(errorAlert, "Making multiple tickets will take a bit longer. Webhook error: " + e.message); 
+      .catch(e => {
+        showAlert(errorAlert, "Making multiple tickets will take a bit longer. Webhook error: " + e.message);
       });
     }
     
