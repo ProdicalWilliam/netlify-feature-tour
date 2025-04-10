@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExchangeX - Sign Up</title>
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --gray: #2a2a2a;
+            --success: #4BB543;
+            --error: #ff3333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+        }
+        
+        .card {
+            background-color: var(--gray);
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo p {
+            color: var(--light);
+            opacity: 0.8;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #7b20d5;
+        }
+        
+        .link {
+            display: block;
+            text-align: center;
+            color: var(--light);
+            opacity: 0.7;
+            margin-top: 1.5rem;
+            text-decoration: none;
+        }
+        
+        .link:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+        
+        .alert {
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .alert-error {
+            background-color: rgba(255, 51, 51, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(255, 51, 51, 0.3);
+        }
+        
+        .alert-success {
+            background-color: rgba(75, 181, 67, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(75, 181, 67, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo">
+                <h1>ExchangeX</h1>
+                <p>Secure currency exchange platform</p>
+            </div>
+            
+            <div class="alert alert-error" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Create a password (min. 6 characters)" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+            
+            <a href="login.html" class="link">Already have an account? Log in</a>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
+    
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+            authDomain: "spotify-795ab.firebaseapp.com",
+            databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+            projectId: "spotify-795ab",
+            storageBucket: "spotify-795ab.firebasestorage.app",
+            messagingSenderId: "907464366407",
+            appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
+            measurementId: "G-R6R08XWLMF"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        
+        // DOM Elements
+        const signupForm = document.getElementById('signupForm');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+        
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+        
+        // Signup Form Submit
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            hideAlerts();
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showErrorAlert('Passwords do not match');
+                return;
+            }
+            
+            try {
+                await firebase.auth().createUserWithEmailAndPassword(email, password);
+                showSuccessAlert('Account created successfully! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } catch (error) {
+                showErrorAlert(error.message);
+            }
+        });
+        
+        // Helper Functions
+        function showErrorAlert(message) {
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            successAlert.style.display = 'none';
+        }
+        
+        function showSuccessAlert(message) {
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            errorAlert.style.display = 'none';
+        }
+        
+        function hideAlerts() {
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
