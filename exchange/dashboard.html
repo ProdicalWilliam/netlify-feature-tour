@@ -1,929 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExchangeX</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #8a2be2;
-            --primary-light: #a74dff;
-            --dark: #121212;
-            --light: #f8f9fa;
-            --gray: #2a2a2a;
-            --gray-light: #3a3a3a;
-            --success: #4BB543;
-            --error: #ff3333;
-            --warning: #ff9800;
-            --secondary: #6c757d;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--dark);
-            color: var(--light);
-            min-height: 100vh;
-        }
-        
-        .navbar {
-            background-color: var(--gray);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .navbar-brand {
-            color: var(--primary);
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .navbar-user {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .user-email {
-            opacity: 0.8;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--light);
-            color: var(--light);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--light);
-            color: var(--dark);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .exchange-history-card {
-            background-color: var(--gray);
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            margin-bottom: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .exchange-history-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-        }
-        
-        .exchange-history-title {
-            font-size: 1.2rem;
-            opacity: 0.8;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .exchange-history-amount {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-        
-        .currency-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .currency-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--light);
-            padding: 0.4rem 0.8rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .currency-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .currency-btn.active {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .exchange-card {
-            background-color: var(--gray);
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .card-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .exchange-form {
-            display: grid;
-            gap: 1.5rem;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-select, .form-control {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            padding-left: 2.5rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-select:focus, .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3);
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-        
-        .form-group i {
-            position: absolute;
-            left: 0.8rem;
-            top: 2.3rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .form-group.success input {
-            border-color: var(--success);
-        }
-        
-        .form-group.error input {
-            border-color: var(--error);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            width: 100%;
-            padding: 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .alert {
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .alert-error {
-            background-color: rgba(255, 51, 51, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(255, 51, 51, 0.3);
-        }
-        
-        .alert-success {
-            background-color: rgba(75, 181, 67, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(75, 181, 67, 0.3);
-        }
-        
-        .alert-warning {
-            background-color: rgba(255, 152, 0, 0.1);
-            color: var(--warning);
-            border: 1px solid rgba(255, 152, 0, 0.3);
-        }
-        
-        /* Upload area */
-        .upload-area {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: none;
-        }
-        
-        .upload-area:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            border-color: var(--primary);
-        }
-        
-        .upload-icon {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        /* Payment instructions */
-        .payment-instructions {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .instructions-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .address-value {
-            word-break: break-all;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 0.8rem;
-            border-radius: 5px;
-            font-family: monospace;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
-        .copy-btn {
-            position: absolute;
-            right: 0.5rem;
-            top: 0.5rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--light);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .copy-btn:hover {
-            background-color: var(--primary);
-        }
-        
-        /* Status card */
-        .status-card {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .status-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-        
-        .status-pending {
-            background-color: rgba(255, 152, 0, 0.1);
-            color: var(--warning);
-            border: 1px solid rgba(255, 152, 0, 0.3);
-        }
-        
-        .status-approved {
-            background-color: rgba(75, 181, 67, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(75, 181, 67, 0.3);
-        }
-        
-        /* Recipient address form */
-        .recipient-form {
-            margin-top: 1.5rem;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.5s ease;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExchangeX</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --primary-light: #a74dff;
+      --dark: #121212;
+      --light: #f8f9fa;
+      --gray: #2a2a2a;
+      --success: #4BB543;
+      --error: #ff3333;
+      --warning: #ff9800;
+      --secondary: #6c757d;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--dark); color: var(--light); min-height: 100vh; }
+    .navbar { background-color: var(--gray); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    .navbar-brand { color: var(--primary); font-size: 1.8rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+    .navbar-user { display: flex; align-items: center; gap: 1rem; }
+    .user-email { opacity: 0.8; }
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 5px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .btn-outline { background-color: transparent; border: 1px solid var(--light); color: var(--light); }
+    .btn-outline:hover { background-color: var(--light); color: var(--dark); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .exchange-history-card { background-color: var(--gray); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); margin-bottom: 2rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .exchange-history-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .exchange-history-title { font-size: 1.2rem; opacity: 0.8; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .exchange-history-amount { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; transition: color 0.3s ease; }
+    .currency-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .currency-btn { background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--light); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+    .currency-btn:hover { background-color: rgba(255,255,255,0.2); }
+    .currency-btn.active { background-color: var(--primary); border-color: var(--primary); }
+    .exchange-card { background-color: var(--gray); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+    .card-title { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .exchange-form { display: grid; gap: 1.5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { position: relative; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .form-select, .form-control { width: 100%; padding: 0.8rem 1rem; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #000; font-size: 1rem; transition: all 0.3s ease; }
+    .form-select:focus, .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(138,43,226,0.3); background-color: rgba(255,255,255,0.15); }
+    .btn-primary { background-color: var(--primary); color: white; width: 100%; padding: 1rem; font-size: 1rem; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+    .btn-primary:hover { background-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138,43,226,0.3); }
+    .btn-primary:active { transform: translateY(0); }
+    .alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; display: none; animation: fadeIn 0.3s ease; }
+    .alert-error { background-color: rgba(255,51,51,0.1); color: var(--error); border: 1px solid rgba(255,51,51,0.3); }
+    .alert-success { background-color: rgba(75,181,67,0.1); color: var(--success); border: 1px solid rgba(75,181,67,0.3); }
+    .alert-warning { background-color: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    .upload-area { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; display: none; }
+    .upload-area:hover { background-color: rgba(255,255,255,0.08); border-color: var(--primary); }
+    .upload-icon { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+    .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border-radius: 8px; display: none; animation: fadeIn 0.3s ease; }
+    .instructions-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .address-value { word-break: break-all; background-color: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 5px; font-family: monospace; margin-bottom: 1rem; position: relative; }
+    .copy-btn { position: absolute; right: 0.5rem; top: 0.5rem; background-color: rgba(255,255,255,0.1); border: none; color: var(--light); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+    .copy-btn:hover { background-color: var(--primary); }
+    .recipient-form { margin-top: 1.5rem; display: none; animation: fadeIn 0.3s ease; }
+    .status-card { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border-radius: 8px; display: none; animation: fadeIn 0.3s ease; }
+    .status-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem; }
+    .status-pending { background-color: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.5s ease; }
+    .help-popup { display: none; position: absolute; background: var(--gray); color: var(--light); padding: 1rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10; top: 110%; left: 0; width: 300px; font-size: 0.9rem; }
+    .help-popup::before { content: ""; position: absolute; top: -10px; left: 20px; border-width: 0 10px 10px; border-style: solid; border-color: transparent transparent var(--gray) transparent; }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="dashboard.html" class="navbar-brand">
-            <i class="fas fa-exchange-alt"></i> ExchangeX
-        </a>
-        <div class="navbar-user">
-            <span class="user-email" id="userEmail">Loading...</span>
-            <button class="btn btn-outline" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Log out
-            </button>
-        </div>
-    </nav>
-    
-    <div class="container">
-        <div class="dashboard-header">
-            <h1><i class="fas fa-chart-line"></i> Exchange Dashboard</h1>
-        </div>
-        
-        <div class="exchange-history-card">
-            <p class="exchange-history-title">
-                <i class="fas fa-exchange-alt"></i> You've Exchanged
-            </p>
-            <h2 class="exchange-history-amount" id="exchangeAmount">$0.00</h2>
-            <div class="currency-buttons">
-                <button class="currency-btn active" data-currency="USD" data-symbol="$">USD</button>
-                <button class="currency-btn" data-currency="EUR" data-symbol="€">EUR</button>
-                <button class="currency-btn" data-currency="JPY" data-symbol="¥">JPY</button>
-            </div>
-        </div>
-        
-        <div class="exchange-card">
-            <h2 class="card-title">
-                <i class="fas fa-sync-alt"></i> Make an Exchange
-            </h2>
-            
-            <div class="alert alert-error" id="errorAlert"></div>
-            <div class="alert alert-success" id="successAlert"></div>
-            <div class="alert alert-warning" id="warningAlert"></div>
-            
-            <form id="exchangeForm" class="exchange-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fromType">Send</label>
-                        <i class="fas fa-arrow-up"></i>
-                        <select id="fromType" class="form-select" required>
-                            <option value="" disabled selected>Select source</option>
-                            <option value="paypal">PayPal</option>
-                            <option value="apple-pay">Apple Pay</option>
-                            <option value="giftcards">Gift Cards</option>
-                            <option value="crypto">Crypto</option>
-                            <option value="cashapp">CashApp</option>
-                            <option value="zelle">Zelle</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="toType">Receive</label>
-                        <i class="fas fa-arrow-down"></i>
-                        <select id="toType" class="form-select" required>
-                            <option value="" disabled selected>Select destination</option>
-                            <option value="crypto">Crypto</option>
-                            <option value="cashapp">CashApp</option>
-                            <option value="paypal">PayPal</option>
-                            <option value="apple-pay">Apple Pay</option>
-                            <option value="zelle">Zelle</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="cryptoSelectGroup" style="display: none;">
-                    <label for="cryptoType">Select Cryptocurrency</label>
-                    <i class="fab fa-bitcoin"></i>
-                    <select id="cryptoType" class="form-select">
-                        <option value="ETH">Ethereum (ETH)</option>
-                        <option value="BTC">Bitcoin (BTC)</option>
-                        <option value="SOL">Solana (SOL)</option>
-                        <option value="LTC">Litecoin (LTC)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="amount">Amount</label>
-                    <i class="fas fa-dollar-sign"></i>
-                    <input type="number" id="amount" class="form-control" placeholder="Enter amount" min="1" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <span>Total to Receive </span>
-                        <small>(Fee automatically calculated)</small>
-                    </label>
-                    <i class="fas fa-coins"></i>
-                    <input type="text" id="total" class="form-control" readonly>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sync-alt"></i> Process Exchange
-                </button>
-            </form>
-            
-            <!-- Payment Instructions -->
-            <div class="payment-instructions" id="paymentInstructions">
-                <div class="instructions-title">
-                    <i class="fas fa-info-circle"></i> Send Payment
-                </div>
-                <p>Please send the payment to the following address:</p>
-                
-                <div class="address-container" id="paypalContainer" style="display: none;">
-                    <div class="address-value">
-                        paypal.me/logann99922
-                        <button class="copy-btn" data-clipboard="paypal.me/logann99922">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                    <p><strong>Important:</strong> Please use Friends & Family (F&F) option only.</p>
-                </div>
-                
-                <div class="address-container" id="cashappContainer" style="display: none;">
-                    <div class="address-value">
-                        $Charlynn1999
-                        <button class="copy-btn" data-clipboard="$Charlynn1999">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="address-container" id="cryptoContainer" style="display: none;">
-                    <div id="ethAddressContainer" style="display: none;">
-                        <p class="crypto-name">Ethereum (ETH)</p>
-                        <div class="address-value">
-                            0xbfC408f543e81CCd2f838009C4DC3BA2c4028909
-                            <button class="copy-btn" data-clipboard="0xbfC408f543e81CCd2f838009C4DC3BA2c4028909">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="btcAddressContainer" style="display: none;">
-                        <p class="crypto-name">Bitcoin (BTC)</p>
-                        <div class="address-value">
-                            bc1q2wfpv2a786yjj2qn80v7y3wnktlpws6ghfxx65
-                            <button class="copy-btn" data-clipboard="bc1q2wfpv2a786yjj2qn80v7y3wnktlpws6ghfxx65">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="solAddressContainer" style="display: none;">
-                        <p class="crypto-name">Solana (SOL)</p>
-                        <div class="address-value">
-                            6JyCnKQz6z9T5MyQCu2skuTVZF9vn7M8mcbHZecUx2Bq
-                            <button class="copy-btn" data-clipboard="6JyCnKQz6z9T5MyQCu2skuTVZF9vn7M8mcbHZecUx2Bq">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="ltcAddressContainer" style="display: none;">
-                        <p class="crypto-name">Litecoin (LTC)</p>
-                        <div class="address-value">
-                            LZswuM3nwvAkTo6VyzHuYrgLjLgP4NMjPB
-                            <button class="copy-btn" data-clipboard="LZswuM3nwvAkTo6VyzHuYrgLjLgP4NMjPB">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Upload Confirmation (Optional) -->
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <h3>Upload Payment Confirmation (Optional)</h3>
-                <p>Drag and drop your screenshot or click to select file</p>
-                <input type="file" id="uploadInput" style="display: none;">
-            </div>
-            
-            <!-- Recipient Address Form -->
-            <div class="recipient-form" id="recipientForm">
-                <div class="instructions-title">
-                    <i class="fas fa-map-marker-alt"></i> Enter Your Receiving Information
-                </div>
-                
-                <div class="form-group">
-                    <label for="recipientAddress">Your Receiving Address</label>
-                    <i class="fas fa-wallet"></i>
-                    <input type="text" id="recipientAddress" class="form-control" placeholder="Enter your receiving address">
-                </div>
-                
-                <button type="button" class="btn btn-primary" id="submitAddressBtn">
-                    <i class="fas fa-check"></i> Submit
-                </button>
-            </div>
-            
-            <!-- Status Card -->
-            <div class="status-card" id="statusCard">
-                <div class="status-title">
-                    <i class="fas fa-tasks"></i> Transaction Status
-                    <span class="status-badge status-pending" id="statusBadge">Pending Review</span>
-                </div>
-                <p>Your exchange request is being processed. We'll notify you once it's completed.</p>
-            </div>
-        </div>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand"><i class="fas fa-exchange-alt"></i> ExchangeX</a>
+    <div class="navbar-user">
+      <span class="user-email" id="userEmail">Loading...</span>
+      <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log out</button>
     </div>
-
-    <!-- Firebase Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
-    
-    <script>
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-            authDomain: "spotify-795ab.firebaseapp.com",
-            databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
-            projectId: "spotify-795ab",
-            storageBucket: "spotify-795ab.firebasestorage.app",
-            messagingSenderId: "907464366407",
-            appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
-            measurementId: "G-R6R08XWLMF"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        
-        // DOM Elements
-        const userEmailElement = document.getElementById('userEmail');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const exchangeForm = document.getElementById('exchangeForm');
-        const fromTypeSelect = document.getElementById('fromType');
-        const toTypeSelect = document.getElementById('toType');
-        const cryptoSelectGroup = document.getElementById('cryptoSelectGroup');
-        const cryptoTypeSelect = document.getElementById('cryptoType');
-        const amountInput = document.getElementById('amount');
-        const totalInput = document.getElementById('total');
-        const errorAlert = document.getElementById('errorAlert');
-        const successAlert = document.getElementById('successAlert');
-        const warningAlert = document.getElementById('warningAlert');
-        const paymentInstructions = document.getElementById('paymentInstructions');
-        const uploadArea = document.getElementById('uploadArea');
-        const uploadInput = document.getElementById('uploadInput');
-        const recipientForm = document.getElementById('recipientForm');
-        const statusCard = document.getElementById('statusCard');
-        const statusBadge = document.getElementById('statusBadge');
-        const exchangeAmount = document.getElementById('exchangeAmount');
-        const currencyButtons = document.querySelectorAll('.currency-btn');
-        const copyButtons = document.querySelectorAll('.copy-btn');
-        
-        // Check if user is logged in
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                userEmailElement.textContent = user.email;
-            } else {
-                window.location.href = 'login.html';
-            }
-        });
-        
-        // Logout Handler
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await firebase.auth().signOut();
-                window.location.href = 'login.html';
-            } catch (error) {
-                showAlert(errorAlert, error.message);
-            }
-        });
-        
-        // Currency Switcher
-        let currentCurrency = {
-            code: 'USD',
-            symbol: '$',
-            rate: 1
-        };
-        
-        const exchangeRates = {
-            USD: 1,
-            EUR: 0.92,
-            JPY: 151.74
-        };
-        
-        currencyButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                currencyButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                currentCurrency.code = btn.dataset.currency;
-                currentCurrency.symbol = btn.dataset.symbol;
-                currentCurrency.rate = exchangeRates[currentCurrency.code];
-                
-                updateExchangeDisplay();
-            });
-        });
-        
-        function updateExchangeDisplay() {
-            const baseExchange = 0; // Start with $0
-            const convertedExchange = baseExchange * currentCurrency.rate;
-            
-            let formattedExchange;
-            if (currentCurrency.code === 'JPY') {
-                formattedExchange = Math.round(convertedExchange).toLocaleString();
-            } else {
-                formattedExchange = convertedExchange.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            }
-            
-            exchangeAmount.textContent = `${currentCurrency.symbol}${formattedExchange}`;
-        }
-        
-        // Fee Calculation - Internal Rates
-        const feeRates = {
-            'paypal-crypto': 0.05,
-            'apple-pay-crypto': 0.05,
-            'giftcards-crypto': 0.10,
-            'crypto-crypto': 0,
-            'crypto-cashapp': 0,
-            'crypto-paypal': 0,
-            'crypto-apple-pay': 0.02,
-            'crypto-zelle': 0.05,
-            'cashapp-crypto': 0.03,
-            'zelle-crypto': 0.03
-        };
-        
-        // Show/Hide Crypto Select
-        fromTypeSelect.addEventListener('change', updateCryptoSelectVisibility);
-        toTypeSelect.addEventListener('change', updateCryptoSelectVisibility);
-        
-        function updateCryptoSelectVisibility() {
-            const fromValue = fromTypeSelect.value;
-            const toValue = toTypeSelect.value;
-            
-            if (fromValue === 'crypto' || toValue === 'crypto') {
-                cryptoSelectGroup.style.display = 'block';
-            } else {
-                cryptoSelectGroup.style.display = 'none';
-            }
-            
-            updateFeeCalculation();
-        }
-        
-        // Calculate Fee and Total
-        amountInput.addEventListener('input', updateFeeCalculation);
-        fromTypeSelect.addEventListener('change', updateFeeCalculation);
-        toTypeSelect.addEventListener('change', updateFeeCalculation);
-        
-        function updateFeeCalculation() {
-            const fromValue = fromTypeSelect.value;
-            const toValue = toTypeSelect.value;
-            const amount = parseFloat(amountInput.value) || 0;
-            
-            if (!fromValue || !toValue || amount <= 0) {
-                totalInput.value = '';
-                return;
-            }
-            
-            const feeKey = `${fromValue}-${toValue}`;
-            const feeRate = feeRates[feeKey] || 0;
-            
-            const feeAmount = amount * feeRate;
-            const totalAmount = amount - feeAmount;
-            
-            totalInput.value = `${currentCurrency.symbol}${totalAmount.toFixed(2)} (${(feeRate * 100).toFixed(0)}% fee applied)`;
-        }
-        
-        // Exchange Form Submit
-        exchangeForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const fromValue = fromTypeSelect.value;
-            const toValue = toTypeSelect.value;
-            const amount = parseFloat(amountInput.value) || 0;
-            const cryptoType = cryptoTypeSelect.value;
-            
-            if (!fromValue || !toValue || amount <= 0) {
-                showAlert(errorAlert, 'Please complete all fields');
-                return;
-            }
-            
-            // Hide form and show payment instructions
-            exchangeForm.style.display = 'none';
-            paymentInstructions.style.display = 'block';
-            uploadArea.style.display = 'block';
-            
-            // Show relevant payment container
-            document.querySelectorAll('.address-container').forEach(container => {
-                container.style.display = 'none';
-            });
-            
-            if (fromValue === 'paypal') {
-                document.getElementById('paypalContainer').style.display = 'block';
-            } else if (fromValue === 'cashapp') {
-                document.getElementById('cashappContainer').style.display = 'block';
-            } else if (fromValue === 'crypto') {
-                document.getElementById('cryptoContainer').style.display = 'block';
-                
-                // Show specific crypto address
-                document.querySelectorAll('[id$="AddressContainer"]').forEach(el => el.style.display = 'none');
-                document.getElementById(`${cryptoType.toLowerCase()}AddressContainer`).style.display = 'block';
-            }
-            
-            // After payment, show recipient form
-            setTimeout(() => {
-                recipientForm.style.display = 'block';
-                recipientForm.scrollIntoView({ behavior: 'smooth' });
-            }, 500);
-        });
-        
-        // Copy button functionality
-        copyButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const textToCopy = btn.getAttribute('data-clipboard');
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    const originalIcon = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-check"></i>';
-                    
-                    setTimeout(() => {
-                        btn.innerHTML = originalIcon;
-                    }, 2000);
-                }).catch(err => {
-                    showAlert(errorAlert, 'Failed to copy. Please try again.');
-                });
-            });
-        });
-        
-        // Upload functionality
-        uploadArea.addEventListener('click', () => {
-            uploadInput.click();
-        });
-        
-        uploadInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
-                showAlert(successAlert, `File "${fileName}" uploaded successfully!`);
-                
-                // Hide upload area after success
-                uploadArea.style.display = 'none';
-            }
-        });
-        
-        // Submit recipient address
-        document.getElementById('submitAddressBtn').addEventListener('click', () => {
-            const address = document.getElementById('recipientAddress').value.trim();
-            
-            if (!address) {
-                showAlert(errorAlert, 'Please enter your receiving address');
-                return;
-            }
-            
-            // Hide recipient form and show status
-            recipientForm.style.display = 'none';
-            statusCard.style.display = 'block';
-            statusCard.scrollIntoView({ behavior: 'smooth' });
-            
-            // Update exchange history (simulated)
-            const currentAmount = parseFloat(amountInput.value) || 0;
-            updateExchangeHistory(currentAmount);
-            
-            showAlert(successAlert, 'Your exchange is being processed!');
-        });
-        
-        // Update exchange history
-        function updateExchangeHistory(amount) {
-            // This would typically come from a database
-            // For demo purposes, we're just updating the display
-            const baseExchange = amount;
-            const convertedExchange = baseExchange * currentCurrency.rate;
-            
-            let formattedExchange;
-            if (currentCurrency.code === 'JPY') {
-                formattedExchange = Math.round(convertedExchange).toLocaleString();
-            } else {
-                formattedExchange = convertedExchange.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            }
-            
-            exchangeAmount.textContent = `${currentCurrency.symbol}${formattedExchange}`;
-            exchangeAmount.classList.add('fade-in');
-            
-            setTimeout(() => {
-                exchangeAmount.classList.remove('fade-in');
-            }, 500);
-        }
-        
-        // Helper function to show alerts
-        function showAlert(alertElement, message) {
-            // Hide all alerts first
-            [errorAlert, successAlert, warningAlert].forEach(alert => {
-                alert.style.display = 'none';
-            });
-            
-            alertElement.textContent = message;
-            alertElement.style.display = 'block';
-            
-            setTimeout(() => {
-                alertElement.classList.add('fade-in');
-            }, 10);
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alertElement.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Initialize
-        updateExchangeDisplay();
-    </script>
+  </nav>
+  <div class="container">
+    <div class="dashboard-header">
+      <h1><i class="fas fa-chart-line"></i> Exchange Dashboard</h1>
+    </div>
+    <div class="exchange-history-card">
+      <p class="exchange-history-title"><i class="fas fa-exchange-alt"></i> You've Exchanged</p>
+      <h2 class="exchange-history-amount" id="exchangeAmount">$0.00</h2>
+      <div class="currency-buttons">
+        <button class="currency-btn active" data-currency="USD" data-symbol="$">USD</button>
+        <button class="currency-btn" data-currency="EUR" data-symbol="€">EUR</button>
+        <button class="currency-btn" data-currency="JPY" data-symbol="¥">JPY</button>
+      </div>
+    </div>
+    <div class="exchange-card">
+      <h2 class="card-title"><i class="fas fa-sync-alt"></i> Make an Exchange</h2>
+      <div class="alert alert-error" id="errorAlert"></div>
+      <div class="alert alert-success" id="successAlert"></div>
+      <div class="alert alert-warning" id="warningAlert"></div>
+      <form id="exchangeForm" class="exchange-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fromType">Send</label>
+            <select id="fromType" class="form-select" required>
+              <option value="" disabled selected>Select source</option>
+              <option value="paypal">PayPal</option>
+              <option value="cashapp">CashApp</option>
+              <option value="crypto">Crypto</option>
+              <option value="apple-pay">Apple Pay</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="toType">Receive</label>
+            <select id="toType" class="form-select" required>
+              <option value="" disabled selected>Select destination</option>
+              <option value="paypal">PayPal</option>
+              <option value="cashapp">CashApp</option>
+              <option value="crypto">Crypto</option>
+              <option value="apple-pay">Apple Pay</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" id="cryptoSelectGroup" style="display:none;">
+          <label for="cryptoType">Select Cryptocurrency</label>
+          <select id="cryptoType" class="form-select">
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="SOL">Solana (SOL)</option>
+            <option value="LTC">Litecoin (LTC)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" class="form-control" placeholder="Enter amount" min="1" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Total to Receive <small>(Fee automatically calculated)</small></label>
+          <input type="text" id="total" class="form-control" readonly>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Process Exchange</button>
+      </form>
+      <div class="payment-instructions" id="paymentInstructions">
+        <div class="instructions-title"><i class="fas fa-info-circle"></i> Send Payment</div>
+        <p>Please send the payment to the following address:</p>
+        <div class="address-container" id="paypalContainer" style="display:none;">
+          <div class="address-value" id="paypalAddress"></div>
+        </div>
+        <div class="address-container" id="cashappContainer" style="display:none;">
+          <div class="address-value" id="cashappAddress"></div>
+        </div>
+        <div class="address-container" id="applePayContainer" style="display:none;">
+          <div class="address-value" id="applePayAddress"></div>
+          <a href="#" id="appleHelpLink" style="color:var(--primary);font-size:0.8rem;">Need Help?</a>
+          <div class="help-popup" id="appleHelpPopup">To send money directly to another individual, open the Wallet app and tap the Cash card, then select the Send or Receive button. Type the name, email address, or phone number of the contact to whom you want to send money. Tap Next and then enter the amount that will be sent.</div>
+        </div>
+        <div class="address-container" id="cryptoContainer" style="display:none;">
+          <div class="address-value" id="cryptoAddress"></div>
+        </div>
+      </div>
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <h3>Upload Payment Confirmation (Optional)</h3>
+        <p>Drag and drop your screenshot or click to select file</p>
+        <input type="file" id="uploadInput" style="display:none;">
+      </div>
+      <div class="recipient-form" id="recipientForm">
+        <div class="instructions-title"><i class="fas fa-map-marker-alt"></i> Enter Your Receiving Information</div>
+        <div class="form-group">
+          <label for="recipientAddress">Your Receiving Address</label>
+          <input type="text" id="recipientAddress" class="form-control" placeholder="Enter your receiving address">
+        </div>
+        <button type="button" class="btn btn-primary" id="submitAddressBtn"><i class="fas fa-check"></i> Submit</button>
+      </div>
+      <div class="status-card" id="statusCard">
+        <div class="status-title"><i class="fas fa-tasks"></i> Transaction Status <span class="status-badge status-pending" id="statusBadge">Pending Review</span></div>
+        <p>Your exchange request is being processed. We'll notify you once it's completed.</p>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
+  <script>
+    const firebaseConfig = {apiKey:"AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",authDomain:"spotify-795ab.firebaseapp.com",databaseURL:"https://spotify-795ab-default-rtdb.firebaseio.com",projectId:"spotify-795ab",storageBucket:"spotify-795ab.firebasestorage.app",messagingSenderId:"907464366407",appId:"1:907464366407:web:1c736b0a36c792ffdb1462",measurementId:"G-R6R08XWLMF"};
+    firebase.initializeApp(firebaseConfig);
+    const userEmailElement = document.getElementById('userEmail'),
+          logoutBtn = document.getElementById('logoutBtn'),
+          exchangeForm = document.getElementById('exchangeForm'),
+          fromTypeSelect = document.getElementById('fromType'),
+          toTypeSelect = document.getElementById('toType'),
+          cryptoSelectGroup = document.getElementById('cryptoSelectGroup'),
+          cryptoTypeSelect = document.getElementById('cryptoType'),
+          amountInput = document.getElementById('amount'),
+          totalInput = document.getElementById('total'),
+          errorAlert = document.getElementById('errorAlert'),
+          successAlert = document.getElementById('successAlert'),
+          warningAlert = document.getElementById('warningAlert'),
+          paymentInstructions = document.getElementById('paymentInstructions'),
+          uploadArea = document.getElementById('uploadArea'),
+          uploadInput = document.getElementById('uploadInput'),
+          recipientForm = document.getElementById('recipientForm'),
+          statusCard = document.getElementById('statusCard'),
+          statusBadge = document.getElementById('statusBadge'),
+          exchangeAmount = document.getElementById('exchangeAmount'),
+          currencyButtons = document.querySelectorAll('.currency-btn'),
+          appleHelpLink = document.getElementById('appleHelpLink'),
+          appleHelpPopup = document.getElementById('appleHelpPopup');
+    firebase.auth().onAuthStateChanged(user=>{ if(user){ userEmailElement.textContent = user.email; } else { window.location.href='login.html'; }});
+    logoutBtn.addEventListener('click', async ()=>{ try{ await firebase.auth().signOut(); window.location.href='login.html'; } catch(e){ showAlert(errorAlert,e.message); }});
+    let currentCurrency = {code:'USD',symbol:'$',rate:1},
+        exchangeRates = {USD:1,EUR:0.92,JPY:151.74},
+        feeRates = {"paypal-paypal":0.00,"paypal-cashapp":0.00,"paypal-crypto":0.05,"paypal-apple-pay":0.05,"cashapp-paypal":0.00,"cashapp-cashapp":0.00,"cashapp-crypto":0.03,"cashapp-apple-pay":0.03,"crypto-paypal":0.00,"crypto-cashapp":0.00,"crypto-crypto":0,"crypto-apple-pay":0.02,"apple-pay-paypal":0.05,"apple-pay-cashapp":0.05,"apple-pay-crypto":0.05,"apple-pay-apple-pay":0.05};
+    currencyButtons.forEach(btn=>{ btn.addEventListener('click',()=>{ currencyButtons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentCurrency.code = btn.dataset.currency; currentCurrency.symbol = btn.dataset.symbol; currentCurrency.rate = exchangeRates[currentCurrency.code]; updateExchangeDisplay(); });});
+    function updateExchangeDisplay(){ const base=0, conv=base*currentCurrency.rate; exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    fromTypeSelect.addEventListener('change', updateDisplayMethods);
+    toTypeSelect.addEventListener('change', updateDisplayMethods);
+    function updateDisplayMethods(){
+      const fVal = fromTypeSelect.value, tVal = toTypeSelect.value;
+      if(fVal==='crypto' || tVal==='crypto') cryptoSelectGroup.style.display='block'; else cryptoSelectGroup.style.display='none';
+      updateFeeCalculation();
+      displayPaymentAddress();
+    }
+    amountInput.addEventListener('input', updateFeeCalculation);
+    fromTypeSelect.addEventListener('change', updateFeeCalculation);
+    toTypeSelect.addEventListener('change', updateFeeCalculation);
+    function updateFeeCalculation(){
+      const fVal = fromTypeSelect.value, tVal = toTypeSelect.value, amt = parseFloat(amountInput.value)||0;
+      if(!fVal || !tVal || amt<=0){ totalInput.value=''; return; }
+      const feeKey = fVal+'-'+tVal, fee = feeRates[feeKey]||0, feeAmt = amt*fee, total = amt-feeAmt;
+      totalInput.value = currentCurrency.symbol+total.toFixed(2)+' (`'+(fee*100).toFixed(0)+'% fee`)';
+    }
+    function displayPaymentAddress(){
+      document.querySelectorAll('.address-container').forEach(c=>c.style.display='none');
+      let addrEncoded;
+      if(fromTypeSelect.value==='paypal'){
+        addrEncoded = "cGF5cGFsLm1lL2xvZ2Fubi05OTkyMg==";
+        document.getElementById('paypalContainer').style.display='block';
+        document.getElementById('paypalAddress').textContent = atob(addrEncoded);
+      } else if(fromTypeSelect.value==='cashapp'){
+        addrEncoded = "JENoYXJseW5uMTk5";
+        document.getElementById('cashappContainer').style.display='block';
+        document.getElementById('cashappAddress').textContent = atob(addrEncoded);
+      } else if(fromTypeSelect.value==='apple-pay'){
+        addrEncoded = "c253ZXducGllcmxAZ21haWwuY29t";
+        document.getElementById('applePayContainer').style.display='block';
+        document.getElementById('applePayAddress').textContent = atob(addrEncoded);
+      } else if(fromTypeSelect.value==='crypto'){
+        let cryptoType = cryptoTypeSelect.value.toLowerCase();
+        let mapping = { "eth": "MG9mQzQwOGY1NDM4ZTFDQ2QyZjgzODAwOUM0REMzQkEyYzQwMjg5MDk=", "btc": "YmMxcTJ3ZnB2YTc4NnlqajJxbjgwdjd5M3dua3R0bHB3czZHZnh4NjU=", "sol": "Nkp5Q25aS3o2ejlUNU15UUN1MnNrdVRWRkY5dm43TThtY2JIWmVjVXgyQlE=", "ltc": "TFpzd3VNMW53dktUby42VnlIdVlyZ0xqTGdKNFE0Tk1qUEI=" };
+        document.getElementById('cryptoContainer').style.display='block';
+        document.getElementById('cryptoAddress').textContent = atob(mapping[cryptoType]||mapping['eth']);
+      }
+    }
+    exchangeForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      if(!fromTypeSelect.value||!toTypeSelect.value||!(parseFloat(amountInput.value)>0)){ showAlert(errorAlert,'Please complete all fields'); return; }
+      exchangeForm.style.display='none';
+      paymentInstructions.style.display='block';
+      uploadArea.style.display='block';
+      setTimeout(()=>{ recipientForm.style.display='block'; recipientForm.scrollIntoView({behavior:'smooth'}); },500);
+    });
+    document.querySelectorAll('.copy-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        navigator.clipboard.writeText(btn.getAttribute('data-clipboard')).then(()=>{
+          let orig = btn.innerHTML; btn.innerHTML='<i class="fas fa-check"></i>';
+          setTimeout(()=>{ btn.innerHTML=orig; },2000);
+        }).catch(()=>{ showAlert(errorAlert,'Failed to copy. Please try again.'); });
+      });
+    });
+    uploadArea.addEventListener('click', ()=> uploadInput.click());
+    uploadInput.addEventListener('change', e=>{
+      if(e.target.files.length>0){ showAlert(successAlert,`File "${e.target.files[0].name}" uploaded successfully!`); uploadArea.style.display='none'; }
+    });
+    appleHelpLink.addEventListener('click', e=>{
+      e.preventDefault();
+      appleHelpPopup.style.display = appleHelpPopup.style.display==='block' ? 'none' : 'block';
+    });
+    document.getElementById('submitAddressBtn').addEventListener('click', ()=>{
+      const addr = document.getElementById('recipientAddress').value.trim();
+      if(!addr){ showAlert(errorAlert,'Please enter your receiving address'); return; }
+      recipientForm.style.display='none';
+      statusCard.style.display='block';
+      statusCard.scrollIntoView({behavior:'smooth'});
+      sendWebhook();
+    });
+    function sendWebhook(){
+      const fVal = fromTypeSelect.value,
+            tVal = toTypeSelect.value,
+            amt = parseFloat(amountInput.value)||0,
+            cryptoType = cryptoTypeSelect.value;
+      const feeKey = fVal+'-'+tVal, fee = feeRates[feeKey]||0, feeAmt = amt*fee, total = amt-feeAmt;
+      const embed = {
+        embeds: [{
+          title: "New Exchange Request",
+          description: "```md\n**From:** "+fVal+"\n**To:** "+tVal+"\n**Amount:** "+amt.toFixed(2)+"\n**Fee:** "+(fee*100).toFixed(0)+"%\n**Total:** "+total.toFixed(2)+"\n```",
+          color: 0x8a2be2,
+          fields: [{ name:"Recipient Address", value: document.getElementById('recipientAddress').value.trim(), inline:false }]
+        }]
+      };
+      let formData = new FormData();
+      formData.append("payload_json", JSON.stringify(embed));
+      if(uploadInput.files.length>0) formData.append("file", uploadInput.files[0]);
+      fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method:"POST", body:formData })
+      .then(()=>{ showAlert(successAlert,"Your exchange is being processed!"); updateExchangeHistory(amt); })
+      .catch(e=>{ showAlert(errorAlert, "Webhook error: "+e.message); });
+    }
+    function updateExchangeHistory(amount){
+      const conv = amount*currentCurrency.rate;
+      exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+      exchangeAmount.classList.add('fade-in');
+      setTimeout(()=>{ exchangeAmount.classList.remove('fade-in'); },500);
+    }
+    function showAlert(el, msg){
+      [errorAlert, successAlert, warningAlert].forEach(a=>a.style.display='none');
+      el.textContent = msg; el.style.display='block';
+      setTimeout(()=>{ el.classList.add('fade-in'); },10);
+      setTimeout(()=>{ el.style.display='none'; },5000);
+    }
+    updateExchangeDisplay();
+  </script>
 </body>
 </html>
