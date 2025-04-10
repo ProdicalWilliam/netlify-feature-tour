@@ -262,6 +262,16 @@
     .instructions-box p {
       font-size: 1rem;
     }
+    /* Replace the input text field with a div for colorized output */
+    .calculation-result {
+      padding: 0.8rem 1rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      color: #000;
+      font-size: 1rem;
+      font-family: monospace;
+    }
     .address-value {
       word-break: break-all;
       background: rgba(255,255,255,0.1);
@@ -407,7 +417,8 @@
         </div>
         <div class="form-group">
           <label>Total to Receive <small>(Fee automatically calculated)</small></label>
-          <input type="text" id="total" class="form-control" readonly>
+          <!-- Replaced the input with a div for styled output -->
+          <div id="total" class="calculation-result"></div>
         </div>
         <!-- Warning Card for Multiple Tickets -->
         <div class="warning-card">
@@ -479,7 +490,7 @@
           cryptoSelectGroup = document.getElementById('cryptoSelectGroup'),
           cryptoTypeSelect = document.getElementById('cryptoType'),
           amountInput = document.getElementById('amount'),
-          totalInput = document.getElementById('total'),
+          totalOutput = document.getElementById('total'),
           errorAlert = document.getElementById('errorAlert'),
           successAlert = document.getElementById('successAlert'),
           warningAlert = document.getElementById('warningAlert'),
@@ -594,14 +605,16 @@
     function updateFeeCalculation(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value, amt = parseFloat(amountInput.value) || 0;
       if (!fVal || !tVal || amt <= 0) { 
-        totalInput.value = ''; 
+        totalOutput.innerHTML = '';
         return; 
       }
       const feeKey = fVal + '-' + tVal,
             fee = feeRates[feeKey] || 0,
             feeAmt = amt * fee,
             total = amt - feeAmt;
-      totalInput.value = currentCurrency.symbol + total.toFixed(2) + ' (`' + (fee * 100).toFixed(0) + '% fee`)';
+      // Set total amount in green and fee percentage in red.
+      totalOutput.innerHTML = '<span style="color: green;">' + currentCurrency.symbol + total.toFixed(2) + '</span>' +
+                              ' (<span style="color: red;">' + (fee * 100).toFixed(0) + '% fee</span>)';
     }
     
     function displayPaymentAddress(){
