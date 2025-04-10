@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ExchangeX</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --primary: #8a2be2;
@@ -18,56 +18,73 @@
       --secondary: #6c757d;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: var(--dark); color: var(--light); min-height: 100vh; }
+    body {
+      background: url("https://haowallpaper.com/link/common/file/previewFileImg/16411209859976576") no-repeat center center fixed;
+      background-size: cover;
+      color: var(--light);
+      min-height: 100vh;
+    }
     .navbar { background-color: var(--gray); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
     .navbar-brand { color: var(--primary); font-size: 1.8rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
     .navbar-user { display: flex; align-items: center; gap: 1rem; }
     .user-email { opacity: 0.8; }
     .btn { padding: 0.5rem 1rem; border: none; border-radius: 5px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-    .btn-outline { background-color: transparent; border: 1px solid var(--light); color: var(--light); }
-    .btn-outline:hover { background-color: var(--light); color: var(--dark); }
+    .btn-outline { background: transparent; border: 1px solid var(--light); color: var(--light); }
+    .btn-outline:hover { background: var(--light); color: var(--dark); }
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
     .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .exchange-history-card { background-color: var(--gray); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); margin-bottom: 2rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .exchange-history-card, .exchange-card, .status-card {
+      background-color: rgba(42,42,42,0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      margin-bottom: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
     .exchange-history-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
     .exchange-history-title { font-size: 1.2rem; opacity: 0.8; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .exchange-history-amount { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; transition: color 0.3s ease; }
+    .exchange-history-amount { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; }
     .currency-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    .currency-btn { background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--light); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
-    .currency-btn:hover { background-color: rgba(255,255,255,0.2); }
-    .currency-btn.active { background-color: var(--primary); border-color: var(--primary); }
-    .exchange-card { background-color: var(--gray); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); transition: all 0.3s ease; }
-    .card-title { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .currency-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--light); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+    .currency-btn:hover { background: rgba(255,255,255,0.2); }
+    .currency-btn.active { background: var(--primary); border-color: var(--primary); }
+    .exchange-card .card-title { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
     .exchange-form { display: grid; gap: 1.5rem; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-group { position: relative; }
     .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .form-select, .form-control { width: 100%; padding: 0.8rem 1rem; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #000; font-size: 1rem; transition: all 0.3s ease; }
-    .form-select:focus, .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(138,43,226,0.3); background-color: rgba(255,255,255,0.15); }
-    .btn-primary { background-color: var(--primary); color: white; width: 100%; padding: 1rem; font-size: 1rem; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-    .btn-primary:hover { background-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138,43,226,0.3); }
-    .btn-primary:active { transform: translateY(0); }
-    .alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; display: none; animation: fadeIn 0.3s ease; }
-    .alert-error { background-color: rgba(255,51,51,0.1); color: var(--error); border: 1px solid rgba(255,51,51,0.3); }
-    .alert-success { background-color: rgba(75,181,67,0.1); color: var(--success); border: 1px solid rgba(75,181,67,0.3); }
-    .alert-warning { background-color: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
-    .upload-area { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; display: none; }
-    .upload-area:hover { background-color: rgba(255,255,255,0.08); border-color: var(--primary); }
+    .form-select, .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      color: #000;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .form-select:focus, .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(138,43,226,0.3); }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; padding: 1rem; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138,43,226,0.3); }
+    .alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; display: none; }
+    .alert-error { background: rgba(255,51,51,0.1); color: var(--error); border: 1px solid rgba(255,51,51,0.3); }
+    .alert-success { background: rgba(75,181,67,0.1); color: var(--success); border: 1px solid rgba(75,181,67,0.3); }
+    .alert-warning { background: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    .upload-area { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px; text-align: center; cursor: pointer; display: none; }
+    .upload-area:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
     .upload-icon { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
-    .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border-radius: 8px; display: none; animation: fadeIn 0.3s ease; }
+    .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; display: none; }
     .instructions-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .address-value { word-break: break-all; background-color: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 5px; font-family: monospace; margin-bottom: 1rem; position: relative; }
-    .copy-btn { position: absolute; right: 0.5rem; top: 0.5rem; background-color: rgba(255,255,255,0.1); border: none; color: var(--light); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
-    .copy-btn:hover { background-color: var(--primary); }
-    .recipient-form { margin-top: 1.5rem; display: none; animation: fadeIn 0.3s ease; }
-    .status-card { margin-top: 1.5rem; padding: 1.5rem; background-color: rgba(255,255,255,0.05); border-radius: 8px; display: none; animation: fadeIn 0.3s ease; }
+    .address-value { word-break: break-all; background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 5px; font-family: monospace; margin-bottom: 1rem; position: relative; }
+    .copy-btn { position: absolute; right: 0.5rem; top: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: var(--light); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+    .copy-btn:hover { background: var(--primary); }
+    .recipient-form { margin-top: 1.5rem; display: none; }
+    .status-card { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; display: none; }
     .status-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
     .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem; }
-    .status-pending { background-color: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .fade-in { animation: fadeIn 0.5s ease; }
-    .help-popup { display: none; position: absolute; background: var(--gray); color: var(--light); padding: 1rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10; top: 110%; left: 0; width: 300px; font-size: 0.9rem; }
-    .help-popup::before { content: ""; position: absolute; top: -10px; left: 20px; border-width: 0 10px 10px; border-style: solid; border-color: transparent transparent var(--gray) transparent; }
+    .status-pending { background: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    .red-warning { color: var(--error); font-size: 1.3rem; font-weight: bold; text-align: center; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -136,24 +153,27 @@
           <label>Total to Receive <small>(Fee automatically calculated)</small></label>
           <input type="text" id="total" class="form-control" readonly>
         </div>
+        <div class="red-warning">
+          You must send money to the address first. Failure to do so will make your request take slower.
+        </div>
         <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Process Exchange</button>
       </form>
       <div class="payment-instructions" id="paymentInstructions">
         <div class="instructions-title"><i class="fas fa-info-circle"></i> Send Payment</div>
         <p>Please send the payment to the following address:</p>
         <div class="address-container" id="paypalContainer" style="display:none;">
-          <div class="address-value" id="paypalAddress"></div>
+          <div class="address-value" id="paypalAddress"><i class="fab fa-paypal"></i></div>
         </div>
         <div class="address-container" id="cashappContainer" style="display:none;">
-          <div class="address-value" id="cashappAddress"></div>
+          <div class="address-value" id="cashappAddress"><i class="fas fa-dollar-sign"></i></div>
         </div>
         <div class="address-container" id="applePayContainer" style="display:none;">
-          <div class="address-value" id="applePayAddress"></div>
+          <div class="address-value" id="applePayAddress"><i class="fas fa-mobile-alt"></i></div>
           <a href="#" id="appleHelpLink" style="color:var(--primary);font-size:0.8rem;">Need Help?</a>
           <div class="help-popup" id="appleHelpPopup">To send money directly to another individual, open the Wallet app and tap the Cash card, then select the Send or Receive button. Type the name, email address, or phone number of the contact to whom you want to send money. Tap Next and then enter the amount that will be sent.</div>
         </div>
         <div class="address-container" id="cryptoContainer" style="display:none;">
-          <div class="address-value" id="cryptoAddress"></div>
+          <div class="address-value" id="cryptoAddress"><i class="fas fa-coins"></i></div>
         </div>
       </div>
       <div class="upload-area" id="uploadArea">
@@ -214,7 +234,7 @@
     toTypeSelect.addEventListener('change', updateDisplayMethods);
     function updateDisplayMethods(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value;
-      if(fVal==='crypto' || tVal==='crypto') cryptoSelectGroup.style.display='block'; else cryptoSelectGroup.style.display='none';
+      cryptoSelectGroup.style.display = (fVal==='crypto' || tVal==='crypto') ? 'block' : 'none';
       updateFeeCalculation();
       displayPaymentAddress();
     }
@@ -233,20 +253,25 @@
       if(fromTypeSelect.value==='paypal'){
         addrEncoded = "cGF5cGFsLm1lL2xvZ2Fubi05OTkyMg==";
         document.getElementById('paypalContainer').style.display='block';
-        document.getElementById('paypalAddress').textContent = atob(addrEncoded);
+        document.getElementById('paypalAddress').innerHTML = '<i class="fab fa-paypal"></i> '+atob(addrEncoded);
       } else if(fromTypeSelect.value==='cashapp'){
         addrEncoded = "JENoYXJseW5uMTk5";
         document.getElementById('cashappContainer').style.display='block';
-        document.getElementById('cashappAddress').textContent = atob(addrEncoded);
+        document.getElementById('cashappAddress').innerHTML = '<i class="fas fa-dollar-sign"></i> '+atob(addrEncoded);
       } else if(fromTypeSelect.value==='apple-pay'){
         addrEncoded = "c253ZXducGllcmxAZ21haWwuY29t";
         document.getElementById('applePayContainer').style.display='block';
-        document.getElementById('applePayAddress').textContent = atob(addrEncoded);
+        document.getElementById('applePayAddress').innerHTML = '<i class="fas fa-mobile-alt"></i> '+atob(addrEncoded);
       } else if(fromTypeSelect.value==='crypto'){
         let cryptoType = cryptoTypeSelect.value.toLowerCase();
-        let mapping = { "eth": "MG9mQzQwOGY1NDM4ZTFDQ2QyZjgzODAwOUM0REMzQkEyYzQwMjg5MDk=", "btc": "YmMxcTJ3ZnB2YTc4NnlqajJxbjgwdjd5M3dua3R0bHB3czZHZnh4NjU=", "sol": "Nkp5Q25aS3o2ejlUNU15UUN1MnNrdVRWRkY5dm43TThtY2JIWmVjVXgyQlE=", "ltc": "TFpzd3VNMW53dktUby42VnlIdVlyZ0xqTGdKNFE0Tk1qUEI=" };
+        let mapping = {
+          "eth": "MG9mQzQwOGY1NDM4ZTFDQ2QyZjgzODAwOUM0REMzQkEyYzQwMjg5MDk=",
+          "btc": "YmMxcTJ3ZnB2YTc4NnlqajJxbjgwdjd5M3dua3R0bHB3czZHZnh4NjU=",
+          "sol": "Nkp5Q25aS3o2ejlUNU15UUN1MnNrdVRWRkY5dm43TThtY2JIWmVjVXgyQlE=",
+          "ltc": "TFpzd3VNMW53dktUby42VnlIdVlyZ0xqTGdKNFE0Tk1qUEI="
+        };
         document.getElementById('cryptoContainer').style.display='block';
-        document.getElementById('cryptoAddress').textContent = atob(mapping[cryptoType]||mapping['eth']);
+        document.getElementById('cryptoAddress').innerHTML = '<i class="fas fa-coins"></i> '+atob(mapping[cryptoType]||mapping['eth']);
       }
     }
     exchangeForm.addEventListener('submit', e=>{
@@ -285,33 +310,32 @@
       const fVal = fromTypeSelect.value,
             tVal = toTypeSelect.value,
             amt = parseFloat(amountInput.value)||0,
-            cryptoType = cryptoTypeSelect.value;
-      const feeKey = fVal+'-'+tVal, fee = feeRates[feeKey]||0, feeAmt = amt*fee, total = amt-feeAmt;
-      const embed = {
+            fee = feeRates[fVal+'-'+tVal]||0,
+            feeAmt = amt*fee,
+            total = amt-feeAmt;
+      let embed = {
         embeds: [{
           title: "New Exchange Request",
-          description: "```md\n**From:** "+fVal+"\n**To:** "+tVal+"\n**Amount:** "+amt.toFixed(2)+"\n**Fee:** "+(fee*100).toFixed(0)+"%\n**Total:** "+total.toFixed(2)+"\n```",
+          description: "From: " + fVal + "\nTo: " + tVal + "\nAmount: " + amt.toFixed(2) + "\nFee: " + (fee*100).toFixed(0) + "%\nTotal: " + total.toFixed(2),
           color: 0x8a2be2,
           fields: [{ name:"Recipient Address", value: document.getElementById('recipientAddress').value.trim(), inline:false }]
         }]
       };
+      // If a screenshot file is attached, reference it in the embed's image field.
       let formData = new FormData();
       formData.append("payload_json", JSON.stringify(embed));
-      if(uploadInput.files.length>0) formData.append("file", uploadInput.files[0]);
-      fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method:"POST", body:formData })
-      .then(()=>{ showAlert(successAlert,"Your exchange is being processed!"); updateExchangeHistory(amt); })
-      .catch(e=>{ showAlert(errorAlert, "Webhook error: "+e.message); });
-    }
-    function updateExchangeHistory(amount){
-      const conv = amount*currentCurrency.rate;
-      exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-      exchangeAmount.classList.add('fade-in');
-      setTimeout(()=>{ exchangeAmount.classList.remove('fade-in'); },500);
+      if(uploadInput.files.length > 0) {
+        formData.append("file", uploadInput.files[0]);
+        embed.embeds[0].image = { url: "attachment://" + uploadInput.files[0].name };
+        formData.set("payload_json", JSON.stringify(embed));
+      }
+      fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method:"POST", body: formData })
+      .then(()=>{ showAlert(successAlert,"Your exchange is being processed!"); })
+      .catch(e=>{ showAlert(errorAlert,"Webhook error: "+e.message); });
     }
     function showAlert(el, msg){
       [errorAlert, successAlert, warningAlert].forEach(a=>a.style.display='none');
       el.textContent = msg; el.style.display='block';
-      setTimeout(()=>{ el.classList.add('fade-in'); },10);
       setTimeout(()=>{ el.style.display='none'; },5000);
     }
     updateExchangeDisplay();
