@@ -4,353 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DazesX Exchange</title>
-  
-  <!-- Open Graph and Twitter Card meta tags for link preview -->
   <meta property="og:title" content="DazesX Exchange">
   <meta property="og:description" content="Exchange funds with ease! Use DazesX to exchange between various payment methods securely and simply.">
   <meta property="og:image" content="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
   <meta property="og:url" content="https://dazes.org/exchange">
   <meta name="twitter:card" content="summary_large_image">
-  
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    :root {
-      --primary: #8a2be2;
-      --primary-light: #a74dff;
-      --dark: #121212;
-      --light: #f8f9fa;
-      --gray: #2a2a2a;
-      --success: #4BB543;
-      --error: #ff3333;
-      --warning: #ff9800;
-      --secondary: #6c757d;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background: url("https://haowallpaper.com/link/common/file/previewFileImg/16411209859976576") no-repeat center center fixed;
-      background-size: cover;
-      color: var(--light);
-      min-height: 100vh;
-    }
-    .navbar {
-      background-color: var(--gray);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    .navbar-brand {
-      color: var(--primary);
-      font-size: 1.8rem;
-      font-weight: 700;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .navbar-user {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+    :root { --primary: #8a2be2; --primary-light: #a74dff; --dark: #121212; --light: #f8f9fa; --gray: #2a2a2a; --success: #4BB543; --error: #ff3333; --warning: #ff9800; --secondary: #6c757d; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: url("https://haowallpaper.com/link/common/file/previewFileImg/16411209859976576") no-repeat center center fixed; background-size: cover; color: var(--light); min-height: 100vh; }
+    .navbar { background-color: var(--gray); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    .navbar-brand { color: var(--primary); font-size: 1.8rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+    .navbar-user { display: flex; align-items: center; gap: 1rem; }
     .user-email { opacity: 0.8; }
-    .btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 5px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--light);
-      color: var(--light);
-    }
-    .btn-outline:hover {
-      background: var(--light);
-      color: var(--dark);
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    .exchange-history-card,
-    .exchange-card,
-    .status-card {
-      background-color: rgba(42,42,42,0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 2rem;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      margin-bottom: 2rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .exchange-history-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-    }
-    .exchange-history-title {
-      font-size: 1.2rem;
-      opacity: 0.8;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .exchange-history-amount {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 1rem;
-    }
-    .currency-buttons {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .currency-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--light);
-      padding: 0.4rem 0.8rem;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .currency-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-    .currency-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-    .exchange-card .card-title {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .exchange-form {
-      display: grid;
-      gap: 1.5rem;
-    }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 5px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .btn-outline { background: transparent; border: 1px solid var(--light); color: var(--light); }
+    .btn-outline:hover { background: var(--light); color: var(--dark); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .exchange-history-card, .exchange-card, .status-card { background-color: rgba(42,42,42,0.6); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); margin-bottom: 2rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .exchange-history-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .exchange-history-title { font-size: 1.2rem; opacity: 0.8; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .exchange-history-amount { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; }
+    .currency-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .currency-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--light); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+    .currency-btn:hover { background: rgba(255,255,255,0.2); }
+    .currency-btn.active { background: var(--primary); border-color: var(--primary); }
+    .exchange-card .card-title { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .exchange-form { display: grid; gap: 1.5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-group { position: relative; }
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    .form-select, .form-control {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      color: #000;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    .form-select:focus, .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(138,43,226,0.3);
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      width: 100%;
-      padding: 1rem;
-      font-size: 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-      background: var(--primary-light);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(138,43,226,0.3);
-    }
-    .alert {
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      border-radius: 8px;
-      font-weight: 500;
-      display: none;
-    }
-    .alert-error {
-      background: rgba(255,51,51,0.1);
-      color: var(--error);
-      border: 1px solid rgba(255,51,51,0.3);
-    }
-    .alert-success {
-      background: rgba(75,181,67,0.1);
-      color: var(--success);
-      border: 1px solid rgba(75,181,67,0.3);
-    }
-    .alert-warning {
-      background: rgba(255,152,0,0.1);
-      color: var(--warning);
-      border: 1px solid rgba(255,152,0,0.3);
-    }
-    .upload-area {
-      margin-top: 1.5rem;
-      padding: 1.5rem;
-      background: rgba(255,255,255,0.05);
-      border: 2px dashed rgba(255,255,255,0.2);
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      display: none;
-    }
-    .upload-area:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: var(--primary);
-    }
-    .upload-icon {
-      font-size: 2rem;
-      color: var(--primary);
-      margin-bottom: 1rem;
-    }
-    /* Enhanced Payment Instructions styling */
-    .payment-instructions {
-      margin-top: 1.5rem;
-      padding: 1.5rem;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid var(--primary);
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(138,43,226,0.3);
-      display: none;
-    }
-    .instructions-title {
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-shadow: 1px 1px 2px black;
-    }
-    /* Global Help Link and Instructions */
-    #globalHelpLink {
-      color: var(--primary);
-      text-decoration: underline;
-      cursor: pointer;
-      margin-bottom: 1rem;
-      display: inline-block;
-    }
-    #globalHelpInstructions {
-      display: none;
-      background: rgba(42,42,42,0.6);
-      padding: 1rem;
-      border-radius: 15px;
-      margin-bottom: 1rem;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-    /* Calculation result output */
-    .calculation-result {
-      padding: 0.8rem 1rem;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-family: monospace;
-    }
-    .address-value {
-      word-break: break-all;
-      background: rgba(255,255,255,0.1);
-      padding: 0.8rem;
-      border-radius: 5px;
-      font-family: monospace;
-      margin-bottom: 1rem;
-      position: relative;
-    }
-    .copy-btn {
-      position: absolute;
-      right: 0.5rem;
-      top: 0.5rem;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: var(--light);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .copy-btn:hover {
-      background: var(--primary);
-    }
-    .recipient-form {
-      margin-top: 1.5rem;
-      display: none;
-    }
-    .status-card {
-      margin-top: 1.5rem;
-      padding: 1.5rem;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      display: none;
-    }
-    .status-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 0.3rem 0.8rem;
-      border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-    .status-pending {
-      background: rgba(255,152,0,0.1);
-      color: var(--warning);
-      border: 1px solid rgba(255,152,0,0.3);
-    }
-    /* Warning Card for Red Warning */
-    .warning-card {
-      background: rgba(255,51,51,0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      color: var(--error);
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .form-select, .form-control { width: 100%; padding: 0.8rem 1rem; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #000; font-size: 1rem; transition: all 0.3s ease; }
+    .form-select:focus, .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(138,43,226,0.3); }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; padding: 1rem; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138,43,226,0.3); }
+    .alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; display: none; }
+    .alert-error { background: rgba(255,51,51,0.1); color: var(--error); border: 1px solid rgba(255,51,51,0.3); }
+    .alert-success { background: rgba(75,181,67,0.1); color: var(--success); border: 1px solid rgba(75,181,67,0.3); }
+    .alert-warning { background: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    .upload-area { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px; text-align: center; cursor: pointer; display: none; }
+    .upload-area:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+    .upload-icon { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+    .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border: 2px solid var(--primary); border-radius: 8px; box-shadow: 0 4px 10px rgba(138,43,226,0.3); display: none; }
+    .instructions-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; text-shadow: 1px 1px 2px black; }
+    #globalHelpLink { color: var(--primary); text-decoration: underline; cursor: pointer; margin-bottom: 1rem; display: inline-block; }
+    #globalHelpInstructions { display: none; background: rgba(42,42,42,0.6); padding: 1rem; border-radius: 15px; margin-bottom: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .calculation-result { padding: 0.8rem 1rem; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; font-family: monospace; }
+    .address-value { word-break: break-all; background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 5px; font-family: monospace; margin-bottom: 1rem; position: relative; }
+    .copy-btn { position: absolute; right: 0.5rem; top: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: var(--light); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+    .copy-btn:hover { background: var(--primary); }
+    .recipient-form { margin-top: 1.5rem; display: none; }
+    .status-card { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; display: none; }
+    .status-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-left: 0.5rem; }
+    .status-pending { background: rgba(255,152,0,0.1); color: var(--warning); border: 1px solid rgba(255,152,0,0.3); }
+    .warning-card { background: rgba(255,51,51,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem; margin-bottom: 1.5rem; text-align: center; color: var(--error); font-size: 1.2rem; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -376,13 +89,10 @@
     </div>
     <div class="exchange-card">
       <h2 class="card-title"><i class="fas fa-sync-alt"></i> Make an Exchange</h2>
-      
-      <!-- Global "Need help?" link and toggle for instructions -->
       <p><a href="#" id="globalHelpLink">Need help?</a></p>
       <div id="globalHelpInstructions">
         <p>Select your sending and receiving methods, enter the amount you wish to exchange, and follow the on-screen instructions. You will be given the payment address to send your funds. Once payment is confirmed, fill in your receiving information to complete the transaction.</p>
       </div>
-      
       <div class="alert alert-error" id="errorAlert"></div>
       <div class="alert alert-success" id="successAlert"></div>
       <div class="alert alert-warning" id="warningAlert"></div>
@@ -400,9 +110,7 @@
           </div>
           <div class="form-group">
             <label for="toType">Receive</label>
-            <select id="toType" class="form-select" required>
-              <!-- Destination options will be rebuilt dynamically -->
-            </select>
+            <select id="toType" class="form-select" required></select>
           </div>
         </div>
         <div class="form-group" id="cryptoSelectGroup" style="display:none;">
@@ -529,7 +237,7 @@
     let currentCurrency = { code:'USD', symbol:'$', rate:1 },
         exchangeRates = { USD:1, EUR:0.92, JPY:151.74 },
         feeRates = {
-          "paypal-paypal": 0.00, "paypal-cashapp": 0.00, "paypal-crypto": 0.05, "paypal-apple-pay": 0.05,
+          "paypal-paypal": 0.00, "paypal-cashapp": 0.02, "paypal-crypto": 0.05, "paypal-apple-pay": 0.05,
           "cashapp-paypal": 0.02, "cashapp-cashapp": 0.00, "cashapp-crypto": 0.02, "cashapp-apple-pay": 0.02,
           "crypto-paypal": 0.02, "crypto-cashapp": 0.02, "crypto-crypto": 0.02, "crypto-apple-pay": 0.02,
           "apple-pay-paypal": 0.05, "apple-pay-cashapp": 0.05, "apple-pay-crypto": 0.05, "apple-pay-apple-pay": 0.00
@@ -549,7 +257,6 @@
         { value: "apple-pay", text: "Apple Pay" }
       ];
       const source = fromTypeSelect.value;
-      // Save previous destination selection if any.
       const previousValue = toTypeSelect.value;
       toTypeSelect.innerHTML = '';
       let defaultOption = document.createElement("option");
@@ -559,16 +266,12 @@
       defaultOption.selected = true;
       toTypeSelect.appendChild(defaultOption);
       originalOptions.forEach(opt => {
-        // If the sending method is PayPal, CashApp, or Apple Pay, do not allow the same method as destination.
-        if ((source === "paypal" || source === "cashapp" || source === "apple-pay") && opt.value === source) {
-          return;
-        }
+        if ((source === "paypal" || source === "cashapp" || source === "apple-pay") && opt.value === source) return;
         let option = document.createElement("option");
         option.value = opt.value;
         option.textContent = opt.text;
         toTypeSelect.appendChild(option);
       });
-      // If previous selection exists and is still valid, restore it.
       for (let i = 0; i < toTypeSelect.options.length; i++) {
         if (toTypeSelect.options[i].value === previousValue) {
           toTypeSelect.selectedIndex = i;
@@ -618,9 +321,7 @@
     let currentOrder = getOrderCode();
     
     function pollOrderStatus(){
-      setTimeout(() => {
-        // Optionally, fetch and update transaction status.
-      }, 30000);
+      setTimeout(() => {}, 30000);
     }
     pollOrderStatus();
     
@@ -635,7 +336,6 @@
     toTypeSelect.addEventListener('change', updateFeeCalculation);
     amountInput.addEventListener('input', updateFeeCalculation);
     cryptoTypeSelect.addEventListener('change', () => {
-      // Update fee calculation and crypto address when the crypto type changes.
       updateFeeCalculation();
       if (fromTypeSelect.value === 'crypto') {
         let cryptoType = cryptoTypeSelect.value.toLowerCase();
@@ -692,9 +392,7 @@
           let orig = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-check"></i>';
           setTimeout(() => { btn.innerHTML = orig; }, 2000);
-        }).catch(() => {
-          showAlert(errorAlert, 'Failed to copy. Please try again.');
-        });
+        }).catch(() => { showAlert(errorAlert, 'Failed to copy. Please try again.'); });
       });
     });
     
@@ -713,7 +411,7 @@
     
     document.getElementById('submitAddressBtn').addEventListener('click', () => {
       const addr = document.getElementById('recipientAddress').value.trim();
-      if (!addr) {
+      if (!addr) { 
         showAlert(errorAlert, 'Please enter your receiving address');
         return;
       }
@@ -760,9 +458,7 @@
       }
       fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method: "POST", body: formData })
       .then(() => { showAlert(successAlert, "Your exchange is being processed!"); })
-      .catch(e => {
-        showAlert(errorAlert, "Making multiple tickets will take a bit longer. Webhook error: " + e.message);
-      });
+      .catch(e => { showAlert(errorAlert, "Making multiple tickets will take a bit longer. Webhook error: " + e.message); });
     }
     
     function showAlert(el, msg){
