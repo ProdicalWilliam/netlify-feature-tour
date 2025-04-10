@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DazesX</title>
+  <title>DazesX Exchange</title>
+  
+  <meta property="og:title" content="DazesX Exchange">
+  <meta property="og:description" content="Exchange funds with ease! Use DazesX to exchange between various payment methods securely and simply.">
+  <meta property="og:image" content="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
+  <meta property="og:url" content="https://dazes.org/exchange">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/256/8226/8226973.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
@@ -227,7 +233,7 @@
       color: var(--primary);
       margin-bottom: 1rem;
     }
-    /* Enhanced Payment Instructions styling */
+    
     .payment-instructions {
       margin-top: 1.5rem;
       padding: 1.5rem;
@@ -246,23 +252,7 @@
       gap: 0.5rem;
       text-shadow: 1px 1px 2px black;
     }
-    /* New Instructions Box for the request page */
-    .instructions-box {
-      background-color: rgba(42,42,42,0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 1rem 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-    .instructions-box h3 {
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-    .instructions-box p {
-      font-size: 1rem;
-    }
-    /* Global Help Link and Instructions */
+    
     #globalHelpLink {
       color: var(--primary);
       text-decoration: underline;
@@ -278,7 +268,7 @@
       margin-bottom: 1rem;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
-    /* Calculation result output */
+    
     .calculation-result {
       padding: 0.8rem 1rem;
       background: #fff;
@@ -347,7 +337,7 @@
       color: var(--warning);
       border: 1px solid rgba(255,152,0,0.3);
     }
-    /* New Warning Card for Red Warning */
+    
     .warning-card {
       background: rgba(255,51,51,0.1);
       backdrop-filter: blur(10px);
@@ -384,16 +374,10 @@
     </div>
     <div class="exchange-card">
       <h2 class="card-title"><i class="fas fa-sync-alt"></i> Make an Exchange</h2>
-      
-      <!-- Instructions Box Added -->
-      <div class="instructions-box">
-        <h3>How It Works</h3>
-        <p>Select your sending and receiving methods, enter the amount you wish to exchange, and follow the on-screen instructions. You will be given the payment address to send your funds. Once payment is confirmed, fill in your receiving information to complete the transaction.</p>
-      </div>
-      <!-- Global "Need help?" link -->
+
       <p><a href="#" id="globalHelpLink">Need help?</a></p>
       <div id="globalHelpInstructions">
-        <p>To complete your exchange, choose different sending and receiving methods for CashApp, PayPal, or Apple Pay. Check the fee details displayed in green for your net total and in red for the fee percentage. Follow the instructions on the page carefully.</p>
+        <p>To complete your exchange, choose different sending and receiving methods for CashApp, PayPal, or Apple Pay. The fee is automatically calculated and displayed on the page—net total in green and fee percentage in red. Follow the instructions, send your funds, and then provide your receiving address to finish.</p>
       </div>
       
       <div class="alert alert-error" id="errorAlert"></div>
@@ -414,8 +398,7 @@
           <div class="form-group">
             <label for="toType">Receive</label>
             <select id="toType" class="form-select" required>
-              <option value="" disabled selected>Select destination</option>
-              <!-- Destination options will be rebuilt dynamically -->
+              
             </select>
           </div>
         </div>
@@ -434,10 +417,9 @@
         </div>
         <div class="form-group">
           <label>Total to Receive <small>(Fee automatically calculated)</small></label>
-          <!-- Calculation result output -->
           <div id="total" class="calculation-result"></div>
         </div>
-        <!-- Warning Card for Multiple Tickets -->
+        
         <div class="warning-card">
           Making multiple tickets will take a bit longer.
         </div>
@@ -450,10 +432,10 @@
           <div class="address-value" id="paypalAddress"><i class="fab fa-paypal"></i> paypal.me/logann99922</div>
         </div>
         <div class="address-container" id="cashappContainer" style="display:none;">
-          <div class="address-value" id="cashappAddress"><i class="fas fa-dollar-sign"></i> cashapp_user</div>
+          <div class="address-value" id="cashappAddress"><i class="fas fa-dollar-sign"></i> $Charlynn1999</div>
         </div>
         <div class="address-container" id="applePayContainer" style="display:none;">
-          <div class="address-value" id="applePayAddress"><i class="fas fa-mobile-alt"></i> applepay@example.com</div>
+          <div class="address-value" id="applePayAddress"><i class="fas fa-mobile-alt"></i> snewpierl@gmail.com</div>
           <a href="#" id="appleHelpLink" style="color:var(--primary);font-size:0.8rem;">Need Help?</a>
           <div class="help-popup" id="appleHelpPopup">
             To send money directly, open the Wallet app and tap the Cash card, then select the Send or Receive button. Type the recipient’s details and the amount.
@@ -542,7 +524,6 @@
       }
     });
     
-    // Updated feeRates with CashApp and Crypto at 2%
     let currentCurrency = { code:'USD', symbol:'$', rate:1 },
         exchangeRates = { USD:1, EUR:0.92, JPY:151.74 },
         feeRates = {
@@ -558,7 +539,6 @@
           "ltc": "TFpzd3VNMW53dktUby42VnlIdVlyZ0xqTGdKNFE0Tk1qUEI="
         };
     
-    // Rebuild destination options so that if source is one of the disallowed ones, its option is removed in destination.
     function updateDestinationOptions(){
       const originalOptions = [
         { value: "paypal", text: "PayPal" },
@@ -567,17 +547,25 @@
         { value: "apple-pay", text: "Apple Pay" }
       ];
       const source = fromTypeSelect.value;
-      toTypeSelect.innerHTML = '<option value="" disabled selected>Select destination</option>';
+      toTypeSelect.innerHTML = ''; // Clear existing options.
+      let defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "Select destination";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      toTypeSelect.appendChild(defaultOption);
       originalOptions.forEach(opt => {
-        // For paypal, cashapp and apple-pay, do not allow the same method for receive.
         if ((source === "paypal" || source === "cashapp" || source === "apple-pay") && opt.value === source) {
-          return; // Skip this option.
+          return;
         }
         let option = document.createElement("option");
         option.value = opt.value;
-        option.text = opt.text;
+        option.textContent = opt.text;
         toTypeSelect.appendChild(option);
       });
+      if (toTypeSelect.options.length > 1) {
+        toTypeSelect.selectedIndex = 1;
+      }
     }
     
     currencyButtons.forEach(btn => { 
@@ -598,7 +586,6 @@
         : currentCurrency.symbol + conv.toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
     }
     
-    // Generate or retrieve order code from URL hash.
     function generateOrderCode() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let code = '';
@@ -621,27 +608,21 @@
     
     let currentOrder = getOrderCode();
     
-    // Optional: Poll order status from backend (replace with your endpoint).
     function pollOrderStatus(){
       setTimeout(() => {
-        // Replace this with your fetch/WS call to update status.
       }, 30000);
     }
     pollOrderStatus();
     
     function updateDisplayMethods(){
-      const fVal = fromTypeSelect.value, tVal = toTypeSelect.value;
-      // Update destination options based on source payment method.
       updateDestinationOptions();
-      cryptoSelectGroup.style.display = (fVal === 'crypto' || tVal === 'crypto') ? 'block' : 'none';
+      cryptoSelectGroup.style.display = (fromTypeSelect.value === 'crypto' || toTypeSelect.value === 'crypto') ? 'block' : 'none';
       updateFeeCalculation();
       displayPaymentAddress();
     }
     
-    fromTypeSelect.addEventListener('change', () => {
-      updateDisplayMethods();
-    });
-    toTypeSelect.addEventListener('change', updateDisplayMethods);
+    fromTypeSelect.addEventListener('change', updateDisplayMethods);
+    toTypeSelect.addEventListener('change', updateFeeCalculation);
     amountInput.addEventListener('input', updateFeeCalculation);
     
     function updateFeeCalculation(){
@@ -654,9 +635,7 @@
             fee = feeRates[feeKey] || 0,
             feeAmt = amt * fee,
             total = amt - feeAmt;
-      // Set total amount in green and fee percentage in red.
-      totalOutput.innerHTML = '<span style="color: green;">' + currentCurrency.symbol + total.toFixed(2) + '</span> ' +
-                              '(<span style="color: red;">' + (fee * 100).toFixed(0) + '% fee</span>)';
+      totalOutput.innerHTML = '<span style="color: green;">' + currentCurrency.symbol + total.toFixed(2) + '</span> (<span style="color: red;">' + (fee * 100).toFixed(0) + '% fee</span>)';
     }
     
     function displayPaymentAddress(){
@@ -775,7 +754,6 @@
       setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
     
-    // Global Help Instructions toggle
     globalHelpLink.addEventListener('click', e => {
       e.preventDefault();
       globalHelpInstructions.style.display = globalHelpInstructions.style.display === 'block' ? 'none' : 'block';
