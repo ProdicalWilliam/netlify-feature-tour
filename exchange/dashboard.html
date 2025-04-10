@@ -262,13 +262,28 @@
     .instructions-box p {
       font-size: 1rem;
     }
-    /* Replace the input text field with a div for colorized output */
+    /* Global Help Link and Instructions */
+    #globalHelpLink {
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    #globalHelpInstructions {
+      display: none;
+      background: rgba(42,42,42,0.6);
+      padding: 1rem;
+      border-radius: 15px;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    /* Calculation result output */
     .calculation-result {
       padding: 0.8rem 1rem;
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 8px;
-      color: #000;
       font-size: 1rem;
       font-family: monospace;
     }
@@ -375,6 +390,11 @@
         <h3>How It Works</h3>
         <p>Select your sending and receiving methods, enter the amount you wish to exchange, and follow the on-screen instructions. You will be given the payment address to send your funds. Once payment is confirmed, fill in your receiving information to complete the transaction.</p>
       </div>
+      <!-- Global "Need help?" link -->
+      <p><a href="#" id="globalHelpLink">Need help?</a></p>
+      <div id="globalHelpInstructions">
+        <p>To complete your exchange, choose different sending and receiving methods for CashApp, PayPal, or Apple Pay. Check the fee details displayed in green for your net total and in red for the fee percentage. Follow the instructions on the page carefully.</p>
+      </div>
       
       <div class="alert alert-error" id="errorAlert"></div>
       <div class="alert alert-success" id="successAlert"></div>
@@ -395,10 +415,7 @@
             <label for="toType">Receive</label>
             <select id="toType" class="form-select" required>
               <option value="" disabled selected>Select destination</option>
-              <option value="paypal">PayPal</option>
-              <option value="cashapp">CashApp</option>
-              <option value="crypto">Crypto</option>
-              <option value="apple-pay">Apple Pay</option>
+              <!-- Destination options will be rebuilt dynamically -->
             </select>
           </div>
         </div>
@@ -417,7 +434,7 @@
         </div>
         <div class="form-group">
           <label>Total to Receive <small>(Fee automatically calculated)</small></label>
-          <!-- Replaced the input with a div for styled output -->
+          <!-- Calculation result output -->
           <div id="total" class="calculation-result"></div>
         </div>
         <!-- Warning Card for Multiple Tickets -->
@@ -443,9 +460,7 @@
           </div>
         </div>
         <div class="address-container" id="cryptoContainer" style="display:none;">
-          <div class="address-value" id="cryptoAddress"><i class="fas fa-coins"></i> 
-            <span id="cryptoText"></span>
-          </div>
+          <div class="address-value" id="cryptoAddress"><i class="fas fa-coins"></i> <span id="cryptoText"></span></div>
         </div>
       </div>
       <div class="upload-area" id="uploadArea">
@@ -472,16 +487,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
   <script>
     const firebaseConfig = {
-      apiKey:"AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-      authDomain:"spotify-795ab.firebaseapp.com",
-      databaseURL:"https://spotify-795ab-default-rtdb.firebaseio.com",
-      projectId:"spotify-795ab",
-      storageBucket:"spotify-795ab.firebasestorage.app",
-      messagingSenderId:"907464366407",
-      appId:"1:907464366407:web:1c736b0a36c792ffdb1462",
-      measurementId:"G-R6R08XWLMF"
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.firebasestorage.app",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
+      measurementId: "G-R6R08XWLMF"
     };
     firebase.initializeApp(firebaseConfig);
+    
     const userEmailElement = document.getElementById('userEmail'),
           logoutBtn = document.getElementById('logoutBtn'),
           exchangeForm = document.getElementById('exchangeForm'),
@@ -505,8 +521,10 @@
           currencyButtons = document.querySelectorAll('.currency-btn'),
           appleHelpLink = document.getElementById('appleHelpLink'),
           appleHelpPopup = document.getElementById('appleHelpPopup'),
-          cryptoText = document.getElementById('cryptoText');
-
+          cryptoText = document.getElementById('cryptoText'),
+          globalHelpLink = document.getElementById('globalHelpLink'),
+          globalHelpInstructions = document.getElementById('globalHelpInstructions');
+    
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         userEmailElement.textContent = user.email;
@@ -519,18 +537,19 @@
       try { 
         await firebase.auth().signOut(); 
         window.location.href = 'login.html'; 
-      } catch(e) { 
+      } catch (e) { 
         showAlert(errorAlert, e.message); 
       }
     });
     
+    // Updated feeRates with CashApp and Crypto at 2%
     let currentCurrency = { code:'USD', symbol:'$', rate:1 },
         exchangeRates = { USD:1, EUR:0.92, JPY:151.74 },
         feeRates = {
-          "paypal-paypal":0.00, "paypal-cashapp":0.00, "paypal-crypto":0.05, "paypal-apple-pay":0.05,
-          "cashapp-paypal":0.00, "cashapp-cashapp":0.00, "cashapp-crypto":0.03, "cashapp-apple-pay":0.03,
-          "crypto-paypal":0.00, "crypto-cashapp":0.00, "crypto-crypto":0,   "crypto-apple-pay":0.02,
-          "apple-pay-paypal":0.05, "apple-pay-cashapp":0.05, "apple-pay-crypto":0.05, "apple-pay-apple-pay":0.05
+          "paypal-paypal": 0.00, "paypal-cashapp": 0.00, "paypal-crypto": 0.05, "paypal-apple-pay": 0.05,
+          "cashapp-paypal": 0.02, "cashapp-cashapp": 0.00, "cashapp-crypto": 0.02, "cashapp-apple-pay": 0.02,
+          "crypto-paypal": 0.02, "crypto-cashapp": 0.02, "crypto-crypto": 0.02, "crypto-apple-pay": 0.02,
+          "apple-pay-paypal": 0.05, "apple-pay-cashapp": 0.05, "apple-pay-crypto": 0.05, "apple-pay-apple-pay": 0.00
         },
         cryptoMapping = {
           "eth": "MG9mQzQwOGY1NDM4ZTFDQ2QyZjgzODAwOUM0REMzQkEyYzQwMjg5MDk=",
@@ -538,6 +557,28 @@
           "sol": "Nkp5Q25aS3o2ejlUNU15UUN1MnNrdVRWRkY5dm43TThtY2JIWmVjVXgyQlE=",
           "ltc": "TFpzd3VNMW53dktUby42VnlIdVlyZ0xqTGdKNFE0Tk1qUEI="
         };
+    
+    // Rebuild destination options so that if source is one of the disallowed ones, its option is removed in destination.
+    function updateDestinationOptions(){
+      const originalOptions = [
+        { value: "paypal", text: "PayPal" },
+        { value: "cashapp", text: "CashApp" },
+        { value: "crypto", text: "Crypto" },
+        { value: "apple-pay", text: "Apple Pay" }
+      ];
+      const source = fromTypeSelect.value;
+      toTypeSelect.innerHTML = '<option value="" disabled selected>Select destination</option>';
+      originalOptions.forEach(opt => {
+        // For paypal, cashapp and apple-pay, do not allow the same method for receive.
+        if ((source === "paypal" || source === "cashapp" || source === "apple-pay") && opt.value === source) {
+          return; // Skip this option.
+        }
+        let option = document.createElement("option");
+        option.value = opt.value;
+        option.text = opt.text;
+        toTypeSelect.appendChild(option);
+      });
+    }
     
     currencyButtons.forEach(btn => { 
       btn.addEventListener('click', () => {
@@ -588,19 +629,20 @@
     }
     pollOrderStatus();
     
-    fromTypeSelect.addEventListener('change', updateDisplayMethods);
-    toTypeSelect.addEventListener('change', updateDisplayMethods);
-    
     function updateDisplayMethods(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value;
+      // Update destination options based on source payment method.
+      updateDestinationOptions();
       cryptoSelectGroup.style.display = (fVal === 'crypto' || tVal === 'crypto') ? 'block' : 'none';
       updateFeeCalculation();
       displayPaymentAddress();
     }
     
+    fromTypeSelect.addEventListener('change', () => {
+      updateDisplayMethods();
+    });
+    toTypeSelect.addEventListener('change', updateDisplayMethods);
     amountInput.addEventListener('input', updateFeeCalculation);
-    fromTypeSelect.addEventListener('change', updateFeeCalculation);
-    toTypeSelect.addEventListener('change', updateFeeCalculation);
     
     function updateFeeCalculation(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value, amt = parseFloat(amountInput.value) || 0;
@@ -613,8 +655,8 @@
             feeAmt = amt * fee,
             total = amt - feeAmt;
       // Set total amount in green and fee percentage in red.
-      totalOutput.innerHTML = '<span style="color: green;">' + currentCurrency.symbol + total.toFixed(2) + '</span>' +
-                              ' (<span style="color: red;">' + (fee * 100).toFixed(0) + '% fee</span>)';
+      totalOutput.innerHTML = '<span style="color: green;">' + currentCurrency.symbol + total.toFixed(2) + '</span> ' +
+                              '(<span style="color: red;">' + (fee * 100).toFixed(0) + '% fee</span>)';
     }
     
     function displayPaymentAddress(){
@@ -732,6 +774,12 @@
       el.style.display = 'block';
       setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
+    
+    // Global Help Instructions toggle
+    globalHelpLink.addEventListener('click', e => {
+      e.preventDefault();
+      globalHelpInstructions.style.display = globalHelpInstructions.style.display === 'block' ? 'none' : 'block';
+    });
     
     updateExchangeDisplay();
   </script>
