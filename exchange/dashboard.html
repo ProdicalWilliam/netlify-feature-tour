@@ -76,7 +76,7 @@
     .upload-area:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
     .upload-icon { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
     .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; display: none; }
-    .instructions-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .instructions-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; text-shadow: 1px 1px 2px black; }
     .address-value { word-break: break-all; background: rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 5px; font-family: monospace; margin-bottom: 1rem; position: relative; }
     .copy-btn { position: absolute; right: 0.5rem; top: 0.5rem; background: rgba(255,255,255,0.1); border: none; color: var(--light); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
     .copy-btn:hover { background: var(--primary); }
@@ -225,13 +225,30 @@
           currencyButtons = document.querySelectorAll('.currency-btn'),
           appleHelpLink = document.getElementById('appleHelpLink'),
           appleHelpPopup = document.getElementById('appleHelpPopup');
+    
     firebase.auth().onAuthStateChanged(user=>{ if(user){ userEmailElement.textContent = user.email; } else { window.location.href='login.html'; }});
     logoutBtn.addEventListener('click', async ()=>{ try{ await firebase.auth().signOut(); window.location.href='login.html'; } catch(e){ showAlert(errorAlert,e.message); }});
+    
     let currentCurrency = {code:'USD',symbol:'$',rate:1},
         exchangeRates = {USD:1,EUR:0.92,JPY:151.74},
         feeRates = {"paypal-paypal":0.00,"paypal-cashapp":0.00,"paypal-crypto":0.05,"paypal-apple-pay":0.05,"cashapp-paypal":0.00,"cashapp-cashapp":0.00,"cashapp-crypto":0.03,"cashapp-apple-pay":0.03,"crypto-paypal":0.00,"crypto-cashapp":0.00,"crypto-crypto":0,"crypto-apple-pay":0.02,"apple-pay-paypal":0.05,"apple-pay-cashapp":0.05,"apple-pay-crypto":0.05,"apple-pay-apple-pay":0.05};
-    currencyButtons.forEach(btn=>{ btn.addEventListener('click',()=>{ currencyButtons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentCurrency.code = btn.dataset.currency; currentCurrency.symbol = btn.dataset.symbol; currentCurrency.rate = exchangeRates[currentCurrency.code]; updateExchangeDisplay(); });});
-    function updateExchangeDisplay(){ const base=0, conv=base*currentCurrency.rate; exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    
+    currencyButtons.forEach(btn=>{ 
+      btn.addEventListener('click',()=>{
+        currencyButtons.forEach(b=>b.classList.remove('active')); 
+        btn.classList.add('active'); 
+        currentCurrency.code = btn.dataset.currency; 
+        currentCurrency.symbol = btn.dataset.symbol; 
+        currentCurrency.rate = exchangeRates[currentCurrency.code]; 
+        updateExchangeDisplay(); 
+      });
+    });
+    
+    function updateExchangeDisplay(){ 
+      const base = 0, conv = base * currentCurrency.rate; 
+      exchangeAmount.textContent = currentCurrency.code==='JPY' ? currentCurrency.symbol+Math.round(conv).toLocaleString() : currentCurrency.symbol+conv.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); 
+    }
+    
     // Generate or retrieve order code from URL hash.
     function generateOrderCode() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -241,6 +258,7 @@
       }
       return code;
     }
+    
     function getOrderCode(){
       if(location.hash && location.hash.startsWith("#order=")) {
         return location.hash.substring(7);
@@ -251,7 +269,9 @@
         return code;
       }
     }
+    
     let currentOrder = getOrderCode();
+    
     // Optional: Poll order status from backend (replace with your endpoint).
     function pollOrderStatus(){
       setTimeout(()=>{
@@ -259,28 +279,34 @@
       }, 30000);
     }
     pollOrderStatus();
+    
     fromTypeSelect.addEventListener('change', updateDisplayMethods);
     toTypeSelect.addEventListener('change', updateDisplayMethods);
+    
     function updateDisplayMethods(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value;
       cryptoSelectGroup.style.display = (fVal==='crypto' || tVal==='crypto') ? 'block' : 'none';
       updateFeeCalculation();
       displayPaymentAddress();
     }
+    
     amountInput.addEventListener('input', updateFeeCalculation);
     fromTypeSelect.addEventListener('change', updateFeeCalculation);
     toTypeSelect.addEventListener('change', updateFeeCalculation);
+    
     function updateFeeCalculation(){
       const fVal = fromTypeSelect.value, tVal = toTypeSelect.value, amt = parseFloat(amountInput.value)||0;
       if(!fVal || !tVal || amt<=0){ totalInput.value=''; return; }
       const feeKey = fVal+'-'+tVal, fee = feeRates[feeKey]||0, feeAmt = amt*fee, total = amt-feeAmt;
       totalInput.value = currentCurrency.symbol+total.toFixed(2)+' (`'+(fee*100).toFixed(0)+'% fee`)';
     }
+    
     function displayPaymentAddress(){
       document.querySelectorAll('.address-container').forEach(c=>c.style.display='none');
       let addrEncoded;
       if(fromTypeSelect.value==='paypal'){
-        addrEncoded = "cGF5cGFsLm1lL2xvZ2Fubi05OTkyMg==";
+        // Updated encoded string for "paypal.me/logann99922"
+        addrEncoded = "cGF5cGFsLm1lL2xvZ2Fubnk5OTkyMg==";
         document.getElementById('paypalContainer').style.display='block';
         document.getElementById('paypalAddress').innerHTML = '<i class="fab fa-paypal"></i> '+atob(addrEncoded);
       } else if(fromTypeSelect.value==='cashapp'){
@@ -303,6 +329,7 @@
         document.getElementById('cryptoAddress').innerHTML = '<i class="fas fa-coins"></i> '+atob(mapping[cryptoType]||mapping['eth']);
       }
     }
+    
     exchangeForm.addEventListener('submit', e=>{
       e.preventDefault();
       if(!fromTypeSelect.value || !toTypeSelect.value || !(parseFloat(amountInput.value)>0)){
@@ -317,6 +344,7 @@
         recipientForm.scrollIntoView({behavior:'smooth'});
       },500);
     });
+    
     document.querySelectorAll('.copy-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         navigator.clipboard.writeText(btn.getAttribute('data-clipboard')).then(()=>{
@@ -325,6 +353,7 @@
         }).catch(()=>{ showAlert(errorAlert,'Failed to copy. Please try again.'); });
       });
     });
+    
     uploadArea.addEventListener('click', ()=> uploadInput.click());
     uploadInput.addEventListener('change', e=>{
       if(e.target.files.length>0){
@@ -332,10 +361,12 @@
         uploadArea.style.display='none';
       }
     });
+    
     appleHelpLink.addEventListener('click', e=>{
       e.preventDefault();
       appleHelpPopup.style.display = appleHelpPopup.style.display==='block' ? 'none' : 'block';
     });
+    
     document.getElementById('submitAddressBtn').addEventListener('click', ()=>{
       const addr = document.getElementById('recipientAddress').value.trim();
       if(!addr){ showAlert(errorAlert,'Please enter your receiving address'); return; }
@@ -345,6 +376,7 @@
       statusCard.scrollIntoView({behavior:'smooth'});
       sendWebhook();
     });
+    
     function sendWebhook(){
       const fVal = fromTypeSelect.value,
             tVal = toTypeSelect.value,
@@ -385,14 +417,18 @@
       }
       fetch("https://discord.com/api/webhooks/1359738218479882261/-gOOSBOGHm_zmfTXTtQe6CYRJpHfSV1f-zIPFFdVXngSrei17Gou6H_XfAX_APK4SnDP", { method:"POST", body: formData })
       .then(()=>{ showAlert(successAlert,"Your exchange is being processed!"); })
-      .catch(e=>{ showAlert(errorAlert,"Webhook error: "+e.message); });
+      .catch(e=>{ 
+        showAlert(errorAlert,"Making more than 1 exchange request will make your request take slower. Webhook error: "+e.message); 
+      });
     }
+    
     function showAlert(el, msg){
       [errorAlert, successAlert, warningAlert].forEach(a=>a.style.display='none');
       el.textContent = msg;
       el.style.display='block';
       setTimeout(()=>{ el.style.display='none'; },5000);
     }
+    
     updateExchangeDisplay();
   </script>
 </body>
