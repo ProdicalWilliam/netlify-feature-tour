@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExchangeX - Redirect</title>
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --dark: #121212;
+        }
+        
+        body {
+            background-color: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <span class="loader"></span>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
+    
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+            authDomain: "spotify-795ab.firebaseapp.com",
+            databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+            projectId: "spotify-795ab",
+            storageBucket: "spotify-795ab.firebasestorage.app",
+            messagingSenderId: "907464366407",
+            appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
+            measurementId: "G-R6R08XWLMF"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        
+        // Check authentication status and redirect
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>
