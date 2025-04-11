@@ -1,405 +1,820 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dazes</title>
-  <!-- Favicon -->
-  <link rel="icon" href="https://pngimg.com/d/demon_PNG63.png" type="image/png">
-  <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-  <style>
-    /* Reset and Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      font-family: 'Montserrat', sans-serif;
-      background: #111;
-      color: #fff;
-      scroll-behavior: smooth;
-    }
-    /* Main Page Background */
-    .main-page {
-      min-height: 100vh;
-      background: url('https://t3.ftcdn.net/jpg/07/03/87/34/360_F_703873440_hnBJTRwDOp6J1XkcMMEdOKkjpweGTzYT.jpg') no-repeat center center fixed;
-      background-size: cover;
-      animation: fadeIn 1.5s ease-in;
-      position: relative;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    /* Container to center content */
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.2);
-      min-height: 100vh;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-    }
-    /* Search Bar */
-    #searchInput {
-      padding: 0.8rem 1rem;
-      width: 90%;
-      max-width: 400px;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-    }
-    /* Grid Layout for Cards */
-    .name-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 960px;
-      margin-bottom: 2rem;
-    }
-    /* Card Styles – larger clickable area */
-    .name-card {
-      position: relative;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      padding: 2rem;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-    }
-    .name-card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
-    }
-    /* Make the whole card clickable */
-    .name-card a {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-    /* Home link styling */
-    .home-link {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      color: #fff;
-      text-decoration: none;
-      font-size: 1rem;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 0.5rem 0.8rem;
-      border-radius: 5px;
-      transition: background 0.3s ease;
-    }
-    .home-link:hover {
-      background: rgba(0, 0, 0, 0.7);
-    }
-    /* Profile Page Styles */
-    .profile-page {
-      display: none;
-      min-height: 100vh;
-      padding: 2rem;
-      background: #222;
-      position: relative;
-    }
-    .profile-page .content {
-      margin-top: 3rem;
-      text-align: center;
-    }
-    /* Footer */
-    footer {
-      background: #111;
-      padding: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.3);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-    }
-    /* Login/Register Modal Styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-    .modal {
-      background: #333;
-      padding: 2rem;
-      border-radius: 8px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-    }
-    .modal h2 {
-      margin-bottom: 1rem;
-    }
-    .modal input {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-    .modal button {
-      padding: 0.75rem 1.5rem;
-      margin: 0.5rem;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      background: #4b0082;
-      color: #fff;
-      transition: background 0.3s ease;
-    }
-    .modal button:hover {
-      background: #3a0066;
-    }
-    .toggle-auth {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: #4b0082;
-      text-decoration: underline;
-    }
-  </style>
-  
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New York Seafood Restaurant - St. Petersburg</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #003b6f;
+            --secondary: #e63946;
+            --light: #f1faee;
+            --dark: #1d3557;
+            --text: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1.2rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJ3b29kIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMwMDNiNmYiLz48cGF0aCBkPSJNMCwwIEwxMDAsMTAwIE0xMDAsMCBMMCwxMDAiIHN0cm9rZT0iIzAwMzg2YSIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMiIvPjxwYXRoIGQ9Ik0yNSwwIEwyNSwxMDAgTTUwLDAgTDUwLDEwMCBNNzUsMCBMNzUsMTAwIE0wLDI1IEwxMDAsMjUgTTAsNTAgTDEwMCw1MCBNMCw3NSBMMTAwLDc1IiBzdHJva2U9IiMwMDI4NGQiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PHBhdGggZD0iTTQwLDAgTDQwLDEwMCBNMCw0MCBMMTAwLDQwIE02MCwwIEw2MCwxMDAgTTAsNjAgTDEwMCw2MCIgc3Ryb2tlPSIjMDAyODRkIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3dvb2QpIi8+PC9zdmc+');
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .tagline {
+            margin-left: 10px;
+            padding-left: 10px;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            padding: 12rem 0 8rem;
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://img.freepik.com/free-vector/seafood-pattern-background_23-2150887306.jpg') center/cover;
+            color: var(--white);
+            margin-bottom: 4rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 0.9rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #c1121f;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(230, 57, 70, 0.3);
+        }
+
+        .section-spacing {
+            padding: 6rem 0;
+        }
+
+        .section-title-container {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-subtitle {
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 3px;
+            background-color: var(--secondary);
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .showcase-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .showcase-item {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+        }
+
+        .showcase-item:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .showcase-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            vertical-align: middle;
+            transition: transform 0.5s ease;
+        }
+        
+        .showcase-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .showcase-content {
+            padding: 2rem;
+        }
+
+        .showcase-item h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .showcase-item p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .menu-section {
+            background-color: var(--light);
+        }
+
+        .about-section {
+            background-color: var(--white);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        .about-text h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .about-features {
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .reviews-section {
+            background-color: var(--light);
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .review-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            height: 100%;
+        }
+
+        .review-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .reviewer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            object-fit: cover;
+            border: 3px solid var(--light);
+        }
+
+        .reviewer-info {
+            flex-grow: 1;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+
+        .review-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .review-stars {
+            color: #FFD700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            line-height: 1.8;
+            color: var(--text-light);
+            font-style: italic;
+            position: relative;
+        }
+
+        .review-text::before {
+            content: '"';
+            font-size: 3rem;
+            font-family: Georgia, serif;
+            color: rgba(0, 59, 111, 0.1);
+            position: absolute;
+            top: -1rem;
+            left: -1rem;
+        }
+        
+        .review-full {
+            display: none;
+        }
+        
+        .review-btn {
+            color: var(--secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0;
+            margin-top: 0.5rem;
+            text-decoration: underline;
+            transition: var(--transition);
+        }
+        
+        .review-btn:hover {
+            color: var(--primary);
+        }
+
+        .contact-section {
+            background-color: var(--primary);
+            color: var(--white);
+            position: relative;
+        }
+
+        .contact-wave {
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .contact-info h3:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary);
+            bottom: 0;
+            left: 0;
+        }
+
+        .contact-info p, .contact-info a {
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            display: block;
+            margin-bottom: 0.7rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .contact-info a:hover {
+            color: var(--secondary);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+        }
+
+        .contact-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+        
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .hours-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hours-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .hours-table td {
+            padding: 6px 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .hours-table td:last-child {
+            text-align: right;
+        }
+
+        footer {
+            background-color: #00264d;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 1.8rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .showcase-item {
+                max-width: 500px;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .tagline {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding: 10rem 0 6rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .about-text h2 {
+                font-size: 1.8rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Main Landing Page -->
-  <section id="home" class="main-page">
-    <div class="container">
-      <h1>Welcome to Dazes.org</h1>
-      <!-- Search Bar -->
-      <input type="text" id="searchInput" placeholder="Search by name...">
-      <!-- Card Grid -->
-      <div class="name-grid" id="nameGrid">
-        <div class="name-card" data-name="William">
-          <a href="#william">William</a>
+    <header>
+        <div class="container nav-container">
+            <div class="logo-container">
+                <a href="index.html" class="logo">New York Seafood</a>
+                <span class="tagline">Authentic Taste of the Sea</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Menu</a>
+                <a href="about.html">About Us</a>
+                <a href="#contact">Contact</a>
+            </nav>
         </div>
-        <div class="name-card" data-name="Brayden">
-          <a href="#brayden">Brayden</a>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Fresh Seafood Experience</h1>
+            <p>Discover the finest New York-style seafood cuisine in the heart of St. Petersburg</p>
+            <a href="#menu" class="btn">Explore Our Menu</a>
         </div>
-        <div class="name-card" data-name="Vaani">
-          <a href="#vaani">Vaani</a>
+    </section>
+
+    <section id="menu" class="menu-section section-spacing">
+        <div class="container">
+            <div class="section-title-container">
+                <p class="section-subtitle">Culinary Excellence</p>
+                <h2 class="section-title">Our Signature Dishes</h2>
+            </div>
+            <div class="showcase-container">
+                <div class="showcase-item">
+                    <img src="https://lh3.googleusercontent.com/geougc-cs/AIHozJIdnlSnhhnLXl1qCUDSAXUW8Ka0x8kl7wUKQ6kM07XoLxbXVJqpRtC5V069t7RetK4WXGMZeM0q_-fOy3zN_XJF7tUZ9Sa29SO_fMIMShw-Hh-UX2PPRdAVi_UBVoFojmeV5aH5pw=s2880-w2880-h1514" alt="Special Fried Rice">
+                    <div class="showcase-content">
+                        <h3>Shrimp Fried Rice</h3>
+                        <p>Our signature shrimp fried rice loaded with shrimp and fresh vegetables, perfectly seasoned and wok-tossed by our chefs.</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <img src="https://lh3.googleusercontent.com/geougc-cs/AIHozJLLebjFMQAfhYbA0HXn_cviHdNO0fzB5r5BUCnn53JY2jU9NGjt-IClLp8gq9F1X9d-f7RiiMzU5vXYRTKlAQAMaj5Qt8BQ1QBDi-wkgSO89MtHQBU-HMrvaSNuATD7tjVbPJ2D=s2880-w2880-h1514" alt="Fresh Seafood">
+                    <div class="showcase-content">
+                        <h3>Fresh Seafood</h3>
+                        <p>A generous assortment of our seafood including potato, corn, shrimp, sausage, crab legs and served with our signature garlic butter.</p>
+                    </div>
+                </div>
+                <div class="showcase-item">
+                    <img src="https://lh3.googleusercontent.com/geougc-cs/AIHozJIHZEAy7DEvYiYQl41IPTWueqB0q9J2b2SPl1SHsyr6JDBM7czJOeqGfRnJIPfXr4LOWkJARKRp26CFN14Q7kj0Lt20a1thUMNFaQlHI8AvqkyE_2is7FSVvQfFoOCXtZBstgWW=s2880-w2880-h1514" alt="Signature Drinks">
+                    <div class="showcase-content">
+                        <h3>Signature Drinks</h3>
+                        <p>Refresh yourself with our selection of creative fruit drinks, special drinks that perfectly complement our seafood cuisine.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="name-card" data-name="Maddie">
-          <a href="#maddie">Maddie</a>
+    </section>
+
+    <section class="about-section section-spacing">
+        <div class="container about-content">
+            <div class="about-text">
+                <p class="section-subtitle">Our Story</p>
+                <h2>About New York Seafood</h2>
+                <p>New York Seafood brings the authentic taste of New York-style seafood cuisine to St. Petersburg. Our restaurant combines traditional cooking methods with modern culinary innovation to create a unique dining experience.</p>
+                <p>We pride ourselves on sourcing only the freshest seafood and ingredients, ensuring that every dish that leaves our kitchen meets our high standards of quality and flavor.</p>
+                
+                <div class="about-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <p>Fresh seafood sourced daily</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <p>Authentic New York recipes</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <p>Cozy, welcoming atmosphere</p>
+                    </div>
+                </div>
+                
+                <a href="about.html" class="btn">Learn More About Us</a>
+            </div>
+            <div class="about-image">
+                <img src="https://lh3.googleusercontent.com/p/AF1QipNCG5XSq-g5RDVwjvCSWaazgzTTn0SSVhPZen4f=s680-w680-h510" alt="Restaurant interior">
+            </div>
         </div>
-        <div class="name-card" data-name="Bambi">
-          <a href="#bambi">Bambi</a>
+    </section>
+
+    <section class="reviews-section section-spacing">
+        <div class="container">
+            <div class="section-title-container">
+                <p class="section-subtitle">Testimonials</p>
+                <h2 class="section-title">What Our Customers Say</h2>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://lh3.googleusercontent.com/a-/ALV-UjWJ0n4Jcy6JalyZnVrwTGso9TuSuPuO2SgCQXmlTnA_Ra24FY1n=w40-h40-p-rp-mo-br100" alt="Reviewer avatar" class="reviewer-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Gail Roberts</div>
+                            <div class="review-date">April 2024 • 1 year ago</div>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★☆</div>
+                    <p class="review-text">Don't let the building fool you! My husband and I visited the restaurant on a recommendation of my daughter. I'm so glad... <button class="review-btn" onclick="toggleReview(this, 'review1')">Read more...</button></p>
+                    <p class="review-text review-full" id="review1">Don't let the building fool you! My husband and I visited the restaurant on a recommendation of my daughter. I'm so glad we decided to patronize this location although the building looked a little different to what we're custom to. The vibe inside was very relaxing and the staff was very friendly. The food was absolutely amazing. The chicken wings were crispy and seasoned to the gods, the lobster crabs, and shrimp platter was cooked to perfection. We ordered the shrimp fried rice to go because we saw it on someone else's table and thought it looked amazing. If you're looking for something off the beaten path, definitely give them a try.</p>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://lh3.googleusercontent.com/a-/ALV-UjXcp8TO8z0DTT0Ok0qmDWUjmDONuSIrn8sLGlAWPM7xAdoA8aW2JA=w40-h40-p-rp-mo-ba5-br100" alt="Reviewer avatar" class="reviewer-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Stacey A.</div>
+                            <div class="review-date">October 2024 • 6 months ago</div>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">We went here for dinner. The food was amazing. The service was great. The drinks at the bar were good. It's well worth the price. We went back today, we sat down in the restaurant to... <button class="review-btn" onclick="toggleReview(this, 'review2')">Read more...</button></p>
+                    <p class="review-text review-full" id="review2">We went here for dinner. The food was amazing. The service was great. The drinks at the bar were good. It's well worth the price. We went back today, we sat down in the restaurant to have lunch. I purchased shrimp and broccoli for $8. My mom had a fish sandwich and fries for $6. Lunch was amazing. The service is always amazing. 🎶I'm in love with the bartender.🎶 She's so sweet and kind-hearted 💕</p>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="https://lh3.googleusercontent.com/a-/ALV-UjXN1vuiVZ0zkrtfq-HoQDdZeh2ajS8CFXzT6HVLgffOS0zWkUQv=w40-h40-p-rp-mo-br100" alt="Reviewer avatar" class="reviewer-avatar">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Nika Nika</div>
+                            <div class="review-date">April 2025 • This month</div>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">I'm so thankful that I stopped here today. It was so good from the sauce, to the heat, to the spice I asked for, like when I say spicy this place knows what spicy is. Thank you guys for your nice service. I loved it.</p>
+                </div>
+            </div>
         </div>
-        <div class="name-card" data-name="Logann">
-          <!-- Direct navigation to the Logann website -->
-          <a href="/logann/index.html">Logann</a>
+    </section>
+
+    <section id="contact" class="contact-section section-spacing">
+        <div class="container">
+            <div class="section-title-container">
+                <p class="section-subtitle">Get In Touch</p>
+                <h2 class="section-title" style="color: white;">Visit Us Today</h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Our Location</h3>
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <div><p>2801 34th St S</p>
+                            <p>St. Petersburg, FL 33711</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📱</span>
+                        <div>
+                            <a href="tel:+17278676666">(727) 867-6666</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">✉️</span>
+                        <div>
+                            <a href="mailto:nyseafoodmarket@gmail.com">nyseafoodmarket@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>Opening Hours</h3>
+                    <table class="hours-table">
+                        <tr>
+                            <td>Monday - Thursday</td>
+                            <td>11:00 AM - 9:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Friday - Saturday</td>
+                            <td>11:00 AM - 10:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sunday</td>
+                            <td>12:00 PM - 8:00 PM</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>Reserve a Table</h3>
+                    <p>Make a reservation for a special dining experience with us. Large groups welcome with advance notice.</p>
+                    <a href="tel:+17278676666" class="btn btn-sm">Call to Reserve</a>
+                </div>
+            </div>
         </div>
-        <div class="name-card" data-name="Mikey">
-          <a href="#mikey">Mikey</a>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <p>&copy; 2025 New York Seafood Restaurant. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+            </div>
         </div>
-        <div class="name-card" data-name="Proxy">
-          <a href="#proxy">Proxy</a>
-        </div>
-      </div>
-      <!-- Button to trigger login/register modal -->
-      <button id="openAuthModal">Login / Register</button>
-    </div>
-  </section>
+    </footer>
 
-  <!-- In-Page Profile Sections -->
-  <section id="william" class="profile-page">
-    <a href="#home" class="home-link">← Home</a>
-    <div class="content">
-      <h1>William's Profile</h1>
-      <!-- Additional content for William -->
-    </div>
-  </section>
-  <!-- Add other profiles similarly -->
-  <section id="maddie" class="profile-page">
-    <a href="#home" class="home-link">← Home</a>
-    <div class="content">
-      <h1>Maddie's Profile</h1>
-    </div>
-  </section>
-  <section id="bambi" class="profile-page">
-    <a href="#home" class="home-link">← Home</a>
-    <div class="content">
-      <h1>Bambi's Profile</h1>
-    </div>
-  </section>
-  <section id="mikey" class="profile-page">
-    <a href="#home" class="home-link">← Home</a>
-    <div class="content">
-      <h1>Mikey's Profile</h1>
-    </div>
-  </section>
-  <section id="proxy" class="profile-page">
-    <a href="#home" class="home-link">← Home</a>
-    <div class="content">
-      <h1>Proxy's Profile</h1>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>Copyright @William INC 2025 Dazes.org</p>
-  </footer>
-
-  <!-- Login/Register Modal (hidden by default) -->
-  <div class="modal-overlay" id="authModal" style="display: none;">
-    <div class="modal">
-      <h2 id="modalTitle">Login</h2>
-      <input type="email" id="emailInput" placeholder="Email">
-      <input type="password" id="passwordInput" placeholder="Password">
-      <button id="authActionBtn">Login</button>
-      <div class="toggle-auth" id="toggleAuth">Don't have an account? Register</div>
-    </div>
-  </div>
-
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
-      authDomain: "github-1ec60.firebaseapp.com",
-      projectId: "github-1ec60",
-      storageBucket: "github-1ec60.firebasestorage.app",
-      messagingSenderId: "370562737308",
-      appId: "1:370562737308:web:6f9c9484c24368bf1c7959",
-      measurementId: "G-JDV0KHPD7F"
-    };
-
-    // Initialize Firebase using the compat methods
-    firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-
-    // Get auth instance and set persistence to LOCAL (default, but explicitly setting for clarity)
-    const auth = firebase.auth();
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .catch((error) => {
-        console.error("Error setting persistence:", error);
-      });
-
-    // Modal and auth form elements
-    const authModal = document.getElementById('authModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const authActionBtn = document.getElementById('authActionBtn');
-    const toggleAuth = document.getElementById('toggleAuth');
-
-    let isLoginMode = true; // toggle between login and register
-
-    // Toggle between login and register modes
-    toggleAuth.addEventListener('click', () => {
-      isLoginMode = !isLoginMode;
-      modalTitle.textContent = isLoginMode ? 'Login' : 'Register';
-      authActionBtn.textContent = isLoginMode ? 'Login' : 'Register';
-      toggleAuth.textContent = isLoginMode ? "Don't have an account? Register" : "Already have an account? Login";
-    });
-
-    // Open auth modal when button is clicked
-    document.getElementById('openAuthModal').addEventListener('click', () => {
-      authModal.style.display = 'flex';
-    });
-
-    // Handle login or registration
-    authActionBtn.addEventListener('click', () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      if(isLoginMode) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => {
-            alert("Logged in successfully!");
-            authModal.style.display = 'none';
-          })
-          .catch((error) => {
-            alert("Login error: " + error.message);
-          });
-      } else {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(() => {
-            alert("Registered and logged in successfully!");
-            authModal.style.display = 'none';
-          })
-          .catch((error) => {
-            alert("Registration error: " + error.message);
-          });
-      }
-    });
-
-    // Close modal if clicked outside of modal content
-    authModal.addEventListener('click', (e) => {
-      if(e.target === authModal) {
-        authModal.style.display = 'none';
-      }
-    });
-
-    /* --- Old Redirect System (Hash Navigation) --- */
-    document.addEventListener('DOMContentLoaded', function() {
-      const sections = document.querySelectorAll('.profile-page');
-      function showSection(hash) {
-        sections.forEach(sec => sec.style.display = 'none');
-        if (hash) {
-          const target = document.getElementById(hash);
-          if (target) {
-            target.style.display = 'block';
-          }
-        } else {
-          document.getElementById('home').style.display = 'block';
+    <script>
+        function toggleReview(button, reviewId) {
+            const reviewFull = document.getElementById(reviewId);
+            if (reviewFull.style.display === 'block') {
+                reviewFull.style.display = 'none';
+                button.textContent = 'Read more...';
+            } else {
+                reviewFull.style.display = 'block';
+                button.textContent = 'Read less';
+            }
         }
-      }
-      window.addEventListener('hashchange', () => {
-        showSection(window.location.hash.substring(1));
-      });
-      // Initialize display based on the current hash
-      showSection(window.location.hash.substring(1));
-    });
-
-    /* --- Search Filter for Name Cards --- */
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const filter = this.value.toLowerCase();
-      const cards = document.querySelectorAll('.name-card');
-      cards.forEach(card => {
-        const name = card.getAttribute('data-name').toLowerCase();
-        card.style.display = name.includes(filter) ? 'block' : 'none';
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
+                        
