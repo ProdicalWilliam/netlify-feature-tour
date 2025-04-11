@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>New York Seafood Restaurant - St. Petersburg</title>
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4223/4223439.png" type="image/png" />
+
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 
@@ -25,24 +28,30 @@
       box-sizing: border-box;
     }
 
+    /* Body with decorative seafood icons */
     body {
       font-family: "Poppins", sans-serif;
       background-color: var(--white);
       color: var(--text);
       line-height: 1.6;
+      /* Place one icon at top left and one at bottom right */
+      background-image: url("https://cdn-icons-png.flaticon.com/512/7780/7780156.png"), url("https://www.wannapik.com/media/W1siZiIsIjIwMTYvMDgvMjIvNGl0dG11Nmx0a184OGE4dTJqYmMwX3RyYW4wNDQwLnBuZyJdXQ/8b0a020f3d942fa1/88a8u2jbc0_tran0440.png");
+      background-repeat: no-repeat, no-repeat;
+      background-position: top left, bottom right;
+      background-size: 60px 60px, 60px 60px;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5 {
+    h1, h2, h3, h4, h5 {
       font-family: "Playfair Display", serif;
       font-weight: 600;
       color: var(--primary);
     }
 
+    /* Header with carved wood texture blended with blue (primary) */
     header {
+      /* Wood texture (from transparenttextures.com) */
+      background-image: url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+      background-blend-mode: multiply;
       background-color: var(--primary);
       color: var(--white);
       padding: 1.2rem 0;
@@ -51,7 +60,7 @@
       top: 0;
       z-index: 1000;
       box-shadow: var(--shadow);
-      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJ3b29kIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMwMDNiNmYiLz48cGF0aCBkPSJNMCwwIEwxMDAsMTAwIE0xMDAsMCBMMCwxMDAiIHN0cm9rZT0iIzAwMzg2YSIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMiIvPjxwYXRoIGQ9Ik0yNSwwIEwyNSwxMDAgTTUwLDAgTDUwLDEwMCBNNzUsMCBMNzUsMTAwIE0wLDI1IEwxMDAsMjUgTTAsNTAgTDEwMCw1MCBNMCw3NSBMMTAwLDc1IiBzdHJva2U9IiMwMDI4NGQiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PHBhdGggZD0iTTQwLDAgTDQwLDEwMCBNMCw0MCBMMTAwLDQwIE02MCwwIEw2MCwxMDAgTTAsNjAgTDEwMCw2MCIgc3Ryb2tlPSIjMDAyODRkIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3dvb2QpIi8+PC9zdmc+");
+      /* Adjust texture overlay if needed */
     }
 
     .container {
@@ -470,8 +479,7 @@
       left: 0;
     }
 
-    .contact-info p,
-    .contact-info a {
+    .contact-info p, .contact-info a {
       line-height: 1.8;
       color: rgba(255, 255, 255, 0.8);
       display: block;
@@ -495,25 +503,25 @@
       font-size: 1.2rem;
       color: var(--secondary);
     }
-
+    
     .hours-table {
       width: 100%;
       border-collapse: collapse;
     }
-
+    
     .hours-table tr {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-
+    
     .hours-table tr:last-child {
       border-bottom: none;
     }
-
+    
     .hours-table td {
       padding: 6px 0;
       color: rgba(255, 255, 255, 0.8);
     }
-
+    
     .hours-table td:last-child {
       text-align: right;
     }
@@ -552,12 +560,12 @@
       .about-content {
         grid-template-columns: 1fr;
       }
-
+      
       .showcase-container {
         flex-direction: column;
         align-items: center;
       }
-
+      
       .showcase-item {
         max-width: 500px;
         width: 100%;
@@ -568,15 +576,15 @@
       .hero h1 {
         font-size: 2.5rem;
       }
-
+      
       .section-title {
         font-size: 2rem;
       }
-
+      
       .nav-links {
         gap: 1rem;
       }
-
+      
       .tagline {
         display: none;
       }
@@ -586,23 +594,23 @@
       .hero {
         padding: 10rem 0 6rem;
       }
-
+      
       .hero h1 {
         font-size: 2rem;
       }
-
+      
       .hero p {
         font-size: 1rem;
       }
-
+      
       .section-title {
         font-size: 1.8rem;
       }
-
+      
       .about-text h2 {
         font-size: 1.8rem;
       }
-
+      
       .footer-content {
         flex-direction: column;
         gap: 1rem;
@@ -615,34 +623,34 @@
   <header>
     <div class="container nav-container">
       <div class="logo-container">
-        <!-- Changed Home link to point to #home -->
-        <a href="#home" class="logo">New York Seafood</a>
+        <!-- Home now points to index.html -->
+        <a href="index.html#home" class="logo">New York Seafood</a>
         <span class="tagline">Authentic Taste of the Sea</span>
       </div>
       <nav class="nav-links">
-        <a href="#home">Home</a>
-        <!-- Updated from products.html to #products -->
-        <a href="#products">Menu</a>
-        <!-- Updated from about.html to #about -->
-        <a href="#about">About Us</a>
-        <a href="#contact">Contact</a>
+        <a href="index.html#home">Home</a>
+        <!-- Menu now points to products.html in same directory -->
+        <a href="products.html#products">Menu</a>
+        <a href="about.html#about">About Us</a>
+        <a href="contact.html#contact">Contact</a>
       </nav>
     </div>
   </header>
 
-  <!-- Hero Section with id home -->
+  <!-- Hero Section on index.html -->
   <section id="home" class="hero">
     <div class="container hero-content">
       <h1>Fresh Seafood Experience</h1>
       <p>
         Discover the finest New York-style seafood cuisine in the heart of St. Petersburg
       </p>
-      <!-- Updated the button to link to #products -->
-      <a href="#products" class="btn">Explore Our Menu</a>
+      <!-- Button now points to products.html -->
+      <a href="products.html#products" class="btn">Explore Our Menu</a>
     </div>
   </section>
 
-  <!-- Menu Section, updated id to products -->
+  <!-- Products Section – for demonstration purposes, keep on the same file.
+       In actual use, products.html would be a separate file with its own content. -->
   <section id="products" class="menu-section section-spacing">
     <div class="container">
       <div class="section-title-container">
@@ -684,7 +692,7 @@
     </div>
   </section>
 
-  <!-- About Section, updated id to about -->
+  <!-- About Section on about.html (for demonstration, shown here) -->
   <section id="about" class="about-section section-spacing">
     <div class="container about-content">
       <div class="about-text">
@@ -710,8 +718,8 @@
             <p>Cozy, welcoming atmosphere</p>
           </div>
         </div>
-        <!-- Updated Learn More link to point internally to #about -->
-        <a href="#about" class="btn">Learn More About Us</a>
+        <!-- About links now point to about.html -->
+        <a href="about.html#about" class="btn">Learn More About Us</a>
       </div>
       <div class="about-image">
         <img src="https://lh3.googleusercontent.com/p/AF1QipNCG5XSq-g5RDVwjvCSWaazgzTTn0SSVhPZen4f=s680-w680-h510" alt="Restaurant interior" />
@@ -719,7 +727,7 @@
     </div>
   </section>
 
-  <!-- Reviews Section (unchanged) -->
+  <!-- Reviews Section remains on the main page -->
   <section class="reviews-section section-spacing">
     <div class="container">
       <div class="section-title-container">
@@ -778,7 +786,7 @@
     </div>
   </section>
 
-  <!-- Contact Section (remains as an anchor link) -->
+  <!-- Contact Section on contact.html (for demonstration) -->
   <section id="contact" class="contact-section section-spacing">
     <div class="container">
       <div class="section-title-container">
@@ -838,7 +846,6 @@
     </div>
   </section>
 
-  <!-- Footer (unchanged) -->
   <footer>
     <div class="container footer-content">
       <p>&copy; 2025 New York Seafood Restaurant. All Rights Reserved.</p>
