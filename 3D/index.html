@@ -1,227 +1,216 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-
-export default function ThirdPersonGame() {
-  const mountRef = useRef(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [controlsInfo, setControlsInfo] = useState("Loading game...");
-
-  useEffect(() => {
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb); // Sky blue background
-    
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 2, 5);
-    
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.8);
-    mountRef.current.appendChild(renderer.domElement);
-    
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
-    
-    // Ground plane
-    const groundGeometry = new THREE.PlaneGeometry(20, 20);
-    const groundMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x556b2f,
-      side: THREE.DoubleSide
-    });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    scene.add(ground);
-    
-    // Player representation (simple box)
-    const playerGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const player = new THREE.Mesh(playerGeometry, playerMaterial);
-    player.position.y = 0.5;
-    scene.add(player);
-    
-    // Wall creation function
-    function createWall(x, z, rotateY = 0) {
-      // For placeholder, create a simple wall
-      const wallGeometry = new THREE.BoxGeometry(5, 2, 0.2);
-      // Try to load a placeholder texture, but have a fallback
-      const textureLoader = new THREE.TextureLoader();
-      
-      const wallMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x808080,
-        roughness: 0.7
-      });
-      
-      // Try to load "wall.png" - this would work if loaded from user's files
-      // In the web environment, we'll just show a placeholder
-      textureLoader.load(
-        '/api/placeholder/400/320', // Placeholder image
-        (texture) => {
-          wallMaterial.map = texture;
-          wallMaterial.needsUpdate = true;
-        },
-        undefined,
-        (err) => {
-          console.log("Couldn't load texture:", err);
-        }
-      );
-      
-      const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-      wall.position.set(x, 1, z);
-      wall.rotation.y = rotateY;
-      scene.add(wall);
-      return wall;
-    }
-    
-    // Create walls around the area
-    const walls = [
-      createWall(0, -5),
-      createWall(0, 5),
-      createWall(-5, 0, Math.PI / 2),
-      createWall(5, 0, Math.PI / 2)
-    ];
-    
-    // Movement controls
-    const playerSpeed = 0.1;
-    const playerRotationSpeed = 0.05;
-    const keys = {
-      forward: false,
-      backward: false,
-      left: false,
-      right: false,
-      turnLeft: false,
-      turnRight: false
-    };
-
-    function handleKeyDown(e) {
-      switch(e.key.toLowerCase()) {
-        case 'w': keys.forward = true; break;
-        case 's': keys.backward = true; break;
-        case 'a': keys.left = true; break;
-        case 'd': keys.right = true; break;
-        case 'q': keys.turnLeft = true; break;
-        case 'e': keys.turnRight = true; break;
-      }
-    }
-
-    function handleKeyUp(e) {
-      switch(e.key.toLowerCase()) {
-        case 'w': keys.forward = false; break;
-        case 's': keys.backward = false; break;
-        case 'a': keys.left = false; break;
-        case 'd': keys.right = false; break;
-        case 'q': keys.turnLeft = false; break;
-        case 'e': keys.turnRight = false; break;
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    // Player movement vector and direction
-    const playerDirection = new THREE.Vector3(0, 0, -1);
-    const playerMovement = new THREE.Vector3();
-    let playerRotation = 0;
-    
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-      
-      // Reset movement vector
-      playerMovement.set(0, 0, 0);
-      
-      // Handle rotation
-      if (keys.turnLeft) {
-        playerRotation += playerRotationSpeed;
-        player.rotation.y = playerRotation;
-        playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
-      }
-      
-      if (keys.turnRight) {
-        playerRotation -= playerRotationSpeed;
-        player.rotation.y = playerRotation;
-        playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
-      }
-      
-      // Handle movement
-      if (keys.forward) {
-        playerMovement.add(playerDirection.clone().multiplyScalar(playerSpeed));
-      }
-      
-      if (keys.backward) {
-        playerMovement.add(playerDirection.clone().multiplyScalar(-playerSpeed));
-      }
-      
-      if (keys.left) {
-        const leftDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), playerDirection).normalize();
-        playerMovement.add(leftDir.multiplyScalar(playerSpeed));
-      }
-      
-      if (keys.right) {
-        const rightDir = new THREE.Vector3().crossVectors(playerDirection, new THREE.Vector3(0, 1, 0)).normalize();
-        playerMovement.add(rightDir.multiplyScalar(playerSpeed));
-      }
-      
-      // Apply movement
-      player.position.add(playerMovement);
-      
-      // Simple collision detection with boundaries
-      if (player.position.x > 9) player.position.x = 9;
-      if (player.position.x < -9) player.position.x = -9;
-      if (player.position.z > 9) player.position.z = 9;
-      if (player.position.z < -9) player.position.z = -9;
-      
-      // Third-person camera follows the player
-      const cameraOffset = new THREE.Vector3(
-        -playerDirection.x * 3,
-        2,
-        -playerDirection.z * 3
-      );
-      camera.position.copy(player.position).add(cameraOffset);
-      camera.lookAt(player.position);
-      
-      renderer.render(scene, camera);
-    };
-    
-    // Start the game
-    animate();
-    setLoading(false);
-    setControlsInfo("Controls: W/S - Move forward/back, A/D - Strafe left/right, Q/E - Rotate left/right");
-    
-    // Handle window resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.8);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('resize', handleResize);
-      mountRef.current && mountRef.current.removeChild(renderer.domElement);
-    };
-  }, []);
-
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold mb-4">Third-Person Game</h1>
-      <div className="mb-4 text-center text-md">{controlsInfo}</div>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <div ref={mountRef} className="border border-gray-300 rounded"/>
-      <div className="mt-4 text-center text-sm text-gray-600">
-        <p>Note: In a real implementation, this game would look for "wall.png" in your local folder.</p>
-        <p>Use WASD to move and QE to rotate.</p>
-      </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Third-Person Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <h1>Third-Person Game</h1>
+        <p id="controls-info">Controls: W/S - Move forward/back, A/D - Strafe left/right, Q/E - Rotate left/right</p>
     </div>
-  );
-}
+    <div id="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Wait for the DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('container');
+            
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb); // Sky blue background
+            
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2, 5);
+            
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Ground plane
+            const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x556b2f,
+                side: THREE.DoubleSide
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+            
+            // Player representation (simple box)
+            const playerGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
+            const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            const player = new THREE.Mesh(playerGeometry, playerMaterial);
+            player.position.y = 0.5;
+            scene.add(player);
+            
+            // Wall creation function
+            function createWall(x, z, rotateY = 0) {
+                // Create a simple wall
+                const wallGeometry = new THREE.BoxGeometry(5, 2, 0.2);
+                // Load texture
+                const textureLoader = new THREE.TextureLoader();
+                
+                const wallMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x808080,
+                    roughness: 0.7
+                });
+                
+                // Try to load "wall.png" from the same directory
+                textureLoader.load(
+                    'wall.png', // This should be in the same folder as your HTML file
+                    (texture) => {
+                        wallMaterial.map = texture;
+                        wallMaterial.needsUpdate = true;
+                    },
+                    undefined,
+                    (err) => {
+                        console.log("Couldn't load texture:", err);
+                    }
+                );
+                
+                const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+                wall.position.set(x, 1, z);
+                wall.rotation.y = rotateY;
+                scene.add(wall);
+                return wall;
+            }
+            
+            // Create walls around the area
+            const walls = [
+                createWall(0, -5),
+                createWall(0, 5),
+                createWall(-5, 0, Math.PI / 2),
+                createWall(5, 0, Math.PI / 2)
+            ];
+            
+            // Movement controls
+            const playerSpeed = 0.1;
+            const playerRotationSpeed = 0.05;
+            const keys = {
+                forward: false,
+                backward: false,
+                left: false,
+                right: false,
+                turnLeft: false,
+                turnRight: false
+            };
+            
+            function handleKeyDown(e) {
+                switch(e.key.toLowerCase()) {
+                    case 'w': keys.forward = true; break;
+                    case 's': keys.backward = true; break;
+                    case 'a': keys.left = true; break;
+                    case 'd': keys.right = true; break;
+                    case 'q': keys.turnLeft = true; break;
+                    case 'e': keys.turnRight = true; break;
+                }
+            }
+            
+            function handleKeyUp(e) {
+                switch(e.key.toLowerCase()) {
+                    case 'w': keys.forward = false; break;
+                    case 's': keys.backward = false; break;
+                    case 'a': keys.left = false; break;
+                    case 'd': keys.right = false; break;
+                    case 'q': keys.turnLeft = false; break;
+                    case 'e': keys.turnRight = false; break;
+                }
+            }
+            
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+            
+            // Player movement vector and direction
+            const playerDirection = new THREE.Vector3(0, 0, -1);
+            const playerMovement = new THREE.Vector3();
+            let playerRotation = 0;
+            
+            // Animation loop
+            const animate = () => {
+                requestAnimationFrame(animate);
+                
+                // Reset movement vector
+                playerMovement.set(0, 0, 0);
+                
+                // Handle rotation
+                if (keys.turnLeft) {
+                    playerRotation += playerRotationSpeed;
+                    player.rotation.y = playerRotation;
+                    playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                }
+                
+                if (keys.turnRight) {
+                    playerRotation -= playerRotationSpeed;
+                    player.rotation.y = playerRotation;
+                    playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                }
+                
+                // Handle movement
+                if (keys.forward) {
+                    playerMovement.add(playerDirection.clone().multiplyScalar(playerSpeed));
+                }
+                
+                if (keys.backward) {
+                    playerMovement.add(playerDirection.clone().multiplyScalar(-playerSpeed));
+                }
+                
+                if (keys.left) {
+                    const leftDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), playerDirection).normalize();
+                    playerMovement.add(leftDir.multiplyScalar(playerSpeed));
+                }
+                
+                if (keys.right) {
+                    const rightDir = new THREE.Vector3().crossVectors(playerDirection, new THREE.Vector3(0, 1, 0)).normalize();
+                    playerMovement.add(rightDir.multiplyScalar(playerSpeed));
+                }
+                
+                // Apply movement
+                player.position.add(playerMovement);
+                
+                // Simple collision detection with boundaries
+                if (player.position.x > 9) player.position.x = 9;
+                if (player.position.x < -9) player.position.x = -9;
+                if (player.position.z > 9) player.position.z = 9;
+                if (player.position.z < -9) player.position.z = -9;
+                
+                // Third-person camera follows the player
+                const cameraOffset = new THREE.Vector3(
+                    -playerDirection.x * 3,
+                    2,
+                    -playerDirection.z * 3
+                );
+                camera.position.copy(player.position).add(cameraOffset);
+                camera.lookAt(player.position);
+                
+                renderer.render(scene, camera);
+            };
+            
+            // Start the game
+            animate();
+            
+            // Handle window resize
+            function handleResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            window.addEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+</html>
