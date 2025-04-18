@@ -4,15 +4,12 @@ class GameCore {
         this.playersRef = playersRef;
         this.otherPlayers = {};
         
-        // Scene setup
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x87ceeb);
         
-        // Camera setup
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(0, 1.7, 0);
         
-        // Renderer setup with shadows
         this.renderer = new THREE.WebGLRenderer({ 
             antialias: true,
             powerPreference: "high-performance"
@@ -26,40 +23,35 @@ class GameCore {
         this.renderer.toneMappingExposure = 1.0;
         container.appendChild(this.renderer.domElement);
         
-        // Controls for first person
         this.controls = new THREE.PointerLockControls(this.camera, document.body);
         this.scene.add(this.controls.getObject());
         
-        // Physics variables
         this.velocity = new THREE.Vector3();
         this.direction = new THREE.Vector3();
         this.clock = new THREE.Clock();
         
-        // Player object
         this.player = new THREE.Object3D();
         this.scene.add(this.player);
         this.playerModel = null;
+        this.handsModel = null;
         
-        // Firebase update throttling
         this.lastUpdate = 0;
+        this.movementSpeed = 8.0; // Increased speed
         
-        // Set up lighting, environment and scene
         this.setupLighting();
         this.loadEnvironmentMap();
-        
-        // Listen for other players
         this.setupMultiplayer();
         
-        // Clean up inactive players periodically
         setInterval(() => this.cleanupInactivePlayers(), 30000);
+        
+        this.fontLoader = new THREE.FontLoader();
+        this.textMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
     }
     
     setupLighting() {
-        // Ambient light
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
         this.scene.add(ambientLight);
         
-        // Directional light (sun)
         const directionalLight = new THREE.DirectionalLight(0xffffaa, 1.0);
         directionalLight.position.set(5, 10, 7);
         directionalLight.castShadow = true;
@@ -73,7 +65,6 @@ class GameCore {
         directionalLight.shadow.camera.bottom = -20;
         this.scene.add(directionalLight);
         
-        // Additional hemisphere light
         const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
         this.scene.add(hemiLight);
     }
@@ -93,11 +84,11 @@ class GameCore {
                 
                 this.setupMaterials();
                 this.loadPlayerModel();
+                this.loadHandsModel();
             });
     }
     
     setupMaterials() {
-        // Ground material with reflection
         const groundMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x556b2f,
             roughness: 0.7,
@@ -106,14 +97,12 @@ class GameCore {
             side: THREE.DoubleSide
         });
         
-        // Create ground
         const groundGeometry = new THREE.PlaneGeometry(40, 40, 32, 32);
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         this.scene.add(ground);
         
-        // Wall material
         const wallMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x808080,
             roughness: 0.6,
@@ -121,7 +110,6 @@ class GameCore {
             envMap: this.envMap
         });
         
-        // Load texture for walls
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(
             'wall.png',
@@ -177,6 +165,7 @@ class GameCore {
             (gltf) => {
                 this.playerModel = gltf.scene;
                 this.playerModel.scale.set(0.5, 0.5, 0.5);
+                this.playerModel.position.y = -1.0; // Raise model so it's not in ground
                 
                 this.playerModel.traverse((child) => {
                     if (child.isMesh) {
@@ -190,7 +179,6 @@ class GameCore {
                     }
                 });
                 
-                // Refresh existing other players with the new model
                 for (const id in this.otherPlayers) {
                     this.updateOtherPlayerModel(id);
                 }
@@ -204,8 +192,37 @@ class GameCore {
         );
     }
     
+    loadHandsModel() {
+        const gltfLoader = new THREE.GLTFLoader();
+        gltfLoader.load(
+            'models/hands.glb', // Make sure you have this model file
+            (gltf) => {
+                this.handsModel = gltf.scene;
+                this.handsModel.scale.set(0.2, 0.2, 0.2);
+                
+                this.handsModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        
+                        if (child.material) {
+                            child.material.envMap = this.envMap;
+                            child.material.needsUpdate = true;
+                        }
+                    }
+                });
+                
+                this.camera.add(this.handsModel);
+                this.handsModel.position.set(0.3, -0.3, -0.5);
+            },
+            undefined,
+            (error) => {
+                console.error('Error loading hands model:', error);
+            }
+        );
+    }
+    
     processMovement(delta, moveForward, moveBackward, moveLeft, moveRight) {
-        const speed = 5.0;
+        const speed = this.movementSpeed;
         const friction = 10.0;
         
         this.velocity.x -= this.velocity.x * friction * delta;
@@ -221,23 +238,19 @@ class GameCore {
         this.controls.moveRight(-this.velocity.x * delta);
         this.controls.moveForward(-this.velocity.z * delta);
         
-        // Simple collision detection with boundaries
         const playerPos = this.controls.getObject().position;
         if (playerPos.x > 19.5) playerPos.x = 19.5;
         if (playerPos.x < -19.5) playerPos.x = -19.5;
         if (playerPos.z > 19.5) playerPos.z = 19.5;
         if (playerPos.z < -19.5) playerPos.z = -19.5;
         
-        // Keep y position stable (no jumping/falling)
         if (playerPos.y !== 1.7) playerPos.y = 1.7;
         
-        // Update position in Firebase
         this.updatePlayerPositionInFirebase();
     }
     
     updatePlayerPositionInFirebase() {
         const now = Date.now();
-        // Update at most every 50ms for smoother remote player movements
         if (now - this.lastUpdate > 50) {
             this.lastUpdate = now;
             
@@ -253,6 +266,7 @@ class GameCore {
                 rotation: {
                     y: rotation.y
                 },
+                name: localStorage.getItem('playerName') || 'Player',
                 lastUpdated: firebase.database.ServerValue.TIMESTAMP
             });
         }
@@ -261,29 +275,52 @@ class GameCore {
     updateOtherPlayerModel(id) {
         if (!this.otherPlayers[id] || !this.playerModel) return;
         
-        // Remove old mesh
         while(this.otherPlayers[id].children.length > 0) {
+            if (this.otherPlayers[id].children[0].isNameTag) continue;
             this.otherPlayers[id].remove(this.otherPlayers[id].children[0]);
         }
         
-        // Add new model as a child
         const newModel = this.playerModel.clone();
+        newModel.position.y = -1.0; // Position adjustment
         this.otherPlayers[id].add(newModel);
     }
     
+    createNameTag(id, name) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 256;
+        canvas.height = 64;
+        
+        context.fillStyle = '#00000088';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        
+        context.font = 'Bold 32px Arial';
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(name || id, canvas.width / 2, canvas.height / 2);
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        
+        const material = new THREE.SpriteMaterial({ map: texture });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(1.5, 0.4, 1);
+        sprite.position.y = 2.2;
+        sprite.isNameTag = true;
+        
+        return sprite;
+    }
+    
     setupMultiplayer() {
-        // Listen for other players' updates
         this.playersRef.on('value', (snapshot) => {
             const players = snapshot.val() || {};
             
-            // Add or update other players
             for (const id in players) {
                 if (id !== this.playerId) {
                     this.createOrUpdateOtherPlayer(id, players[id]);
                 }
             }
             
-            // Remove disconnected players
             for (const id in this.otherPlayers) {
                 if (!players[id]) {
                     this.scene.remove(this.otherPlayers[id]);
@@ -297,17 +334,19 @@ class GameCore {
         if (id === this.playerId) return;
         
         if (!this.otherPlayers[id]) {
-            // Create a new object for this player
             const otherPlayer = new THREE.Object3D();
             this.scene.add(otherPlayer);
             this.otherPlayers[id] = otherPlayer;
             
-            // If we have the player model loaded, use it
+            // Add name tag
+            const nameTag = this.createNameTag(id, data.name);
+            otherPlayer.add(nameTag);
+            
             if (this.playerModel) {
                 const newModel = this.playerModel.clone();
+                newModel.position.y = -1.0; // Position adjustment
                 otherPlayer.add(newModel);
             } else {
-                // Fallback to a colored capsule until model loads
                 const capsuleGeom = new THREE.CapsuleGeometry(0.3, 1.0, 4, 8);
                 const capsuleMat = new THREE.MeshStandardMaterial({ 
                     color: 0x0088ff,
@@ -319,9 +358,16 @@ class GameCore {
                 capsule.position.y = 0.85;
                 otherPlayer.add(capsule);
             }
+        } else if (data.name && this.otherPlayers[id].getObjectByProperty('isNameTag', true)) {
+            // Update name tag if necessary
+            const nameTagObj = this.otherPlayers[id].getObjectByProperty('isNameTag', true);
+            if (nameTagObj) {
+                this.otherPlayers[id].remove(nameTagObj);
+            }
+            const nameTag = this.createNameTag(id, data.name);
+            this.otherPlayers[id].add(nameTag);
         }
         
-        // Get the current position/rotation
         const otherPlayer = this.otherPlayers[id];
         const currentPos = otherPlayer.position.clone();
         const targetPos = new THREE.Vector3(
@@ -330,12 +376,10 @@ class GameCore {
             data.position.z
         );
         
-        // Store target position for interpolation
         otherPlayer.userData.targetPosition = targetPos;
         otherPlayer.userData.startPosition = currentPos;
         otherPlayer.userData.interpolationStart = Date.now();
         
-        // Also store rotation
         if (data.rotation) {
             otherPlayer.userData.targetRotation = data.rotation.y;
         }
@@ -351,14 +395,12 @@ class GameCore {
                 const elapsed = now - otherPlayer.userData.interpolationStart;
                 const progress = Math.min(elapsed / interpolationDuration, 1);
                 
-                // Lerp position for smooth movement
                 otherPlayer.position.lerpVectors(
                     otherPlayer.userData.startPosition,
                     otherPlayer.userData.targetPosition,
                     progress
                 );
                 
-                // Smoothly rotate to target rotation
                 if (otherPlayer.userData.targetRotation !== undefined) {
                     otherPlayer.rotation.y = THREE.MathUtils.lerp(
                         otherPlayer.rotation.y || 0,
@@ -372,7 +414,7 @@ class GameCore {
     
     cleanupInactivePlayers() {
         const now = Date.now();
-        const timeoutDuration = 10000; // 10 seconds
+        const timeoutDuration = 10000;
         
         this.playersRef.once('value', (snapshot) => {
             const players = snapshot.val() || {};
