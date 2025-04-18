@@ -420,33 +420,13 @@
             animate();
         }
         
-        // Simulate loading process
         function simulateLoading() {
-            let progress = 0;
-            const loadingInterval = setInterval(() => {
-                progress += Math.random() * 5;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(loadingInterval);
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        currentState = GameState.PLAYING;
-                        showGameElements();
-                    }, 500);
-                }
-                progressFill.style.width = `${progress}%`;
-                
-                if (progress < 30) {
-                    loadingText.textContent = 'Loading game assets...';
-                } else if (progress < 60) {
-                    loadingText.textContent = 'Building game world...';
-                } else if (progress < 90) {
-                    loadingText.textContent = 'Connecting to server...';
-                } else {
-                    loadingText.textContent = 'Ready to play!';
-                }
-            }, 100);
-        }
+    console.log("Bypassing loading screen...");
+    loadingScreen.style.display = 'none'; // Hide the loading screen immediately
+    currentState = GameState.PLAYING; // Set the game state to Playing
+    showGameElements(); // Show the game elements
+}
+    
         
         // Set up Three.js environment
         function setupThreeJS() {
