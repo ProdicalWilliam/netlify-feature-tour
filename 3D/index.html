@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Movement Game</title>
+    <title>3D FPS Game</title>
     <style>
         body { 
             margin: 0; 
@@ -22,6 +22,7 @@
             padding: 10px;
             border-radius: 5px;
             max-width: 300px;
+            z-index: 100;
         }
         .loading {
             position: absolute;
@@ -34,6 +35,7 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            z-index: 100;
         }
         .character-select {
             position: absolute;
@@ -46,6 +48,7 @@
             border-radius: 5px;
             display: flex;
             gap: 10px;
+            z-index: 100;
         }
         .character-option {
             padding: 8px 16px;
@@ -60,6 +63,60 @@
         .character-option.active {
             background-color: #4CAF50;
         }
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            pointer-events: none;
+            display: none;
+            z-index: 99;
+        }
+        .stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: right;
+            z-index: 100;
+        }
+        .ammo-display {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 100;
+            display: none;
+        }
+        .health-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 20px;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .health-fill {
+            height: 100%;
+            width: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -68,6 +125,8 @@
         <p>W, A, S, D - Move character</p>
         <p>Space - Jump</p>
         <p>Mouse - Look around</p>
+        <p>Left Click - Shoot</p>
+        <p>R - Reload</p>
         <p>Character speed: <span id="speed-value">5</span></p>
         <input type="range" id="speed-slider" min="1" max="10" value="5">
     </div>
@@ -78,6 +137,19 @@
         <div class="character-option active" data-char="capsule">Capsule</div>
         <div class="character-option" data-char="cube">Cube</div>
         <div class="character-option" data-char="sphere">Sphere</div>
+    </div>
+    
+    <div class="crosshair" id="crosshair">+</div>
+    
+    <div class="stats" id="stats">
+        <div>FPS: <span id="fps">0</span></div>
+        <div>Position: <span id="position">0, 0, 0</span></div>
+    </div>
+    
+    <div class="ammo-display" id="ammo-display">30 / 90</div>
+    
+    <div class="health-bar">
+        <div class="health-fill" id="health-fill"></div>
     </div>
 
     <script type="importmap">
@@ -92,21 +164,57 @@
     <script type="module">
         import * as THREE from 'three';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-        // Scene setup
+        // Game state
+        const gameState = {
+            health: 100,
+            ammo: 30,
+            totalAmmo: 90,
+            reloading: false,
+            lastShot: 0,
+            fireRate: 100, // ms between shots
+            bulletSpeed: 50,
+            bulletDamage: 10,
+            collidableObjects: [],
+            enemies: [],
+            gravity: 30,
+            jumpVelocity: 12,
+            playerRadius: 0.5,
+            playerHeight: 1.75,
+            playerCollisions: true,
+            fps: 0,
+            lastTime: 0,
+            frameCount: 0,
+            lastFpsUpdate: 0
+        };
+
+        // Debug elements
+        const statsElement = document.getElementById('stats');
+        const fpsElement = document.getElementById('fps');
+        const positionElement = document.getElementById('position');
+        const ammoDisplay = document.getElementById('ammo-display');
+        const healthFill = document.getElementById('health-fill');
+        const crosshair = document.getElementById('crosshair');
+
+        // Scene setup with environment
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x88ccff);
-        scene.fog = new THREE.Fog(0x88ccff, 0, 500);
+        scene.fog = new THREE.FogExp2(0x88ccff, 0.01);
 
         // Camera setup
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.y = 1.6; // Average eye height
+        camera.position.y = gameState.playerHeight;
 
         // Renderer setup
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1;
         document.body.appendChild(renderer.domElement);
 
         // Controls setup
@@ -119,48 +227,162 @@
         
         controls.addEventListener('lock', () => {
             document.getElementById('character-select').style.display = 'none';
+            crosshair.style.display = 'block';
+            ammoDisplay.style.display = 'block';
         });
         
         controls.addEventListener('unlock', () => {
             document.getElementById('character-select').style.display = 'flex';
+            crosshair.style.display = 'none';
+            ammoDisplay.style.display = 'none';
         });
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 5);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
-        directionalLight.shadow.camera.near = 0.5;
-        directionalLight.shadow.camera.far = 50;
-        directionalLight.shadow.camera.left = -20;
-        directionalLight.shadow.camera.right = 20;
-        directionalLight.shadow.camera.top = 20;
-        directionalLight.shadow.camera.bottom = -20;
-        scene.add(directionalLight);
+        // Create raycaster for collision detection
+        const raycaster = new THREE.Raycaster();
 
-        // Ground
+        // Setup environment with HDR lighting
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        pmremGenerator.compileEquirectangularShader();
+
+        new RGBELoader()
+            .setPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/textures/equirectangular/')
+            .load('royal_esplanade_1k.hdr', function(texture) {
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                scene.environment = envMap;
+                texture.dispose();
+                pmremGenerator.dispose();
+                
+                // Add standard lighting after environment map is loaded
+                addLighting();
+            });
+
+        // Standard lighting
+        function addLighting() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 50;
+            directionalLight.shadow.camera.left = -20;
+            directionalLight.shadow.camera.right = 20;
+            directionalLight.shadow.camera.top = 20;
+            directionalLight.shadow.camera.bottom = -20;
+            scene.add(directionalLight);
+        }
+
+        // Ground with texture
+        const textureLoader = new THREE.TextureLoader();
+        const groundTexture = textureLoader.load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/textures/terrain/grasslight-big.jpg');
+        groundTexture.repeat.set(25, 25);
+        groundTexture.wrapS = THREE.RepeatWrapping;
+        groundTexture.wrapT = THREE.RepeatWrapping;
+        
         const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
         const groundMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x33aa33,
+            map: groundTexture,
             roughness: 0.8,
         });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
+        gameState.collidableObjects.push(ground);
 
         // Grid helper for visual reference
         const gridHelper = new THREE.GridHelper(1000, 100, 0x000000, 0x444444);
         scene.add(gridHelper);
 
-        // Create some obstacles
-        function createObstacles() {
-            const obstacles = [];
+        // Create gun model holder
+        const gunContainer = new THREE.Group();
+        camera.add(gunContainer);
+        gunContainer.position.set(0.3, -0.3, -0.5); // Position in front of camera
+
+        // Load gun model
+        const gltfLoader = new GLTFLoader();
+        let gunModel = null;
+        
+        gltfLoader.load(
+            'models/scene.gltf',
+            function(gltf) {
+                gunModel = gltf.scene;
+                gunModel.traverse((node) => {
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        node.material.envMapIntensity = 1.5;
+                    }
+                });
+                
+                // Scale and position the gun model
+                gunModel.scale.set(0.01, 0.01, 0.01); // Adjust scale as needed
+                gunContainer.add(gunModel);
+                
+                // Add muzzle flash position
+                const muzzleFlash = new THREE.PointLight(0xffaa00, 0, 5);
+                muzzleFlash.position.set(0, 0, -1); // Adjust to your gun's barrel position
+                gunContainer.add(muzzleFlash);
+                gameState.muzzleFlash = muzzleFlash;
+                
+                // Hide loading screen once gun is loaded
+                document.getElementById('loading-screen').style.display = 'none';
+            },
+            function(progress) {
+                const percent = Math.floor((progress.loaded / progress.total) * 100);
+                document.getElementById('loading-screen').textContent = `Loading Gun Model... ${percent}%`;
+            },
+            function(error) {
+                console.error('Error loading gun model:', error);
+                document.getElementById('loading-screen').textContent = "Error loading gun model! Using default.";
+                // Create a default gun if loading fails
+                createDefaultGun();
+            }
+        );
+        
+        // Default gun model as fallback
+        function createDefaultGun() {
+            const gunGroup = new THREE.Group();
             
+            // Gun body
+            const gunBody = new THREE.Mesh(
+                new THREE.BoxGeometry(0.1, 0.1, 0.3),
+                new THREE.MeshStandardMaterial({ color: 0x222222 })
+            );
+            gunBody.position.z = -0.15;
+            gunGroup.add(gunBody);
+            
+            // Gun barrel
+            const gunBarrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.02, 0.02, 0.3, 16),
+                new THREE.MeshStandardMaterial({ color: 0x111111 })
+            );
+            gunBarrel.rotation.x = Math.PI / 2;
+            gunBarrel.position.z = -0.35;
+            gunGroup.add(gunBarrel);
+            
+            // Gun handle
+            const gunHandle = new THREE.Mesh(
+                new THREE.BoxGeometry(0.07, 0.2, 0.1),
+                new THREE.MeshStandardMaterial({ color: 0x444444 })
+            );
+            gunHandle.position.y = -0.15;
+            gunGroup.add(gunHandle);
+            
+            // Add muzzle flash
+            const muzzleFlash = new THREE.PointLight(0xffaa00, 0, 5);
+            muzzleFlash.position.z = -0.5;
+            gunGroup.add(muzzleFlash);
+            gameState.muzzleFlash = muzzleFlash;
+            
+            gunContainer.add(gunGroup);
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+
+        // Create obstacles with physics properties
+        function createObstacles() {
             // Create random cube obstacles
             for (let i = 0; i < 50; i++) {
                 const size = Math.random() * 3 + 1;
@@ -169,7 +391,8 @@
                 const geometry = new THREE.BoxGeometry(size, height, size);
                 const material = new THREE.MeshStandardMaterial({
                     color: new THREE.Color(Math.random(), Math.random(), Math.random()),
-                    roughness: 0.7
+                    roughness: 0.7,
+                    metalness: Math.random() * 0.5
                 });
                 
                 const cube = new THREE.Mesh(geometry, material);
@@ -180,8 +403,17 @@
                 cube.castShadow = true;
                 cube.receiveShadow = true;
                 
+                // Add physics properties
+                cube.userData.physics = {
+                    type: 'box',
+                    width: size,
+                    height: height,
+                    depth: size,
+                    mass: size * height * size
+                };
+                
                 scene.add(cube);
-                obstacles.push(cube);
+                gameState.collidableObjects.push(cube);
             }
             
             // Create some platforms
@@ -193,7 +425,8 @@
                 const geometry = new THREE.BoxGeometry(width, height, depth);
                 const material = new THREE.MeshStandardMaterial({
                     color: 0x999999,
-                    roughness: 0.6
+                    roughness: 0.6,
+                    metalness: 0.2
                 });
                 
                 const platform = new THREE.Mesh(geometry, material);
@@ -204,14 +437,21 @@
                 platform.castShadow = true;
                 platform.receiveShadow = true;
                 
+                // Add physics properties
+                platform.userData.physics = {
+                    type: 'box',
+                    width: width,
+                    height: height,
+                    depth: depth,
+                    mass: width * height * depth
+                };
+                
                 scene.add(platform);
-                obstacles.push(platform);
+                gameState.collidableObjects.push(platform);
             }
-            
-            return obstacles;
         }
         
-        const obstacles = createObstacles();
+        createObstacles();
 
         // Character objects
         let currentCharacter = null;
@@ -310,8 +550,6 @@
         let moveRight = false;
         let canJump = true;
         let speed = 5.0;
-        let jumpVelocity = 12;
-        const gravity = 30;
 
         // Speed slider
         const speedSlider = document.getElementById('speed-slider');
@@ -321,6 +559,102 @@
             speed = parseInt(this.value);
             speedValue.textContent = speed;
         });
+
+        // Bullets array
+        const bullets = [];
+        const bulletGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+        const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFF00 });
+
+        // Shooting function
+        function shoot() {
+            if (gameState.reloading) return;
+            
+            const now = Date.now();
+            if (now - gameState.lastShot < gameState.fireRate) return;
+            
+            if (gameState.ammo <= 0) {
+                reload();
+                return;
+            }
+            
+            gameState.ammo--;
+            updateAmmoDisplay();
+            gameState.lastShot = now;
+            
+            // Create bullet
+            const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+            
+            // Position bullet at gun muzzle
+            bullet.position.set(camera.position.x, camera.position.y, camera.position.z);
+            
+            // Get shooting direction from camera
+            const direction = new THREE.Vector3(0, 0, -1);
+            direction.applyQuaternion(camera.quaternion);
+            
+            // Store direction in bullet
+            bullet.userData.direction = direction;
+            bullet.userData.velocity = direction.clone().multiplyScalar(gameState.bulletSpeed);
+            bullet.userData.lifetime = 3000; // 3 seconds lifetime
+            bullet.userData.created = now;
+            
+            scene.add(bullet);
+            bullets.push(bullet);
+            
+            // Muzzle flash
+            if (gameState.muzzleFlash) {
+                gameState.muzzleFlash.intensity = 5;
+                setTimeout(() => {
+                    gameState.muzzleFlash.intensity = 0;
+                }, 50);
+            }
+            
+            // Gun recoil animation
+            if (gunContainer) {
+                gunContainer.position.z += 0.05;
+                setTimeout(() => {
+                    gunContainer.position.z -= 0.05;
+                }, 50);
+            }
+        }
+
+        // Reload function
+        function reload() {
+            if (gameState.reloading || gameState.totalAmmo <= 0) return;
+            
+            gameState.reloading = true;
+            ammoDisplay.textContent = "Reloading...";
+            
+            setTimeout(() => {
+                const ammoNeeded = 30 - gameState.ammo;
+                const ammoToReload = Math.min(ammoNeeded, gameState.totalAmmo);
+                
+                gameState.totalAmmo -= ammoToReload;
+                gameState.ammo += ammoToReload;
+                gameState.reloading = false;
+                
+                updateAmmoDisplay();
+            }, 2000); // 2 second reload time
+        }
+
+        // Update ammo display
+        function updateAmmoDisplay() {
+            ammoDisplay.textContent = `${gameState.ammo} / ${gameState.totalAmmo}`;
+        }
+        updateAmmoDisplay();
+
+        // Update health display
+        function updateHealthDisplay() {
+            healthFill.style.width = `${gameState.health}%`;
+            
+            if (gameState.health > 60) {
+                healthFill.style.backgroundColor = '#4CAF50'; // Green
+            } else if (gameState.health > 30) {
+                healthFill.style.backgroundColor = '#FFC107'; // Yellow
+            } else {
+                healthFill.style.backgroundColor = '#F44336'; // Red
+            }
+        }
+        updateHealthDisplay();
 
         // Key controls
         const onKeyDown = function(event) {
@@ -343,9 +677,12 @@
                     break;
                 case 'Space':
                     if (canJump) {
-                        velocity.y = jumpVelocity;
+                        velocity.y = gameState.jumpVelocity;
                         canJump = false;
                     }
+                    break;
+                case 'KeyR':
+                    reload();
                     break;
             }
         };
@@ -373,6 +710,46 @@
 
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
+        
+        // Mouse events
+        document.addEventListener('mousedown', function(event) {
+            if (event.button === 0 && controls.isLocked) {
+                shoot();
+            }
+        });
+
+        // Check for collisions
+        function checkCollisions(position, radius) {
+            for (const object of gameState.collidableObjects) {
+                // Skip ground for horizontal collisions
+                if (object === ground) continue;
+                
+                if (object.userData.physics && object.userData.physics.type === 'box') {
+                    // Box-sphere collision
+                    const box = new THREE.Box3().setFromObject(object);
+                    
+                    // Find closest point on box to sphere center
+                    const closestPoint = new THREE.Vector3();
+                    closestPoint.copy(position);
+                    closestPoint.clamp(box.min, box.max);
+                    
+                    // Check if within collision distance
+                    const distance = position.distanceTo(closestPoint);
+                    if (distance < radius) {
+                        // Collision response - push player away
+                        const pushDirection = new THREE.Vector3().subVectors(position, closestPoint).normalize();
+                        const pushAmount = radius - distance;
+                        return {
+                            collision: true,
+                            pushDirection: pushDirection,
+                            pushAmount: pushAmount
+                        };
+                    }
+                }
+            }
+            
+            return { collision: false };
+        }
 
         // Window resize handler
         window.addEventListener('resize', function() {
@@ -384,69 +761,133 @@
         // Game clock for consistent timing
         const clock = new THREE.Clock();
 
-        // Remove loading screen
-        document.getElementById('loading-screen').style.display = 'none';
-
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
             
-            if (controls.isLocked) {
-                // Delta time for frame-rate independent movement
-                const delta = Math.min(clock.getDelta(), 0.1);
+            const delta = Math.min(clock.getDelta(), 0.1);
+            
+            // Calculate FPS
+            gameState.frameCount++;
+            const now = performance.now();
+            if (now - gameState.lastFpsUpdate > 1000) {
+                gameState.fps = Math.round((gameState.frameCount * 1000) / (now - gameState.lastFpsUpdate));
+                gameState.frameCount = 0;
+                gameState.lastFpsUpdate = now;
+                fpsElement.textContent = gameState.fps;
+                positionElement.textContent = `${camera.position.x.toFixed(1)}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)}`;
+            }
+            
+            // Update bullets
+            const bulletsToRemove = [];
+            for (let i = 0; i < bullets.length; i++) {
+                const bullet = bullets[i];
                 
-                // Apply gravity
-                velocity.y -= gravity * delta;
+                // Move bullet
+                bullet.position.add(bullet.userData.velocity.clone().multiplyScalar(delta));
                 
-                // Calculate movement direction
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
-                
-                // Apply movement based on camera direction
-                if (moveForward || moveBackward) velocity.z = -direction.z * speed;
-                else velocity.z = 0;
-                
-                if (moveLeft || moveRight) velocity.x = -direction.x * speed;
-                else velocity.x = 0;
-                
-                // Apply movement to camera and character
-                controls.moveRight(velocity.x * delta);
-                controls.moveForward(velocity.z * delta);
-                
-                // Update vertical position
-                camera.position.y += velocity.y * delta;
-                
-                // Ground collision detection
-                if (camera.position.y < 1.6) {
-                    velocity.y = 0;
-                    camera.position.y = 1.6;
-                    canJump = true;
+                // Check bullet lifetime
+                if (now - bullet.userData.created > bullet.userData.lifetime) {
+                    bulletsToRemove.push(i);
+                    continue;
                 }
                 
-                // Update character position to follow camera
-                if (currentCharacter) {
-                    currentCharacter.position.set(
-                        camera.position.x,
-                        camera.position.y - 1.6, // Offset to keep character on ground
-                        camera.position.z
-                    );
+                // Check bullet collisions
+                for (const object of gameState.collidableObjects) {
+                    if (object === ground) continue; // Skip ground for simplicity
                     
-                    // Make character face movement direction
-                    if (velocity.x !== 0 || velocity.z !== 0) {
-                        const angle = Math.atan2(velocity.x, velocity.z);
-                        currentCharacter.rotation.y = angle;
+                    // Simple sphere-box collision
+                    const box = new THREE.Box3().setFromObject(object);
+                    if (box.containsPoint(bullet.position)) {
+                        bulletsToRemove.push(i);
+                        
+                        // Add impact effect
+                        const impactGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                        const impactMaterial = new THREE.MeshBasicMaterial({ 
+                            color: 0xFFFF00,
+                            transparent: true,
+                            opacity: 1
+                        });
+                        const impact = new THREE.Mesh(impactGeometry, impactMaterial);
+                        impact.position.copy(bullet.position);
+                        scene.add(impact);
+                        
+                        // Animate impact and remove
+                        const startTime = now;
+                        function animateImpact() {
+                            const elapsed = performance.now() - startTime;
+                            if (elapsed > 300) {
+                                scene.remove(impact);
+                                return;
+                            }
+                            impact.material.opacity = 1 - (elapsed / 300);
+                            impact.scale.set(1 + elapsed/100, 1 + elapsed/100, 1 + elapsed/100);
+                            requestAnimationFrame(animateImpact);
+                        }
+                        animateImpact();
+                        
+                        break;
                     }
                 }
             }
             
-            renderer.render(scene, camera);
-        }
-        
-        animate();
-        
-        // Display initial instruction
-        alert("Click on the game to start. Use WASD to move, Space to jump, and mouse to look around.");
-    </script>
-</body>
-</html>
+            // Remove bullets from end to start
+            for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
+                const index = bulletsToRemove[i];
+                scene.remove(bullets[index]);
+                bullets.splice(index, 1);
+            }
+            
+            if (controls.isLocked) {
+                // Apply gravity
+                velocity.y -= gameState.gravity * delta;
+                
+                // Get previous position for collision detection
+                const prevPosition = camera.position.clone();
+                
+                // Calculate movement direction
+                direction.z = Number(moveForward) - Number(moveBackward);
+direction.x = Number(moveRight) - Number(moveLeft);
+direction.normalize(); // This ensures consistent movement in all directions
+
+// Move player based on direction and speed
+const movementSpeed = speed * delta;
+velocity.x = direction.x * movementSpeed;
+velocity.z = direction.z * movementSpeed;
+
+// Update camera position
+camera.position.x += velocity.x;
+camera.position.z += velocity.z;
+camera.position.y += velocity.y * delta;
+
+// Update character position to match camera
+if (currentCharacter) {
+    currentCharacter.position.x = camera.position.x;
+    currentCharacter.position.z = camera.position.z;
+    currentCharacter.position.y = camera.position.y - gameState.playerHeight;
+}
+
+// Check floor collision
+if (camera.position.y < gameState.playerHeight) {
+    velocity.y = 0;
+    camera.position.y = gameState.playerHeight;
+    canJump = true;
+}
+
+// Check other collisions
+if (gameState.playerCollisions) {
+    const collision = checkCollisions(camera.position, gameState.playerRadius);
+    if (collision.collision) {
+        // Move player away from collision
+        camera.position.add(
+            collision.pushDirection.multiplyScalar(collision.pushAmount)
+        );
+    }
+}
+}
+
+renderer.render(scene, camera);
+}
+
+// Start the animation loop
+animate();
