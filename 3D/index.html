@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Model Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <!--
+    3D Model Viewer using Three.js
+    - Place your GLTF/GLB model in the `model/` folder and update the path in the loader if needed.
+    - Commit this file and the `model/` folder to a GitHub repository.
+    - Enable GitHub Pages (Settings → Pages) on the `main` branch.
+    - Access your site at https://<username>.github.io/<repo-name>/
+  -->
+
+  <!-- Three.js core library -->
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <!-- OrbitControls for drag/rotate interaction -->
+  <script src="https://unpkg.com/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+  <!-- GLTFLoader to load GLTF/GLB models -->
+  <script src="https://unpkg.com/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
+
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 10, 10);
+    scene.add(directionalLight);
+
+    // Controls for dragging/rotating
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Load a GLTF/GLB model
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      'model/scene.gltf', // <-- Update path if your model is named differently
+      (gltf) => {
+        scene.add(gltf.scene);
+      },
+      undefined,
+      (error) => {
+        console.error('Error loading model:', error);
+      }
+    );
+
+    // Initial camera position
+    camera.position.set(0, 2, 5);
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
