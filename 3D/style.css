@@ -1,21 +1,67 @@
+/* Suggested style.css for the multiplayer game */
 body {
     margin: 0;
+    padding: 0;
     overflow: hidden;
     font-family: Arial, sans-serif;
-}
-
-#info {
-    position: absolute;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    background-color: rgba(0,0,0,0.5);
-    padding: 10px;
-    z-index: 100;
+    color: #ffffff;
 }
 
 #container {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
+}
+
+#blocker {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#instructions {
+    width: 100%;
+    max-width: 600px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#instructions h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+#instructions p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+#player-id {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #aaffaa;
+}
+
+/* Crosshair (optional) */
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
 }
