@@ -5,36 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PS5 Controller 3D Viewer</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
+        body { 
+            margin: 0; 
+            overflow: hidden;
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+        }
         .loading-text {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-family: Arial, sans-serif;
             font-size: 24px;
+            text-align: center;
+        }
+        .debug-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 500px;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="loading-text">Loading PS5 Controller...</div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/FBXLoader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/libs/fflate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+    <div class="info">PS5 Controller Viewer - Drag to rotate, scroll to zoom</div>
+    <div class="debug-panel" id="debug-panel">Debug Information:<br></div>
 
-    <script>
+    <!-- Import Three.js from CDN with modules -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js",
+                "three/addons/": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
+        // Debug function
+        const debugPanel = document.getElementById('debug-panel');
+        function debug(message) {
+            const line = document.createElement('div');
+            line.textContent = message;
+            debugPanel.appendChild(line);
+            console.log(message);
+        }
+
+        debug("Starting initialization...");
+
         // Scene setup
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x333333);
+        debug("Scene created");
         
         // Camera setup
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
+        debug("Camera set up at position z=5");
         
         // Renderer setup
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -42,14 +95,16 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
+        debug("Renderer initialized");
         
         // Controls for dragging
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
         controls.minDistance = 3;
         controls.maxDistance = 10;
+        debug("OrbitControls initialized");
         
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -63,56 +118,87 @@
         const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
         directionalLight2.position.set(-5, -5, -5);
         scene.add(directionalLight2);
+        debug("Lighting set up");
+
+        // Add a default object to verify the scene is working
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+        debug("Added temporary cube to verify scene rendering");
         
         // Load PS5 controller model
-        const loader = new THREE.FBXLoader();
-        loader.load('PS5Controller.fbx', function(object) {
-            // Handle model
-            object.traverse(function(child) {
-                if (child.isMesh) {
-                    // Apply a default material since we don't have textures
-                    child.material = new THREE.MeshPhongMaterial({
-                        color: 0xffffff,
-                        shininess: 30,
-                        specular: 0x111111
-                    });
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+        const loader = new FBXLoader();
+        debug("FBXLoader created, attempting to load PS5Controller.fbx");
+        
+        loader.load(
+            'PS5Controller.fbx', 
+            function(object) {
+                debug("Model loaded successfully!");
+                
+                // Handle model
+                object.traverse(function(child) {
+                    if (child.isMesh) {
+                        // Apply a default material since we don't have textures
+                        child.material = new THREE.MeshPhongMaterial({
+                            color: 0xffffff,
+                            shininess: 30,
+                            specular: 0x111111
+                        });
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                
+                // Center the model
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                object.position.sub(center);
+                
+                // Scale the model appropriately
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 3 / maxDim;
+                object.scale.set(scale, scale, scale);
+                
+                // Remove the cube once model is loaded
+                scene.remove(cube);
+                scene.add(object);
+                
+                // Hide loading text when model is loaded
+                document.querySelector('.loading-text').style.display = 'none';
+                debug("Model added to scene, cube removed");
+            }, 
+            // Progress callback
+            function(xhr) {
+                if (xhr.lengthComputable) {
+                    const percent = Math.floor(xhr.loaded / xhr.total * 100);
+                    document.querySelector('.loading-text').textContent = `Loading PS5 Controller... ${percent}%`;
+                    debug(`Loading progress: ${percent}%`);
+                } else {
+                    document.querySelector('.loading-text').textContent = 'Loading PS5 Controller...';
+                    debug(`Loading in progress (size unknown)`);
                 }
-            });
-            
-            // Center the model
-            const box = new THREE.Box3().setFromObject(object);
-            const center = box.getCenter(new THREE.Vector3());
-            object.position.sub(center);
-            
-            // Scale the model appropriately
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scale = 3 / maxDim;
-            object.scale.set(scale, scale, scale);
-            
-            scene.add(object);
-            
-            // Hide loading text when model is loaded
-            document.querySelector('.loading-text').style.display = 'none';
-        }, 
-        // Progress callback
-        function(xhr) {
-            const loadingText = document.querySelector('.loading-text');
-            loadingText.textContent = `Loading PS5 Controller... ${Math.floor(xhr.loaded / xhr.total * 100)}%`;
-        },
-        // Error callback
-        function(error) {
-            console.error('Error loading model:', error);
-            document.querySelector('.loading-text').textContent = 'Error loading PS5 Controller model. Check console for details.';
-        });
+            },
+            // Error callback
+            function(error) {
+                debug(`Error loading model: ${error.message || 'Unknown error'}`);
+                console.error('Error loading model:', error);
+                document.querySelector('.loading-text').innerHTML = 
+                    'Error loading PS5 Controller model.<br>Check that PS5Controller.fbx exists in the correct location.<br>' +
+                    'See developer console for details.';
+                
+                // Make cube red to indicate error
+                cube.material.color.set(0xff0000);
+            }
+        );
         
         // Handle window resize
         window.addEventListener('resize', function() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            debug("Window resized, renderer and camera updated");
         });
         
         // Animation loop
@@ -122,6 +208,7 @@
             renderer.render(scene, camera);
         }
         
+        debug("Starting animation loop");
         animate();
     </script>
 </body>
