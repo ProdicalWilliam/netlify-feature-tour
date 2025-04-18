@@ -339,6 +339,7 @@
                 document.getElementById('loading-screen').textContent = "Error loading gun model! Using default.";
                 // Create a default gun if loading fails
                 createDefaultGun();
+                document.getElementById('loading-screen').style.display = 'none';
             }
         );
         
