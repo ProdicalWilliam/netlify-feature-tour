@@ -10,49 +10,51 @@
   </style>
 </head>
 <body>
-  <!-- Three.js core -->
-  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
-  <!-- OrbitControls for interaction -->
-  <script src="https://unpkg.com/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
-  <!-- FBXLoader to load your controller model -->
-  <script src="https://unpkg.com/three@0.152.2/examples/js/loaders/FBXLoader.js"></script>
+  <!-- Use a module script so we can import examples/jsm -->
+  <script type="module">
+    // 1) Core three + helpers as ES modules
+    import * as THREE from 'https://unpkg.com/three@0.152.2/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js';
+    import { FBXLoader } from 'https://unpkg.com/three@0.152.2/examples/jsm/loaders/FBXLoader.js';
 
-  <script>
-    // Basic scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // 2) Scene + camera + renderer
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, 10);
-    scene.add(directionalLight);
+    // 3) Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dir = new THREE.DirectionalLight(0xffffff, 1);
+    dir.position.set(10,10,10);
+    scene.add(dir);
 
-    // Orbit controls for dragging/rotating
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    // 4) Controls
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    // FBX loader: load your low-poly PS5 controller from same folder
-    const loader = new THREE.FBXLoader();
+    // 5) Load FBX
+    const loader = new FBXLoader();
     loader.load(
       'PS5Controller.fbx',
-      (object) => {
-        // Scale down if too large
+      object => {
+        // attach a simple gray material if no textures
+        object.traverse(child => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({ color: 0x888888 });
+          }
+        });
         object.scale.setScalar(0.01);
         scene.add(object);
       },
-      (xhr) => console.log(`Loading: ${ (xhr.loaded / xhr.total * 100).toFixed(0) }%`),
-      (error) => console.error('Error loading FBX:', error)
+      xhr => console.log(`Loading ${(xhr.loaded/xhr.total*100).toFixed(0)}%`),
+      err => console.error('Load error', err)
     );
 
-    // Position camera
     camera.position.set(0, 2, 5);
 
-    // Render loop
+    // 6) Animate
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
@@ -60,9 +62,9 @@
     }
     animate();
 
-    // Handle window resize
+    // 7) Resize
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = window.innerWidth/window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
