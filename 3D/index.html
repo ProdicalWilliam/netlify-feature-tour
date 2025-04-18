@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>3D Model Viewer</title>
+  <title>PS5 Controller Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { margin: 0; overflow: hidden; }
@@ -10,23 +10,15 @@
   </style>
 </head>
 <body>
-  <!--
-    3D Model Viewer using Three.js
-    - Place your GLTF/GLB model in the `model/` folder and update the path in the loader if needed.
-    - Commit this file and the `model/` folder to a GitHub repository.
-    - Enable GitHub Pages (Settings → Pages) on the `main` branch.
-    - Access your site at https://<username>.github.io/<repo-name>/
-  -->
-
-  <!-- Three.js core library -->
+  <!-- Three.js core -->
   <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
-  <!-- OrbitControls for drag/rotate interaction -->
+  <!-- OrbitControls for interaction -->
   <script src="https://unpkg.com/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
-  <!-- GLTFLoader to load GLTF/GLB models -->
-  <script src="https://unpkg.com/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- FBXLoader to load your controller model -->
+  <script src="https://unpkg.com/three@0.152.2/examples/js/loaders/FBXLoader.js"></script>
 
   <script>
-    // Scene setup
+    // Basic scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,27 +32,27 @@
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
-    // Controls for dragging/rotating
+    // Orbit controls for dragging/rotating
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    // Load a GLTF/GLB model
-    const loader = new THREE.GLTFLoader();
+    // FBX loader: load your low-poly PS5 controller from same folder
+    const loader = new THREE.FBXLoader();
     loader.load(
-      'model/scene.gltf', // <-- Update path if your model is named differently
-      (gltf) => {
-        scene.add(gltf.scene);
+      'PS5Controller.fbx',
+      (object) => {
+        // Scale down if too large
+        object.scale.setScalar(0.01);
+        scene.add(object);
       },
-      undefined,
-      (error) => {
-        console.error('Error loading model:', error);
-      }
+      (xhr) => console.log(`Loading: ${ (xhr.loaded / xhr.total * 100).toFixed(0) }%`),
+      (error) => console.error('Error loading FBX:', error)
     );
 
-    // Initial camera position
+    // Position camera
     camera.position.set(0, 2, 5);
 
-    // Animation loop
+    // Render loop
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
@@ -68,7 +60,7 @@
     }
     animate();
 
-    // Handle window resizing
+    // Handle window resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
