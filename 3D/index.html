@@ -46,19 +46,34 @@
             max-height: 200px;
             overflow-y: auto;
         }
+        #file-input {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="loading-text">Loading PS5 Controller...</div>
+    <div class="loading-text">Waiting for model file...</div>
     <div class="info">PS5 Controller Viewer - Drag to rotate, scroll to zoom</div>
     <div class="debug-panel" id="debug-panel">Debug Information:<br></div>
+    
+    <!-- Add file input as fallback -->
+    <div id="file-input">
+        <p>Select your PS5Controller.fbx file:</p>
+        <input type="file" id="model-file" accept=".fbx">
+    </div>
 
     <!-- Import Three.js from CDN with modules -->
     <script type="importmap">
         {
             "imports": {
-                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js",
-                "three/addons/": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/examples/jsm/"
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
             }
         }
     </script>
@@ -127,71 +142,97 @@
         scene.add(cube);
         debug("Added temporary cube to verify scene rendering");
         
-        // Load PS5 controller model
-        const loader = new FBXLoader();
-        debug("FBXLoader created, attempting to load PS5Controller.fbx");
-        
-        loader.load(
-            'PS5Controller.fbx', 
-            function(object) {
-                debug("Model loaded successfully!");
-                
-                // Handle model
-                object.traverse(function(child) {
-                    if (child.isMesh) {
-                        // Apply a default material since we don't have textures
-                        child.material = new THREE.MeshPhongMaterial({
-                            color: 0xffffff,
-                            shininess: 30,
-                            specular: 0x111111
-                        });
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
-                
-                // Center the model
-                const box = new THREE.Box3().setFromObject(object);
-                const center = box.getCenter(new THREE.Vector3());
-                object.position.sub(center);
-                
-                // Scale the model appropriately
-                const size = box.getSize(new THREE.Vector3());
-                const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 3 / maxDim;
-                object.scale.set(scale, scale, scale);
-                
-                // Remove the cube once model is loaded
-                scene.remove(cube);
-                scene.add(object);
-                
-                // Hide loading text when model is loaded
-                document.querySelector('.loading-text').style.display = 'none';
-                debug("Model added to scene, cube removed");
-            }, 
-            // Progress callback
-            function(xhr) {
-                if (xhr.lengthComputable) {
-                    const percent = Math.floor(xhr.loaded / xhr.total * 100);
-                    document.querySelector('.loading-text').textContent = `Loading PS5 Controller... ${percent}%`;
-                    debug(`Loading progress: ${percent}%`);
-                } else {
-                    document.querySelector('.loading-text').textContent = 'Loading PS5 Controller...';
-                    debug(`Loading in progress (size unknown)`);
-                }
-            },
-            // Error callback
-            function(error) {
-                debug(`Error loading model: ${error.message || 'Unknown error'}`);
-                console.error('Error loading model:', error);
-                document.querySelector('.loading-text').innerHTML = 
-                    'Error loading PS5 Controller model.<br>Check that PS5Controller.fbx exists in the correct location.<br>' +
-                    'See developer console for details.';
-                
-                // Make cube red to indicate error
-                cube.material.color.set(0xff0000);
+        // Function to load model either from path or file input
+        function loadModel(source, isFile = false) {
+            const loader = new FBXLoader();
+            
+            if (isFile) {
+                debug(`Loading model from uploaded file: ${source.name}`);
+                loader.loadAsync(URL.createObjectURL(source))
+                    .then(handleLoadedModel)
+                    .catch(handleLoadError);
+            } else {
+                debug(`Attempting to load model from path: ${source}`);
+                loader.load(
+                    source, 
+                    handleLoadedModel,
+                    // Progress callback
+                    function(xhr) {
+                        if (xhr.lengthComputable) {
+                            const percent = Math.floor(xhr.loaded / xhr.total * 100);
+                            document.querySelector('.loading-text').textContent = `Loading PS5 Controller... ${percent}%`;
+                            debug(`Loading progress: ${percent}%`);
+                        } else {
+                            document.querySelector('.loading-text').textContent = 'Loading PS5 Controller...';
+                            debug(`Loading in progress (size unknown)`);
+                        }
+                    },
+                    handleLoadError
+                );
             }
-        );
+        }
+        
+        function handleLoadedModel(object) {
+            debug("Model loaded successfully!");
+            
+            // Handle model
+            object.traverse(function(child) {
+                if (child.isMesh) {
+                    // Apply a default material since we don't have textures
+                    child.material = new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        shininess: 30,
+                        specular: 0x111111
+                    });
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            
+            // Center the model
+            const box = new THREE.Box3().setFromObject(object);
+            const center = box.getCenter(new THREE.Vector3());
+            object.position.sub(center);
+            
+            // Scale the model appropriately
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 3 / maxDim;
+            object.scale.set(scale, scale, scale);
+            
+            // Remove the cube once model is loaded
+            scene.remove(cube);
+            scene.add(object);
+            
+            // Hide loading text and file input when model is loaded
+            document.querySelector('.loading-text').style.display = 'none';
+            document.getElementById('file-input').style.display = 'none';
+            debug("Model added to scene, cube removed");
+        }
+        
+        function handleLoadError(error) {
+            debug(`Error loading model: ${error.message || 'Unknown error'}`);
+            console.error('Error loading model:', error);
+            document.querySelector('.loading-text').innerHTML = 
+                'Error loading PS5 Controller model.<br>' +
+                'Either use the file input above or ensure PS5Controller.fbx exists in the correct location.<br>' +
+                'See debug panel for details.';
+            
+            // Make cube red to indicate error
+            cube.material.color.set(0xff0000);
+        }
+        
+        // Try to load the model from the expected path
+        loadModel('PS5Controller.fbx');
+        
+        // Set up file input as a fallback
+        document.getElementById('model-file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.querySelector('.loading-text').textContent = `Loading ${file.name}...`;
+                loadModel(file, true);
+            }
+        });
         
         // Handle window resize
         window.addEventListener('resize', function() {
