@@ -3,18 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Third-Person Game</title>
+    <title>Third-Person Multiplayer Game</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Three.js and GLTFLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
     <div id="info">
-        <h1>Third-Person Game</h1>
-        <p id="controls-info">Controls: W/S - Move forward/back, A/D - Strafe left/right, Q/E - Rotate left/right</p>
+        <h1>Third-Person Multiplayer Game</h1>
+        <p id="controls-info">Controls: W/S - Move forward/back, A/D - Strafe left/right, Q/E - Rotate</p>
+        <p id="player-id">Connecting...</p>
     </div>
     <div id="container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // Initialize Firebase
+        // IMPORTANT: Replace with your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZrLCnjCyUvMOzDe-yeB185qrN8M97LP4",
+            authDomain: "github-1ec60.firebaseapp.com",
+            databaseURL: "https://github-1ec60-default-rtdb.firebaseio.com",
+            projectId: "github-1ec60",
+            storageBucket: "github-1ec60.firebasestorage.app",
+            messagingSenderId: "370562737308",
+            appId: "G-JDV0KHPD7F"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Generate a random player ID
+        const playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        document.getElementById('player-id').textContent = 'Your ID: ' + playerId;
+        
+        // Reference to store player positions
+        const playersRef = database.ref('players');
+        
+        // Store other player objects
+        const otherPlayers = {};
+        
         // Wait for the DOM to load
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('container');
@@ -50,18 +81,89 @@
             ground.rotation.x = -Math.PI / 2;
             scene.add(ground);
             
-            // Player representation (simple box)
-            const playerGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
-            const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-            const player = new THREE.Mesh(playerGeometry, playerMaterial);
-            player.position.y = 0.5;
-            scene.add(player);
+            // Player model variables
+            let player;
+            let playerMesh;
+            let mixer;
+            let playerLoaded = false;
+            
+            // Load player model
+            const gltfLoader = new THREE.GLTFLoader();
+            gltfLoader.load(
+                'models/character_sktail2a.glb', // Path to your model
+                (gltf) => {
+                    playerMesh = gltf.scene;
+                    
+                    // Scale and position the model
+                    playerMesh.scale.set(0.5, 0.5, 0.5);
+                    playerMesh.position.y = 0; // Adjust as needed
+                    
+                    // Setup animation mixer if available
+                    if (gltf.animations && gltf.animations.length) {
+                        mixer = new THREE.AnimationMixer(playerMesh);
+                        const idleAction = mixer.clipAction(gltf.animations[0]);
+                        idleAction.play();
+                    }
+                    
+                    player = new THREE.Object3D();
+                    player.add(playerMesh);
+                    player.position.y = 0;
+                    scene.add(player);
+                    playerLoaded = true;
+                    
+                    // Initial position update to Firebase
+                    updatePlayerPositionInFirebase();
+                },
+                (xhr) => {
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+                (error) => {
+                    console.error('Error loading model:', error);
+                    // Fallback to a simple box if model fails to load
+                    const playerGeometry = new THREE.BoxGeometry(0.5, 1, 0.5);
+                    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+                    playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
+                    
+                    player = new THREE.Object3D();
+                    player.add(playerMesh);
+                    player.position.y = 0.5;
+                    scene.add(player);
+                    playerLoaded = true;
+                    
+                    // Initial position update to Firebase
+                    updatePlayerPositionInFirebase();
+                }
+            );
+            
+            // Load textures for the model - typically handled by GLTFLoader,
+            // but can be customized for specific needs
+            function loadTexturesForModel() {
+                const textureLoader = new THREE.TextureLoader();
+                
+                // Example of loading a texture for a specific part of the model
+                textureLoader.load(
+                    'models/skin_texture.jpg',
+                    (texture) => {
+                        // Apply to material if playerMesh is loaded
+                        if (playerMesh) {
+                            playerMesh.traverse((child) => {
+                                if (child.isMesh && child.material.name === 'skin') {
+                                    child.material.map = texture;
+                                    child.material.needsUpdate = true;
+                                }
+                            });
+                        }
+                    },
+                    undefined,
+                    (err) => console.error('Error loading texture:', err)
+                );
+                
+                // Additional textures can be loaded similarly
+            }
             
             // Wall creation function
             function createWall(x, z, rotateY = 0) {
-                // Create a simple wall
                 const wallGeometry = new THREE.BoxGeometry(5, 2, 0.2);
-                // Load texture
                 const textureLoader = new THREE.TextureLoader();
                 
                 const wallMaterial = new THREE.MeshStandardMaterial({ 
@@ -69,9 +171,8 @@
                     roughness: 0.7
                 });
                 
-                // Try to load "wall.png" from the same directory
                 textureLoader.load(
-                    'wall.png', // This should be in the same folder as your HTML file
+                    'wall.png',
                     (texture) => {
                         wallMaterial.map = texture;
                         wallMaterial.needsUpdate = true;
@@ -139,62 +240,185 @@
             const playerMovement = new THREE.Vector3();
             let playerRotation = 0;
             
+            // Update player position in Firebase (throttled)
+            let lastUpdate = 0;
+            function updatePlayerPositionInFirebase() {
+                if (!playerLoaded) return;
+                
+                const now = Date.now();
+                // Update at most every 100ms to avoid flooding the database
+                if (now - lastUpdate > 100) {
+                    lastUpdate = now;
+                    
+                    playersRef.child(playerId).set({
+                        position: {
+                            x: player.position.x,
+                            y: player.position.y,
+                            z: player.position.z
+                        },
+                        rotation: {
+                            y: playerRotation
+                        },
+                        lastUpdated: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            }
+            
+            // Handle other players
+            function createOrUpdateOtherPlayer(id, data) {
+                if (id === playerId) return; // Skip self
+                
+                if (!otherPlayers[id]) {
+                    // Clone the player model for other players
+                    if (playerMesh) {
+                        const otherPlayerMesh = playerMesh.clone();
+                        const otherPlayer = new THREE.Object3D();
+                        otherPlayer.add(otherPlayerMesh);
+                        scene.add(otherPlayer);
+                        otherPlayers[id] = otherPlayer;
+                    } else {
+                        // Fallback if player model isn't loaded yet
+                        const otherPlayerGeom = new THREE.BoxGeometry(0.5, 1, 0.5);
+                        const otherPlayerMat = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+                        const otherPlayerMesh = new THREE.Mesh(otherPlayerGeom, otherPlayerMat);
+                        const otherPlayer = new THREE.Object3D();
+                        otherPlayer.add(otherPlayerMesh);
+                        scene.add(otherPlayer);
+                        otherPlayers[id] = otherPlayer;
+                    }
+                }
+                
+                // Update position and rotation
+                const otherPlayer = otherPlayers[id];
+                if (data.position) {
+                    otherPlayer.position.set(
+                        data.position.x,
+                        data.position.y,
+                        data.position.z
+                    );
+                }
+                
+                if (data.rotation) {
+                    otherPlayer.rotation.y = data.rotation.y;
+                }
+            }
+            
+            // Listen for other players' updates
+            playersRef.on('value', (snapshot) => {
+                const players = snapshot.val() || {};
+                
+                // Add or update other players
+                for (const id in players) {
+                    createOrUpdateOtherPlayer(id, players[id]);
+                }
+                
+                // Remove disconnected players (they'll be automatically removed from Firebase after a timeout)
+                for (const id in otherPlayers) {
+                    if (!players[id]) {
+                        scene.remove(otherPlayers[id]);
+                        delete otherPlayers[id];
+                    }
+                }
+            });
+            
+            // Clean up player data when they disconnect
+            window.addEventListener('beforeunload', () => {
+                playersRef.child(playerId).remove();
+            });
+            
+            // Automatically remove inactive players (Firebase security rules can enforce this too)
+            function cleanupInactivePlayers() {
+                const now = Date.now();
+                const timeoutDuration = 10000; // 10 seconds
+                
+                playersRef.once('value', (snapshot) => {
+                    const players = snapshot.val() || {};
+                    
+                    for (const id in players) {
+                        const player = players[id];
+                        if (player.lastUpdated && now - player.lastUpdated > timeoutDuration) {
+                            playersRef.child(id).remove();
+                        }
+                    }
+                });
+            }
+            
+            // Clean up inactive players every 30 seconds
+            setInterval(cleanupInactivePlayers, 30000);
+            
+            // Clock for animation mixer
+            const clock = new THREE.Clock();
+            
             // Animation loop
             const animate = () => {
                 requestAnimationFrame(animate);
                 
-                // Reset movement vector
-                playerMovement.set(0, 0, 0);
+                const delta = clock.getDelta();
                 
-                // Handle rotation
-                if (keys.turnLeft) {
-                    playerRotation += playerRotationSpeed;
-                    player.rotation.y = playerRotation;
-                    playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                // Update animation mixer if it exists
+                if (mixer) {
+                    mixer.update(delta);
                 }
                 
-                if (keys.turnRight) {
-                    playerRotation -= playerRotationSpeed;
-                    player.rotation.y = playerRotation;
-                    playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                if (playerLoaded) {
+                    // Reset movement vector
+                    playerMovement.set(0, 0, 0);
+                    
+                    // Handle rotation
+                    if (keys.turnLeft) {
+                        playerRotation += playerRotationSpeed;
+                        player.rotation.y = playerRotation;
+                        playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                    }
+                    
+                    if (keys.turnRight) {
+                        playerRotation -= playerRotationSpeed;
+                        player.rotation.y = playerRotation;
+                        playerDirection.set(Math.sin(playerRotation), 0, -Math.cos(playerRotation));
+                    }
+                    
+                    // Handle movement
+                    if (keys.forward) {
+                        playerMovement.add(playerDirection.clone().multiplyScalar(playerSpeed));
+                    }
+                    
+                    if (keys.backward) {
+                        playerMovement.add(playerDirection.clone().multiplyScalar(-playerSpeed));
+                    }
+                    
+                    if (keys.left) {
+                        const leftDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), playerDirection).normalize();
+                        playerMovement.add(leftDir.multiplyScalar(playerSpeed));
+                    }
+                    
+                    if (keys.right) {
+                        const rightDir = new THREE.Vector3().crossVectors(playerDirection, new THREE.Vector3(0, 1, 0)).normalize();
+                        playerMovement.add(rightDir.multiplyScalar(playerSpeed));
+                    }
+                    
+                    // Apply movement
+                    player.position.add(playerMovement);
+                    
+                    // Simple collision detection with boundaries
+                    if (player.position.x > 9) player.position.x = 9;
+                    if (player.position.x < -9) player.position.x = -9;
+                    if (player.position.z > 9) player.position.z = 9;
+                    if (player.position.z < -9) player.position.z = -9;
+                    
+                    // Update position in Firebase if player moved
+                    if (playerMovement.lengthSq() > 0 || keys.turnLeft || keys.turnRight) {
+                        updatePlayerPositionInFirebase();
+                    }
+                    
+                    // Third-person camera follows the player
+                    const cameraOffset = new THREE.Vector3(
+                        -playerDirection.x * 3,
+                        2,
+                        -playerDirection.z * 3
+                    );
+                    camera.position.copy(player.position).add(cameraOffset);
+                    camera.lookAt(player.position);
                 }
-                
-                // Handle movement
-                if (keys.forward) {
-                    playerMovement.add(playerDirection.clone().multiplyScalar(playerSpeed));
-                }
-                
-                if (keys.backward) {
-                    playerMovement.add(playerDirection.clone().multiplyScalar(-playerSpeed));
-                }
-                
-                if (keys.left) {
-                    const leftDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), playerDirection).normalize();
-                    playerMovement.add(leftDir.multiplyScalar(playerSpeed));
-                }
-                
-                if (keys.right) {
-                    const rightDir = new THREE.Vector3().crossVectors(playerDirection, new THREE.Vector3(0, 1, 0)).normalize();
-                    playerMovement.add(rightDir.multiplyScalar(playerSpeed));
-                }
-                
-                // Apply movement
-                player.position.add(playerMovement);
-                
-                // Simple collision detection with boundaries
-                if (player.position.x > 9) player.position.x = 9;
-                if (player.position.x < -9) player.position.x = -9;
-                if (player.position.z > 9) player.position.z = 9;
-                if (player.position.z < -9) player.position.z = -9;
-                
-                // Third-person camera follows the player
-                const cameraOffset = new THREE.Vector3(
-                    -playerDirection.x * 3,
-                    2,
-                    -playerDirection.z * 3
-                );
-                camera.position.copy(player.position).add(cameraOffset);
-                camera.lookAt(player.position);
                 
                 renderer.render(scene, camera);
             };
