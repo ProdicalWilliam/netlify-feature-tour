@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Showcase - Dazes.org</title>
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f7934a;
+            --dark-bg: #1a1a2e;
+            --card-bg: #242438;
+            --text-color: #e6e6e6;
+            --text-muted: #9999a8;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .filter-dropdown {
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-image {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .game-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .game-card:hover .game-image img {
+            transform: scale(1.05);
+        }
+
+        .game-icon {
+            position: absolute;
+            bottom: -20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            padding: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .game-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .game-content {
+            padding: 1.5rem 1rem 1rem;
+        }
+
+        .game-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .game-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            background-color: rgba(74, 108, 247, 0.2);
+            color: var(--primary-color);
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .game-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .play-button {
+            padding: 0.5rem 1.2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .play-button:hover {
+            background-color: #3450cc;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .game-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+            gap: 0.5rem;
+        }
+
+        .pagination-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #444;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-button.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-button:hover:not(.active) {
+            background-color: #32324a;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--card-bg);
+            margin-top: 3rem;
+        }
+
+        footer p {
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .search-filter {
+                flex-direction: column;
+            }
+            .game-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+
+        /* Hover effects for accessibility */
+        @media (hover: hover) {
+            .play-button:focus, .search-box:focus, .filter-dropdown:focus, .pagination-button:focus {
+                outline: 2px solid var(--secondary-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dazes.org Game Showcase</h1>
+        <p class="subtitle">Explore my collection of web games</p>
+    </header>
+
+    <div class="container">
+        <div class="search-filter">
+            <input type="text" class="search-box" placeholder="Search games..." id="searchInput">
+            <select class="filter-dropdown" id="categoryFilter">
+                <option value="all">All Categories</option>
+                <option value="3d">3D Games</option>
+                <option value="puzzle">Puzzle</option>
+                <option value="action">Action</option>
+                <option value="platformer">Platformer</option>
+                <option value="adventure">Adventure</option>
+                <option value="strategy">Strategy</option>
+                <option value="simulation">Simulation</option>
+                <option value="racing">Racing</option>
+            </select>
+        </div>
+
+        <div class="game-grid" id="gameGrid">
+            <!-- Game cards will be generated by JavaScript -->
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <footer>
+        <p>Created by <a href="https://github.com/yourusername" target="_blank">Dazes</a> &copy; <span id="currentYear"></span></p>
+    </footer>
+
+    <script>
+        // Game data - EDIT THIS SECTION TO CUSTOMIZE YOUR GAMES
+        // For each game, update the following properties:
+        // - id: A unique identifier for the game
+        // - title: The name of your game
+        // - description: A short description of the game
+        // - image: Path to the game's screenshot/banner image
+        // - icon: Path to the game's icon
+        // - link: URL where the game can be played
+        // - category: The game's primary category (used for filtering)
+        // - tags: Array of tags for additional categorization
+        // - dateAdded: When the game was added to the showcase
+        // - featured: Whether to highlight this game (not currently used)
+        
+        const gamesData = [
+            {
+                id: 1,
+                title: "3D Explorer",
+                description: "A 3D world where you can navigate and explore using WASD controls and mouse look.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=3D+Explorer",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=3D",
+                link: "/games/3d-explorer/",
+                category: "3d",
+                tags: ["3D", "Exploration", "First-Person"],
+                dateAdded: "2023-04-18",
+                featured: true
+            },
+            {
+                id: 2,
+                title: "Puzzle Master",
+                description: "Challenge your brain with this collection of increasingly difficult puzzles.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Puzzle+Master",
+                icon: "https://placehold.co/200x200/f7934a/ffffff?text=PM",
+                link: "/games/puzzle-master/",
+                category: "puzzle",
+                tags: ["Puzzle", "Brain Teaser", "Logic"],
+                dateAdded: "2023-04-15",
+                featured: false
+            },
+            {
+                id: 3,
+                title: "Space Shooter",
+                description: "Defend the galaxy from alien invaders in this fast-paced space shooter.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Space+Shooter",
+                icon: "https://placehold.co/200x200/4af793/000000?text=SS",
+                link: "/games/space-shooter/",
+                category: "action",
+                tags: ["Action", "Space", "Shooter"],
+                dateAdded: "2023-04-10",
+                featured: true
+            },
+            {
+                id: 4,
+                title: "Platform Adventure",
+                description: "Jump and run through colorful levels in this classic platformer game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Platform+Adventure",
+                icon: "https://placehold.co/200x200/f74a6c/ffffff?text=PA",
+                link: "/games/platform-adventure/",
+                category: "platformer",
+                tags: ["Platformer", "Adventure", "2D"],
+                dateAdded: "2023-04-05",
+                featured: false
+            },
+            {
+                id: 5,
+                title: "Dungeon Crawler",
+                description: "Explore procedurally generated dungeons and fight monsters to find treasure.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Dungeon+Crawler",
+                icon: "https://placehold.co/200x200/9f4af7/ffffff?text=DC",
+                link: "/games/dungeon-crawler/",
+                category: "adventure",
+                tags: ["RPG", "Dungeon", "Adventure"],
+                dateAdded: "2023-03-28",
+                featured: true
+            },
+            {
+                id: 6,
+                title: "Strategic Command",
+                description: "Build armies and conquer territories in this turn-based strategy game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Strategic+Command",
+                icon: "https://placehold.co/200x200/f7d54a/000000?text=SC",
+                link: "/games/strategic-command/",
+                category: "strategy",
+                tags: ["Strategy", "Turn-based", "War"],
+                dateAdded: "2023-03-20",
+                featured: false
+            },
+            {
+                id: 7,
+                title: "City Builder",
+                description: "Plan and develop your own city, manage resources and keep citizens happy.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=City+Builder",
+                icon: "https://placehold.co/200x200/4af7d5/000000?text=CB",
+                link: "/games/city-builder/",
+                category: "simulation",
+                tags: ["Simulation", "Management", "Building"],
+                dateAdded: "2023-03-15",
+                featured: true
+            },
+            {
+                id: 8,
+                title: "Speed Racer",
+                description: "Race against time and opponents on challenging tracks all around the world.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Speed+Racer",
+                icon: "https://placehold.co/200x200/f74a4a/ffffff?text=SR",
+                link: "/games/speed-racer/",
+                category: "racing",
+                tags: ["Racing", "Cars", "Speed"],
+                dateAdded: "2023-03-10",
+                featured: false
+            },
+            {
+                id: 9,
+                title: "Match Three",
+                description: "Match colorful gems in this addictive puzzle game with hundreds of levels.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Match+Three",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=M3",
+                link: "/games/match-three/",
+                category: "puzzle",
+                tags: ["Puzzle", "Matching", "Casual"],
+                dateAdded: "2023-03-05",
+                featured: false
+            },
+            {
+                id: 10,
+                title: "Zombie Survival",
+                description: "Survive waves of zombies in this intense action game. How long can you last?",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Zombie+Survival",
+                icon: "https://placehold.co/200x200/4af74a/000000?text=ZS",
+                link: "/games/zombie-survival/",
+                category: "action",
+                tags: ["Action", "Zombie", "Survival"],
+                dateAdded: "2023-02-28",
+                featured: true
+            },
+            {
+                id: 11,
+                title: "Memory Challenge",
+                description: "Test and improve your memory with this classic card-matching game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Memory+Challenge",
+                icon: "https://placehold.co/200x200/f793f7/000000?text=MC",
+                link: "/games/memory-challenge/",
+                category: "puzzle",
+                tags: ["Memory", "Cards", "Brain Training"],
+                dateAdded: "2023-02-25",
+                featured: false
+            },
+            {
+                id: 12,
+                title: "Galaxy Explorer",
+                description: "Explore an infinite procedurally generated galaxy with unique planets.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Galaxy+Explorer",
+                icon: "https://placehold.co/200x200/93f7f7/000000?text=GE",
+                link: "/games/galaxy-explorer/",
+                category: "3d",
+                tags: ["Space", "Exploration", "3D"],
+                dateAdded: "2023-02-20",
+                featured: true
+            },
+            {
+                id: 13,
+                title: "Word Puzzler",
+                description: "Find words in a grid of letters. Test your vocabulary and word-finding skills.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Word+Puzzler",
+                icon: "https://placehold.co/200x200/f7934a/ffffff?text=WP",
+                link: "/games/word-puzzler/",
+                category: "puzzle",
+                tags: ["Word", "Puzzle", "Educational"],
+                dateAdded: "2023-02-15",
+                featured: false
+            },
+            {
+                id: 14,
+                title: "Tower Defense",
+                description: "Build defensive towers to protect your base from waves of enemies.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tower+Defense",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=TD",
+                link: "/games/tower-defense/",
+                category: "strategy",
+                tags: ["Strategy", "Defense", "Tower"],
+                dateAdded: "2023-02-10",
+                featured: false
+            },
+            {
+                id: 15,
+                title: "Snake Game",
+                description: "Classic snake game with modern graphics and multiple game modes.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Snake+Game",
+                icon: "https://placehold.co/200x200/4af793/000000?text=SG",
+                link: "/games/snake-game/",
+                category: "action",
+                tags: ["Classic", "Snake", "Arcade"],
+                dateAdded: "2023-02-05",
+                featured: false
+            },
+            {
+                id: 16,
+                title: "Chess Master",
+                description: "Play chess against an AI opponent with adjustable difficulty levels.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Chess+Master",
+                icon: "https://placehold.co/200x200/f74a6c/ffffff?text=CM",
+                link: "/games/chess-master/",
+                category: "strategy",
+                tags: ["Chess", "Board Game", "Strategy"],
+                dateAdded: "2023-01-30",
+                featured: true
+            },
+            {
+                id: 17,
+                title: "Farm Simulator",
+                description: "Build and manage your own farm. Grow crops and raise animals.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Farm+Simulator",
+                icon: "https://placehold.co/200x200/9f4af7/ffffff?text=FS",
+                link: "/games/farm-simulator/",
+                category: "simulation",
+                tags: ["Farming", "Simulation", "Management"],
+                dateAdded: "2023-01-25",
+                featured: false
+            },
+            {
+                id: 18,
+                title: "2048 Puzzle",
+                description: "Combine numbers and reach 2048 in this addictive mathematical puzzle.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=2048+Puzzle",
+                icon: "https://placehold.co/200x200/f7d54a/000000?text=2048",
+                link: "/games/2048-puzzle/",
+                category: "puzzle",
+                tags: ["Numbers", "Puzzle", "Logic"],
+                dateAdded: "2023-01-20",
+                featured: true
+            },
+            {
+                id: 19,
+                title: "Flight Simulator",
+                description: "Experience realistic flight physics in various aircraft around the world.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Flight+Simulator",
+                icon: "https://placehold.co/200x200/4af7d5/000000?text=FS",
+                link: "/games/flight-simulator/",
+                category: "simulation",
+                tags: ["Flight", "Simulation", "3D"],
+                dateAdded: "2023-01-15",
+                featured: false
+            },
+            {
+                id: 20,
+                title: "Tetris Clone",
+                description: "The classic block-stacking puzzle game with a modern twist.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tetris+Clone",
+                icon: "https://placehold.co/200x200/f74a4a/ffffff?text=TC",
+                link: "/games/tetris-clone/",
+                category: "puzzle",
+                tags: ["Tetris", "Classic", "Blocks"],
+                dateAdded: "2023-01-10",
+                featured: true
+            },
+            {
+                id: 21,
+                title: "Virtual Pet",
+                description: "Adopt a virtual pet, feed it, play with it, and watch it grow.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Virtual+Pet",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=VP",
+                link: "/games/virtual-pet/",
+                category: "simulation",
+                tags: ["Pet", "Simulation", "Casual"],
+                dateAdded: "2023-01-05",
+                featured: false
+            },
+            {
+                id: 22,
+                title: "Cooking Dash",
+                description: "Prepare and serve dishes in this fast-paced cooking simulation.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Cooking+Dash",
+                icon: "https://placehold.co/200x200/f793f7/000000?text=CD",
+                link: "/games/cooking-dash/",
+                category: "simulation",
+                tags: ["Cooking", "Time Management", "Simulation"],
+                dateAdded: "2022-12-30",
+                featured: false
+            },
+            {
+                id: 23,
+                title: "Endless Runner",
+                description: "Run, jump, and slide to avoid obstacles in this infinite runner game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Endless+Runner",
+                icon: "https://placehold.co/200x200/93f7f7/000000?text=ER",
+                link: "/games/endless-runner/",
+                category: "action",
+                tags: ["Runner", "Endless", "Action"],
+                dateAdded: "2022-12-25",
+                featured: true
+            },
+            {
+                id: 24,
+                title: "Block Puzzle",
+                description: "Fit blocks of different shapes into the grid to clear lines.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Block+Puzzle",
+                icon: "https://placehold.co/200x200/f7934a/ffffff?text=BP",
+                link: "/games/block-puzzle/",
+                category: "puzzle",
+                tags: ["Blocks", "Puzzle", "Casual"],
+                dateAdded: "2022-12-20",
+                featured: false
+            },
+            {
+                id: 25,
+                title: "Pirate Adventure",
+                description: "Set sail, explore islands, and search for treasure in this pirate game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Pirate+Adventure",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=PA",
+                link: "/games/pirate-adventure/",
+                category: "adventure",
+                tags: ["Pirates", "Adventure", "Exploration"],
+                dateAdded: "2022-12-15",
+                featured: true
+            },
+            {
+                id: 26,
+                title: "Car Racing",
+                description: "Race against AI opponents on various tracks with different car models.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Car+Racing",
+                icon: "https://placehold.co/200x200/4af793/000000?text=CR",
+                link: "/games/car-racing/",
+                category: "racing",
+                tags: ["Cars", "Racing", "Speed"],
+                dateAdded: "2022-12-10",
+                featured: false
+            },
+            {
+                id: 27,
+                title: "Sudoku Challenge",
+                description: "Classic Sudoku puzzles with multiple difficulty levels.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Sudoku+Challenge",
+                icon: "https://placehold.co/200x200/f74a6c/ffffff?text=SC",
+                link: "/games/sudoku-challenge/",
+                category: "puzzle",
+                tags: ["Sudoku", "Numbers", "Logic"],
+                dateAdded: "2022-12-05",
+                featured: false
+            },
+            {
+                id: 28,
+                title: "Magic Quest",
+                description: "Embark on an epic quest to become the most powerful wizard in the realm.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Magic+Quest",
+                icon: "https://placehold.co/200x200/9f4af7/ffffff?text=MQ",
+                link: "/games/magic-quest/",
+                category: "adventure",
+                tags: ["Fantasy", "Magic", "RPG"],
+                dateAdded: "2022-11-30",
+                featured: true
+            },
+            {
+                id: 29,
+                title: "Football Manager",
+                description: "Manage your own football team, buy players, and win championships.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Football+Manager",
+                icon: "https://placehold.co/200x200/f7d54a/000000?text=FM",
+                link: "/games/football-manager/",
+                category: "simulation",
+                tags: ["Sports", "Management", "Football"],
+                dateAdded: "2022-11-25",
+                featured: false
+            },
+            {
+                id: 30,
+                title: "VR Museum",
+                description: "Explore a virtual museum with interactive exhibits in VR or on screen.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=VR+Museum",
+                icon: "https://placehold.co/200x200/4af7d5/000000?text=VR",
+                link: "/games/vr-museum/",
+                category: "3d",
+                tags: ["VR", "Museum", "Educational"],
+                dateAdded: "2022-11-20",
+                featured: true
+            },
+            {
+                id: 31,
+                title: "Crossword Puzzle",
+                description: "Test your vocabulary with daily crossword puzzles of varying difficulty.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Crossword+Puzzle",
+                icon: "https://placehold.co/200x200/f74a4a/ffffff?text=CP",
+                link: "/games/crossword-puzzle/",
+                category: "puzzle",
+                tags: ["Words", "Crossword", "Educational"],
+                dateAdded: "2022-11-15",
+                featured: false
+            },
+            {
+                id: 32,
+                title: "Ninja Runner",
+                description: "Test your reflexes in this fast-paced ninja platformer game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Ninja+Runner",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=NR",
+                link: "/games/ninja-runner/",
+                category: "platformer",
+                tags: ["Ninja", "Platformer", "Action"],
+                dateAdded: "2022-11-10",
+                featured: true
+            },
+            {
+                id: 33,
+                title: "Mahjong Solitaire",
+                description: "Classic tile-matching puzzle game with beautiful tile sets.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Mahjong+Solitaire",
+                icon: "https://placehold.co/200x200/f793f7/000000?text=MS",
+                link: "/games/mahjong-solitaire/",
+                category: "puzzle",
+                tags: ["Mahjong", "Tiles", "Matching"],
+                dateAdded: "2022-11-05",
+                featured: false
+            },
+            {
+                id: 34,
+                title: "Western Shooter",
+                description: "Test your aim in this western-themed shooting gallery game.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Western+Shooter",
+                icon: "https://placehold.co/200x200/93f7f7/000000?text=WS",
+                link: "/games/western-shooter/",
+                category: "action",
+                tags: ["Western", "Shooter", "Aim"],
+                dateAdded: "2022-11-05",
+                featured: false
+            },
+            {
+                id: 35,
+                title: "Space Station Sim",
+                description: "Build and manage your own space station. Keep your crew alive and happy.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Space+Station+Sim",
+                icon: "https://placehold.co/200x200/f7934a/ffffff?text=SS",
+                link: "/games/space-station-sim/",
+                category: "simulation",
+                tags: ["Space", "Simulation", "Management"],
+                dateAdded: "2022-10-30",
+                featured: true
+            },
+            {
+                id: 36,
+                title: "Castle Defense",
+                description: "Defend your castle from waves of enemies with various weapons and traps.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Castle+Defense",
+                icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=CD",
+                link: "/games/castle-defense/",
+                category: "strategy",
+                tags: ["Defense", "Medieval", "Strategy"],
+                dateAdded: "2022-10-25",
+                featured: false
+            },
+            {
+                id: 37,
+                title: "Fishing Simulator",
+                description: "Relax and catch fish in different locations with various equipment.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Fishing+Simulator",
+                icon: "https://placehold.co/200x200/4af793/000000?text=FS",
+                link: "/games/fishing-simulator/",
+                category: "simulation",
+                tags: ["Fishing", "Relaxing", "Simulation"],
+                dateAdded: "2022-10-20",
+                featured: false
+            },
+            {
+                id: 38,
+                title: "Jungle Adventure",
+                description: "Explore the jungle, solve puzzles, and find ancient treasures.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Jungle+Adventure",
+                icon: "https://placehold.co/200x200/f74a6c/ffffff?text=JA",
+                link: "/games/jungle-adventure/",
+                category: "adventure",
+                tags: ["Jungle", "Adventure", "Exploration"],
+                dateAdded: "2022-10-15",
+                featured: true
+            },
+            {
+                id: 39,
+                title: "Retro Arcade",
+                description: "Collection of classic arcade games with a retro pixel art style.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Retro+Arcade",
+                icon: "https://placehold.co/200x200/9f4af7/ffffff?text=RA",
+                link: "/games/retro-arcade/",
+                category: "action",
+                tags: ["Retro", "Arcade", "Collection"],
+                dateAdded: "2022-10-10",
+                featured: false
+            },
+            {
+                id: 40,
+                title: "Robot Factory",
+                description: "Build and program robots to complete various tasks and challenges.",
+                image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Robot+Factory",
+                icon: "https://placehold.co/200x200/f7d54a/000000?text=RF",
+                link: "/games/robot-factory/",
+                category: "puzzle",
+                tags: ["Robots", "Programming", "Logic"],
+                dateAdded: "2022-10-05",
+                featured: true
+            }
+        ];
+
+        // Constants
+        const GAMES_PER_PAGE = 12;
+        let currentPage = 1;
+        let filteredGames = [...gamesData];
+
+        // DOM elements
+        const gameGrid = document.getElementById('gameGrid');
+        const pagination = document.getElementById('pagination');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const currentYearSpan = document.getElementById('currentYear');
+
+        // Set current year in footer
+        currentYearSpan.textContent = new Date().getFullYear();
+
+        // Initialize the page
+        function initPage() {
+            renderGames();
+            setupEventListeners();
+        }
+
+        // Render games based on current filters and pagination
+        function renderGames() {
+            // Clear the grid
+            gameGrid.innerHTML = '';
+            
+            // Calculate start and end indices
+            const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
+            const endIndex = startIndex + GAMES_PER_PAGE;
+            
+            // Get current page games
+            const currentGames = filteredGames.slice(startIndex, endIndex);
+            
+            // If no games match the filter
+            if (currentGames.length === 0) {
+                gameGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;">
+                        <h2>No games found</h2>
+                        <p>Try changing your search or filter criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create and append game cards
+            currentGames.forEach(game => {
+                const gameCard = createGameCard(game);
+                gameGrid.appendChild(gameCard);
+            });
+            
+            // Update pagination
+            renderPagination();
+        }
+
+        // Create a game card element
+        function createGameCard(game) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            
+            // Create tags HTML
+            const tagsHTML = game.tags.map(tag => `
+                <span class="game-tag">${tag}</span>
+            `).join('');
+            
+            card.innerHTML = `
+                <div class="game-image">
+                    <img src="${game.image}" alt="${game.title}">
+                    <div class="game-icon">
+                        <img src="${game.icon}" alt="${game.title} icon">
+                    </div>
+                </div>
+                <div class="game-content">
+                    <div class="game-tags">
+                        ${tagsHTML}
+                    </div>
+                    <h3 class="game-title">${game.title}</h3>
+                    <p class="game-description">${game.description}</p>
+                    <div class="game-actions">
+                        <a href="${game.link}" class="play-button">Play Now</a>
+                        <div class="game-info">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                ${formatDate(game.dateAdded)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Render pagination controls
+        function renderPagination() {
+            pagination.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
+            
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.className = 'pagination-button';
+            prevButton.textContent = '← Prev';
+            prevButton.disabled = currentPage === 1;
+            if (currentPage > 1) {
+                prevButton.addEventListener('click', () => {
+                    currentPage--;
+                    renderGames();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+            pagination.appendChild(prevButton);
+            
+            // Page buttons
+            const maxButtons = 5; // Maximum number of page buttons to show
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            // Adjust start page if we're near the end
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    renderGames();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                pagination.appendChild(pageButton);
+            }
+            
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.className = 'pagination-button';
+            nextButton.textContent = 'Next →';
+            nextButton.disabled = currentPage === totalPages;
+            if (currentPage < totalPages) {
+                nextButton.addEventListener('click', () => {
+                    currentPage++;
+                    renderGames();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+            pagination.appendChild(nextButton);
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', debounce(function() {
+                filterGames();
+            }, 300));
+            
+            // Category filter
+            categoryFilter.addEventListener('change', function() {
+                filterGames();
+            });
+            
+            // Window resize
+            window.addEventListener('resize', debounce(function() {
+                renderGames();
+            }, 200));
+        }
+
+        // Filter games based on search and category
+        function filterGames() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter.value;
+            
+            filteredGames = gamesData.filter(game => {
+                // Check if game matches search term
+                const matchesSearch = searchTerm === '' || 
+                    game.title.toLowerCase().includes(searchTerm) || 
+                    game.description.toLowerCase().includes(searchTerm) ||
+                    game.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                
+                // Check if game matches category
+                const matchesCategory = category === 'all' || game.category === category;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            // Reset to first page when filtering
+            currentPage = 1;
+            renderGames();
+        }
+
+        // Helper function for debouncing
+        function debounce(func, delay) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        // Format date to readable format
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
