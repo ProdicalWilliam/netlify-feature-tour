@@ -3,255 +3,1059 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Response Humanizer</title>
+    <title>TextBlend | AI Text Humanizer</title>
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #14b8a6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9;
         }
         
         header {
             text-align: center;
             margin-bottom: 40px;
+            padding-top: 40px;
         }
         
         h1 {
-            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
             margin-bottom: 10px;
-        }
-        
-        .container {
+            color: var(--dark);
             display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        
-        .input-section, .settings-section, .output-section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 150px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-        }
-        
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        
-        .setting-card {
-            border: 1px solid #eee;
-            border-radius: 6px;
-            padding: 15px;
-        }
-        
-        .setting-card h3 {
-            margin-top: 0;
-            font-size: 16px;
-        }
-        
-        .slider-container {
-            margin: 10px 0;
-        }
-        
-        .slider {
-            width: 100%;
-        }
-        
-        .models-section {
-            margin-top: 15px;
-        }
-        
-        .models-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            align-items: center;
+            justify-content: center;
             gap: 10px;
-            margin-top: 10px;
         }
         
-        .model-checkbox {
+        h1 span {
+            color: var(--primary);
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        label {
-            font-weight: 500;
+        h2 svg {
+            opacity: 0.8;
         }
         
-        .history-section {
-            margin-top: 20px;
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            font-family: inherit;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        button svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .button-secondary {
+            background-color: white;
+            border: 1px solid #cbd5e1;
+            color: var(--dark);
+        }
+        
+        .button-secondary:hover {
+            background-color: #f8fafc;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .setting-card {
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        
+        .setting-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .setting-card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .setting-card p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .slider-container {
+            margin: 16px 0;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .models-section {
+            margin-top: 24px;
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .model-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .model-checkbox:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .model-checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+        
+        .model-label {
+            font-weight: 500;
+            font-size: 15px;
         }
         
         .history-item {
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 0;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .history-action {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .text-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        
+        .text-content {
+            font-size: 15px;
+            line-height: 1.6;
+            background-color: #f8fafc;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
         }
         
         footer {
-            margin-top: 40px;
             text-align: center;
-            color: #7f8c8d;
+            padding: 20px 0 40px;
+            color: var(--gray);
             font-size: 14px;
+        }
+        
+        .watermark {
+            display: inline-block;
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: -1px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            border: 1px solid transparent;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: #e2e8f0;
+            border-bottom-color: white;
+            color: var(--primary);
+        }
+        
+        .tab:not(.active):hover {
+            background-color: #f8fafc;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #065f46;
+        }
+        
+        .btn-copy {
+            background-color: transparent;
+            padding: 6px;
+            color: var(--gray);
+        }
+        
+        .btn-copy:hover {
+            background-color: #f1f5f9;
+            color: var(--dark);
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .detection-meter {
+            background-color: #f1f5f9;
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .detection-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--success), var(--warning), var(--danger));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .detection-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .advanced-option {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .toggle-content {
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .aiDetectionGraph {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .aiScoreHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .aiScoreValue {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .aiScoreValue.human {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+        }
+        
+        .aiScoreValue.ai {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>AI Response Humanizer</h1>
-        <p>Transform formal AI responses into more natural, human-like conversation</p>
-    </header>
-    
     <div class="container">
-        <div class="input-section">
-            <h2>Input AI Response</h2>
-            <textarea id="ai-input" placeholder="Paste the AI-generated text you want to humanize here..."></textarea>
-        </div>
+        <header>
+            <h1>Text<span>Blend</span></h1>
+            <p class="tagline">Transform AI-generated text into natural human writing that bypasses detection</p>
+        </header>
         
-        <div class="settings-section">
-            <h2>Humanization Settings</h2>
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="input">Input Text</div>
+                <div class="tab" data-tab="settings">Settings</div>
+                <div class="tab" data-tab="advanced">Advanced</div>
+            </div>
             
-            <div class="settings-grid">
-                <div class="setting-card">
-                    <h3>Casual Language</h3>
-                    <p>Replace formal language with more casual expressions</p>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="70" class="slider" id="casual-slider">
-                        <div><span id="casual-value">70</span>%</div>
+            <div class="card-body tab-content active" id="input-tab">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
+                    Paste AI Text
+                </h2>
+                <p style="color: var(--gray); margin-bottom: 16px;">Paste the AI-generated text you want to make undetectable</p>
+                
+                <textarea id="ai-input" placeholder="Enter or paste AI-generated text here..."></textarea>
+                
+                <div class="aiDetectionGraph">
+                    <div class="aiScoreHeader">
+                        <span>AI Detection Score:</span>
+                        <span class="aiScoreValue ai" id="input-score">Not analyzed</span>
+                    </div>
+                    <div class="detection-meter">
+                        <div class="detection-bar" id="input-meter" style="width: 0%"></div>
+                    </div>
+                    <div class="detection-labels">
+                        <span>Human</span>
+                        <span>Mixed</span>
+                        <span>AI</span>
                     </div>
                 </div>
                 
-                <div class="setting-card">
-                    <h3>Add Filler Words</h3>
-                    <p>Insert natural filler words (well, actually, you know)</p>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="40" class="slider" id="filler-slider">
-                        <div><span id="filler-value">40</span>%</div>
-                    </div>
-                </div>
-                
-                <div class="setting-card">
-                    <h3>Conversational Rhythm</h3>
-                    <p>Vary sentence length and structure for natural flow</p>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="60" class="slider" id="rhythm-slider">
-                        <div><span id="rhythm-value">60</span>%</div>
-                    </div>
-                </div>
-                
-                <div class="setting-card">
-                    <h3>Personality Traits</h3>
-                    <p>Add expressions of personality</p>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="50" class="slider" id="personality-slider">
-                        <div><span id="personality-value">50</span>%</div>
-                    </div>
-                    <select id="personality-type" class="full-width">
-                        <option value="friendly">Friendly & Warm</option>
-                        <option value="witty">Witty & Humorous</option>
-                        <option value="thoughtful">Thoughtful & Reflective</option>
-                        <option value="enthusiastic">Enthusiastic & Energetic</option>
-                    </select>
+                <div class="button-group">
+                    <button id="humanize-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5l6.74-6.76z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+                        Transform Text
+                    </button>
+                    <button id="analyze-btn" class="button-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        Check Detectability
+                    </button>
                 </div>
             </div>
             
-            <div class="models-section">
-                <h3>Target AI Models</h3>
-                <p>Select which models you want to optimize for:</p>
-                <div class="models-grid">
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="gpt4" checked>
-                        <label for="gpt4">GPT-4</label>
+            <div class="card-body tab-content" id="settings-tab">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Humanization Settings
+                </h2>
+                <p style="color: var(--gray); margin-bottom: 24px;">Customize how your text will be transformed</p>
+                
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Natural Language
+                        </h3>
+                        <p>Replace formal AI phrasing with natural human expressions</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="85" class="slider" id="natural-slider">
+                            <div class="slider-labels">
+                                <span>Minimal</span>
+                                <span id="natural-value">85%</span>
+                                <span>Maximum</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="gpt4-mini" checked>
-                        <label for="gpt4-mini">GPT-4 Mini</label>
+                    
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            Filler Phrases
+                        </h3>
+                        <p>Add natural human hesitations and verbal patterns</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="45" class="slider" id="filler-slider">
+                            <div class="slider-labels">
+                                <span>None</span>
+                                <span id="filler-value">45%</span>
+                                <span>Many</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="gpt35" checked>
-                        <label for="gpt35">GPT-3.5 Turbo</label>
+                    
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            Sentence Variation
+                        </h3>
+                        <p>Vary sentence structure and length for natural flow</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="75" class="slider" id="sentence-slider">
+                            <div class="slider-labels">
+                                <span>Uniform</span>
+                                <span id="sentence-value">75%</span>
+                                <span>Varied</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="claude">
-                        <label for="claude">Claude</label>
+                    
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                            Human Voice Style
+                        </h3>
+                        <p>Add personality traits to your text</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="65" class="slider" id="voice-slider">
+                            <div class="slider-labels">
+                                <span>Subtle</span>
+                                <span id="voice-value">65%</span>
+                                <span>Strong</span>
+                            </div>
+                        </div>
+                        <select id="voice-style" class="full-width">
+                            <option value="casual">Casual & Conversational</option>
+                            <option value="friendly">Friendly & Approachable</option>
+                            <option value="thoughtful">Thoughtful & Reflective</option>
+                            <option value="expert">Expert & Knowledgeable</option>
+                            <option value="academic">Academic & Formal</option>
+                        </select>
                     </div>
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="llama">
-                        <label for="llama">Llama 3</label>
+
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            Imperfection Level
+                        </h3>
+                        <p>Add natural mistakes and human inconsistencies</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="30" class="slider" id="imperfection-slider">
+                            <div class="slider-labels">
+                                <span>Perfect</span>
+                                <span id="imperfection-value">30%</span>
+                                <span>Flawed</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="model-checkbox">
-                        <input type="checkbox" id="gemini">
-                        <label for="gemini">Gemini</label>
+
+                    <div class="setting-card">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            Bypass Strategy
+                        </h3>
+                        <p>Choose strategy for avoiding AI detection</p>
+                        <select id="bypass-strategy" class="full-width">
+                            <option value="balanced">Balanced (Recommended)</option>
+                            <option value="gpt4">Optimized for GPT-4</option>
+                            <option value="classroom">Academic/Classroom Detectors</option>
+                            <option value="maximum">Maximum Evasion</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="models-section">
+                    <h3>Target AI Models</h3>
+                    <p style="color: var(--gray); margin-bottom: 16px;">Select models to optimize for:</p>
+                    <div class="models-grid">
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="gpt4" checked>
+                            <span class="model-label">GPT-4</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="gpt4o" checked>
+                            <span class="model-label">GPT-4o</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="gpt4-mini" checked>
+                            <span class="model-label">GPT-4 Mini</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="gpt35" checked>
+                            <span class="model-label">GPT-3.5</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="claude" checked>
+                            <span class="model-label">Claude</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="llama">
+                            <span class="model-label">Llama 3</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="gemini">
+                            <span class="model-label">Gemini</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="mistral">
+                            <span class="model-label">Mistral</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="turnitin">
+                            <span class="model-label">Turnitin</span>
+                        </label>
+                        <label class="model-checkbox">
+                            <input type="checkbox" id="originality">
+                            <span class="model-label">Originality.ai</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body tab-content" id="advanced-tab">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Advanced Options
+                </h2>
+                <p style="color: var(--gray); margin-bottom: 24px;">Fine-tune your text transformation for maximum undetectability</p>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Vocabulary Replacement</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="vocab-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="vocab-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Replace common AI phrases and vocabulary with human alternatives</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="75" class="slider" id="vocab-slider">
+                            <div class="slider-labels">
+                                <span>Conservative</span>
+                                <span id="vocab-value">75%</span>
+                                <span>Aggressive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Syntax Variation</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="syntax-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="syntax-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Modify sentence structures to be more human-like</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="80" class="slider" id="syntax-slider">
+                            <div class="slider-labels">
+                                <span>Minimal</span>
+                                <span id="syntax-value">80%</span>
+                                <span>Extensive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Perplexity Enhancement</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="perplexity-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="perplexity-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Increase text unpredictability to fool AI detectors</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="65" class="slider" id="perplexity-slider">
+                            <div class="slider-labels">
+                                <span>Low</span>
+                                <span id="perplexity-value">65%</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Context-Aware Adjustments</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="context-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="context-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Modify text based on surrounding context and topic</p>
+                        <select id="context-type" class="full-width" style="margin-bottom: 16px;">
+                            <option value="auto">Auto-detect (Recommended)</option>
+                            <option value="academic">Academic/Research</option>
+                            <option value="creative">Creative Writing</option>
+                            <option value="business">Business/Professional</option>
+                            <option value="technical">Technical/Scientific</option>
+                            <option value="casual">Casual/Conversational</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Add Statistical Noise</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="noise-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="noise-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Add statistical variations to confuse AI detectors</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="55" class="slider" id="noise-slider">
+                            <div class="slider-labels">
+                                <span>Subtle</span>
+                                <span id="noise-value">55%</span>
+                                <span>Strong</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="advanced-option">
+                    <div class="toggle">
+                        <span class="toggle-label">Style Preservation</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="style-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-content" id="style-content" style="display: block;">
+                        <p style="color: var(--gray); margin-bottom: 16px;">Keep the original style while making text undetectable</p>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="70" class="slider" id="style-slider">
+                            <div class="slider-labels">
+                                <span>Change Style</span>
+                                <span id="style-value">70%</span>
+                                <span>Preserve Style</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="output-section">
-            <h2>Humanized Result</h2>
-            <button id="humanize-btn">Humanize Text</button>
-            <div style="margin-top: 15px;">
+        <div class="card" id="output-section">
+            <div class="card-header">
+                <div class="output-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Humanized Result
+                    </h2>
+                    <div class="output-actions">
+                        <button class="btn-copy" id="copy-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button class="btn-copy" id="download-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="aiDetectionGraph">
+                    <div class="aiScoreHeader">
+                        <span>AI Detection Score:</span>
+                        <span class="aiScoreValue human" id="output-score">Not analyzed</span>
+                    </div>
+                    <div class="detection-meter">
+                        <div class="detection-bar" id="output-meter" style="width: 0%"></div>
+                    </div>
+                    <div class="detection-labels">
+                        <span>Human</span>
+                        <span>Mixed</span>
+                        <span>AI</span>
+                    </div>
+                </div>
+                
                 <textarea id="humanized-output" placeholder="Your humanized text will appear here..." readonly></textarea>
+                
+                <div class="watermark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5l6.74-6.76z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+                    TextBlend by @Ming
+                </div>
             </div>
         </div>
         
-        <div class="history-section">
-            <h2>Recent Transformations</h2>
-            <div id="history-items">
-                <div class="history-item">
-                    <strong>Original:</strong> "The task has been completed successfully. All requirements have been met and the deliverables have been submitted."
-                    <br>
-                    <strong>Humanized:</strong> "Hey, just wanted to let you know I've finished up the task! Everything you asked for is done and I've already sent over all the deliverables."
-                </div>
-                <div class="history-item">
-                    <strong>Original:</strong> "According to the data analysis, there is a correlation between the variables. The statistical significance is p < 0.05."
-                    <br>
-                    <strong>Humanized:</strong> "So I looked at the data, and you know what? These variables are actually connected! And it's not just random - the stats show it's significant (p less than 0.05)."
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Recent Transformations
+                </h2>
+            </div>
+            <div class="card-body">
+                <div id="history-items">
+                    <!-- History items will be added here dynamically -->
                 </div>
             </div>
         </div>
+        
+        <footer>
+            <p>TextBlend &copy; 2025 | All processing happens in your browser for privacy</p>
+            <div class="watermark">Created by @Ming</div>
+        </footer>
     </div>
-    
-    <footer>
-        <p>AI Humanizer Tool &copy; 2025 | Privacy-focused - All processing happens in your browser</p>
-    </footer>
 
     <script>
-        // Update slider values on screen
+        // Update slider values displays
         document.querySelectorAll('.slider').forEach(slider => {
             slider.addEventListener('input', function() {
-                document.getElementById(this.id.replace('-slider', '-value')).textContent = this.value;
+                document.getElementById(this.id.replace('-slider', '-value')).textContent = this.value + '%';
             });
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                // Show corresponding tab content
+                document.getElementById(this.getAttribute('data-tab') + '-tab').classList.add('active');
+            });
+        });
+        
+        // Toggle advanced options visibility
+        document.querySelectorAll('.toggle input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const contentId = this.id.replace('-toggle', '-content');
+                const content = document.getElementById(contentId);
+                content.style.display = this.checked ? 'block' : 'none';
+            });
+        });
+        
+        // Copy button functionality
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const output = document.getElementById('humanized-output');
+            output.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+            setTimeout(() => {
+                this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+            }, 2000);
+        });
+        
+        // Download button functionality
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const text = document.getElementById('humanized-output').value;
+            if (!text) return;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'humanized-text.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // Example AI detection analysis function
+        function analyzeTextForAIDetection(text) {
+            // This would be replaced with actual AI detection algorithm
+            // Here we'll just simulate detection for demonstration
+            
+            if (!text) return { score: 0, isAI: false };
+            
+            const patterns = [
+                /I mean,/gi,
+                /like,/gi,
+                /well,/gi,
+                /you know,/gi,
+                /just a thought, but/gi,
+                /it is believed that/gi,
+                /hope that helps/gi,
+                /in conclusion/gi,
+                /furthermore/gi,
+                /therefore/gi,
+                /moreover/gi,
+                /subsequently/gi,
+                /highly/gi,
+                /significantly/gi,
+                /with respect to/gi,
+                /with regard to/gi,
+                /ultimately/gi
+            ];
+            
+            // Count pattern matches
+            let matches = 0;
+            patterns.forEach(pattern => {
+                const count = (text.match(pattern) || []).length;
+                matches += count;
+            });
+            
+            // Calculate rough "AI score" - higher is more AI-like
+            const wordCount = text.split(/\s+/).length;
+            const normalizedScore = Math.min(100, Math.max(0, 100 - (matches * 10 / wordCount * 100)));
+            
+            // AI scores: 0-30 Human, 30-70 Mixed, 70-100 AI
+            return {
+                score: normalizedScore,
+                isAI: normalizedScore > 70
+            };
+        }
+        
+        // Analyze input text button
+        document.getElementById('analyze-btn').addEventListener('click', function() {
+            const text = document.getElementById('ai-input').value;
+            if (!text) return;
+            
+            const analysis = analyzeTextForAIDetection(text);
+            const scoreElement = document.getElementById('input-score');
+            const meterElement = document.getElementById('input-meter');
+            
+            scoreElement.textContent = analysis.isAI ? 
+                `${analysis.score.toFixed(2)}% AI` : 
+                `${(100-analysis.score).toFixed(2)}% Human`;
+                
+            scoreElement.className = analysis.isAI ? 'aiScoreValue ai' : 'aiScoreValue human';
+            meterElement.style.width = `${analysis.score}%`;
         });
         
         // Humanize text functionality
@@ -262,27 +1066,78 @@
                 return;
             }
             
-            // Get slider values
-            const casualLevel = parseInt(document.getElementById('casual-slider').value);
+            // Get all settings
+            const naturalLevel = parseInt(document.getElementById('natural-slider').value);
             const fillerLevel = parseInt(document.getElementById('filler-slider').value);
-            const rhythmLevel = parseInt(document.getElementById('rhythm-slider').value);
-            const personalityLevel = parseInt(document.getElementById('personality-slider').value);
-            const personalityType = document.getElementById('personality-type').value;
+            const sentenceLevel = parseInt(document.getElementById('sentence-slider').value);
+            const voiceLevel = parseInt(document.getElementById('voice-slider').value);
+            const imperfectionLevel = parseInt(document.getElementById('imperfection-slider').value);
+            const voiceStyle = document.getElementById('voice-style').value;
+            const bypassStrategy = document.getElementById('bypass-strategy').value;
             
-            // Simple humanization logic (in a real app, this would be much more sophisticated)
-            let humanizedText = humanizeText(inputText, casualLevel, fillerLevel, rhythmLevel, personalityLevel, personalityType);
+            // Get advanced settings if they're toggled on
+            const useVocab = document.getElementById('vocab-toggle').checked;
+            const vocabLevel = useVocab ? parseInt(document.getElementById('vocab-slider').value) : 0;
+            
+            const useSyntax = document.getElementById('syntax-toggle').checked;
+            const syntaxLevel = useSyntax ? parseInt(document.getElementById('syntax-slider').value) : 0;
+            
+            const usePerplexity = document.getElementById('perplexity-toggle').checked;
+            const perplexityLevel = usePerplexity ? parseInt(document.getElementById('perplexity-slider').value) : 0;
+            
+            const useNoise = document.getElementById('noise-toggle').checked;
+            const noiseLevel = useNoise ? parseInt(document.getElementById('noise-slider').value) : 0;
+            
+            // Process the text with all settings
+            const humanizedText = humanizeText(
+                inputText, 
+                naturalLevel, 
+                fillerLevel, 
+                sentenceLevel, 
+                voiceLevel, 
+                imperfectionLevel,
+                voiceStyle, 
+                bypassStrategy,
+                vocabLevel,
+                syntaxLevel,
+                perplexityLevel,
+                noiseLevel
+            );
             
             // Display the result
             document.getElementById('humanized-output').value = humanizedText;
             
-            // Add to history (in a real app, we'd limit the history length)
+            // Analyze the humanized output
+            const analysis = analyzeTextForAIDetection(humanizedText);
+            const scoreElement = document.getElementById('output-score');
+            const meterElement = document.getElementById('output-meter');
+            
+            scoreElement.textContent = analysis.isAI ? 
+                `${analysis.score.toFixed(2)}% AI` : 
+                `${(100-analysis.score).toFixed(2)}% Human`;
+                
+            scoreElement.className = analysis.isAI ? 'aiScoreValue ai' : 'aiScoreValue human';
+            meterElement.style.width = `${analysis.score}%`;
+            
+            // Add to history
             addToHistory(inputText, humanizedText);
         });
         
-        // Simple text humanization function
-        function humanizeText(text, casualLevel, fillerLevel, rhythmLevel, personalityLevel, personalityType) {
-            // This is a very simplified version - in reality, this would use NLP techniques
-            
+        // Main humanization function
+        function humanizeText(
+            text, 
+            naturalLevel, 
+            fillerLevel, 
+            sentenceLevel, 
+            voiceLevel, 
+            imperfectionLevel,
+            voiceStyle, 
+            bypassStrategy,
+            vocabLevel,
+            syntaxLevel,
+            perplexityLevel,
+            noiseLevel
+        ) {
             // Break text into sentences
             let sentences = text.split(/(?<=[.!?])\s+/);
             
@@ -290,99 +1145,375 @@
             let humanizedSentences = sentences.map((sentence, index) => {
                 let modified = sentence;
                 
-                // Apply casual language transformations
-                if (casualLevel > 30) {
-                    modified = modified.replace("I would like to", "I'd like to");
-                    modified = modified.replace("I would", "I'd");
-                    modified = modified.replace("you would", "you'd");
-                    modified = modified.replace("it would", "it'd");
+                // Apply natural language transformations
+                if (naturalLevel > 30) {
+                    modified = modified.replace(/it is ([\w]+) that/gi, "it's $1 that");
+                    modified = modified.replace(/there is/gi, "there's");
+                    modified = modified.replace(/that is/gi, "that's");
+                    modified = modified.replace(/it is/gi, "it's");
+                    modified = modified.replace(/I would/gi, "I'd");
+                    modified = modified.replace(/you would/gi, "you'd");
+                    modified = modified.replace(/they would/gi, "they'd");
+                    modified = modified.replace(/we would/gi, "we'd");
+                    modified = modified.replace(/he would/gi, "he'd");
+                    modified = modified.replace(/she would/gi, "she'd");
                 }
                 
-                if (casualLevel > 50) {
-                    modified = modified.replace("approximately", "about");
-                    modified = modified.replace("therefore", "so");
-                    modified = modified.replace("subsequently", "then");
-                    modified = modified.replace("utilize", "use");
-                    modified = modified.replace("obtain", "get");
+                if (naturalLevel > 50) {
+                    modified = modified.replace(/approximately/gi, "about");
+                    modified = modified.replace(/therefore/gi, "so");
+                    modified = modified.replace(/subsequently/gi, "then");
+                    modified = modified.replace(/utilize/gi, "use");
+                    modified = modified.replace(/obtain/gi, "get");
+                    modified = modified.replace(/however/gi, "but");
+                    modified = modified.replace(/additionally/gi, "also");
+                    modified = modified.replace(/in addition/gi, "also");
                 }
                 
-                if (casualLevel > 70) {
-                    modified = modified.replace("is not", "isn't");
-                    modified = modified.replace("are not", "aren't");
-                    modified = modified.replace("cannot", "can't");
-                    modified = modified.replace("will not", "won't");
+                if (naturalLevel > 70) {
+                    modified = modified.replace(/is not/gi, "isn't");
+                    modified = modified.replace(/are not/gi, "aren't");
+                    modified = modified.replace(/cannot/gi, "can't");
+                    modified = modified.replace(/will not/gi, "won't");
+                    modified = modified.replace(/do not/gi, "don't");
+                    modified = modified.replace(/does not/gi, "doesn't");
+                    modified = modified.replace(/did not/gi, "didn't");
+                    modified = modified.replace(/could not/gi, "couldn't");
+                    modified = modified.replace(/would not/gi, "wouldn't");
+                    modified = modified.replace(/should not/gi, "shouldn't");
                 }
                 
-                // Add filler words occasionally
-                if (fillerLevel > 30 && Math.random() < fillerLevel/100) {
-                    const fillers = ["well, ", "so, ", "basically, ", "I mean, ", "you know, ", "like, "];
+                // Apply vocabulary replacement for advanced evasion
+                if (vocabLevel > 40) {
+                    modified = modified.replace(/in conclusion/gi, "to wrap things up");
+                    modified = modified.replace(/furthermore/gi, "plus");
+                    modified = modified.replace(/nevertheless/gi, "still");
+                    modified = modified.replace(/consequently/gi, "as a result");
+                    modified = modified.replace(/with respect to/gi, "about");
+                    modified = modified.replace(/with regard to/gi, "regarding");
+                    modified = modified.replace(/essentially/gi, "basically");
+                    modified = modified.replace(/primarily/gi, "mainly");
+                    modified = modified.replace(/significant/gi, "important");  
+                    modified = modified.replace(/numerous/gi, "many");
+                }
+                
+                if (vocabLevel > 70) {
+                    modified = modified.replace(/optimal/gi, "best");
+                    modified = modified.replace(/adequate/gi, "enough");
+                    modified = modified.replace(/extensive/gi, "wide");
+                    modified = modified.replace(/initial/gi, "first");
+                    modified = modified.replace(/fundamental/gi, "basic");
+                    modified = modified.replace(/frequently/gi, "often");
+                    modified = modified.replace(/substantial/gi, "big");
+                    modified = modified.replace(/encountered/gi, "faced");
+                    modified = modified.replace(/demonstrated/gi, "showed");
+                    modified = modified.replace(/attempt/gi, "try");
+                }
+                
+                // Add filler words based on settings
+                if (fillerLevel > 30 && Math.random() < fillerLevel/200) {
+                    const fillers = [
+                        "well, ", "so, ", "basically, ", "you know, ", "like, ", 
+                        "I mean, ", "honestly, ", "actually, ", "yeah, ", "kinda, "
+                    ];
                     const selectedFiller = fillers[Math.floor(Math.random() * fillers.length)];
                     
-                    // Only add to the beginning of some sentences
-                    if (index > 0 && modified.length > 20) {
+                    // Only add to beginning of some sentences, not all
+                    if (index > 0 && modified.length > 15) {
+                        // Make first letter lowercase after filler
                         modified = selectedFiller + modified.charAt(0).toLowerCase() + modified.slice(1);
                     }
                 }
                 
-                // Add personality-based modifications
-                if (personalityLevel > 40) {
-                    const personalityPhrases = {
-                        'friendly': ["Hey! ", "Just a thought, but ", "I think ", "By the way, "],
-                        'witty': ["Interestingly enough, ", "Fun fact: ", "Plot twist: ", "Here's the thing: "],
-                        'thoughtful': ["I wonder if ", "I've been thinking that ", "It's worth considering that ", "Perhaps "],
-                        'enthusiastic': ["Wow! ", "Amazing! ", "This is exciting: ", "Check this out: "]
+                // Add mid-sentence fillers if level is high
+                if (fillerLevel > 60 && modified.length > 40 && Math.random() < fillerLevel/250) {
+                    const midFillers = [
+                        " like,", " you know,", " I mean,", " actually,", " kind of",
+                        " sort of", " basically,", " pretty much", " in a way,"
+                    ];
+                    
+                    const selectedMidFiller = midFillers[Math.floor(Math.random() * midFillers.length)];
+                    
+                    // Find a good spot to insert the filler (after comma or natural pause)
+                    const commaPos = modified.indexOf(',');
+                    const conjPos = Math.max(
+                        modified.indexOf(' and '),
+                        modified.indexOf(' but '),
+                        modified.indexOf(' or '),
+                        modified.indexOf(' so ')
+                    );
+                    
+                    let insertPos = -1;
+                    if (commaPos > 10 && commaPos < modified.length - 15) {
+                        insertPos = commaPos + 1;
+                    } else if (conjPos > 10 && conjPos < modified.length - 15) {
+                        insertPos = conjPos + 1;
+                    }
+                    
+                    if (insertPos > 0) {
+                        modified = modified.slice(0, insertPos) + selectedMidFiller + modified.slice(insertPos);
+                    }
+                }
+                
+                // Add voice style modifications
+                if (voiceLevel > 40) {
+                    const voicePhrases = {
+                        'casual': ["Hey, ", "Listen, ", "So here's the thing: ", "Check it out - ", "BTW, "],
+                        'friendly': ["Hey there! ", "Just wanted to mention that ", "I think ", "FYI, "],
+                        'thoughtful': ["I wonder if ", "It's interesting that ", "When you think about it, ", "Consider this: "],
+                        'expert': ["Notably, ", "Importantly, ", "A key point is that ", "Research shows that "],
+                        'academic': ["Upon analysis, ", "Evidence suggests that ", "It should be noted that ", "Critical examination reveals "]
                     };
                     
-                    // Occasionally add personality phrases
-                    if (Math.random() < personalityLevel/150 && index === 0) {
-                        const phrases = personalityPhrases[personalityType];
+                    // Occasionally add voice phrases to beginning of sentences
+                    if (Math.random() < voiceLevel/150 && index === 0) {
+                        const phrases = voicePhrases[voiceStyle] || voicePhrases['casual'];
                         const selectedPhrase = phrases[Math.floor(Math.random() * phrases.length)];
                         modified = selectedPhrase + modified.charAt(0).toLowerCase() + modified.slice(1);
+                    }
+                }
+                
+                // Add imperfections to make it more human
+                if (imperfectionLevel > 30 && Math.random() < imperfectionLevel/200) {
+                    // Occasionally start with filler or hesitation
+                    const hesitations = ["Hmm, ", "Um, ", "Uh, "];
+                    if (index > 0 && Math.random() < 0.3) {
+                        modified = hesitations[Math.floor(Math.random() * hesitations.length)] + modified;
+                    }
+                    
+                    // Occasionally truncate or restate
+                    if (modified.length > 50 && Math.random() < 0.15) {
+                        const truncatePos = modified.indexOf(',', modified.length/2);
+                        if (truncatePos > 0) {
+                            modified = modified.slice(0, truncatePos) + "... I mean, " + modified;
+                        }
+                    }
+                }
+                
+                // Apply syntax variations
+                if (syntaxLevel > 60 && modified.length > 40 && Math.random() < syntaxLevel/150) {
+                    // Convert passive to active occasionally
+                    if (modified.match(/is|are|was|were/) && modified.match(/by/)) {
+                        modified = modified
+                            .replace(/is ([\w]+) by/gi, "they $1")
+                            .replace(/are ([\w]+) by/gi, "they $1")
+                            .replace(/was ([\w]+) by/gi, "they $1")
+                            .replace(/were ([\w]+) by/gi, "they $1");
+                    }
+                    
+                    // Invert sentence structure occasionally
+                    if (modified.includes(',') && Math.random() < 0.3) {
+                        const parts = modified.split(',');
+                        if (parts.length >= 2) {
+                            // Move the last part to the beginning
+                            const lastPart = parts.pop().trim();
+                            modified = lastPart + ', ' + parts.join(',');
+                        }
+                    }
+                }
+                
+                // Add perplexity enhancers for better AI detection evasion
+                if (perplexityLevel > 50 && Math.random() < perplexityLevel/200) {
+                    // Add unexpected word choices occasionally
+                    const unexpectedPairs = [
+                        {from: /very/gi, to: "super"},
+                        {from: /great/gi, to: "awesome"},
+                        {from: /good/gi, to: "decent"},
+                        {from: /bad/gi, to: "terrible"},
+                        {from: /difficult/gi, to: "tricky"},
+                        {from: /important/gi, to: "crucial"}
+                    ];
+                    
+                    // Apply random unexpected word replacements
+                    if (Math.random() < 0.4) {
+                        const randomPair = unexpectedPairs[Math.floor(Math.random() * unexpectedPairs.length)];
+                        modified = modified.replace(randomPair.from, randomPair.to);
+                    }
+                    
+                    // Add occasional sentence fragments or interruptions
+                    if (modified.length > 60 && Math.random() < 0.2) {
+                        const insertPos = Math.floor(modified.length * 0.7);
+                        modified = modified.slice(0, insertPos) + "... actually, " + modified.slice(insertPos);
+                    }
+                }
+                
+                // Add statistical noise for detection avoidance
+                if (noiseLevel > 40 && Math.random() < noiseLevel/150) {
+                    // Insert uncommon conjunctions/transitions
+                    const uncommonTransitions = [
+                        " albeit ", " whereas ", " nonetheless ", " notwithstanding ", " conversely ",
+                        " henceforth ", " thereupon ", " whereby ", " lest ", " ergo "
+                    ];
+                    
+                    if (modified.length > 50 && Math.random() < 0.3) {
+                        const insertPos = modified.indexOf(' ', modified.length/2);
+                        if (insertPos > 0) {
+                            const randomTransition = uncommonTransitions[Math.floor(Math.random() * uncommonTransitions.length)];
+                            modified = modified.slice(0, insertPos) + randomTransition + modified.slice(insertPos+1);
+                        }
+                    }
+                    
+                    // Occasionally use more obscure synonyms
+                    if (Math.random() < 0.2) {
+                        modified = modified
+                            .replace(/use/gi, "employ")
+                            .replace(/make/gi, "fabricate")
+                            .replace(/think/gi, "ruminate")
+                            .replace(/said/gi, "articulated");
                     }
                 }
                 
                 return modified;
             });
             
-            // Join sentences back together
-            let result = humanizedSentences.join(" ");
-            
-            // Add conversational expressions based on personality
-            if (personalityLevel > 60) {
-                const closingExpressions = {
-                    'friendly': " Hope that helps!",
-                    'witty': " Pretty neat, right?",
-                    'thoughtful': " It's something to consider, anyway.",
-                    'enthusiastic': " Isn't that awesome?!"
-                };
+            // Apply sentence variation based on settings
+            if (sentenceLevel > 50) {
+                // Combine some short sentences
+                for (let i = 0; i < humanizedSentences.length - 1; i++) {
+                    if (humanizedSentences[i].length < 40 && 
+                        humanizedSentences[i+1].length < 40 && 
+                        Math.random() < sentenceLevel/150) {
+                        
+                        // Choose connector based on context
+                        const connectors = [" and ", " but ", " yet ", " while ", " although ", " since "];
+                        const connector = connectors[Math.floor(Math.random() * connectors.length)];
+                        
+                        // Combine sentences and make second part lowercase if needed
+                        humanizedSentences[i] = humanizedSentences[i].replace(/[.!?]\s*$/, ", ");
+                        if (humanizedSentences[i+1].charAt(0) === humanizedSentences[i+1].charAt(0).toUpperCase()) {
+                            humanizedSentences[i+1] = humanizedSentences[i+1].charAt(0).toLowerCase() + humanizedSentences[i+1].slice(1);
+                        }
+                        
+                        humanizedSentences[i] = humanizedSentences[i] + connector + humanizedSentences[i+1];
+                        humanizedSentences.splice(i+1, 1);
+                    }
+                }
                 
-                if (Math.random() < 0.7) {
-                    result += closingExpressions[personalityType];
+                // Split some long sentences
+                for (let i = 0; i < humanizedSentences.length; i++) {
+                    if (humanizedSentences[i].length > 100 && Math.random() < sentenceLevel/150) {
+                        const commaPos = humanizedSentences[i].indexOf(',', humanizedSentences[i].length/2);
+                        if (commaPos > 0) {
+                            const firstPart = humanizedSentences[i].slice(0, commaPos) + ".";
+                            let secondPart = humanizedSentences[i].slice(commaPos + 1).trim();
+                            secondPart = secondPart.charAt(0).toUpperCase() + secondPart.slice(1);
+                            
+                            humanizedSentences[i] = firstPart;
+                            humanizedSentences.splice(i+1, 0, secondPart);
+                        }
+                    }
                 }
             }
             
-            return result;
+            // Apply bypass-specific strategies
+            if (bypassStrategy === "gpt4") {
+                // Optimized for GPT-4 detectors
+                humanizedSentences = humanizedSentences.map(s => {
+                    return s.replace(/while/gi, "whilst")
+                            .replace(/because/gi, "as")
+                            .replace(/although/gi, "though")
+                            .replace(/also/gi, "additionally");
+                });
+            } else if (bypassStrategy === "classroom") {
+                // Optimized for academic detectors
+                humanizedSentences = humanizedSentences.map(s => {
+                    if (Math.random() < 0.1) {
+                        return s.replace(/\./, "..."); // Occasional ellipsis
+                    }
+                    if (Math.random() < 0.15) {
+                        return s.replace(/\./, "!"); // Occasional exclamation
+                    }
+                    return s;
+                });
+            } else if (bypassStrategy === "maximum") {
+                // Maximum evasion - more aggressive transformations
+                humanizedSentences = humanizedSentences.map(s => {
+                    // Add more typos and imperfections
+                    if (Math.random() < 0.07) {
+                        const words = s.split(' ');
+                        if (words.length > 5) {
+                            const randomIndex = Math.floor(Math.random() * words.length);
+                            // Intentional typo in a random word if over 4 chars
+                            if (words[randomIndex].length > 4) {
+                                const pos = Math.floor(Math.random() * (words[randomIndex].length - 2)) + 1;
+                                words[randomIndex] = words[randomIndex].slice(0, pos) + 
+                                    words[randomIndex].slice(pos+1);
+                            }
+                            s = words.join(' ');
+                        }
+                    }
+                    return s;
+                });
+            }
+            
+            // Combine all sentences back into text
+            return humanizedSentences.join(' ');
         }
         
-        // Add transformation to history
+        // Add entries to history
         function addToHistory(original, humanized) {
             const historyContainer = document.getElementById('history-items');
-            const newItem = document.createElement('div');
-            newItem.className = 'history-item';
-            newItem.innerHTML = `
-                <strong>Original:</strong> "${truncateText(original, 100)}"
-                <br>
-                <strong>Humanized:</strong> "${truncateText(humanized, 100)}"
-            `;
             
-            // Add at the top
-            historyContainer.insertBefore(newItem, historyContainer.firstChild);
-        }
-        
-        // Helper function to truncate text
-        function truncateText(text, maxLength) {
-            if (text.length <= maxLength) return text;
-            return text.substring(0, maxLength) + "...";
+            // Create new history item
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            // Create the header with timestamp and action buttons
+            const historyHeader = document.createElement('div');
+            historyHeader.className = 'history-header';
+            
+            // Add timestamp
+            const timestamp = document.createElement('div');
+            const now = new Date();
+            timestamp.textContent = `${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`;
+            historyHeader.appendChild(timestamp);
+            
+            // Add actions
+            const actions = document.createElement('div');
+            actions.className = 'history-action';
+            actions.textContent = 'Reuse';
+            actions.addEventListener('click', function() {
+                document.getElementById('ai-input').value = original;
+                document.getElementById('humanized-output').value = humanized;
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            });
+            historyHeader.appendChild(actions);
+            
+            historyItem.appendChild(historyHeader);
+            
+            // Add original text preview
+            const originalLabel = document.createElement('div');
+            originalLabel.className = 'text-label';
+            originalLabel.textContent = 'Original:';
+            historyItem.appendChild(originalLabel);
+            
+            const originalText = document.createElement('div');
+            originalText.className = 'text-content';
+            originalText.textContent = original.length > 100 ? original.slice(0, 100) + '...' : original;
+            historyItem.appendChild(originalText);
+            
+            // Add humanized text preview
+            const humanizedLabel = document.createElement('div');
+            humanizedLabel.className = 'text-label';
+            humanizedLabel.textContent = 'Humanized:';
+            historyItem.appendChild(humanizedLabel);
+            
+            const humanizedText = document.createElement('div');
+            humanizedText.className = 'text-content';
+            humanizedText.textContent = humanized.length > 100 ? humanized.slice(0, 100) + '...' : humanized;
+            historyItem.appendChild(humanizedText);
+            
+            // Add to history container (at the beginning)
+            if (historyContainer.firstChild) {
+                historyContainer.insertBefore(historyItem, historyContainer.firstChild);
+            } else {
+                historyContainer.appendChild(historyItem);
+            }
+            
+            // Limit history to 5 items
+            if (historyContainer.children.length > 5) {
+                historyContainer.removeChild(historyContainer.lastChild);
+            }
         }
     </script>
 </body>
