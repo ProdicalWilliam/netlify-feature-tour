@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R6 Siege Stats Tracker</title>
+    <style>
+        :root {
+            --primary: #F04E23;
+            --dark: #1E2328;
+            --light: #F2F2F2;
+            --accent: #0099FF;
+            --success: #00CC66;
+            --warning: #FFB800;
+            --danger: #FF3333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .search-bar {
+            display: flex;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            background-color: #2D3035;
+            color: var(--light);
+        }
+        
+        .search-bar button {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .profile-info h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-info p {
+            color: #999;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #999;
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--light);
+        }
+        
+        .stat-card .kd-ratio {
+            color: var(--success);
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #444;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .operators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .operator-card {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .operator-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 10px;
+            background-color: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .operator-card h4 {
+            margin-bottom: 5px;
+        }
+        
+        .operator-card p {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .maps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .map-card {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .map-card h4 {
+            margin-bottom: 10px;
+        }
+        
+        .map-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #444;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+        }
+        
+        .seasons-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .seasons-table th, .seasons-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        
+        .seasons-table th {
+            color: #999;
+            font-weight: normal;
+        }
+        
+        .rank-badge {
+            display: flex;
+            align-items: center;
+        }
+        
+        .badge-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading p {
+            margin-top: 20px;
+            color: #999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .results-container {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">R6 STATS TRACKER</div>
+        </header>
+        
+        <div class="search-bar">
+            <input type="text" id="player-search" placeholder="Enter Ubisoft username or ID...">
+            <button id="search-button">SEARCH</button>
+        </div>
+        
+        <div class="loading" id="loading-section">
+            <div class="spinner"></div>
+            <p>Searching for player stats...</p>
+        </div>
+        
+        <div class="no-results" id="no-results-section">
+            <h2>No player found</h2>
+            <p>Please check the username and try again</p>
+        </div>
+        
+        <div class="results-container" id="results-section">
+            <div class="profile-header">
+                <div class="profile-avatar" id="avatar">KD</div>
+                <div class="profile-info">
+                    <h1 id="player-name">KingDestroyer</h1>
+                    <p>Level <span id="player-level">215</span> • Last played <span id="last-played">2 hours ago</span></p>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>K/D RATIO</h3>
+                    <div class="stat-value kd-ratio" id="kd-ratio">1.34</div>
+                </div>
+                <div class="stat-card">
+                    <h3>WINS</h3>
+                    <div class="stat-value" id="wins">1,245</div>
+                </div>
+                <div class="stat-card">
+                    <h3>LOSSES</h3>
+                    <div class="stat-value" id="losses">985</div>
+                </div>
+                <div class="stat-card">
+                    <h3>WIN %</h3>
+                    <div class="stat-value" id="win-percent">55.8%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>KILLS</h3>
+                    <div class="stat-value" id="kills">12,567</div>
+                </div>
+                <div class="stat-card">
+                    <h3>DEATHS</h3>
+                    <div class="stat-value" id="deaths">9,394</div>
+                </div>
+                <div class="stat-card">
+                    <h3>HEADSHOT %</h3>
+                    <div class="stat-value" id="headshot-percent">42.3%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>MATCHES PLAYED</h3>
+                    <div class="stat-value" id="matches">2,230</div>
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="operators">OPERATORS</div>
+                    <div class="tab" data-tab="maps">MAPS</div>
+                    <div class="tab" data-tab="seasons">SEASONS</div>
+                    <div class="tab" data-tab="weapons">WEAPONS</div>
+                </div>
+                
+                <div class="tab-content active" id="operators-tab">
+                    <div class="operators-grid">
+                        <div class="operator-card">
+                            <div class="operator-icon">A</div>
+                            <h4>Ash</h4>
+                            <p>K/D: 1.76</p>
+                            <p>Win %: 62.4%</p>
+                            <p>Pick Rate: 18.2%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">J</div>
+                            <h4>Jäger</h4>
+                            <p>K/D: 1.52</p>
+                            <p>Win %: 57.8%</p>
+                            <p>Pick Rate: 15.5%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">T</div>
+                            <h4>Thermite</h4>
+                            <p>K/D: 1.22</p>
+                            <p>Win %: 59.1%</p>
+                            <p>Pick Rate: 12.7%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">B</div>
+                            <h4>Bandit</h4>
+                            <p>K/D: 1.41</p>
+                            <p>Win %: 54.2%</p>
+                            <p>Pick Rate: 11.9%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">Z</div>
+                            <h4>Zofia</h4>
+                            <p>K/D: 1.38</p>
+                            <p>Win %: 58.3%</p>
+                            <p>Pick Rate: 14.6%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">D</div>
+                            <h4>Doc</h4>
+                            <p>K/D: 1.29</p>
+                            <p>Win %: 52.7%</p>
+                            <p>Pick Rate: 9.8%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">I</div>
+                            <h4>IQ</h4>
+                            <p>K/D: 1.31</p>
+                            <p>Win %: 55.9%</p>
+                            <p>Pick Rate: 8.4%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">M</div>
+                            <h4>Mute</h4>
+                            <p>K/D: 1.27</p>
+                            <p>Win %: 56.1%</p>
+                            <p>Pick Rate: 10.3%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="maps-tab">
+                    <div class="maps-grid">
+                        <div class="map-card">
+                            <h4>Clubhouse</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>68%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 68%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>42 Matches</span>
+                                <span>1.45 K/D</span>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <h4>Oregon</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>62%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 62%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>39 Matches</span>
+                                <span>1.38 K/D</span>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <h4>Bank</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>57%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 57%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>35 Matches</span>
+                                <span>1.26 K/D</span>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <h4>Kafe Dostoyevsky</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>64%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 64%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>41 Matches</span>
+                                <span>1.42 K/D</span>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <h4>Consulate</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>51%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 51%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>33 Matches</span>
+                                <span>1.19 K/D</span>
+                            </div>
+                        </div>
+                        <div class="map-card">
+                            <h4>Chalet</h4>
+                            <div class="map-stats">
+                                <span>Win Rate</span>
+                                <span>59%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 59%"></div>
+                            </div>
+                            <div class="map-stats">
+                                <span>37 Matches</span>
+                                <span>1.32 K/D</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="seasons-tab">
+                    <table class="seasons-table">
+                        <thead>
+                            <tr>
+                                <th>Season</th>
+                                <th>Rank</th>
+                                <th>MMR</th>
+                                <th>K/D</th>
+                                <th>Win %</th>
+                                <th>Matches</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Y10S1</td>
+                                <td>
+                                    <div class="rank-badge">
+                                        <div class="badge-icon"></div>
+                                        Platinum II
+                                    </div>
+                                </td>
+                                <td>3,658</td>
+                                <td>1.38</td>
+                                <td>58%</td>
+                                <td>142</td>
+                            </tr>
+                            <tr>
+                                <td>Y9S4</td>
+                                <td>
+                                    <div class="rank-badge">
+                                        <div class="badge-icon"></div>
+                                        Platinum III
+                                    </div>
+                                </td>
+                                <td>3,542</td>
+                                <td>1.32</td>
+                                <td>56%</td>
+                                <td>156</td>
+                            </tr>
+                            <tr>
+                                <td>Y9S3</td>
+                                <td>
+                                    <div class="rank-badge">
+                                        <div class="badge-icon"></div>
+                                        Gold I
+                                    </div>
+                                </td>
+                                <td>3,289</td>
+                                <td>1.29</td>
+                                <td>54%</td>
+                                <td>138</td>
+                            </tr>
+                            <tr>
+                                <td>Y9S2</td>
+                                <td>
+                                    <div class="rank-badge">
+                                        <div class="badge-icon"></div>
+                                        Gold II
+                                    </div>
+                                </td>
+                                <td>3,156</td>
+                                <td>1.25</td>
+                                <td>52%</td>
+                                <td>124</td>
+                            </tr>
+                            <tr>
+                                <td>Y9S1</td>
+                                <td>
+                                    <div class="rank-badge">
+                                        <div class="badge-icon"></div>
+                                        Gold III
+                                    </div>
+                                </td>
+                                <td>3,087</td>
+                                <td>1.21</td>
+                                <td>51%</td>
+                                <td>119</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="weapons-tab">
+                    <div class="operators-grid">
+                        <div class="operator-card">
+                            <div class="operator-icon">R4</div>
+                            <h4>R4-C</h4>
+                            <p>Kills: 1,856</p>
+                            <p>Headshot %: 48.2%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">MP</div>
+                            <h4>MP7</h4>
+                            <p>Kills: 1,543</p>
+                            <p>Headshot %: 45.7%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">L8</div>
+                            <h4>L85A2</h4>
+                            <p>Kills: 1,245</p>
+                            <p>Headshot %: 42.3%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">MP</div>
+                            <h4>MP5</h4>
+                            <p>Kills: 1,189</p>
+                            <p>Headshot %: 47.8%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">41</div>
+                            <h4>416-C</h4>
+                            <p>Kills: 1,326</p>
+                            <p>Headshot %: 44.1%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">F2</div>
+                            <h4>F2</h4>
+                            <p>Kills: 978</p>
+                            <p>Headshot %: 46.9%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">55</div>
+                            <h4>552 Commando</h4>
+                            <p>Kills: 856</p>
+                            <p>Headshot %: 41.5%</p>
+                        </div>
+                        <div class="operator-card">
+                            <div class="operator-icon">MP</div>
+                            <h4>MPX</h4>
+                            <p>Kills: 732</p>
+                            <p>Headshot %: 49.2%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+        
+        // Search button functionality (demo)
+        document.getElementById('search-button').addEventListener('click', () => {
+            const username = document.getElementById('player-search').value.trim();
+            
+            if (!username) return;
+            
+            // Hide results and show loading
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('no-results-section').style.display = 'none';
+            document.getElementById('loading-section').style.display = 'block';
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                // Hide loading
+                document.getElementById('loading-section').style.display = 'none';
+                
+                // Show results (in a real app, this would depend on API response)
+                if (Math.random() > 0.1) { // 90% chance to "find" the player for demo
+                    document.getElementById('results-section').style.display = 'block';
+                    
+                    // Update player info with the searched username
+                    document.getElementById('player-name').textContent = username;
+                    document.getElementById('avatar').textContent = username.substring(0, 2).toUpperCase();
+                } else {
+                    document.getElementById('no-results-section').style.display = 'block';
+                }
+            }, 1500);
+        });
+        
+        // In a real application, you would call the R6 Stats API here
+        // For demonstration purposes, we're using hardcoded data
+        // Example API implementation might look like:
+        /*
+        async function fetchPlayerStats(username) {
+            try {
+                const response = await fetch(`https://api.r6stats.com/api/v1/players/${username}`, {
+                    headers: {
+                        'Authorization': 'Your-API-Key'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Player not found');
+                }
+                
+                const data = await response.json();
+                updatePlayerUI(data);
+            } catch (error) {
+                document.getElementById('loading-section').style.display = 'none';
+                document.getElementById('no-results-section').style.display = 'block';
+            }
+        }
+        
+        function updatePlayerUI(data) {
+            // Update all UI elements with data from API
+            document.getElementById('player-name').textContent = data.username;
+            document.getElementById('player-level').textContent = data.progression.level;
+            document.getElementById('kd-ratio').textContent = data.stats.general.kd.toFixed(2);
+            // etc...
+        }
+        */
+    </script>
+</body>
+</html>
