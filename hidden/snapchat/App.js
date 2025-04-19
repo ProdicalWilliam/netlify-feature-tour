@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
@@ -26,7 +26,6 @@ import {
   arrayUnion,
   arrayRemove
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import './App.css';
 
 // Firebase configuration from your provided details
@@ -45,7 +44,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // Auth Context
 const AuthContext = React.createContext();
@@ -120,7 +118,7 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-card">
-        <img src="/logo.png" alt="Snapchat" className="login-logo" />
+        <div className="login-logo">👻</div>
         <h2>{isLogin ? 'Log in to Snapchat' : 'Sign up for Snapchat'}</h2>
         
         {error && <p className="error-message">{error}</p>}
@@ -220,6 +218,7 @@ function Friends() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const { currentUser } = React.useContext(AuthContext);
+  const navigate = useNavigate();
   
   useEffect(() => {
     if (currentUser) {
@@ -347,6 +346,7 @@ function Friends() {
           placeholder="Search for friends..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
         />
         <button onClick={handleSearch} disabled={loading}>
           {loading ? "Searching..." : "Search"}
@@ -413,10 +413,10 @@ function Friends() {
 }
 
 // Chat Component
-function Chat({ match }) {
+function Chat() {
   const { currentUser } = React.useContext(AuthContext);
   const navigate = useNavigate();
-  const friendId = match.params.id;
+  const { id: friendId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [friendData, setFriendData] = useState(null);
@@ -455,19 +455,20 @@ function Chat({ match }) {
     if (!friendId || !currentUser) return;
     
     const chatId = getChatId();
-    const q = query(
-      collection(db, "chats", chatId, "messages"),
-      where("timestamp", ">", new Date(0))
-    );
+    const messagesRef = collection(db, "chats", chatId, "messages");
     
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribe = onSnapshot(messagesRef, (querySnapshot) => {
       const messagesData = [];
       querySnapshot.forEach((doc) => {
         messagesData.push({ id: doc.id, ...doc.data() });
       });
       
       // Sort messages by timestamp
-      messagesData.sort((a, b) => a.timestamp - b.timestamp);
+      messagesData.sort((a, b) => {
+        if (!a.timestamp || !b.timestamp) return 0;
+        return a.timestamp.seconds - b.timestamp.seconds;
+      });
+      
       setMessages(messagesData);
     });
     
@@ -482,13 +483,15 @@ function Chat({ match }) {
   // Handle image selection
   const handleImageChange = (e) => {
     if (e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setImageFile(file);
       
+      // Convert image to base64
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
   
@@ -500,7 +503,7 @@ function Chat({ match }) {
   
   // Send message
   const sendMessage = async () => {
-    if ((!newMessage.trim() && !imageFile) || !friendId) return;
+    if ((!newMessage.trim() && !imagePreview) || !friendId) return;
     
     try {
       const chatId = getChatId();
@@ -530,12 +533,9 @@ function Chat({ match }) {
         deleted: false
       };
       
-      // Upload image if selected
-      if (imageFile) {
-        const imageRef = ref(storage, `chats/${chatId}/${Date.now()}`);
-        await uploadBytes(imageRef, imageFile);
-        const imageUrl = await getDownloadURL(imageRef);
-        messageData.imageUrl = imageUrl;
+      // Add image if selected
+      if (imagePreview) {
+        messageData.imageUrl = imagePreview;
       }
       
       // Add message to chat
@@ -577,7 +577,8 @@ function Chat({ match }) {
       const chatId = getChatId();
       await updateDoc(doc(db, "chats", chatId, "messages", messageId), {
         deleted: true,
-        text: "This message was deleted"
+        text: "This message was deleted",
+        imageUrl: null
       });
     } catch (error) {
       console.error("Error deleting message:", error);
@@ -762,7 +763,7 @@ function ChatsList() {
             >
               <div className="chat-avatar">👤</div>
               <div className="chat-details">
-                <div className="chat-header">
+                <div className="chat-header-row">
                   <span className="chat-username">{chat.otherUser.username}</span>
                   {chat.lastUpdated && (
                     <span className="chat-time">
@@ -813,7 +814,7 @@ function Profile() {
     }
   };
   
-  const updateProfile = async () => {
+  const updateUserProfile = async () => {
     if (!username.trim() || !currentUser) return;
     
     setUpdating(true);
@@ -864,7 +865,7 @@ function Profile() {
           
           <button 
             className="update-profile-btn"
-            onClick={updateProfile}
+            onClick={updateUserProfile}
             disabled={updating}
           >
             {updating ? "Updating..." : "Update Profile"}
