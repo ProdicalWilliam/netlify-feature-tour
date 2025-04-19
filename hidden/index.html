@@ -1,671 +1,1037 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive School Route Map</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 25px;
-            background-color: #121212;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(255, 0, 60, 0.2);
-            border: 1px solid #333;
-        }
-        h1 {
-            text-align: center;
-            color: #ff003c;
-            margin-bottom: 25px;
-            font-size: 32px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 0, 60, 0.7);
-        }
-        .map-container {
-            position: relative;
-            margin: 0 auto 30px;
-            max-width: 900px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(126, 0, 255, 0.4);
-            border: 1px solid #333;
-            height: 600px;
-        }
-        .map-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        .map-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            transform-origin: 0 0;
-            transition: transform 0.3s ease;
-            cursor: move;
-        }
-        .map-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,0,60,0.1) 0%, rgba(126,0,255,0.1) 100%);
-            pointer-events: none;
-            z-index: 2;
-        }
-        .map-title-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 8px 15px;
-            background-color: rgba(10,10,10,0.8);
-            color: #ff003c;
-            border-radius: 4px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border: 1px solid #333;
-            box-shadow: 0 0 10px rgba(255,0,60,0.3);
-            z-index: 5;
-        }
-        .map-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(10,10,10,0.8);
-            border-radius: 8px;
-            padding: 15px;
-            z-index: 5;
-            border: 1px solid #333;
-            box-shadow: 0 0 10px rgba(126,0,255,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .control-group {
-            display: flex;
-            gap: 5px;
-        }
-        .control-btn {
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-            border: 1px solid #444;
-            border-radius: 4px;
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .control-btn:hover {
-            background-color: #2a2a2a;
-            border-color: #ff003c;
-            box-shadow: 0 0 8px rgba(255,0,60,0.4);
-        }
-        .control-btn.active {
-            background-color: #ff003c;
-            color: #fff;
-            border-color: #ff003c;
-            box-shadow: 0 0 12px rgba(255,0,60,0.6);
-        }
-        .zoom-level {
-            color: #999;
-            font-size: 12px;
-            text-align: center;
-            margin-top: 5px;
-        }
-        .info-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 15px;
-            background-color: rgba(10,10,10,0.8);
-            color: #e0e0e0;
-            border-radius: 4px;
-            border: 1px solid #333;
-            font-size: 14px;
-            z-index: 5;
-            min-width: 200px;
-        }
-        .info-title {
-            color: #ff003c;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .pointer {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background-color: #ff003c;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3;
-            box-shadow: 0 0 10px rgba(255,0,60,0.7);
-            cursor: pointer;
-            border: 2px solid #fff;
-        }
-        .pointer:hover::after {
-            content: attr(data-label);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(10,10,10,0.9);
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            margin-bottom: 5px;
-            border: 1px solid #ff003c;
-        }
-        .distance-line {
-            position: absolute;
-            height: 2px;
-            background-color: #7700ff;
-            transform-origin: 0 0;
-            z-index: 3;
-            pointer-events: none;
-            box-shadow: 0 0 8px rgba(126,0,255,0.7);
-        }
-        .distance-label {
-            position: absolute;
-            background-color: rgba(10,10,10,0.8);
-            color: #7700ff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 4;
-            pointer-events: none;
-            border: 1px solid #7700ff;
-            box-shadow: 0 0 8px rgba(126,0,255,0.4);
-            transform: translate(-50%, -50%);
-        }
-        .legend {
-            padding: 20px;
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(126, 0, 255, 0.2);
-            margin-bottom: 20px;
-            border: 1px solid #333;
-        }
-        .legend h3 {
-            margin-top: 0;
-            color: #ff003c;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 22px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(255, 0, 60, 0.7);
-        }
-        .legend-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        .legend-item:hover {
-            background-color: #252525;
-        }
-        .legend-color {
-            width: 26px;
-            height: 26px;
-            margin-right: 15px;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.2);
-            flex-shrink: 0;
-            box-shadow: 0 0 5px rgba(200, 200, 200, 0.1);
-        }
-        .legend-text {
-            font-size: 15px;
-            letter-spacing: 0.5px;
-        }
-        .info-section {
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 25px;
-            border-left: 4px solid #7700ff;
-            box-shadow: 0 0 15px rgba(126, 0, 255, 0.2);
-        }
-        .info-section h3 {
-            margin-top: 0;
-            color: #7700ff;
-            font-size: 20px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(126, 0, 255, 0.7);
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #333;
-            color: #777;
-            font-size: 14px;
-        }
-        .key-highlight {
-            display: inline-block;
-            padding: 0 5px;
-            color: #ff003c;
-            font-weight: bold;
-        }
-        .pointer-input {
-            background-color: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: #e0e0e0;
-            padding: 5px 8px;
-            font-size: 14px;
-            margin-top: 5px;
-            width: 100%;
-        }
-        .pointer-input:focus {
-            outline: none;
-            border-color: #7700ff;
-            box-shadow: 0 0 8px rgba(126,0,255,0.4);
-        }
-        .pointer-dialog {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1a1a1a;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            box-shadow: 0 0 15px rgba(255,0,60,0.3);
-            z-index: 10;
-            width: 250px;
-            display: none;
-        }
-        .dialog-title {
-            color: #ff003c;
-            font-size: 16px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .dialog-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-    </style>
+<meta charset="UTF-8">
+<link rel="icon" href="https://cdn-icons-png.freepik.com/256/8414/8414412.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ming's Libaries</title>
+<style>
+:root {
+--primary-color: #4a6cf7;
+--secondary-color: #f7934a;
+--dark-bg: #1a1a2e;
+--card-bg: #242438;
+--text-color: #e6e6e6;
+--text-muted: #9999a8;
+--transition: all 0.3s ease;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+background-color: var(--dark-bg);
+color: var(--text-color);
+line-height: 1.6;
+}
+
+header {
+background-color: var(--card-bg);
+padding: 1.5rem 0;
+text-align: center;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+h1 {
+font-size: 2.2rem;
+margin-bottom: 0.5rem;
+color: var(--primary-color);
+}
+
+.subtitle {
+color: var(--text-muted);
+font-size: 1.1rem;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 2rem 1rem;
+}
+
+.search-filter {
+display: flex;
+justify-content: space-between;
+margin-bottom: 2rem;
+flex-wrap: wrap;
+gap: 1rem;
+}
+
+.search-box {
+flex: 1;
+min-width: 300px;
+padding: 0.75rem 1rem;
+border-radius: 5px;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+font-size: 1rem;
+}
+
+.filter-dropdown {
+padding: 0.75rem 1rem;
+border-radius: 5px;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+font-size: 1rem;
+cursor: pointer;
+}
+
+.game-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 1.5rem;
+}
+
+.game-card {
+background-color: var(--card-bg);
+border-radius: 8px;
+overflow: hidden;
+transition: var(--transition);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.game-image {
+position: relative;
+height: 180px;
+overflow: hidden;
+}
+
+.game-image img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: var(--transition);
+}
+
+.game-card:hover .game-image img {
+transform: scale(1.05);
+}
+
+.game-icon {
+position: absolute;
+bottom: -20px;
+left: 20px;
+width: 60px;
+height: 60px;
+border-radius: 12px;
+background-color: var(--card-bg);
+padding: 5px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+
+.game-icon img {
+width: 100%;
+height: 100%;
+object-fit: contain;
+}
+
+.game-content {
+padding: 1.5rem 1rem 1rem;
+}
+
+.game-tags {
+display: flex;
+gap: 0.5rem;
+margin-bottom: 0.5rem;
+flex-wrap: wrap;
+}
+
+.game-tag {
+font-size: 0.7rem;
+padding: 0.2rem 0.5rem;
+border-radius: 3px;
+background-color: rgba(74, 108, 247, 0.2);
+color: var(--primary-color);
+}
+
+.game-title {
+font-size: 1.3rem;
+margin-top: 0.5rem;
+margin-bottom: 0.5rem;
+font-weight: 600;
+}
+
+.game-description {
+color: var(--text-muted);
+font-size: 0.9rem;
+margin-bottom: 1rem;
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.game-actions {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-top: 1px solid rgba(255, 255, 255, 0.1);
+padding-top: 1rem;
+}
+
+.play-button {
+padding: 0.5rem 1.2rem;
+background-color: var(--primary-color);
+color: white;
+border-radius: 5px;
+text-decoration: none;
+font-weight: 500;
+transition: var(--transition);
+display: inline-block;
+}
+
+.play-button:hover {
+background-color: #3450cc;
+}
+
+.game-info {
+display: flex;
+gap: 1rem;
+color: var(--text-muted);
+font-size: 0.8rem;
+}
+
+.game-info span {
+display: flex;
+align-items: center;
+gap: 0.3rem;
+}
+
+.pagination {
+display: flex;
+justify-content: center;
+margin-top: 3rem;
+gap: 0.5rem;
+}
+
+.pagination-button {
+padding: 0.5rem 1rem;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
+}
+
+.pagination-button.active {
+background-color: var(--primary-color);
+border-color: var(--primary-color);
+}
+
+.pagination-button:hover:not(.active) {
+background-color: #32324a;
+}
+
+footer {
+text-align: center;
+padding: 2rem 0;
+background-color: var(--card-bg);
+margin-top: 3rem;
+}
+
+footer p {
+color: var(--text-muted);
+}
+
+footer a {
+color: var(--primary-color);
+text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+h1 {
+font-size: 1.8rem;
+}
+.search-filter {
+flex-direction: column;
+}
+.game-grid {
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+}
+
+/* Hover effects for accessibility */
+@media (hover: hover) {
+.play-button:focus, .search-box:focus, .filter-dropdown:focus, .pagination-button:focus {
+outline: 2px solid var(--secondary-color);
+}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Pinellas Park Middle School</h1>
-        
-        <div class="map-container">
-            <div class="map-wrapper" id="mapWrapper">
-                <img src="https://i.postimg.cc/7qTFxfG1/Routes.png" alt="School Map with Routes" class="map-image" id="mapImage">
-            </div>
-            <div class="map-overlay"></div>
-            <div class="map-title-overlay">ROUTE MAP</div>
-            <div class="map-controls">
-                <div class="control-group">
-                    <button class="control-btn" id="zoomIn">+</button>
-                    <button class="control-btn" id="zoomOut">−</button>
-                    <button class="control-btn" id="resetZoom">Reset</button>
-                </div>
-                <div class="zoom-level" id="zoomLevel">Zoom: 100%</div>
-                <div class="control-group">
-                    <button class="control-btn" id="pointerTool">Add Pointer</button>
-                    <button class="control-btn" id="distanceTool">Measure</button>
-                </div>
-                <div class="control-group">
-                    <button class="control-btn" id="clearAll">Clear All</button>
-                </div>
-            </div>
-            <div class="info-panel">
-                <div class="info-title">MAP INFO</div>
-                <div id="mapInfo">Click on map to add pointers or measure distances</div>
-            </div>
-        </div>
-        
-        <div class="pointer-dialog" id="pointerDialog">
-            <div class="dialog-title">Add New Pointer</div>
-            <label for="pointerLabel">Label:</label>
-            <input type="text" id="pointerLabel" class="pointer-input" placeholder="Enter label...">
-            <div class="dialog-buttons">
-                <button class="control-btn" id="cancelPointer">Cancel</button>
-                <button class="control-btn" id="savePointer">Add</button>
-            </div>
-        </div>
-        
-        <div class="legend">
-            <h3>NAVIGATION LEGEND</h3>
-            <div class="legend-grid">
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: red; box-shadow: 0 0 8px rgba(255,0,0,0.7);"></div>
-                    <span class="legend-text"><span class="key-highlight">Red Line</span> = Mrs. Becker's Route</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: white; border: 1px solid #666; box-shadow: 0 0 8px rgba(255,255,255,0.4);"></div>
-                    <span class="legend-text"><span class="key-highlight">White Line</span> = Mr. Gracia (Omnipresent)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: green; box-shadow: 0 0 8px rgba(0,255,0,0.4);"></div>
-                    <span class="legend-text"><span class="key-highlight">Green Line</span> = Building 1 Intern Dog Whistle Lady</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: yellow; box-shadow: 0 0 8px rgba(255,255,0,0.4);"></div>
-                    <span class="legend-text"><span class="key-highlight">Yellow Line</span> = Mrs. Ruben (primarily Building 3)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: purple; box-shadow: 0 0 8px rgba(128,0,128,0.7);"></div>
-                    <span class="legend-text"><span class="key-highlight">Purple Boxes</span> = Classrooms</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: yellow; opacity: 0.7; box-shadow: 0 0 8px rgba(255,255,0,0.3);"></div>
-                    <span class="legend-text"><span class="key-highlight">Yellow Boxes</span> = Buildings</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: green; opacity: 0.7; box-shadow: 0 0 8px rgba(0,255,0,0.3);"></div>
-                    <span class="legend-text"><span class="key-highlight">Green Boxes</span> = Walk Paths</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="info-section">
-            <h3>NAVIGATION GUIDE</h3>
-            <p>This tactical map displays common routes taken by key staff members at Pinellas Park Middle School. Use the interactive controls to zoom and analyze specific areas. The pointer tool allows you to mark important locations, while the distance tool helps calculate approximate distances between any two points on campus.</p>
-        </div>
-        
-        <div class="footer">
-            © 2025 Campus Navigation System • Updated April 2025
-        </div>
-    </div>
+<header>
+<h1>Ming's Unblocked Libaries</h1>
+<p class="subtitle">All of this is unblocked mostly if something is patched or you want something ask me.</p>
+</header>
 
-    <script>
-        // Map interaction variables
-        let scale = 1;
-        let panning = false;
-        let pointStart = { x: 0, y: 0 };
-        let pointEnd = { x: 0, y: 0 };
-        let startPos = { x: 0, y: 0 };
-        let currentPos = { x: 0, y: 0 };
-        
-        // Tool selection variables
-        let activeTool = null;
-        let measuringPoint1 = null;
-        let measuringPoint2 = null;
-        let pointerCount = 0;
-        let tempPointerCoords = null;
-        
-        // DOM elements
-        const mapWrapper = document.getElementById('mapWrapper');
-        const mapImage = document.getElementById('mapImage');
-        const zoomInBtn = document.getElementById('zoomIn');
-        const zoomOutBtn = document.getElementById('zoomOut');
-        const resetZoomBtn = document.getElementById('resetZoom');
-        const zoomLevelDisplay = document.getElementById('zoomLevel');
-        const pointerToolBtn = document.getElementById('pointerTool');
-        const distanceToolBtn = document.getElementById('distanceTool');
-        const clearAllBtn = document.getElementById('clearAll');
-        const mapInfo = document.getElementById('mapInfo');
-        const pointerDialog = document.getElementById('pointerDialog');
-        const pointerLabelInput = document.getElementById('pointerLabel');
-        const savePointerBtn = document.getElementById('savePointer');
-        const cancelPointerBtn = document.getElementById('cancelPointer');
-        
-        // Map panning functionality
-        mapWrapper.addEventListener('mousedown', (e) => {
-            if (activeTool) return; // Don't pan if using a tool
-            
-            panning = true;
-            pointStart.x = e.clientX;
-            pointStart.y = e.clientY;
-            startPos.x = currentPos.x;
-            startPos.y = currentPos.y;
-        });
-        
-        mapWrapper.addEventListener('mousemove', (e) => {
-            if (!panning) return;
-            
-            pointEnd.x = e.clientX;
-            pointEnd.y = e.clientY;
-            
-            currentPos.x = startPos.x + (pointEnd.x - pointStart.x);
-            currentPos.y = startPos.y + (pointEnd.y - pointStart.y);
-            
-            mapImage.style.transform = `translate(${currentPos.x}px, ${currentPos.y}px) scale(${scale})`;
-        });
-        
-        mapWrapper.addEventListener('mouseup', () => {
-            panning = false;
-        });
-        
-        mapWrapper.addEventListener('mouseleave', () => {
-            panning = false;
-        });
-        
-        // Zoom functionality
-        zoomInBtn.addEventListener('click', () => {
-            scale *= 1.2;
-            updateZoom();
-        });
-        
-        zoomOutBtn.addEventListener('click', () => {
-            scale /= 1.2;
-            if (scale < 0.5) scale = 0.5;
-            updateZoom();
-        });
-        
-        resetZoomBtn.addEventListener('click', () => {
-            scale = 1;
-            currentPos.x = 0;
-            currentPos.y = 0;
-            updateZoom();
-        });
-        
-        function updateZoom() {
-            mapImage.style.transform = `translate(${currentPos.x}px, ${currentPos.y}px) scale(${scale})`;
-            zoomLevelDisplay.textContent = `Zoom: ${Math.round(scale * 100)}%`;
-        }
-        
-        // Tool selection functionality
-        pointerToolBtn.addEventListener('click', () => {
-            if (activeTool === 'pointer') {
-                activeTool = null;
-                pointerToolBtn.classList.remove('active');
-                mapInfo.textContent = 'Click on map to add pointers or measure distances';
-            } else {
-                activeTool = 'pointer';
-                pointerToolBtn.classList.add('active');
-                distanceToolBtn.classList.remove('active');
-                mapInfo.textContent = 'Click on the map to add a pointer';
-            }
-        });
-        
-        distanceToolBtn.addEventListener('click', () => {
-            if (activeTool === 'distance') {
-                activeTool = null;
-                distanceToolBtn.classList.remove('active');
-                mapInfo.textContent = 'Click on map to add pointers or measure distances';
-                measuringPoint1 = null;
-                measuringPoint2 = null;
-            } else {
-                activeTool = 'distance';
-                distanceToolBtn.classList.add('active');
-                pointerToolBtn.classList.remove('active');
-                mapInfo.textContent = 'Click on first point to start measuring';
-                measuringPoint1 = null;
-                measuringPoint2 = null;
-            }
-        });
-        
-        clearAllBtn.addEventListener('click', () => {
-            // Remove all pointers
-            document.querySelectorAll('.pointer').forEach(pointer => {
-                pointer.remove();
-            });
-            
-            // Remove all distance lines
-            document.querySelectorAll('.distance-line').forEach(line => {
-                line.remove();
-            });
-            
-            // Remove all distance labels
-            document.querySelectorAll('.distance-label').forEach(label => {
-                label.remove();
-            });
-            
-            // Reset measuring points
-            measuringPoint1 = null;
-            measuringPoint2 = null;
-            
-            // Reset pointer count
-            pointerCount = 0;
-            
-            mapInfo.textContent = 'All markers and measurements cleared';
-        });
-        
-        // Map click handlers for tools
-        mapWrapper.addEventListener('click', (e) => {
-            if (panning) return;
-            
-            // Get click coordinates relative to map
-            const rect = mapWrapper.getBoundingClientRect();
-            const x = (e.clientX - rect.left - currentPos.x) / scale;
-            const y = (e.clientY - rect.top - currentPos.y) / scale;
-            
-            if (activeTool === 'pointer') {
-                tempPointerCoords = { x, y };
-                pointerDialog.style.display = 'block';
-                pointerLabelInput.focus();
-            } else if (activeTool === 'distance') {
-                if (!measuringPoint1) {
-                    // Set first point
-                    measuringPoint1 = { x, y };
-                    mapInfo.textContent = 'Click on second point to complete measurement';
-                    
-                    // Add a temporary pointer for the first point
-                    const pointer = document.createElement('div');
-                    pointer.className = 'pointer';
-                    pointer.style.left = `${x * scale + currentPos.x}px`;
-                    pointer.style.top = `${y * scale + currentPos.y}px`;
-                    pointer.id = 'tempMeasurePoint';
-                    mapWrapper.appendChild(pointer);
-                } else {
-                    // Set second point
-                    measuringPoint2 = { x, y };
-                    
-                    // Remove the temporary pointer
-                    document.getElementById('tempMeasurePoint').remove();
-                    
-                    // Calculate distance (in pixels, which we could convert to a real unit if we had a scale)
-                    const dx = measuringPoint2.x - measuringPoint1.x;
-                    const dy = measuringPoint2.y - measuringPoint1.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx);
-                    
-                    // Create the distance line
-                    const line = document.createElement('div');
-                    line.className = 'distance-line';
-                    const lineLength = Math.sqrt(dx * dx + dy * dy);
-                    line.style.width = `${lineLength * scale}px`;
-                    line.style.left = `${measuringPoint1.x * scale + currentPos.x}px`;
-                    line.style.top = `${measuringPoint1.y * scale + currentPos.y}px`;
-                    line.style.transform = `rotate(${angle}rad)`;
-                    mapWrapper.appendChild(line);
-                    
-                    // Create the distance label
-                    const label = document.createElement('div');
-                    label.className = 'distance-label';
-                    label.textContent = `${Math.round(distance)} pixels`;
-                    label.style.left = `${(measuringPoint1.x + measuringPoint2.x) / 2 * scale + currentPos.x}px`;
-                    label.style.top = `${(measuringPoint1.y + measuringPoint2.y) / 2 * scale + currentPos.y}px`;
-                    mapWrapper.appendChild(label);
-                    
-                    // Reset for next measurement
-                    measuringPoint1 = null;
-                    measuringPoint2 = null;
-                    mapInfo.textContent = 'Distance measured. Click again for a new measurement.';
-                }
-            }
-        });
-        
-        // Pointer dialog functionality
-        savePointerBtn.addEventListener('click', () => {
-            if (!tempPointerCoords) return;
-            
-            const label = pointerLabelInput.value.trim() || `Point ${++pointerCount}`;
-            
-            // Create the pointer
-            const pointer = document.createElement('div');
-            pointer.className = 'pointer';
-            pointer.style.left = `${tempPointerCoords.x * scale + currentPos.x}px`;
-            pointer.style.top = `${tempPointerCoords.y * scale + currentPos.y}px`;
-            pointer.setAttribute('data-label', label);
-            pointer.setAttribute('data-x', tempPointerCoords.x);
-            pointer.setAttribute('data-y', tempPointerCoords.y);
-            mapWrapper.appendChild(pointer);
-            
-            // Close dialog and reset
-            pointerDialog.style.display = 'none';
-            pointerLabelInput.value = '';
-            tempPointerCoords = null;
-            mapInfo.textContent = `Pointer "${label}" added`;
-        });
-        
-        cancelPointerBtn.addEventListener('click', () => {
-            pointerDialog.style.display = 'none';
-            pointerLabelInput.value = '';
-            tempPointerCoords = null;
-        });
-        
-        // Update elements position when zooming
-        function updateElementsOnZoom() {
-            // Update pointers
-            document.querySelectorAll('.pointer').forEach(pointer => {
-                const x = parseFloat(pointer.getAttribute('data-x'));
-                const y = parseFloat(pointer.getAttribute('data-y'));
-                pointer.style.left = `${x * scale + currentPos.x}px`;
-                pointer.style.top = `${y * scale + currentPos.y}px`;
-            });
-            
-            // More complex: update distance lines and labels
-            // This would need to store the original points and recalculate
-            // For simplicity, we're clearing these when zooming changes
-            document.querySelectorAll('.distance-line').forEach(line => line.remove());
-            document.querySelectorAll('.distance-label').forEach(label => label.remove());
-        }
-        
-        // Add event listeners to update elements on zoom
-        zoomInBtn.addEventListener('click', updateElementsOnZoom);
-        zoomOutBtn.addEventListener('click', updateElementsOnZoom);
-        resetZoomBtn.addEventListener('click', updateElementsOnZoom);
-        
-        // Initialize the map
-        window.onload = function() {
-            mapImage.onload = function() {
-                mapWrapper.style.width = '100%';
-                mapWrapper.style.height = '100%';
-                updateZoom();
-            };
-        };
-    </script>
+<div class="container">
+<div class="search-filter">
+<input type="text" class="search-box" placeholder="Search games..." id="searchInput">
+<select class="filter-dropdown" id="categoryFilter">
+<option value="all">All Categories</option>
+<option value="3d">3D Games</option>
+<option value="puzzle">Puzzle</option>
+<option value="action">Action</option>
+<option value="platformer">Platformer</option>
+<option value="adventure">Adventure</option>
+<option value="strategy">Strategy</option>
+<option value="simulation">Simulation</option>
+<option value="racing">Racing</option>
+</select>
+</div>
+
+<div class="game-grid" id="gameGrid">
+<!-- Game cards will be generated by JavaScript -->
+</div>
+
+<div class="pagination" id="pagination">
+<!-- Pagination will be generated by JavaScript -->
+</div>
+</div>
+
+<footer>
+<p>Created by <a href="https://github.com/ProdicalWilliam" target="_blank">Ming's Forrbiden Libary</a> &copy; <span id="currentYear"></span></p>
+</footer>
+
+<script>
+// Game data - EDIT THIS SECTION TO CUSTOMIZE YOUR GAMES
+// For each game, update the following properties:
+// - id: A unique identifier for the game
+// - title: The name of your game
+// - description: A short description of the game
+// - image: Path to the game's screenshot/banner image
+// - icon: Path to the game's icon
+// - link: URL where the game can be played
+// - category: The game's primary category (used for filtering)
+// - tags: Array of tags for additional categorization
+// - dateAdded: When the game was added to the showcase
+// - featured: Whether to highlight this game (not currently used)
+
+const gamesData = [
+{
+id: 1,
+title: "Simple Messenger",
+description: "A No Trace Chat System Made by Ming",
+image: "https://media.idownloadblog.com/wp-content/uploads/2016/01/12-messenger-app-icon-android.jpg",
+icon: "https://cdn4.iconfinder.com/data/icons/social-media-2285/1024/logo-512.png",
+link: "/hidden/simple/",
+category: "Tool",
+tags: ["Chat", "Social", "Texting"],
+dateAdded: "2025-04-18",
+featured: true
+},
+{
+id: 2,
+title: "Ming AI Humanizer",
+description: "A Premium AI Humanizer made by Ming.",
+image: "https://i.ibb.co/67csGPXg/DALL-E-2025-04-18-18-37-27-A-sleek-modern-banner-design-featuring-the-name-Ming-Humanizer-with-the-l.webp",
+icon: "https://i.ibb.co/VWx5v6Ht/DALL-E-2025-04-18-18-38-06-A-simple-modern-icon-design-for-Ming-Humanizer-The-icon-should-be-minimal.webp",
+link: "/hidden/minghuman/",
+category: "Humanizer",
+tags: ["AI Humanizer", "Supports 6+ AI's", "Logic"],
+dateAdded: "2025-04-18",
+featured: true
+},
+{
+id: 3,
+title: "IXL Algebra & Pre-Algebra Calculator",
+description: "One of the most advanced IXL Calculator for Algebra & Pre-Algebra.",
+image: "https://www.ixl.com/dv3/jYg5YEjxG5lJfNjwW0r4Kw8lo5g/yui3/opengraph/assets/square_og_ixl.png",
+icon: "https://img.icons8.com/plasticine/512/ixl.png",
+link: "/hidden/ixl/",
+category: "Math",
+tags: ["Calculator", "Logic", "Math"],
+dateAdded: "2025-04-18",
+featured: true
+},
+{
+id: 4,
+title: "Rainbow Six Siege Tracker",
+description: "A Rainbow Six Siege Stat tracker.",
+image: "https://i.redd.it/gzmkpd7b2p441.jpg",
+icon: "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/05100836-b28d-4395-a29d-2f17b751c23f/dcenrbz-667b492e-2ff6-4433-8308-873fd3adba67.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzA1MTAwODM2LWIyOGQtNDM5NS1hMjlkLTJmMTdiNzUxYzIzZlwvZGNlbnJiei02NjdiNDkyZS0yZmY2LTQ0MzMtODMwOC04NzNmZDNhZGJhNjcucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIUJyFHUlKj59cIGEeTOmKwTdhKF1Ws810F4Bq4ff30",
+link: "/hidden/r6/index.html",
+category: "Tool",
+tags: ["Exclusive", "Rainbow Six Siege", "Stat Tracker"],
+dateAdded: "2025-04-18",
+featured: false
+},
+{
+id: 5,
+title: "Dungeon Crawler",
+description: "Explore procedurally generated dungeons and fight monsters to find treasure.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Dungeon+Crawler",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=DC",
+link: "/games/dungeon-crawler/",
+category: "adventure",
+tags: ["RPG", "Dungeon", "Adventure"],
+title: "Route Map",
+description: "Specific route map for PPMS to find your class!",
+image: "https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/07/route-marked-on-a-map.jpg",
+icon: "https://cdn-icons-png.flaticon.com/512/7891/7891893.png",
+link: "/hidden/map/",
+category: "Tool",
+tags: ["Route Map", "New Students", "Helpful"],
+dateAdded: "2023-03-28",
+featured: true
+},
+{
+id: 6,
+title: "Strategic Command",
+description: "Build armies and conquer territories in this turn-based strategy game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Strategic+Command",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=SC",
+link: "/games/strategic-command/",
+category: "strategy",
+tags: ["Strategy", "Turn-based", "War"],
+dateAdded: "2023-03-20",
+featured: false
+},
+{
+id: 7,
+title: "City Builder",
+description: "Plan and develop your own city, manage resources and keep citizens happy.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=City+Builder",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=CB",
+link: "/games/city-builder/",
+category: "simulation",
+tags: ["Simulation", "Management", "Building"],
+dateAdded: "2023-03-15",
+featured: true
+},
+{
+id: 8,
+title: "Speed Racer",
+description: "Race against time and opponents on challenging tracks all around the world.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Speed+Racer",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=SR",
+link: "/games/speed-racer/",
+category: "racing",
+tags: ["Racing", "Cars", "Speed"],
+dateAdded: "2023-03-10",
+featured: false
+},
+{
+id: 9,
+title: "Match Three",
+description: "Match colorful gems in this addictive puzzle game with hundreds of levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Match+Three",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=M3",
+link: "/games/match-three/",
+category: "puzzle",
+tags: ["Puzzle", "Matching", "Casual"],
+dateAdded: "2023-03-05",
+featured: false
+},
+{
+id: 10,
+title: "Zombie Survival",
+description: "Survive waves of zombies in this intense action game. How long can you last?",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Zombie+Survival",
+icon: "https://placehold.co/200x200/4af74a/000000?text=ZS",
+link: "/games/zombie-survival/",
+category: "action",
+tags: ["Action", "Zombie", "Survival"],
+dateAdded: "2023-02-28",
+featured: true
+},
+{
+id: 11,
+title: "Memory Challenge",
+description: "Test and improve your memory with this classic card-matching game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Memory+Challenge",
+icon: "https://placehold.co/200x200/f793f7/000000?text=MC",
+link: "/games/memory-challenge/",
+category: "puzzle",
+tags: ["Memory", "Cards", "Brain Training"],
+dateAdded: "2023-02-25",
+featured: false
+},
+{
+id: 12,
+title: "Galaxy Explorer",
+description: "Explore an infinite procedurally generated galaxy with unique planets.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Galaxy+Explorer",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=GE",
+link: "/games/galaxy-explorer/",
+category: "3d",
+tags: ["Space", "Exploration", "3D"],
+dateAdded: "2023-02-20",
+featured: true
+},
+{
+id: 13,
+title: "Word Puzzler",
+description: "Find words in a grid of letters. Test your vocabulary and word-finding skills.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Word+Puzzler",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=WP",
+link: "/games/word-puzzler/",
+category: "puzzle",
+tags: ["Word", "Puzzle", "Educational"],
+dateAdded: "2023-02-15",
+featured: false
+},
+{
+id: 14,
+title: "Tower Defense",
+description: "Build defensive towers to protect your base from waves of enemies.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tower+Defense",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=TD",
+link: "/games/tower-defense/",
+category: "strategy",
+tags: ["Strategy", "Defense", "Tower"],
+dateAdded: "2023-02-10",
+featured: false
+},
+{
+id: 15,
+title: "Snake Game",
+description: "Classic snake game with modern graphics and multiple game modes.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Snake+Game",
+icon: "https://placehold.co/200x200/4af793/000000?text=SG",
+link: "/games/snake-game/",
+category: "action",
+tags: ["Classic", "Snake", "Arcade"],
+dateAdded: "2023-02-05",
+featured: false
+},
+{
+id: 16,
+title: "Chess Master",
+description: "Play chess against an AI opponent with adjustable difficulty levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Chess+Master",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=CM",
+link: "/games/chess-master/",
+category: "strategy",
+tags: ["Chess", "Board Game", "Strategy"],
+dateAdded: "2023-01-30",
+featured: true
+},
+{
+id: 17,
+title: "Farm Simulator",
+description: "Build and manage your own farm. Grow crops and raise animals.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Farm+Simulator",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=FS",
+link: "/games/farm-simulator/",
+category: "simulation",
+tags: ["Farming", "Simulation", "Management"],
+dateAdded: "2023-01-25",
+featured: false
+},
+{
+id: 18,
+title: "2048 Puzzle",
+description: "Combine numbers and reach 2048 in this addictive mathematical puzzle.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=2048+Puzzle",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=2048",
+link: "/games/2048-puzzle/",
+category: "puzzle",
+tags: ["Numbers", "Puzzle", "Logic"],
+dateAdded: "2023-01-20",
+featured: true
+},
+{
+id: 19,
+title: "Flight Simulator",
+description: "Experience realistic flight physics in various aircraft around the world.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Flight+Simulator",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=FS",
+link: "/games/flight-simulator/",
+category: "simulation",
+tags: ["Flight", "Simulation", "3D"],
+dateAdded: "2023-01-15",
+featured: false
+},
+{
+id: 20,
+title: "Tetris Clone",
+description: "The classic block-stacking puzzle game with a modern twist.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tetris+Clone",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=TC",
+link: "/games/tetris-clone/",
+category: "puzzle",
+tags: ["Tetris", "Classic", "Blocks"],
+dateAdded: "2023-01-10",
+featured: true
+},
+{
+id: 21,
+title: "Virtual Pet",
+description: "Adopt a virtual pet, feed it, play with it, and watch it grow.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Virtual+Pet",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=VP",
+link: "/games/virtual-pet/",
+category: "simulation",
+tags: ["Pet", "Simulation", "Casual"],
+dateAdded: "2023-01-05",
+featured: false
+},
+{
+id: 22,
+title: "Cooking Dash",
+description: "Prepare and serve dishes in this fast-paced cooking simulation.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Cooking+Dash",
+icon: "https://placehold.co/200x200/f793f7/000000?text=CD",
+link: "/games/cooking-dash/",
+category: "simulation",
+tags: ["Cooking", "Time Management", "Simulation"],
+dateAdded: "2022-12-30",
+featured: false
+},
+{
+id: 23,
+title: "Endless Runner",
+description: "Run, jump, and slide to avoid obstacles in this infinite runner game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Endless+Runner",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=ER",
+link: "/games/endless-runner/",
+category: "action",
+tags: ["Runner", "Endless", "Action"],
+dateAdded: "2022-12-25",
+featured: true
+},
+{
+id: 24,
+title: "Block Puzzle",
+description: "Fit blocks of different shapes into the grid to clear lines.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Block+Puzzle",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=BP",
+link: "/games/block-puzzle/",
+category: "puzzle",
+tags: ["Blocks", "Puzzle", "Casual"],
+dateAdded: "2022-12-20",
+featured: false
+},
+{
+id: 25,
+title: "Pirate Adventure",
+description: "Set sail, explore islands, and search for treasure in this pirate game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Pirate+Adventure",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=PA",
+link: "/games/pirate-adventure/",
+category: "adventure",
+tags: ["Pirates", "Adventure", "Exploration"],
+dateAdded: "2022-12-15",
+featured: true
+},
+{
+id: 26,
+title: "Car Racing",
+description: "Race against AI opponents on various tracks with different car models.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Car+Racing",
+icon: "https://placehold.co/200x200/4af793/000000?text=CR",
+link: "/games/car-racing/",
+category: "racing",
+tags: ["Cars", "Racing", "Speed"],
+dateAdded: "2022-12-10",
+featured: false
+},
+{
+id: 27,
+title: "Sudoku Challenge",
+description: "Classic Sudoku puzzles with multiple difficulty levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Sudoku+Challenge",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=SC",
+link: "/games/sudoku-challenge/",
+category: "puzzle",
+tags: ["Sudoku", "Numbers", "Logic"],
+dateAdded: "2022-12-05",
+featured: false
+},
+{
+id: 28,
+title: "Magic Quest",
+description: "Embark on an epic quest to become the most powerful wizard in the realm.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Magic+Quest",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=MQ",
+link: "/games/magic-quest/",
+category: "adventure",
+tags: ["Fantasy", "Magic", "RPG"],
+dateAdded: "2022-11-30",
+featured: true
+},
+{
+id: 29,
+title: "Football Manager",
+description: "Manage your own football team, buy players, and win championships.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Football+Manager",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=FM",
+link: "/games/football-manager/",
+category: "simulation",
+tags: ["Sports", "Management", "Football"],
+dateAdded: "2022-11-25",
+featured: false
+},
+{
+id: 30,
+title: "VR Museum",
+description: "Explore a virtual museum with interactive exhibits in VR or on screen.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=VR+Museum",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=VR",
+link: "/games/vr-museum/",
+category: "3d",
+tags: ["VR", "Museum", "Educational"],
+dateAdded: "2022-11-20",
+featured: true
+},
+{
+id: 31,
+title: "Crossword Puzzle",
+description: "Test your vocabulary with daily crossword puzzles of varying difficulty.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Crossword+Puzzle",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=CP",
+link: "/games/crossword-puzzle/",
+category: "puzzle",
+tags: ["Words", "Crossword", "Educational"],
+dateAdded: "2022-11-15",
+featured: false
+},
+{
+id: 32,
+title: "Ninja Runner",
+description: "Test your reflexes in this fast-paced ninja platformer game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Ninja+Runner",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=NR",
+link: "/games/ninja-runner/",
+category: "platformer",
+tags: ["Ninja", "Platformer", "Action"],
+dateAdded: "2022-11-10",
+featured: true
+},
+{
+id: 33,
+title: "Mahjong Solitaire",
+description: "Classic tile-matching puzzle game with beautiful tile sets.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Mahjong+Solitaire",
+icon: "https://placehold.co/200x200/f793f7/000000?text=MS",
+link: "/games/mahjong-solitaire/",
+category: "puzzle",
+tags: ["Mahjong", "Tiles", "Matching"],
+dateAdded: "2022-11-05",
+featured: false
+},
+{
+id: 34,
+title: "Western Shooter",
+description: "Test your aim in this western-themed shooting gallery game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Western+Shooter",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=WS",
+link: "/games/western-shooter/",
+category: "action",
+tags: ["Western", "Shooter", "Aim"],
+dateAdded: "2022-11-05",
+featured: false
+},
+{
+id: 35,
+title: "Space Station Sim",
+description: "Build and manage your own space station. Keep your crew alive and happy.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Space+Station+Sim",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=SS",
+link: "/games/space-station-sim/",
+category: "simulation",
+tags: ["Space", "Simulation", "Management"],
+dateAdded: "2022-10-30",
+featured: true
+},
+{
+id: 36,
+title: "Castle Defense",
+description: "Defend your castle from waves of enemies with various weapons and traps.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Castle+Defense",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=CD",
+link: "/games/castle-defense/",
+category: "strategy",
+tags: ["Defense", "Medieval", "Strategy"],
+dateAdded: "2022-10-25",
+featured: false
+},
+{
+id: 37,
+title: "Fishing Simulator",
+description: "Relax and catch fish in different locations with various equipment.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Fishing+Simulator",
+icon: "https://placehold.co/200x200/4af793/000000?text=FS",
+link: "/games/fishing-simulator/",
+category: "simulation",
+tags: ["Fishing", "Relaxing", "Simulation"],
+dateAdded: "2022-10-20",
+featured: false
+},
+{
+id: 38,
+title: "Jungle Adventure",
+description: "Explore the jungle, solve puzzles, and find ancient treasures.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Jungle+Adventure",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=JA",
+link: "/games/jungle-adventure/",
+category: "adventure",
+tags: ["Jungle", "Adventure", "Exploration"],
+dateAdded: "2022-10-15",
+featured: true
+},
+{
+id: 39,
+title: "Retro Arcade",
+description: "Collection of classic arcade games with a retro pixel art style.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Retro+Arcade",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=RA",
+link: "/games/retro-arcade/",
+category: "action",
+tags: ["Retro", "Arcade", "Collection"],
+dateAdded: "2022-10-10",
+featured: false
+},
+{
+id: 40,
+title: "Robot Factory",
+description: "Build and program robots to complete various tasks and challenges.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Robot+Factory",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=RF",
+link: "/games/robot-factory/",
+category: "puzzle",
+tags: ["Robots", "Programming", "Logic"],
+dateAdded: "2022-10-05",
+featured: true
+}
+];
+
+// Constants
+const GAMES_PER_PAGE = 12;
+let currentPage = 1;
+let filteredGames = [...gamesData];
+
+// DOM elements
+const gameGrid = document.getElementById('gameGrid');
+const pagination = document.getElementById('pagination');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const currentYearSpan = document.getElementById('currentYear');
+
+// Set current year in footer
+currentYearSpan.textContent = new Date().getFullYear();
+
+// Initialize the page
+function initPage() {
+renderGames();
+setupEventListeners();
+}
+
+// Render games based on current filters and pagination
+function renderGames() {
+// Clear the grid
+gameGrid.innerHTML = '';
+
+// Calculate start and end indices
+const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
+const endIndex = startIndex + GAMES_PER_PAGE;
+
+// Get current page games
+const currentGames = filteredGames.slice(startIndex, endIndex);
+
+// If no games match the filter
+if (currentGames.length === 0) {
+gameGrid.innerHTML = `
+                  <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;">
+                      <h2>No games found</h2>
+                      <p>Try changing your search or filter criteria</p>
+                  </div>
+              `;
+return;
+}
+
+// Create and append game cards
+currentGames.forEach(game => {
+const gameCard = createGameCard(game);
+gameGrid.appendChild(gameCard);
+});
+
+// Update pagination
+renderPagination();
+}
+
+// Create a game card element
+function createGameCard(game) {
+const card = document.createElement('div');
+card.className = 'game-card';
+
+// Create tags HTML
+const tagsHTML = game.tags.map(tag => `
+              <span class="game-tag">${tag}</span>
+          `).join('');
+
+card.innerHTML = `
+              <div class="game-image">
+                  <img src="${game.image}" alt="${game.title}">
+                  <div class="game-icon">
+                      <img src="${game.icon}" alt="${game.title} icon">
+                  </div>
+              </div>
+              <div class="game-content">
+                  <div class="game-tags">
+                      ${tagsHTML}
+                  </div>
+                  <h3 class="game-title">${game.title}</h3>
+                  <p class="game-description">${game.description}</p>
+                  <div class="game-actions">
+                      <a href="${game.link}" class="play-button">Use Now</a>
+                      <div class="game-info">
+                          <span>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                              </svg>
+                              ${formatDate(game.dateAdded)}
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          `;
+
+return card;
+}
+
+// Render pagination controls
+function renderPagination() {
+pagination.innerHTML = '';
+
+const totalPages = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
+
+// Previous button
+const prevButton = document.createElement('button');
+prevButton.className = 'pagination-button';
+prevButton.textContent = '← Prev';
+prevButton.disabled = currentPage === 1;
+if (currentPage > 1) {
+prevButton.addEventListener('click', () => {
+currentPage--;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+}
+pagination.appendChild(prevButton);
+
+// Page buttons
+const maxButtons = 5; // Maximum number of page buttons to show
+let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+
+// Adjust start page if we're near the end
+if (endPage - startPage + 1 < maxButtons) {
+startPage = Math.max(1, endPage - maxButtons + 1);
+}
+
+for (let i = startPage; i <= endPage; i++) {
+const pageButton = document.createElement('button');
+pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
+pageButton.textContent = i;
+pageButton.addEventListener('click', () => {
+currentPage = i;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+pagination.appendChild(pageButton);
+}
+
+// Next button
+const nextButton = document.createElement('button');
+nextButton.className = 'pagination-button';
+nextButton.textContent = 'Next →';
+nextButton.disabled = currentPage === totalPages;
+if (currentPage < totalPages) {
+nextButton.addEventListener('click', () => {
+currentPage++;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+}
+pagination.appendChild(nextButton);
+}
+
+// Set up event listeners
+function setupEventListeners() {
+// Search input
+searchInput.addEventListener('input', debounce(function() {
+filterGames();
+}, 300));
+
+// Category filter
+categoryFilter.addEventListener('change', function() {
+filterGames();
+});
+
+// Window resize
+window.addEventListener('resize', debounce(function() {
+renderGames();
+}, 200));
+}
+
+// Filter games based on search and category
+function filterGames() {
+const searchTerm = searchInput.value.toLowerCase().trim();
+const category = categoryFilter.value;
+
+filteredGames = gamesData.filter(game => {
+// Check if game matches search term
+const matchesSearch = searchTerm === '' || 
+game.title.toLowerCase().includes(searchTerm) || 
+game.description.toLowerCase().includes(searchTerm) ||
+game.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+
+// Check if game matches category
+const matchesCategory = category === 'all' || game.category === category;
+
+return matchesSearch && matchesCategory;
+});
+
+// Reset to first page when filtering
+currentPage = 1;
+renderGames();
+}
+
+// Helper function for debouncing
+function debounce(func, delay) {
+let timeout;
+return function() {
+const context = this;
+const args = arguments;
+clearTimeout(timeout);
+timeout = setTimeout(() => func.apply(context, args), delay);
+};
+}
+
+// Format date to readable format
+function formatDate(dateString) {
+const options = { year: 'numeric', month: 'short', day: 'numeric' };
+return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Initialize the page when DOM is loaded
+document.addEventListener('DOMContentLoaded', initPage);
+</script>
 </body>
 </html>
