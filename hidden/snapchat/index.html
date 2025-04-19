@@ -923,10 +923,7 @@ conversationList.appendChild(conversationItem);
 // Add click handler
 conversationItem.addEventListener('click', () => {
     openConversation(chatId, otherUserId, otherUser.username);
-});
-});
-});
-}
+};
 
 // Open a conversation
 function openConversation(chatId, userId, username) {
@@ -948,7 +945,7 @@ allConversations.forEach(item => {
     if (item.dataset.chatId === chatId) {
         item.classList.add('active');
     }
-});
+};
 
 // Load messages
 loadMessages(chatId);
