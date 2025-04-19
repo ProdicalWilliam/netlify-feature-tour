@@ -1,1054 +1,908 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleChat</title>
-    <style>
-        :root {
-            --primary-color: #FF5722;
-            --secondary-color: #2196F3;
-            --light-gray: #f0f0f0;
-            --dark-gray: #333;
-            --white: #fff;
-            --error: #f44336;
-            --success: #4CAF50;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #fafafa;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Auth Container Styles */
-        .auth-container {
-            padding: 20px;
-            max-width: 400px;
-            margin: 50px auto;
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .app-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            font-size: 28px;
-        }
-        
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        
-        .btn {
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #e64a19;
-        }
-        
-        .btn:disabled {
-            background-color: #ffccbc;
-            cursor: not-allowed;
-        }
-        
-        .form-footer {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .form-footer a {
-            color: var(--secondary-color);
-            text-decoration: none;
-        }
-        
-        .error-message {
-            color: var(--error);
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        
-        .success-message {
-            color: var(--success);
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        
-        /* Chat Container Styles */
-        .chat-container {
-            display: flex;
-            height: 100%;
-            flex-direction: column;
-        }
-        
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-        
-        .logout-btn {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .sessions-info {
-            font-size: 12px;
-            margin-left: 10px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .chat-main {
-            display: flex;
-            height: calc(100% - 70px);
-        }
-        
-        .sidebar {
-            width: 300px;
-            background-color: var(--white);
-            border-right: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .conversation-list {
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        .conversation-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-        
-        .conversation-item:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .conversation-item.active {
-            background-color: #e1f5fe;
-        }
-        
-        .contact-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 15px;
-            color: var(--dark-gray);
-        }
-        
-        .conversation-details {
-            flex: 1;
-        }
-        
-        .conversation-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .last-message {
-            color: #666;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
-        }
-        
-        .new-chat-btn {
-            margin: 15px;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .chat-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #f5f5f5;
-        }
-        
-        .empty-state {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #999;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .empty-state-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-        
-        .messages-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .message {
-            max-width: 70%;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 16px;
-            position: relative;
-        }
-        
-        .message-sent {
-            align-self: flex-end;
-            background-color: var(--primary-color);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        
-        .message-received {
-            align-self: flex-start;
-            background-color: white;
-            border-bottom-left-radius: 4px;
-        }
-        
-        .message-time {
-            font-size: 10px;
-            position: absolute;
-            bottom: -15px;
-            right: 5px;
-            color: #999;
-        }
-        
-        .message-input-container {
-            display: flex;
-            padding: 15px;
-            background-color: white;
-            border-top: 1px solid #eee;
-        }
-        
-        .message-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 16px;
-            resize: none;
-        }
-        
-        .send-button {
-            margin-left: 10px;
-            width: 46px;
-            height: 46px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .date-separator {
-            text-align: center;
-            color: #999;
-            margin: 20px 0;
-            position: relative;
-        }
-        
-        .date-separator::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 40%;
-            height: 1px;
-            background-color: #ddd;
-        }
-        
-        .date-separator::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            width: 40%;
-            height: 1px;
-            background-color: #ddd;
-        }
-        
-        .new-chat-dialog {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .dialog-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-        }
-        
-        .dialog-title {
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        
-        .user-search {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .user-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .user-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        
-        .user-item:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .dialog-buttons {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-        
-        .dialog-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .cancel-btn {
-            background-color: #f0f0f0;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .chat-main {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: 50%;
-                border-right: 0;
-                border-bottom: 1px solid #eee;
-            }
-            
-            .chat-content {
-                height: 50%;
-            }
-            
-            .message {
-                max-width: 85%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Messenger</title>
+  <!-- Firebase SDK via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-database-compat.min.js"></script>
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    h2 {
+      color: #2563eb;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .input-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    
+    .btn-primary {
+      width: 100%;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+    
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #1f2937;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #d1d5db;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .mt-2 {
+      margin-top: 8px;
+    }
+    
+    .mb-4 {
+      margin-bottom: 16px;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .flex-1 {
+      flex: 1;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    .mr-2 {
+      margin-right: 8px;
+    }
+    
+    .ml-auto {
+      margin-left: auto;
+    }
+    
+    .text-blue {
+      color: #2563eb;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #d1d5db;
+    }
+    
+    .tab-button {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab-button.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+    
+    .chat-item, .friend-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+    }
+    
+    .chat-item:hover, .friend-item:hover {
+      background-color: #f9fafb;
+    }
+    
+    .chat-item:last-child, .friend-item:last-child {
+      border-bottom: none;
+    }
+    
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #2563eb;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-weight: bold;
+    }
+    
+    .chat-details {
+      flex: 1;
+    }
+    
+    .chat-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .chat-preview {
+      font-size: 14px;
+      color: #6b7280;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .messages-container {
+      height: 400px;
+      overflow-y: auto;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .message {
+      padding: 8px 12px;
+      border-radius: 16px;
+      max-width: 80%;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+    }
+    
+    .message-sent {
+      background-color: #2563eb;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message-received {
+      background-color: #e5e7eb;
+      color: #1f2937;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message-time {
+      font-size: 12px;
+      margin-top: 4px;
+      opacity: 0.8;
+      text-align: right;
+    }
+    
+    .read-status {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+      text-align: right;
+    }
+    
+    .message-input-container {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Auth Container -->
-        <div id="auth-container" class="auth-container">
-            <h1 class="app-title">SimpleChat</h1>
-            
-            <!-- Login Form -->
-            <div id="login-form" class="auth-form">
-                <div class="form-group">
-                    <input type="email" id="login-email" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="login-password" placeholder="Password" required>
-                </div>
-                <button type="button" id="login-button" class="btn">Log In</button>
-                <div id="login-error" class="error-message hidden"></div>
-                <div class="form-footer">
-                    <span>Don't have an account? <a href="#" id="switch-to-register">Register</a></span>
-                </div>
-            </div>
-            
-            <!-- Register Form -->
-            <div id="register-form" class="auth-form hidden">
-                <div class="form-group">
-                    <input type="text" id="register-username" placeholder="Username" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="register-email" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="register-password" placeholder="Password" required>
-                </div>
-                <button type="button" id="register-button" class="btn">Register</button>
-                <div id="register-error" class="error-message hidden"></div>
-                <div id="register-success" class="success-message hidden"></div>
-                <div class="form-footer">
-                    <span>Already have an account? <a href="#" id="switch-to-login">Log In</a></span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Chat Container -->
-        <div id="chat-container" class="chat-container hidden">
-            <div class="chat-header">
-                <div class="user-info">
-                    <div id="user-avatar" class="user-avatar">U</div>
-                    <div id="username">User</div>
-                    <div id="session-id" class="sessions-info">Session: Unknown</div>
-                </div>
-                <button id="logout-button" class="logout-btn">Logout</button>
-            </div>
-            
-            <div class="chat-main">
-                <div class="sidebar">
-                    <button id="new-chat-button" class="new-chat-btn">+ New Conversation</button>
-                    <div id="conversation-list" class="conversation-list">
-                        <!-- Conversations will be loaded here -->
-                    </div>
-                </div>
-                
-                <div class="chat-content">
-                    <div id="empty-state" class="empty-state">
-                        <div class="empty-state-icon">💬</div>
-                        <h3>Select a conversation or start a new one</h3>
-                        <p>Your messages are end-to-end encrypted and will persist across sessions</p>
-                    </div>
-                    
-                    <div id="chat-area" class="hidden">
-                        <div id="messages-container" class="messages-container">
-                            <!-- Messages will be loaded here -->
-                        </div>
-                        
-                        <div class="message-input-container">
-                            <textarea id="message-input" class="message-input" placeholder="Type a message..." rows="1"></textarea>
-                            <button id="send-button" class="send-button">➤</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- New Chat Dialog -->
-        <div id="new-chat-dialog" class="new-chat-dialog hidden">
-            <div class="dialog-content">
-                <h3 class="dialog-title">Start a new conversation</h3>
-                <input type="text" id="user-search" class="user-search" placeholder="Search users...">
-                <div id="user-list" class="user-list">
-                    <!-- Users will be loaded here -->
-                </div>
-                <div class="dialog-buttons">
-                    <button id="cancel-dialog" class="dialog-btn cancel-btn">Cancel</button>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div id="auth-container" class="card">
+      <h2>Simple Messenger</h2>
+      <div id="login-form">
+        <h3>Login</h3>
+        <input type="email" id="login-email" placeholder="Email" class="input-field">
+        <input type="password" id="login-password" placeholder="Password" class="input-field">
+        <button id="login-button" class="btn-primary">Login</button>
+        <p class="text-center mt-2">Don't have an account? <a href="#" id="switch-to-register" class="text-blue">Register</a></p>
+      </div>
+      <div id="register-form" class="hidden">
+        <h3>Register</h3>
+        <input type="text" id="register-username" placeholder="Username" class="input-field">
+        <input type="email" id="register-email" placeholder="Email" class="input-field">
+        <input type="password" id="register-password" placeholder="Password" class="input-field">
+        <button id="register-button" class="btn-primary">Register</button>
+        <p class="text-center mt-2">Already have an account? <a href="#" id="switch-to-login" class="text-blue">Login</a></p>
+      </div>
     </div>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getDatabase, ref, set, get, onValue, push, serverTimestamp, update, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+    <div id="app-container" class="hidden">
+      <div class="flex mb-4">
+        <div class="flex-1">
+          <h2 id="username-display"></h2>
+        </div>
+        <div>
+          <button id="logout-button" class="btn-secondary">Logout</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div id="tab-chats" class="tab-button active">Chats</div>
+        <div id="tab-friends" class="tab-button">Friends</div>
+      </div>
+
+      <div id="chats-container" class="card">
+        <div id="chat-list"></div>
+      </div>
+
+      <div id="friends-container" class="card hidden">
+        <div class="mb-4">
+          <input type="text" id="friend-username" placeholder="Find friend by username" class="input-field">
+          <button id="add-friend-button" class="btn-primary">Add Friend</button>
+        </div>
+        <h3>Friends</h3>
+        <div id="friends-list"></div>
+      </div>
+    </div>
+
+    <div id="chat-view" class="hidden">
+      <div class="flex mb-4 items-center">
+        <button id="back-button" class="btn-secondary mr-2">←</button>
+        <div class="flex-1">
+          <h3 id="chat-recipient"></h3>
+        </div>
+      </div>
+      <div class="card messages-container" id="messages-container">
+        <div id="messages-list"></div>
+      </div>
+      <div class="message-input-container">
+        <input type="text" id="message-input" placeholder="Type a message" class="input-field flex-1">
+        <button id="send-button" class="btn-primary" style="width: auto;">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Firebase at the top of the script
+    const firebaseConfig = {
+      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+      authDomain: "spotify-795ab.firebaseapp.com",
+      databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+      projectId: "spotify-795ab",
+      storageBucket: "spotify-795ab.firebasestorage.app",
+      messagingSenderId: "907464366407",
+      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // DOM Elements
+    const authContainer = document.getElementById('auth-container');
+    const appContainer = document.getElementById('app-container');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const chatsContainer = document.getElementById('chats-container');
+    const friendsContainer = document.getElementById('friends-container');
+    const chatView = document.getElementById('chat-view');
+    const usernameDisplay = document.getElementById('username-display');
+    const chatRecipient = document.getElementById('chat-recipient');
+    const messagesList = document.getElementById('messages-list');
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatList = document.getElementById('chat-list');
+    const friendsList = document.getElementById('friends-list');
+    const backButton = document.getElementById('back-button');
+    const tabChats = document.getElementById('tab-chats');
+    const tabFriends = document.getElementById('tab-friends');
+    const addFriendButton = document.getElementById('add-friend-button');
+    const friendUsernameInput = document.getElementById('friend-username');
+
+    // State variables
+    let currentUser = null;
+    let currentChat = null;
+    let currentChatId = null;
+    let userProfile = null;
+
+    // Auth listeners
+    document.getElementById('switch-to-register').addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+    });
+
+    document.getElementById('switch-to-login').addEventListener('click', (e) => {
+      e.preventDefault();
+      registerForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+    });
+
+    document.getElementById('login-button').addEventListener('click', () => {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(error => {
+          alert(`Login failed: ${error.message}`);
+        });
+    });
+
+    document.getElementById('register-button').addEventListener('click', () => {
+      const username = document.getElementById('register-username').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      
+      if (!username || !email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Check if username already exists
+      db.ref('usernames').child(username).once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            alert('Username already taken');
+            return;
+          }
+          
+          // Create user
+          return auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+              const user = userCredential.user;
+              
+              // Create user profile
+              return db.ref('users/' + user.uid).set({
+                username: username,
+                email: email,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+              }).then(() => {
+                // Create username mapping
+                return db.ref('usernames/' + username).set(user.uid);
+              });
+            });
+        })
+        .catch(error => {
+          alert(`Registration failed: ${error.message}`);
+        });
+    });
+
+    document.getElementById('logout-button').addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // Tab navigation
+    tabChats.addEventListener('click', () => {
+      tabChats.classList.add('active');
+      tabFriends.classList.remove('active');
+      chatsContainer.classList.remove('hidden');
+      friendsContainer.classList.add('hidden');
+    });
+
+    tabFriends.addEventListener('click', () => {
+      tabFriends.classList.add('active');
+      tabChats.classList.remove('active');
+      friendsContainer.classList.remove('hidden');
+      chatsContainer.classList.add('hidden');
+    });
+
+    // Back button
+    backButton.addEventListener('click', () => {
+      chatView.classList.add('hidden');
+      appContainer.classList.remove('hidden');
+      currentChat = null;
+      currentChatId = null;
+    });
+
+    // Add friend
+    addFriendButton.addEventListener('click', () => {
+      const friendUsername = friendUsernameInput.value.trim();
+      
+      if (!friendUsername) {
+        alert('Please enter a username');
+        return;
+      }
+      
+      if (friendUsername === userProfile.username) {
+        alert('You cannot add yourself as a friend');
+        return;
+      }
+      
+      // Find user by username
+      db.ref('usernames').child(friendUsername).once('value')
+        .then(snapshot => {
+          if (!snapshot.exists()) {
+            alert('User not found');
+            return;
+          }
+          
+          const friendId = snapshot.val();
+          
+          // Check if already friends
+          return db.ref(`users/${currentUser.uid}/friends/${friendId}`).once('value')
+            .then(snapshot => {
+              if (snapshot.exists()) {
+                alert('Already friends with this user');
+                return;
+              }
+              
+              // Add friend for current user
+              return db.ref(`users/${currentUser.uid}/friends/${friendId}`).set(true)
+                .then(() => {
+                  // Add current user as friend for friend
+                  return db.ref(`users/${friendId}/friends/${currentUser.uid}`).set(true);
+                })
+                .then(() => {
+                  friendUsernameInput.value = '';
+                  alert('Friend added successfully');
+                });
+            });
+        })
+        .catch(error => {
+          alert(`Error adding friend: ${error.message}`);
+        });
+    });
+
+    // Send message
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', event => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (!messageText || !currentChat) return;
+      
+      const message = {
+        senderId: currentUser.uid,
+        text: messageText,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        read: false
+      };
+      
+      db.ref(`chats/${currentChatId}/messages`).push(message)
+        .then(() => {
+          // Update last message
+          return db.ref(`chats/${currentChatId}/lastMessage`).set({
+            text: messageText,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            senderId: currentUser.uid
+          });
+        })
+        .then(() => {
+          messageInput.value = '';
+        })
+        .catch(error => {
+          console.error('Error sending message:', error);
+        });
+    }
+
+    // Create or open chat
+    function openChat(userId, username) {
+      // Find existing chat between users
+      const chatParticipants = [currentUser.uid, userId].sort();
+      const chatId = chatParticipants.join('_');
+      
+      db.ref(`chats/${chatId}`).once('value')
+        .then(snapshot => {
+          if (!snapshot.exists()) {
+            // Create new chat
+            return db.ref(`chats/${chatId}`).set({
+              participants: {
+                [currentUser.uid]: true,
+                [userId]: true
+              },
+              createdAt: firebase.database.ServerValue.TIMESTAMP,
+              lastMessage: {
+                text: '',
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                senderId: ''
+              }
+            });
+          }
+        })
+        .then(() => {
+          // Open chat
+          currentChat = userId;
+          currentChatId = chatId;
+          chatRecipient.textContent = username;
+          
+          appContainer.classList.add('hidden');
+          chatView.classList.remove('hidden');
+          
+          // Load messages
+          loadMessages(chatId);
+          
+          // Mark messages as read
+          markMessagesAsRead(chatId);
+        })
+        .catch(error => {
+          console.error('Error opening chat:', error);
+        });
+    }
+
+    // Load messages for a chat
+    function loadMessages(chatId) {
+      messagesList.innerHTML = '';
+      
+      const messagesRef = db.ref(`chats/${chatId}/messages`);
+      messagesRef.off(); // Remove previous listeners
+      
+      messagesRef.on('child_added', snapshot => {
+        const message = snapshot.val();
+        addMessageToUI(message, snapshot.key);
         
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-            authDomain: "spotify-795ab.firebaseapp.com",
-            databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
-            projectId: "spotify-795ab",
-            storageBucket: "spotify-795ab.firebasestorage.app",
-            messagingSenderId: "907464366407",
-            appId: "1:907464366407:web:1c736b0a36c792ffdb1462",
-            measurementId: "G-R6R08XWLMF"
-        };
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
-        // Initialize Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getDatabase(app);
-            
-            // DOM Elements
-            const authContainer = document.getElementById('auth-container');
-            const chatContainer = document.getElementById('chat-container');
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const switchToRegister = document.getElementById('switch-to-register');
-            const switchToLogin = document.getElementById('switch-to-login');
-            const loginButton = document.getElementById('login-button');
-            const registerButton = document.getElementById('register-button');
-            const logoutButton = document.getElementById('logout-button');
-            const userAvatar = document.getElementById('user-avatar');
-            const usernameDisplay = document.getElementById('username');
-            const sessionIdDisplay = document.getElementById('session-id');
-            const conversationList = document.getElementById('conversation-list');
-            const newChatButton = document.getElementById('new-chat-button');
-            const newChatDialog = document.getElementById('new-chat-dialog');
-            const userSearchInput = document.getElementById('user-search');
-            const userList = document.getElementById('user-list');
-            const cancelDialog = document.getElementById('cancel-dialog');
-            const emptyState = document.getElementById('empty-state');
-            const chatArea = document.getElementById('chat-area');
-            const messagesContainer = document.getElementById('messages-container');
-            const messageInput = document.getElementById('message-input');
-            const sendButton = document.getElementById('send-button');
-            
-            // Global variables
-            let currentUser = null;
-            let currentSessionId = null;
-            let activeChatId = null;
-            let activeChatUser = null;
-            
-            // Generate a unique session ID
-            function generateSessionId() {
-                return 'snapchat=' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                );
-            }
-            
-            // Switch between login and register forms
-            switchToRegister.addEventListener('click', (e) => {
-                e.preventDefault();
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-            });
-            
-            switchToLogin.addEventListener('click', (e) => {
-                e.preventDefault();
-                registerForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-            });
-            
-            // Handle user login
-            loginButton.addEventListener('click', () => {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const loginError = document.getElementById('login-error');
-                
-                if (!email || !password) {
-                    loginError.textContent = 'Please enter both email and password';
-                    loginError.classList.remove('hidden');
-                    return;
-                }
-                
-                loginButton.disabled = true;
-                loginError.classList.add('hidden');
-                
-                signInWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        // Create or update session
-                        currentSessionId = localStorage.getItem('simpleChat_sessionId') || generateSessionId();
-                        localStorage.setItem('simpleChat_sessionId', currentSessionId);
-                        
-                        // Save user email to local storage for convenience
-                        localStorage.setItem('simpleChat_userEmail', email);
-                    })
-                    .catch(error => {
-                        console.error('Login error:', error);
-                        let errorMessage = 'Login failed: ';
-                        
-                        switch(error.code) {
-                            case 'auth/user-not-found':
-                                errorMessage += 'User not found. Please check your email or register.';
-                                break;
-                            case 'auth/wrong-password':
-                                errorMessage += 'Incorrect password. Please try again.';
-                                break;
-                            case 'auth/invalid-email':
-                                errorMessage += 'Invalid email format.';
-                                break;
-                            case 'auth/network-request-failed':
-                                errorMessage += 'Network connection error. Please check your internet connection.';
-                                break;
-                            default:
-                                errorMessage += error.message;
-                        }
-                        
-                        loginError.textContent = errorMessage;
-                        loginError.classList.remove('hidden');
-                    })
-                    .finally(() => {
-                        loginButton.disabled = false;
-                    });
-            });
-            
-            // Handle user registration
-            registerButton.addEventListener('click', () => {
-                const username = document.getElementById('register-username').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const registerError = document.getElementById('register-error');
-                const registerSuccess = document.getElementById('register-success');
-                
-                if (!username || !email || !password) {
-                    registerError.textContent = 'Please fill in all fields';
-                    registerError.classList.remove('hidden');
-                    registerSuccess.classList.add('hidden');
-                    return;
-                }
-                
-                registerButton.disabled = true;
-                registerError.classList.add('hidden');
-                registerSuccess.classList.add('hidden');
-                
-                // Check if username already exists
-                get(ref(db, 'usernames/' + username))
-                    .then((snapshot) => {
-                        if (snapshot.exists()) {
-                            throw { code: 'username-exists', message: 'Username already taken. Please choose another one.' };
-                        }
-                        
-                        // Create user with email and password
-                        return createUserWithEmailAndPassword(auth, email, password);
-                    })
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        
-                        // Update profile with username
-                        return updateProfile(user, {
-                            displayName: username
-                        }).then(() => user);
-                    })
-                    .then((user) => {
-                        // Save user in database
-                        return set(ref(db, 'users/' + user.uid), {
-                            username: username,
-                            email: user.email,
-                            createdAt: serverTimestamp()
-                        }).then(() => user);
-                    })
-                    .then((user) => {
-                        // Register username to prevent duplicates
-                        return set(ref(db, 'usernames/' + username), user.uid);
-                    })
-                    .then(() => {
-                        registerSuccess.textContent = 'Registration successful! You can now log in.';
-                        registerSuccess.classList.remove('hidden');
-                        
-                        // Reset form
-                        document.getElementById('register-username').value = '';
-                        document.getElementById('register-email').value = '';
-                        document.getElementById('register-password').value = '';
-                        
-                        // Switch to login after a delay
-                        setTimeout(() => {
-                            registerForm.classList.add('hidden');
-                            loginForm.classList.remove('hidden');
-                        }, 2000);
-                    })
-                    .catch(error => {
-                        console.error('Registration error:', error);
-                        let errorMessage = 'Registration failed: ';
-                        
-                        switch(error.code) {
-                            case 'username-exists':
-                                errorMessage = error.message;
-                                break;
-                            case 'auth/email-already-in-use':
-                                errorMessage += 'Email already in use. Try logging in.';
-                                break;
-                            case 'auth/weak-password':
-                                errorMessage += 'Password is too weak. Use at least 6 characters.';
-                                break;
-                            case 'auth/invalid-email':
-                                errorMessage += 'Invalid email format.';
-                                break;
-                            case 'auth/network-request-failed':
-                                errorMessage += 'Network connection error. Please check your internet connection.';
-                                break;
-                            default:
-                                errorMessage += error.message || 'Unknown error occurred';
-                        }
-                        
-                        registerError.textContent = errorMessage;
-                        registerError.classList.remove('hidden');
-                    })
-                    .finally(() => {
-                        registerButton.disabled = false;
-                    });
-            });
-            
-            // Handle user logout
-            logoutButton.addEventListener('click', () => {
-                signOut(auth)
-                    .then(() => {
-                        // Don't clear session ID from localStorage to maintain persistence across logins
-                    })
-                    .catch(error => {
-                        console.error('Logout error:', error);
-                        alert('Error logging out: ' + error.message);
-                    });
-            });
-            
-            // Auth state change listener
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // User is signed in
-                    currentUser = user;
-                    
-                    // Get or create session ID
-                    currentSessionId = localStorage.getItem('simpleChat_sessionId');
-                    if (!currentSessionId) {
-                        currentSessionId = generateSessionId();
-                        localStorage.setItem('simpleChat_sessionId', currentSessionId);
-                    }
-                    
-                    // Update user session in database
-                    const sessionRef = ref(db, `sessions/${user.uid}/${currentSessionId}`);
-                    update(sessionRef, {
-                        lastActive: serverTimestamp(),
-                        userAgent: navigator.userAgent
-                    });
-                    
-                    // Show user info in header
-                    userAvatar.textContent = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U';
-                    usernameDisplay.textContent = user.displayName || user.email;
-                    
-                    // Display session ID with limited visibility
-                    const shortSessionId = currentSessionId.substring(currentSessionId.length - 8);
-                    sessionIdDisplay.textContent = `Session: ...${shortSessionId}`;
-                    
-                    // Show chat container, hide auth container
-                    authContainer.classList.add('hidden');
-                    chatContainer.classList.remove('hidden');
-                    
-                    // Load conversations
-                    loadConversations();
-                } else {
-                    // User is signed out
-                    currentUser = null;
-                    
-                    // Show auth container, hide chat container
-                    authContainer.classList.remove('hidden');
-                    chatContainer.classList.add('hidden');
-                    
-                    // Clear active chat
-                    activeChatId = null;
-                    activeChatUser = null;
-                    
-                    // Pre-fill email from localStorage if available
-                    const savedEmail = localStorage.getItem('simpleChat_userEmail');
-                    if (savedEmail) {
-                        document.getElementById('login-email').value = savedEmail;
-                    }
-                }
-            });
-            
-            // Load user conversations
-            function loadConversations() {
-                // Query conversations where current user is a participant
-                const userChatsRef = query(ref(db, 'chats'), orderByChild(`participants/${currentUser.uid}`), equalTo(true));
-                
-                onValue(userChatsRef, (snapshot) => {
-                    // Clear conversation list
-                    conversationList.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        const noConversations = document.createElement('div');
-                        noConversations.className = 'empty-state';
-                        noConversations.style.padding = '20px';
-                        noConversations.textContent = 'No conversations yet';
-                        conversationList.appendChild(noConversations);
-                        return;
-                    }
-                    
-                    const conversations = snapshot.val();
-                    
-                    // Sort conversations by latest message timestamp
-                    const sortedConversations = Object.entries(conversations).sort((a, b) => {
-                        const aLastMsg = a[1].lastMessage ? a[1].lastMessage.timestamp : a[1].createdAt;
-                        const bLastMsg = b[1].lastMessage ? b[1].lastMessage.timestamp : b[1].createdAt;
-                        return bLastMsg - aLastMsg;
-                    });
-                    
-                    sortedConversations.forEach(([chatId, chat]) => {
-                        // Find the other participant (not current user)
-                        const otherUserIds = Object.keys(chat.participants).filter(uid => uid !== currentUser.uid);
-                        
-                        if (otherUserIds.length === 0) return;
-                        
-                        // For simplicity, we're just using the first other user (for group chats, this would need to be extended)
-                        const otherUserId = otherUserIds[0];
-                        
-                        // Get other user's info
-                        get(ref(db, `users/${otherUserId}`))
-                            .then((userSnapshot) => {
-                                if (!userSnapshot.exists()) return;
-                                
-                                const otherUser = userSnapshot.val();
-                                
-                                // Create conversation item
-                                const conversationItem = document.createElement('div');
-                                conversationItem.className = 'conversation-item';
-                                if (chatId === activeChatId) {
-                                    conversationItem.classList.add('active');
-                                }
-                                conversationItem.dataset.chatId = chatId;
-                                conversationItem.dataset.userId = otherUserId;
-                                
-                                // Create contact avatar
-                                const contactAvatar = document.createElement('div');
-                                contactAvatar.className = 'contact-avatar';
-                                contactAvatar.textContent = otherUser.username.charAt(0).toUpperCase();
-                                
-                                // Create conversation details
-                                const conversationDetails = document.createElement('div');
-                                conversationDetails.className = 'conversation-details';
-                                
-                                // When creating conversation item
-                                conversationName.className = 'conversation-name';
-                                conversationName.textContent = otherUser.username;
+        // Mark message as read if received
+        if (message.senderId !== currentUser.uid && !message.read) {
+          markMessageAsRead(chatId, snapshot.key);
+        }
+      });
+    }
 
-                                // Create last message preview
-                                const lastMessage = document.createElement('div');
-                                lastMessage.className = 'last-message';
-                                if (chat.lastMessage) {
-                                lastMessage.textContent = chat.lastMessage.text;
-                                } else {
-                                    lastMessage.textContent = 'Start a conversation';
-                                }
+    // Add message to UI
+    function addMessageToUI(message, messageId) {
+      const messageElement = document.createElement('div');
+      const isCurrentUser = message.senderId === currentUser.uid;
+      messageElement.classList.add('message', isCurrentUser ? 'message-sent' : 'message-received');
+      
+      const messageText = document.createElement('div');
+      messageText.textContent = message.text;
+      messageElement.appendChild(messageText);
+      
+      const messageTime = document.createElement('div');
+      messageTime.classList.add('message-time');
+      messageTime.textContent = formatTime(message.timestamp);
+      messageElement.appendChild(messageTime);
+      
+      if (isCurrentUser) {
+        const readStatus = document.createElement('div');
+        readStatus.classList.add('read-status');
+        readStatus.textContent = message.read ? 'Read' : 'Delivered';
+        readStatus.dataset.messageId = messageId;
+        messageElement.appendChild(readStatus);
+      }
+      
+      messagesList.appendChild(messageElement);
+    }
 
-                                // Add elements to conversation item
-                                conversationDetails.appendChild(conversationName);
-                                conversationDetails.appendChild(lastMessage);
-                                conversationItem.appendChild(contactAvatar);
-                                conversationItem.appendChild(conversationDetails);
-                                conversationList.appendChild(conversationItem);
+    // Mark messages as read
+    function markMessagesAsRead(chatId) {
+      db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentChat).once('value')
+        .then(snapshot => {
+          const updates = {};
+          
+          snapshot.forEach(childSnapshot => {
+            const message = childSnapshot.val();
+            if (!message.read) {
+              updates[`${childSnapshot.key}/read`] = true;
+            }
+          });
+          
+          if (Object.keys(updates).length > 0) {
+            return db.ref(`chats/${chatId}/messages`).update(updates);
+          }
+        })
+        .catch(error => {
+          console.error('Error marking messages as read:', error);
+        });
+    }
 
-                                // Add click handler
-                                conversationItem.addEventListener('click', () => {
-                                    openConversation(chatId, otherUserId, otherUser.username);
-                                });
-                            });
-                    });
-                });
+    // Mark single message as read
+    function markMessageAsRead(chatId, messageId) {
+      db.ref(`chats/${chatId}/messages/${messageId}`).update({ read: true });
+    }
+
+    // Listen for read status changes
+    function listenForReadStatusChanges(chatId) {
+      db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentUser.uid).on('child_changed', snapshot => {
+        const message = snapshot.val();
+        const messageId = snapshot.key;
+        
+        if (message.read) {
+          const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
+          if (readStatusElement) {
+            readStatusElement.textContent = 'Read';
+          }
+        }
+      });
+    }
+
+    // Format timestamp
+    function formatTime(timestamp) {
+      if (!timestamp) return '';
+      
+      const date = new Date(timestamp);
+      const now = new Date();
+      
+      const isSameDay = date.getDate() === now.getDate() && 
+                        date.getMonth() === now.getMonth() && 
+                        date.getFullYear() === now.getFullYear();
+      
+      if (isSameDay) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } else {
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + 
+               ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+
+    // Load user chats
+    function loadChats() {
+      chatList.innerHTML = '';
+      
+      db.ref(`chats`).orderByChild(`participants/${currentUser.uid}`).equalTo(true).on('value', snapshot => {
+        if (!snapshot.exists()) {
+          chatList.innerHTML = '<p class="text-center">No chats yet</p>';
+          return;
+        }
+        
+        const chats = [];
+        snapshot.forEach(childSnapshot => {
+          const chat = childSnapshot.val();
+          chat.id = childSnapshot.key;
+          
+          // Get other participant id
+          const participants = Object.keys(chat.participants);
+          const otherUserId = participants.find(id => id !== currentUser.uid);
+          
+          if (otherUserId) {
+            chat.otherUserId = otherUserId;
+            chats.push(chat);
+          }
+        });
+        
+        // Sort by last message timestamp
+        chats.sort((a, b) => {
+          return (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0);
+        });
+        
+        if (chats.length === 0) {
+          chatList.innerHTML = '<p class="text-center">No chats yet</p>';
+          return;
+        }
+        
+        // Clear existing chats
+        chatList.innerHTML = '';
+        
+        // Create chat items
+        chats.forEach(chat => {
+          loadChatItem(chat);
+        });
+      });
+    }
+
+    // Load chat item
+    function loadChatItem(chat) {
+      db.ref(`users/${chat.otherUserId}`).once('value')
+        .then(snapshot => {
+          const user = snapshot.val();
+          if (!user) return;
+          
+          const chatItem = document.createElement('div');
+          chatItem.classList.add('chat-item');
+          chatItem.addEventListener('click', () => {
+            openChat(chat.otherUserId, user.username);
+          });
+          
+          const avatar = document.createElement('div');
+          avatar.classList.add('chat-avatar');
+          avatar.textContent = user.username.charAt(0).toUpperCase();
+          chatItem.appendChild(avatar);
+          
+          const details = document.createElement('div');
+          details.classList.add('chat-details');
+          
+          const name = document.createElement('div');
+          name.classList.add('chat-name');
+          name.textContent = user.username;
+          details.appendChild(name);
+          
+          if (chat.lastMessage && chat.lastMessage.text) {
+            const preview = document.createElement('div');
+            preview.classList.add('chat-preview');
             
-            // Open a conversation
-            function openConversation(chatId, userId, username) {
-                // Update active chat
-                activeChatId = chatId;
-                activeChatUser = {
-                    id: userId,
-                    username: username
-                };
-                
-                // Update UI state
-                emptyState.classList.add('hidden');
-                chatArea.classList.remove('hidden');
-                
-                // Highlight active conversation
-                const allConversations = document.querySelectorAll('.conversation-item');
-                allConversations.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.dataset.chatId === chatId) {
-                        item.classList.add('active');
-                    }
-                });
-                
-                // Load messages
-                loadMessages(chatId);
-            }
+            const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
+            preview.textContent = (isCurrentUserSender ? 'You: ' : '') + chat.lastMessage.text;
             
-            // Load messages for a conversation
-            function loadMessages(chatId) {
-                const messagesRef = ref(db, `messages/${chatId}`);
-                
-                // Clear messages container
-                messagesContainer.innerHTML = '';
-                
-                onValue(messagesRef, (snapshot) => {
-                    if (!snapshot.exists()) {
-                        return;
-                    }
-                    
-                    const messages = snapshot.val();
-                    const messagesList = Object.entries(messages);
-                    
-                    // Sort messages by timestamp
-                    messagesList.sort((a, b) => a[1].timestamp - b[1].timestamp);
-                    
-                    let lastDate = null;
-                    
-                    // Display messages
-                    messagesList.forEach(([messageId, message]) => {
-                        // Check if we need a date separator
-                        const messageDate = new Date(message.timestamp);
-                        const messageDay = messageDate.toLocaleDateString();
-                        
-                        if (messageDay !== lastDate) {
-                            const dateSeparator = document.createElement('div');
-                            dateSeparator.className = 'date-separator';
-                            dateSeparator.textContent = messageDay;
-                            messagesContainer.appendChild(dateSeparator);
-                            lastDate = messageDay;
-                        }
-                        
-                        // Create message element
-                        const messageElement = document.createElement('div');
-                        messageElement.className = 'message';
-                        
-                        if (message.senderId === currentUser.uid) {
-                            messageElement.classList.add('message-sent');
-                        } else {
-                            messageElement.classList.add('message-received');
-                        }
-                        
-                        // Message text
-                        messageElement.textContent = message.text;
-                        
-                        // Message time
-                        const messageTime = document.createElement('span');
-                        messageTime.className = 'message-time';
-                        messageTime.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        messageElement.appendChild(messageTime);
-                        
-                        messagesContainer.appendChild(messageElement);
-                    });
-                    
-                    // Scroll to bottom
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                });
-            }
+            details.appendChild(preview);
+          }
+          
+          chatItem.appendChild(details);
+          
+          const time = document.createElement('div');
+          time.style.fontSize = '12px';
+          time.style.color = '#6b7280';
+          time.textContent = chat.lastMessage && chat.lastMessage.timestamp ? 
+                          formatTime(chat.lastMessage.timestamp) : '';
+          chatItem.appendChild(time);
+          
+          chatList.appendChild(chatItem);
+        });
+    }
+
+    // Load friends
+    function loadFriends() {
+      friendsList.innerHTML = '';
+      
+      db.ref(`users/${currentUser.uid}/friends`).on('value', snapshot => {
+        if (!snapshot.exists()) {
+          friendsList.innerHTML = '<p class="text-center">No friends yet</p>';
+          return;
+        }
+        
+        const friendIds = Object.keys(snapshot.val());
+        if (friendIds.length === 0) {
+          friendsList.innerHTML = '<p class="text-center">No friends yet</p>';
+          return;
+        }
+        
+        // Clear existing friends
+        friendsList.innerHTML = '';
+        
+        // Load each friend
+        friendIds.forEach(friendId => {
+          db.ref(`users/${friendId}`).once('value')
+            .then(snapshot => {
+              const friend = snapshot.val();
+              if (!friend) return;
+              
+              const friendItem = document.createElement('div');
+              friendItem.classList.add('friend-item');
+              
+              const avatar = document.createElement('div');
+              avatar.classList.add('chat-avatar');
+              avatar.textContent = friend.username.charAt(0).toUpperCase();
+              friendItem.appendChild(avatar);
+              
+              const name = document.createElement('div');
+              name.classList.add('flex-1');
+              name.textContent = friend.username;
+              friendItem.appendChild(name);
+              
+              const messageBtn = document.createElement('button');
+              messageBtn.classList.add('btn-secondary');
+              messageBtn.textContent = 'Message';
+              messageBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openChat(friendId, friend.username);
+              });
+              friendItem.appendChild(messageBtn);
+              
+              const removeBtn = document.createElement('button');
+              removeBtn.classList.add('btn-secondary');
+              removeBtn.textContent = 'Remove';
+              removeBtn.style.marginLeft = '8px';
+              removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Remove ${friend.username} from friends?`)) {
+                  removeFriend(friendId);
+                }
+              });
+              friendItem.appendChild(removeBtn);
+              
+              friendsList.appendChild(friendItem);
+            });
+        });
+      });
+    }
+
+    // Remove friend
+    function removeFriend(friendId) {
+      // Remove friend for current user
+      db.ref(`users/${currentUser.uid}/friends/${friendId}`).remove()
+        .then(() => {
+          // Remove current user as friend for friend
+          return db.ref(`users/${friendId}/friends/${currentUser.uid}`).remove();
+        })
+        .catch(error => {
+          console.error('Error removing friend:', error);
+        });
+    }
+
+    // Auth state change
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        
+        // Get user profile
+        db.ref(`users/${user.uid}`).once('value')
+          .then(snapshot => {
+            userProfile = snapshot.val();
             
-            // Send a message
-            function sendMessage() {
-                const text = messageInput.value.trim();
-                if (!text || !activeChatId) return;
-                
-                // Create message
-                const messageRef = push(ref(db, `messages/${activeChatId}`));
-                const messageData = {
-                    text: text,
-                    senderId: currentUser.uid,
-                    senderName: currentUser.displayName || currentUser.email,
-                    timestamp: Date.now(),
-                    sessionId: currentSessionId
-                };
-                
-                // Update last message in chat
-                const chatRef = ref(db, `chats/${activeChatId}/lastMessage`);
-                const lastMessageData = {
-                    text: text,
-                    senderId: currentUser.uid,
-                    timestamp: Date.now()
-                };
-                
-                // Update both nodes atomically
-                const updates = {};
-                updates[`messages/${activeChatId}/${messageRef.key}`] = messageData;
-                updates[`chats/${activeChatId}/lastMessage`] = lastMessageData;
-                
-                update(ref(db), updates)
-                    .then(() => {
-                        // Clear input field
-                        messageInput.value = '';
-                    })
-                    .catch(error => {
-                        console.error('Error sending message:', error);
-                        alert('Error sending message: ' + error.message);
-                    });
-            }
+            usernameDisplay.textContent = userProfile.username;
+            
+            authContainer.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            chatView.classList.add('hidden');
+            
+            // Load chats and friends
+            loadChats();
+            loadFriends();
+          })
+          .catch(error => {
+            console.error('Error loading user profile:', error);
+          });
+      } else {
+        currentUser = null;
+        userProfile = null;
+        
+        // Clear forms
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('register-username').value = '';
+        document.getElementById('register-email').value = '';
+        document.getElementById('register-password').value = '';
+        
+        // Show auth container
+        authContainer.classList.remove('hidden');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        appContainer.classList.add('hidden');
+        chatView.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
