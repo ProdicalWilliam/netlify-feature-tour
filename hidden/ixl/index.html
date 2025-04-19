@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra Function Calculator</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #93c5fd;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--background);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: var(--secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.75rem 1rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .tab:hover {
+            border-color: var(--primary-light);
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            font-size: 1rem;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+        
+        .results {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .table-input {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .table-input th, .table-input td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .table-input input {
+            width: 60px;
+            padding: 0.25rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+        
+        .coordinate-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .coordinate-input label {
+            min-width: 25px;
+        }
+        
+        .coordinate-input input {
+            width: 60px;
+            padding: 0.25rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+        }
+        
+        #graph-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .function-choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .function-choice {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .function-choice:hover {
+            border-color: var(--primary);
+            background-color: #f0f9ff;
+        }
+        
+        .function-choice.selected {
+            border-color: var(--primary);
+            background-color: #e0f2fe;
+        }
+        
+        .characteristic-item {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f0f9ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 0.25rem;
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+        
+        .info-box p {
+            margin: 0.5rem 0;
+        }
+        
+        .info-box ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Algebra Function Calculator</h1>
+            <p>Explore and analyze different types of functions, their transformations, domains, ranges, and characteristics</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="identify">Identify Functions</div>
+            <div class="tab" data-tab="transform">Transformations</div>
+            <div class="tab" data-tab="domain-range">Domain & Range</div>
+            <div class="tab" data-tab="match">Match Functions</div>
+            <div class="tab" data-tab="characteristics">Characteristics</div>
+        </div>
+        
+        <!-- Identify Functions Tab -->
+        <div class="tab-content active" id="identify">
+            <div class="section-title">Identify Linear, Quadratic, and Exponential Functions from Tables</div>
+            
+            <p>Enter values in the table below, and the calculator will identify if the function is linear, quadratic, or exponential.</p>
+            
+            <table class="table-input">
+                <thead>
+                    <tr>
+                        <th>x</th>
+                        <th>
+                            <input type="number" id="x1" value="0">
+                        </th>
+                        <th>
+                            <input type="number" id="x2" value="1">
+                        </th>
+                        <th>
+                            <input type="number" id="x3" value="2">
+                        </th>
+                        <th>
+                            <input type="number" id="x4" value="3">
+                        </th>
+                        <th>
+                            <input type="number" id="x5" value="4">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>y</th>
+                        <td>
+                            <input type="number" id="y1" value="1">
+                        </td>
+                        <td>
+                            <input type="number" id="y2" value="2">
+                        </td>
+                        <td>
+                            <input type="number" id="y3" value="4">
+                        </td>
+                        <td>
+                            <input type="number" id="y4" value="8">
+                        </td>
+                        <td>
+                            <input type="number" id="y5" value="16">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button id="identify-btn" class="btn">Identify Function</button>
+            
+            <div class="results hidden" id="identify-results">
+                <h3>Results:</h3>
+                <p id="function-type"></p>
+                <p id="function-equation"></p>
+                <div id="function-explanation"></div>
+                
+                <div class="info-box">
+                    <h3>How to Identify Functions from Tables</h3>
+                    <ul>
+                        <li><strong>Linear Function:</strong> The first differences are constant.</li>
+                        <li><strong>Quadratic Function:</strong> The first differences change, but the second differences are constant.</li>
+                        <li><strong>Exponential Function:</strong> The ratios between consecutive y-values are constant.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transformations Tab -->
+        <div class="tab-content" id="transform">
+            <div class="section-title">Transformations of Quadratic Functions</div>
+            
+            <p>Explore how parameters affect the graph of a quadratic function f(x) = a(x-h)² + k.</p>
+            
+            <div class="input-group">
+                <div class="input-label">Base Function: f(x) = a(x-h)² + k</div>
+                
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label for="param-a">a:</label>
+                        <input type="number" id="param-a" class="input-field" value="1" step="0.1">
+                    </div>
+                    <div>
+                        <label for="param-h">h:</label>
+                        <input type="number" id="param-h" class="input-field" value="0">
+                    </div>
+                    <div>
+                        <label for="param-k">k:</label>
+                        <input type="number" id="param-k" class="input-field" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <button id="transform-btn" class="btn">Show Transformation</button>
+            
+            <div class="results hidden" id="transform-results">
+                <h3>Transformation Results:</h3>
+                <p id="transform-equation"></p>
+                <p id="vertex-point"></p>
+                <p id="transform-effects"></p>
+                
+                <div id="graph-container"></div>
+                
+                <div class="info-box">
+                    <h3>Transformation Effects</h3>
+                    <ul>
+                        <li><strong>Parameter a:</strong> Controls the vertical stretch/compression and reflection.</li>
+                        <li><strong>Parameter h:</strong> Controls the horizontal shift (right if h > 0, left if h < 0).</li>
+                        <li><strong>Parameter k:</strong> Controls the vertical shift (up if k > 0, down if k < 0).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Domain and Range Tab -->
+        <div class="tab-content" id="domain-range">
+            <div class="section-title">Domain and Range of Quadratic Functions</div>
+            
+            <p>Calculate the domain and range of a quadratic function from its equation or graph.</p>
+            
+            <div class="input-group">
+                <div class="input-label">Enter Quadratic Function:</div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span>f(x) = </span>
+                    <input type="number" id="domain-a" class="input-field" value="1" style="width: 60px;">
+                    <span>x² + </span>
+                    <input type="number" id="domain-b" class="input-field" value="0" style="width: 60px;">
+                    <span>x + </span>
+                    <input type="number" id="domain-c" class="input-field" value="0" style="width: 60px;">
+                </div>
+            </div>
+            
+            <button id="domain-btn" class="btn">Calculate Domain & Range</button>
+            
+            <div class="results hidden" id="domain-results">
+                <h3>Domain and Range Results:</h3>
+                <p id="domain-equation"></p>
+                <p id="domain-value"></p>
+                <p id="range-value"></p>
+                <p id="vertex-value"></p>
+                <p id="axis-symmetry"></p>
+                
+                <div id="domain-graph-container"></div>
+                
+                <div class="info-box">
+                    <h3>About Domain and Range</h3>
+                    <ul>
+                        <li><strong>Domain:</strong> All possible x-values the function can accept.</li>
+                        <li><strong>Range:</strong> All possible y-values the function can produce.</li>
+                        <li>For a quadratic function f(x) = ax² + bx + c:
+                            <ul>
+                                <li>Domain is all real numbers (ℝ)</li>
+                                <li>Range depends on the vertex and whether the parabola opens up or down</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Match Functions Tab -->
+        <div class="tab-content" id="match">
+            <div class="section-title">Match Quadratic Functions and Graphs</div>
+            
+            <p>Practice matching quadratic function equations to their corresponding graphs.</p>
+            
+            <button id="generate-match-btn" class="btn">Generate New Matching Problem</button>
+            
+            <div class="results hidden" id="match-results">
+                <h3>Match the Function to its Graph:</h3>
+                
+                <div id="function-options" class="function-choices"></div>
+                
+                <div id="graph-to-match"></div>
+                
+                <button id="check-match-btn" class="btn" style="margin-top: 1rem;">Check Answer</button>
+                
+                <p id="match-feedback"></p>
+                
+                <div class="info-box">
+                    <h3>Tips for Matching Functions to Graphs</h3>
+                    <ul>
+                        <li>Look for the vertex of the parabola to determine (h, k).</li>
+                        <li>Check if the parabola opens up (a > 0) or down (a < 0).</li>
+                        <li>Notice how wide or narrow the parabola is to estimate |a|.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Characteristics Tab -->
+        <div class="tab-content" id="characteristics">
+            <div class="section-title">Characteristics of Quadratic Functions</div>
+            
+            <p>Analyze the key characteristics of a quadratic function from its equation.</p>
+            
+            <div class="input-group">
+                <div class="input-label">Enter Quadratic Function:</div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span>f(x) = </span>
+                    <input type="number" id="char-a" class="input-field" value="1" style="width: 60px;">
+                    <span>x² + </span>
+                    <input type="number" id="char-b" class="input-field" value="0" style="width: 60px;">
+                    <span>x + </span>
+                    <input type="number" id="char-c" class="input-field" value="0" style="width: 60px;">
+                </div>
+            </div>
+            
+            <button id="char-btn" class="btn">Analyze Characteristics</button>
+            
+            <div class="results hidden" id="char-results">
+                <h3>Function Characteristics:</h3>
+                
+                <div class="grid-container">
+                    <div class="card">
+                        <div class="card-title">Basic Information</div>
+                        <div id="char-equation"></div>
+                        <div id="char-vertex"></div>
+                        <div id="char-direction"></div>
+                        <div id="char-axis"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">Intercepts</div>
+                        <div id="char-y-intercept"></div>
+                        <div id="char-x-intercepts"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">Domain & Range</div>
+                        <div id="char-domain"></div>
+                        <div id="char-range"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">Other Properties</div>
+                        <div id="char-increasing"></div>
+                        <div id="char-decreasing"></div>
+                        <div id="char-symmetry"></div>
+                    </div>
+                </div>
+                
+                <div id="char-graph-container" style="margin-top: 1.5rem; width: 100%; height: 300px;"></div>
+                
+                <div class="info-box">
+                    <h3>Key Characteristics of Quadratic Functions</h3>
+                    <ul>
+                        <li><strong>Vertex:</strong> The highest or lowest point of the parabola.</li>
+                        <li><strong>Axis of Symmetry:</strong> The vertical line passing through the vertex.</li>
+                        <li><strong>Direction:</strong> Opens up (a > 0) or down (a < 0).</li>
+                        <li><strong>Intercepts:</strong> Where the parabola crosses the x and y axes.</li>
+                        <li><strong>Domain & Range:</strong> Possible input and output values.</li>
+                        <li><strong>Intervals:</strong> Where the function is increasing or decreasing.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Function to handle tab switching
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+        
+        // Function to identify function type from table
+        function identifyFunction() {
+            // Get x and y values from inputs
+            const xValues = [];
+            const yValues = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const xVal = parseFloat(document.getElementById(`x${i}`).value);
+                const yVal = parseFloat(document.getElementById(`y${i}`).value);
+                
+                if (!isNaN(xVal) && !isNaN(yVal)) {
+                    xValues.push(xVal);
+                    yValues.push(yVal);
+                }
+            }
+            
+            if (xValues.length < 3) {
+                alert("Please enter at least 3 x-y pairs to identify the function type.");
+                return;
+            }
+            
+            // Calculate first differences
+            const firstDiffs = [];
+            for (let i = 1; i < yValues.length; i++) {
+                firstDiffs.push(yValues[i] - yValues[i-1]);
+            }
+            
+            // Calculate second differences
+            const secondDiffs = [];
+            for (let i = 1; i < firstDiffs.length; i++) {
+                secondDiffs.push(firstDiffs[i] - firstDiffs[i-1]);
+            }
+            
+            // Calculate ratios
+            const ratios = [];
+            for (let i = 1; i < yValues.length; i++) {
+                if (yValues[i-1] !== 0) {
+                    ratios.push(yValues[i] / yValues[i-1]);
+                }
+            }
+            
+            // Check if all second differences are approximately equal (quadratic)
+            const isQuadratic = secondDiffs.length > 0 && secondDiffs.every(diff => 
+                Math.abs(diff - secondDiffs[0]) < 0.0001
+            );
+            
+            // Check if all first differences are approximately equal (linear)
+            const isLinear = !isQuadratic && firstDiffs.every(diff => 
+                Math.abs(diff - firstDiffs[0]) < 0.0001
+            );
+            
+            // Check if all ratios are approximately equal (exponential)
+            const isExponential = !isLinear && !isQuadratic && ratios.length > 0 && ratios.every(ratio => 
+                Math.abs(ratio - ratios[0]) < 0.0001
+            );
+            
+            // Determine function type and equation
+            let functionType, functionEquation, explanation;
+            
+            if (isLinear) {
+                const slope = firstDiffs[0];
+                const intercept = yValues[0] - slope * xValues[0];
+                functionType = "Linear";
+                functionEquation = `f(x) = ${slope.toFixed(2)}x ${intercept >= 0 ? '+ ' + intercept.toFixed(2) : '- ' + Math.abs(intercept).toFixed(2)}`;
+                explanation = `
+                    <p>This is a <strong>linear function</strong> because the first differences are constant: ${firstDiffs.map(d => d.toFixed(2)).join(', ')}</p>
+                    <p>The slope is ${slope.toFixed(2)} and the y-intercept is ${intercept.toFixed(2)}.</p>
+                `;
+            } else if (isQuadratic) {
+                // For quadratic function f(x) = ax² + bx + c, we can solve a system of equations
+                // Using the first three points to find a, b, c
+                const x1 = xValues[0], y1 = yValues[0];
+                const x2 = xValues[1], y2 = yValues[1];
+                const x3 = xValues[2], y3 = yValues[2];
+                
+                const determinant = (x1*x1)*(x2-x3) - x1*(x2*x2-x3*x3) + (x2*x2*x3-x2*x3*x3);
+                
+                if (Math.abs(determinant) < 0.0001) {
+                    functionType = "Could not determine (possibly degenerate case)";
+                    functionEquation = "N/A";
+                    explanation = "<p>Could not calculate the precise equation. Please try different points.</p>";
+                } else {
+                    const a = ((y1)*(x2-x3) - x1*(y2-y3) + (y2*x3-y3*x2)) / determinant;
+                    const b = ((x1*x1)*(y2-y3) - (y1)*(x2*x2-x3*x3) + (y2*x3*x3-y3*x2*x2)) / determinant;
+                    const c = ((x1*x1)*(x2*y3-x3*y2) - x1*(x2*x2*y3-x3*x3*y2) + (y1)*(x2*x2*x3-x2*x3*x3)) / determinant;
+
+                    functionType = "Quadratic";
+                    functionEquation = `f(x) = ${a.toFixed(2)}x² ${b >= 0 ? '+ ' + b.toFixed(2) : '- ' + Math.abs(b).toFixed(2)}x ${c >= 0 ? '+ ' + c.toFixed(2) : '- ' + Math.abs(c).toFixed(2)}`;
+                    explanation = `
+                        <p>This is a <strong>quadratic function</strong> because the second differences are constant: ${secondDiffs.map(d => d.toFixed(2)).join(', ')}</p>
+                        <p>The coefficient a = ${a.toFixed(2)}, b = ${b.toFixed(2)}, and c = ${c.toFixed(2)}.</p>
+                    `;
+                }
+            } else if (isExponential) {
+                const base = ratios[0];
+                const coefficient = yValues[0] / Math.pow(base, xValues[0]);
+                
+                functionType = "Exponential";
+                functionEquation = `f(x) = ${coefficient.toFixed(2)} × ${base.toFixed(2)}^x`;
+                explanation = `
+                    <p>This is an <strong>exponential function</strong> because the ratios between consecutive y-values are constant: ${ratios.map(r => r.toFixed(2)).join(', ')}</p>
+                    <p>The base is ${base.toFixed(2)} and the coefficient is ${coefficient.toFixed(2)}.</p>
+                `;
+            } else {
+                functionType = "Could not determine the function type.";
+                functionEquation = "N/A";
+                explanation = "<p>The data does not clearly match a linear, quadratic, or exponential pattern. Try checking your values or using different points.</p>";
+            }
+            
+            // Display results
+            document.getElementById('function-type').textContent = `Function Type: ${functionType}`;
+            document.getElementById('function-equation').textContent = `Equation: ${functionEquation}`;
+            document.getElementById('function-explanation').innerHTML = explanation;
+            document.getElementById('identify-results').classList.remove('hidden');
+        }
+        
+        // Function to display quadratic transformation
+        function showTransformation() {
+            const a = parseFloat(document.getElementById('param-a').value);
+            const h = parseFloat(document.getElementById('param-h').value);
+            const k = parseFloat(document.getElementById('param-k').value);
+            
+            if (isNaN(a) || isNaN(h) || isNaN(k)) {
+                alert("Please enter valid values for a, h, and k.");
+                return;
+            }
+            
+            // Generate equation in vertex form
+            const equation = `f(x) = ${a}(x ${h >= 0 ? '- ' + h : '+ ' + Math.abs(h)})² ${k >= 0 ? '+ ' + k : '- ' + Math.abs(k)}`;
+            
+            // Expand to standard form
+            const expandedA = a;
+            const expandedB = -2 * a * h;
+            const expandedC = a * h * h + k;
+            
+            const standardForm = `f(x) = ${expandedA}x² ${expandedB >= 0 ? '+ ' + expandedB : '- ' + Math.abs(expandedB)}x ${expandedC >= 0 ? '+ ' + expandedC : '- ' + Math.abs(expandedC)}`;
+            
+            // Describe transformations
+            let effects = "";
+            
+            if (a > 0) {
+                effects += `<p>The parabola opens upward.</p>`;
+            } else {
+                effects += `<p>The parabola opens downward (reflection across x-axis).</p>`;
+            }
+            
+            if (Math.abs(a) !== 1) {
+                if (Math.abs(a) > 1) {
+                    effects += `<p>The parabola is vertically stretched by a factor of ${Math.abs(a)}.</p>`;
+                } else {
+                    effects += `<p>The parabola is vertically compressed by a factor of ${1/Math.abs(a)}.</p>`;
+                }
+            }
+            
+            // Continuing from where the code was cut off
+if (h !== 0) {
+    effects += `<p>The parabola is shifted ${h > 0 ? 'right' : 'left'} by ${Math.abs(h)} units.</p>`;
+}
+
+if (k !== 0) {
+    effects += `<p>The parabola is shifted ${k > 0 ? 'up' : 'down'} by ${Math.abs(k)} units.</p>`;
+}
+
+// Display results
+document.getElementById('transform-equation').innerHTML = `Vertex Form: ${equation}<br>Standard Form: ${standardForm}`;
+document.getElementById('vertex-point').textContent = `Vertex: (${h}, ${k})`;
+document.getElementById('transform-effects').innerHTML = effects;
+document.getElementById('transform-results').classList.remove('hidden');
+
+// Simple graph drawing for demonstration
+const graphContainer = document.getElementById('graph-container');
+graphContainer.innerHTML = ''; // Clear previous content
+
+// Create canvas for graph
+const canvas = document.createElement('canvas');
+canvas.width = graphContainer.clientWidth;
+canvas.height = graphContainer.clientHeight;
+graphContainer.appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+const width = canvas.width;
+const height = canvas.height;
+
+// Draw coordinate axes
+ctx.strokeStyle = '#ccc';
+ctx.lineWidth = 1;
+
+// Draw grid
+const gridSize = 30;
+const xAxisPos = height / 2;
+const yAxisPos = width / 2;
+
+// Determine suitable range for x-axis based on vertex and shape
+const xMin = h - 6;
+const xMax = h + 6;
+const xRange = xMax - xMin;
+
+// Draw vertical grid lines
+for (let x = 0; x <= width; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+}
+
+// Draw horizontal grid lines
+for (let y = 0; y <= height; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+}
+
+// Draw axes
+ctx.strokeStyle = '#000';
+ctx.lineWidth = 2;
+
+// x-axis
+ctx.beginPath();
+ctx.moveTo(0, height / 2);
+ctx.lineTo(width, height / 2);
+ctx.stroke();
+
+// y-axis
+ctx.beginPath();
+ctx.moveTo(width / 2, 0);
+ctx.lineTo(width / 2, height);
+ctx.stroke();
+
+// Function to convert x coordinate to canvas x
+function toCanvasX(x) {
+    return ((x - xMin) / xRange) * width;
+}
+
+// Function to convert y coordinate to canvas y
+function toCanvasY(y) {
+    // Scale y values to fit the chart
+    // For quadratic functions, we'll adjust based on a and k
+    const yScale = 30 / Math.max(1, Math.abs(a));
+    return height / 2 - y * yScale;
+}
+
+// Draw the quadratic function
+ctx.strokeStyle = '#3b82f6';
+ctx.lineWidth = 3;
+ctx.beginPath();
+
+for (let canvasX = 0; canvasX < width; canvasX++) {
+    const x = xMin + (canvasX / width) * xRange;
+    const y = a * Math.pow(x - h, 2) + k;
+    const canvasY = toCanvasY(y);
+    
+    if (canvasX === 0) {
+        ctx.moveTo(canvasX, canvasY);
+    } else {
+        ctx.lineTo(canvasX, canvasY);
+    }
+}
+
+ctx.stroke();
+
+// Draw vertex point
+ctx.fillStyle = '#ef4444';
+ctx.beginPath();
+ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
+ctx.fill();
+
+// Label the vertex
+ctx.fillStyle = '#000';
+ctx.font = '12px sans-serif';
+ctx.fillText(`(${h}, ${k})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
+}
+
+// Function to calculate domain and range
+function calculateDomainRange() {
+    const a = parseFloat(document.getElementById('domain-a').value);
+    const b = parseFloat(document.getElementById('domain-b').value);
+    const c = parseFloat(document.getElementById('domain-c').value);
+    
+    if (isNaN(a) || isNaN(b) || isNaN(c)) {
+        alert("Please enter valid coefficients for a, b, and c.");
+        return;
+    }
+    
+    if (a === 0) {
+        alert("The coefficient 'a' cannot be zero for a quadratic function.");
+        return;
+    }
+    
+    // Calculate vertex using completed square form
+    const h = -b / (2 * a);
+    const k = c - (b * b) / (4 * a);
+    
+    // Domain is all real numbers for quadratic functions
+    const domainStr = "Domain: All real numbers (ℝ)";
+    
+    // Range depends on direction of opening
+    let rangeStr;
+    if (a > 0) {
+        rangeStr = `Range: [${k.toFixed(2)}, ∞)`;
+    } else {
+        rangeStr = `Range: (-∞, ${k.toFixed(2)}]`;
+    }
+    
+    // Axis of symmetry
+    const axisSymmetry = `x = ${h.toFixed(2)}`;
+    
+    // Display results
+    document.getElementById('domain-equation').textContent = `Function: f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`;
+    document.getElementById('domain-value').textContent = domainStr;
+    document.getElementById('range-value').textContent = rangeStr;
+    document.getElementById('vertex-value').textContent = `Vertex: (${h.toFixed(2)}, ${k.toFixed(2)})`;
+    document.getElementById('axis-symmetry').textContent = `Axis of Symmetry: ${axisSymmetry}`;
+    document.getElementById('domain-results').classList.remove('hidden');
+    
+    // Draw graph for domain and range
+    const graphContainer = document.getElementById('domain-graph-container');
+    graphContainer.innerHTML = ''; // Clear previous content
+    
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = graphContainer.clientWidth;
+    canvas.height = graphContainer.clientHeight;
+    graphContainer.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Draw coordinate axes and grid (similar to transformation function)
+    // Draw grid
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    const gridSize = 30;
+    
+    // Draw vertical grid lines
+    for (let x = 0; x <= width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+    
+    // Draw horizontal grid lines
+    for (let y = 0; y <= height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+    
+    // Draw axes
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    
+    // x-axis
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+    
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(width / 2, 0);
+    ctx.lineTo(width / 2, height);
+    ctx.stroke();
+    
+    // Determine suitable range for x-axis based on vertex
+    const xMin = h - 5;
+    const xMax = h + 5;
+    const xRange = xMax - xMin;
+    
+    // Function to convert x coordinate to canvas x
+    function toCanvasX(x) {
+        return ((x - xMin) / xRange) * width;
+    }
+    
+    // Function to convert y coordinate to canvas y
+    function toCanvasY(y) {
+        // Scale y values to fit the chart
+        const yScale = 20 / Math.max(1, Math.abs(a));
+        return height / 2 - y * yScale;
+    }
+    
+    // Draw the quadratic function
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    for (let canvasX = 0; canvasX < width; canvasX++) {
+        const x = xMin + (canvasX / width) * xRange;
+        const y = a * x * x + b * x + c;
+        const canvasY = toCanvasY(y);
+        
+        if (canvasX === 0) {
+            ctx.moveTo(canvasX, canvasY);
+        } else {
+            ctx.lineTo(canvasX, canvasY);
+        }
+    }
+    
+    ctx.stroke();
+    
+    // Draw vertex point
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Label the vertex
+    ctx.fillStyle = '#000';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(`(${h.toFixed(2)}, ${k.toFixed(2)})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
+    
+    // Highlight domain and range
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 2;
+    
+    // Domain (x-axis)
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2 + 5);
+    ctx.lineTo(width, height / 2 + 5);
+    ctx.stroke();
+    
+    // Range (vertical line to the side)
+    ctx.beginPath();
+    if (a > 0) {
+        // y >= k
+        ctx.moveTo(width - 15, toCanvasY(k));
+        ctx.lineTo(width - 15, 0);
+    } else {
+        // y <= k
+        ctx.moveTo(width - 15, toCanvasY(k));
+        ctx.lineTo(width - 15, height);
+    }
+    ctx.stroke();
+    
+    // Axis of symmetry
+    ctx.strokeStyle = '#f59e0b';
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(h), 0);
+    ctx.lineTo(toCanvasX(h), height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+// Function to generate a matching problem
+function generateMatchingProblem() {
+    // Generate 4 different quadratic functions for matching
+    const functions = [];
+    
+    // Generate random coefficients for variety
+    for (let i = 0; i < 4; i++) {
+        const a = Math.random() > 0.5 ? 1 : -1; // Either 1 or -1 for simplicity
+        const h = Math.floor(Math.random() * 7) - 3; // h between -3 and 3
+        const k = Math.floor(Math.random() * 7) - 3; // k between -3 and 3
+        
+        functions.push({
+            a: a,
+            h: h,
+            k: k,
+            equation: `f(x) = ${a}(x ${h >= 0 ? '- ' + h : '+ ' + Math.abs(h)})² ${k >= 0 ? '+ ' + k : '- ' + Math.abs(k)}`
+        });
+    }
+    
+    // Choose one randomly to be the answer
+    const correctIndex = Math.floor(Math.random() * 4);
+    const correctFunction = functions[correctIndex];
+    
+    // Display function options
+    const optionsContainer = document.getElementById('function-options');
+    optionsContainer.innerHTML = '';
+    
+    functions.forEach((func, index) => {
+        const option = document.createElement('div');
+        option.className = 'function-choice';
+        option.textContent = `Option ${index + 1}: ${func.equation}`;
+        option.setAttribute('data-index', index);
+        option.addEventListener('click', () => {
+            // Clear previous selections
+            document.querySelectorAll('.function-choice').forEach(el => el.classList.remove('selected'));
+            // Mark this as selected
+            option.classList.add('selected');
+        });
+        optionsContainer.appendChild(option);
+    });
+    
+    // Draw the graph of the correct function
+    const graphContainer = document.getElementById('graph-to-match');
+    graphContainer.innerHTML = '<h3>Match with one of the options above:</h3>';
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = graphContainer.clientWidth || 400;
+    canvas.height = 300;
+    graphContainer.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Draw grid and axes
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    const gridSize = 30;
+    
+    // Draw vertical grid lines
+    for (let x = 0; x <= width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+    
+    // Draw horizontal grid lines
+    for (let y = 0; y <= height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+    
+    // Draw axes
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    
+    // x-axis
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+    
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(width / 2, 0);
+    ctx.lineTo(width / 2, height);
+    ctx.stroke();
+    
+    // Calculate reasonable viewing window
+    const xMin = correctFunction.h - 5;
+    const xMax = correctFunction.h + 5;
+    const xRange = xMax - xMin;
+    
+    // Function to convert x coordinate to canvas x
+    function toCanvasX(x) {
+        return ((x - xMin) / xRange) * width;
+    }
+    
+    // Function to convert y coordinate to canvas y
+    function toCanvasY(y) {
+        // Scale y values to fit the chart
+        const yScale = 20;
+        return height / 2 - y * yScale;
+    }
+    
+    // Plot the correct function
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    for (let canvasX = 0; canvasX < width; canvasX++) {
+        const x = xMin + (canvasX / width) * xRange;
+        const y = correctFunction.a * Math.pow(x - correctFunction.h, 2) + correctFunction.k;
+        const canvasY = toCanvasY(y);
+        
+        if (canvasX === 0) {
+            ctx.moveTo(canvasX, canvasY);
+        } else {
+            ctx.lineTo(canvasX, canvasY);
+        }
+    }
+    
+    ctx.stroke();
+    
+    // Store correct answer for checking
+    graphContainer.setAttribute('data-correct', correctIndex);
+    
+    // Show results
+    document.getElementById('match-results').classList.remove('hidden');
+    document.getElementById('match-feedback').textContent = '';
+}
+
+// Function to check matching answer
+function checkMatchAnswer() {
+    const selectedOption = document.querySelector('.function-choice.selected');
+    
+    if (!selectedOption) {
+        document.getElementById('match-feedback').textContent = 'Please select an option first.';
+        return;
+    }
+    
+    const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+    const correctIndex = parseInt(document.getElementById('graph-to-match').getAttribute('data-correct'));
+    
+    if (selectedIndex === correctIndex) {
+        document.getElementById('match-feedback').innerHTML = '<span style="color: var(--success);">Correct! You matched the function to its graph.</span>';
+    } else {
+        document.getElementById('match-feedback').innerHTML = `<span style="color: var(--error);">Incorrect. The correct answer was Option ${correctIndex + 1}. Try again!</span>`;
+    }
+}
+
+// Function to analyze characteristics of quadratic function
+function analyzeCharacteristics() {
+    const a = parseFloat(document.getElementById('char-a').value);
+    const b = parseFloat(document.getElementById('char-b').value);
+    const c = parseFloat(document.getElementById('char-c').value);
+    
+    if (isNaN(a) || isNaN(b) || isNaN(c)) {
+        alert("Please enter valid coefficients for a, b, and c.");
+        return;
+    }
+    
+    if (a === 0) {
+        alert("The coefficient 'a' cannot be zero for a quadratic function.");
+        return;
+    }
+    
+    // Calculate vertex
+    const h = -b / (2 * a);
+    const k = c - (b * b) / (4 * a);
+    
+    // Calculate y-intercept
+    const yIntercept = c;
+    
+    // Calculate discriminant for x-intercepts
+    const discriminant = b * b - 4 * a * c;
+    let xIntercepts;
+    
+    if (discriminant > 0) {
+        const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        xIntercepts = `Two x-intercepts: (${x1.toFixed(2)}, 0) and (${x2.toFixed(2)}, 0)`;
+    } else if (discriminant === 0) {
+        const x = -b / (2 * a);
+        xIntercepts = `One x-intercept: (${x.toFixed(2)}, 0)`;
+    } else {
+        xIntercepts = "No x-intercepts";
+    }
+    
+    // Determine increasing/decreasing intervals
+    let increasingInterval, decreasingInterval;
+    
+    if (a > 0) {
+        // Opens upward
+        increasingInterval = `Increasing on (${h.toFixed(2)}, ∞)`;
+        decreasingInterval = `Decreasing on (-∞, ${h.toFixed(2)})`;
+    } else {
+        // Opens downward
+        increasingInterval = `Increasing on (-∞, ${h.toFixed(2)})`;
+        decreasingInterval = `Decreasing on (${h.toFixed(2)}, ∞)`;
+    }
+    
+    // Update DOM with characteristics
+    document.getElementById('char-equation').innerHTML = `Equation: f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`;
+    document.getElementById('char-vertex').innerHTML = `Vertex: (${h.toFixed(2)}, ${k.toFixed(2)})`;
+    document.getElementById('char-direction').innerHTML = `Direction: Parabola opens ${a > 0 ? 'upward' : 'downward'}`;
+    document.getElementById('char-axis').innerHTML = `Axis of Symmetry: x = ${h.toFixed(2)}`;
+    document.getElementById('char-y-intercept').innerHTML = `y-intercept: ${yIntercept.toFixed(2)}`;
+    document.getElementById('char-x-intercepts').innerHTML = xIntercepts;
+    document.getElementById('char-domain').innerHTML = `Domain: All real numbers (ℝ)`;
+    document.getElementById('char-range').innerHTML = `Range: ${a > 0 ? `[${k.toFixed(2)}, ∞)` : `(-∞, ${k.toFixed(2)}]`}`;
+    document.getElementById('char-increasing').innerHTML = increasingInterval;
+    document.getElementById('char-decreasing').innerHTML = decreasingInterval;
+    document.getElementById('char-symmetry').innerHTML = `Symmetry: Symmetric about the line x = ${h.toFixed(2)}`;
+    
+    document.getElementById('char-results').classList.remove('hidden');
+    
+    // Draw the graph
+    const graphContainer = document.getElementById('char-graph-container');
+    graphContainer.innerHTML = '';
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = graphContainer.clientWidth;
+    canvas.height = graphContainer.clientHeight;
+    graphContainer.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Draw grid and axes (similar to previous implementations)
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    const gridSize = 30;
+    
+    // Draw vertical grid lines
+    for (let x = 0; x <= width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+    
+    // Draw horizontal grid lines
+    for (let y = 0; y <= height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+    
+    // Draw axes
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    
+    // x-axis
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+    
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(width / 2, 0);
+    ctx.lineTo(width / 2, height);
+    ctx.stroke();
+    
+    // Determine suitable range for x-axis based on vertex and intercepts
+    let xMin = Math.min(h - 3, -2);
+    let xMax = Math.max(h + 3, 2);
+    
+    // Include x-intercepts in the view if they exist
+    if (discriminant > 0) {
+        const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        xMin = Math.min(xMin, x1 - 1, x2 - 1);
+        xMax = Math.max(xMax, x1 + 1, x2 + 1);
+    }
+    
+    const xRange = xMax - xMin;
+    
+    // Function to convert x coordinate to canvas x
+    function toCanvasX(x) {
+        return ((x - xMin) / xRange) * width;
+    }
+    
+    // Function to convert y coordinate to canvas y
+    function toCanvasY(y) {
+        // Scale y values to fit the chart
+        const yRange = Math.max(Math.abs(k) * 2, 6);
+        return height / 2 - (y * height / yRange / 2);
+    }
+    
+    // Draw the quadratic function
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    for (let canvasX = 0; canvasX < width; canvasX++) {
+        const x = xMin + (canvasX / width) * xRange;
+        const y = a * x * x + b * x + c;
+        const canvasY = toCanvasY(y);
+        
+        if (canvasX === 0) {
+            ctx.moveTo(canvasX, canvasY);
+        } else {
+            ctx.lineTo(canvasX, canvasY);
+        }
+    }
+    
+    ctx.stroke();
+    
+    // Draw key points
+    
+    // Vertex
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(`(${h.toFixed(2)}, ${k.toFixed(2)})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
+    
+    // y-intercept
+    ctx.fillStyle = '#10b981';
+    ctx.beginPath();
+    ctx.arc(toCanvasX(0), toCanvasY(c), 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.fillText(`(0, ${c.toFixed(2)})`, toCanvasX(0) + 8, toCanvasY(c) - 8);
+    
+    // x-intercepts if they exist
+    if (discriminant >= 0) {
+        ctx.fillStyle = '#f59e0b';
+        
+        if (discriminant > 0) {
+            const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+            
+            ctx.beginPath();
+            ctx.arc(toCanvasX(x1), toCanvasY(0), 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillText(`(${x1.toFixed(2)}, 0)`, toCanvasX(x1) + 8, toCanvasY(0) - 8);
+            
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(toCanvasX(x2), toCanvasY(0), 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillText(`(${x2.toFixed(2)}, 0)`, toCanvasX(x2) + 8, toCanvasY(0) - 8);
+        } else {
+            const x = -b / (2 * a);
+            
+            ctx.beginPath();
+            ctx.arc(toCanvasX(x), toCanvasY(0), 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillText(`(${x.toFixed(2)}, 0)`, toCanvasX(x) + 8, toCanvasY(0) - 8);
+        }
+    }
+    
+    // Draw axis of symmetry
+    ctx.strokeStyle = '#9333ea';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(h), 0);
+    ctx.lineTo(toCanvasX(h), height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+// Initialize the page when DOM content is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up tab navigation
+    setupTabs();
+    
+    // Add event listeners for buttons
+    document.getElementById('identify-btn').addEventListener('click', identifyFunction);
+    document.getElementById('transform-btn').addEventListener('click', showTransformation);
+    document.getElementById('domain-btn').addEventListener('click', calculateDomainRange);
+    document.getElementById('generate-match-btn').addEventListener('click', generateMatchingProblem);
+    document.getElementById('check-match-btn').addEventListener('click', checkMatchAnswer);
+    document.getElementById('char-btn').addEventListener('click', analyzeCharacteristics);
+    
+    // Initialize with sample data
+    identifyFunction();
+});
