@@ -75,6 +75,14 @@
             font-weight: bold;
         }
         
+        .search-bar select {
+            padding: 12px 16px;
+            background-color: #2D3035;
+            color: var(--light);
+            border: none;
+            border-right: 1px solid #444;
+        }
+        
         .profile-header {
             display: flex;
             align-items: center;
@@ -96,6 +104,13 @@
             font-size: 36px;
             font-weight: bold;
             color: var(--primary);
+            overflow: hidden;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .profile-info h1 {
@@ -191,6 +206,13 @@
             justify-content: center;
             font-size: 24px;
             font-weight: bold;
+            overflow: hidden;
+        }
+        
+        .operator-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .operator-card h4 {
@@ -264,6 +286,13 @@
             background-color: var(--primary);
             border-radius: 50%;
             margin-right: 10px;
+            overflow: hidden;
+        }
+        
+        .badge-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .loading {
@@ -301,6 +330,34 @@
             display: none;
         }
         
+        .error-message {
+            color: var(--danger);
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .platform-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .platform-btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #333;
+            border: none;
+            border-radius: 4px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .platform-btn.active {
+            background-color: var(--primary);
+        }
+        
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -330,8 +387,17 @@
         </header>
         
         <div class="search-bar">
-            <input type="text" id="player-search" placeholder="Enter Ubisoft username or ID...">
+            <select id="platform-select">
+                <option value="pc">PC</option>
+                <option value="psn">PlayStation</option>
+                <option value="xbl">Xbox</option>
+            </select>
+            <input type="text" id="player-search" placeholder="Enter Ubisoft username...">
             <button id="search-button">SEARCH</button>
+        </div>
+        
+        <div id="error-message" class="error-message">
+            Unable to fetch player data. Please try again later.
         </div>
         
         <div class="loading" id="loading-section">
@@ -346,45 +412,47 @@
         
         <div class="results-container" id="results-section">
             <div class="profile-header">
-                <div class="profile-avatar" id="avatar">KD</div>
+                <div class="profile-avatar" id="avatar">
+                    <!-- Avatar image will be inserted here -->
+                </div>
                 <div class="profile-info">
-                    <h1 id="player-name">KingDestroyer</h1>
-                    <p>Level <span id="player-level">215</span> • Last played <span id="last-played">2 hours ago</span></p>
+                    <h1 id="player-name">Loading...</h1>
+                    <p>Level <span id="player-level">0</span> • Last played <span id="last-played">loading...</span></p>
                 </div>
             </div>
             
             <div class="stats-container">
                 <div class="stat-card">
                     <h3>K/D RATIO</h3>
-                    <div class="stat-value kd-ratio" id="kd-ratio">1.34</div>
+                    <div class="stat-value kd-ratio" id="kd-ratio">0.00</div>
                 </div>
                 <div class="stat-card">
                     <h3>WINS</h3>
-                    <div class="stat-value" id="wins">1,245</div>
+                    <div class="stat-value" id="wins">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>LOSSES</h3>
-                    <div class="stat-value" id="losses">985</div>
+                    <div class="stat-value" id="losses">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>WIN %</h3>
-                    <div class="stat-value" id="win-percent">55.8%</div>
+                    <div class="stat-value" id="win-percent">0.0%</div>
                 </div>
                 <div class="stat-card">
                     <h3>KILLS</h3>
-                    <div class="stat-value" id="kills">12,567</div>
+                    <div class="stat-value" id="kills">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>DEATHS</h3>
-                    <div class="stat-value" id="deaths">9,394</div>
+                    <div class="stat-value" id="deaths">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>HEADSHOT %</h3>
-                    <div class="stat-value" id="headshot-percent">42.3%</div>
+                    <div class="stat-value" id="headshot-percent">0.0%</div>
                 </div>
                 <div class="stat-card">
                     <h3>MATCHES PLAYED</h3>
-                    <div class="stat-value" id="matches">2,230</div>
+                    <div class="stat-value" id="matches">0</div>
                 </div>
             </div>
             
@@ -397,152 +465,14 @@
                 </div>
                 
                 <div class="tab-content active" id="operators-tab">
-                    <div class="operators-grid">
-                        <div class="operator-card">
-                            <div class="operator-icon">A</div>
-                            <h4>Ash</h4>
-                            <p>K/D: 1.76</p>
-                            <p>Win %: 62.4%</p>
-                            <p>Pick Rate: 18.2%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">J</div>
-                            <h4>Jäger</h4>
-                            <p>K/D: 1.52</p>
-                            <p>Win %: 57.8%</p>
-                            <p>Pick Rate: 15.5%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">T</div>
-                            <h4>Thermite</h4>
-                            <p>K/D: 1.22</p>
-                            <p>Win %: 59.1%</p>
-                            <p>Pick Rate: 12.7%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">B</div>
-                            <h4>Bandit</h4>
-                            <p>K/D: 1.41</p>
-                            <p>Win %: 54.2%</p>
-                            <p>Pick Rate: 11.9%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">Z</div>
-                            <h4>Zofia</h4>
-                            <p>K/D: 1.38</p>
-                            <p>Win %: 58.3%</p>
-                            <p>Pick Rate: 14.6%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">D</div>
-                            <h4>Doc</h4>
-                            <p>K/D: 1.29</p>
-                            <p>Win %: 52.7%</p>
-                            <p>Pick Rate: 9.8%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">I</div>
-                            <h4>IQ</h4>
-                            <p>K/D: 1.31</p>
-                            <p>Win %: 55.9%</p>
-                            <p>Pick Rate: 8.4%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">M</div>
-                            <h4>Mute</h4>
-                            <p>K/D: 1.27</p>
-                            <p>Win %: 56.1%</p>
-                            <p>Pick Rate: 10.3%</p>
-                        </div>
+                    <div class="operators-grid" id="operators-grid">
+                        <!-- Operator cards will be inserted here -->
                     </div>
                 </div>
                 
                 <div class="tab-content" id="maps-tab">
-                    <div class="maps-grid">
-                        <div class="map-card">
-                            <h4>Clubhouse</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>68%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 68%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>42 Matches</span>
-                                <span>1.45 K/D</span>
-                            </div>
-                        </div>
-                        <div class="map-card">
-                            <h4>Oregon</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>62%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 62%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>39 Matches</span>
-                                <span>1.38 K/D</span>
-                            </div>
-                        </div>
-                        <div class="map-card">
-                            <h4>Bank</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>57%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 57%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>35 Matches</span>
-                                <span>1.26 K/D</span>
-                            </div>
-                        </div>
-                        <div class="map-card">
-                            <h4>Kafe Dostoyevsky</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>64%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 64%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>41 Matches</span>
-                                <span>1.42 K/D</span>
-                            </div>
-                        </div>
-                        <div class="map-card">
-                            <h4>Consulate</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>51%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 51%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>33 Matches</span>
-                                <span>1.19 K/D</span>
-                            </div>
-                        </div>
-                        <div class="map-card">
-                            <h4>Chalet</h4>
-                            <div class="map-stats">
-                                <span>Win Rate</span>
-                                <span>59%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 59%"></div>
-                            </div>
-                            <div class="map-stats">
-                                <span>37 Matches</span>
-                                <span>1.32 K/D</span>
-                            </div>
-                        </div>
+                    <div class="maps-grid" id="maps-grid">
+                        <!-- Map cards will be inserted here -->
                     </div>
                 </div>
                 
@@ -558,126 +488,15 @@
                                 <th>Matches</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Y10S1</td>
-                                <td>
-                                    <div class="rank-badge">
-                                        <div class="badge-icon"></div>
-                                        Platinum II
-                                    </div>
-                                </td>
-                                <td>3,658</td>
-                                <td>1.38</td>
-                                <td>58%</td>
-                                <td>142</td>
-                            </tr>
-                            <tr>
-                                <td>Y9S4</td>
-                                <td>
-                                    <div class="rank-badge">
-                                        <div class="badge-icon"></div>
-                                        Platinum III
-                                    </div>
-                                </td>
-                                <td>3,542</td>
-                                <td>1.32</td>
-                                <td>56%</td>
-                                <td>156</td>
-                            </tr>
-                            <tr>
-                                <td>Y9S3</td>
-                                <td>
-                                    <div class="rank-badge">
-                                        <div class="badge-icon"></div>
-                                        Gold I
-                                    </div>
-                                </td>
-                                <td>3,289</td>
-                                <td>1.29</td>
-                                <td>54%</td>
-                                <td>138</td>
-                            </tr>
-                            <tr>
-                                <td>Y9S2</td>
-                                <td>
-                                    <div class="rank-badge">
-                                        <div class="badge-icon"></div>
-                                        Gold II
-                                    </div>
-                                </td>
-                                <td>3,156</td>
-                                <td>1.25</td>
-                                <td>52%</td>
-                                <td>124</td>
-                            </tr>
-                            <tr>
-                                <td>Y9S1</td>
-                                <td>
-                                    <div class="rank-badge">
-                                        <div class="badge-icon"></div>
-                                        Gold III
-                                    </div>
-                                </td>
-                                <td>3,087</td>
-                                <td>1.21</td>
-                                <td>51%</td>
-                                <td>119</td>
-                            </tr>
+                        <tbody id="seasons-tbody">
+                            <!-- Season rows will be inserted here -->
                         </tbody>
                     </table>
                 </div>
                 
                 <div class="tab-content" id="weapons-tab">
-                    <div class="operators-grid">
-                        <div class="operator-card">
-                            <div class="operator-icon">R4</div>
-                            <h4>R4-C</h4>
-                            <p>Kills: 1,856</p>
-                            <p>Headshot %: 48.2%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">MP</div>
-                            <h4>MP7</h4>
-                            <p>Kills: 1,543</p>
-                            <p>Headshot %: 45.7%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">L8</div>
-                            <h4>L85A2</h4>
-                            <p>Kills: 1,245</p>
-                            <p>Headshot %: 42.3%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">MP</div>
-                            <h4>MP5</h4>
-                            <p>Kills: 1,189</p>
-                            <p>Headshot %: 47.8%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">41</div>
-                            <h4>416-C</h4>
-                            <p>Kills: 1,326</p>
-                            <p>Headshot %: 44.1%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">F2</div>
-                            <h4>F2</h4>
-                            <p>Kills: 978</p>
-                            <p>Headshot %: 46.9%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">55</div>
-                            <h4>552 Commando</h4>
-                            <p>Kills: 856</p>
-                            <p>Headshot %: 41.5%</p>
-                        </div>
-                        <div class="operator-card">
-                            <div class="operator-icon">MP</div>
-                            <h4>MPX</h4>
-                            <p>Kills: 732</p>
-                            <p>Headshot %: 49.2%</p>
-                        </div>
+                    <div class="operators-grid" id="weapons-grid">
+                        <!-- Weapon cards will be inserted here -->
                     </div>
                 </div>
             </div>
@@ -698,67 +517,500 @@
             });
         });
         
-        // Search button functionality (demo)
-        document.getElementById('search-button').addEventListener('click', () => {
-            const username = document.getElementById('player-search').value.trim();
+        // Configuration for the proxy server
+        const PROXY_URL = 'https://corsproxy.io/?';
+        
+        // Function to format numbers with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // Function to calculate time difference
+        function getTimeDifference(timestamp) {
+            const now = new Date();
+            const lastPlayed = new Date(timestamp);
+            const diffMs = now - lastPlayed;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
             
+            if (diffDays > 0) {
+                return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+                return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else {
+                return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            }
+        }
+        
+        // Function to search for a player
+        async function searchPlayer(username, platform) {
             if (!username) return;
             
             // Hide results and show loading
             document.getElementById('results-section').style.display = 'none';
             document.getElementById('no-results-section').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
             document.getElementById('loading-section').style.display = 'block';
             
-            // Simulate API call with timeout
-            setTimeout(() => {
-                // Hide loading
-                document.getElementById('loading-section').style.display = 'none';
-                
-                // Show results (in a real app, this would depend on API response)
-                if (Math.random() > 0.1) { // 90% chance to "find" the player for demo
-                    document.getElementById('results-section').style.display = 'block';
-                    
-                    // Update player info with the searched username
-                    document.getElementById('player-name').textContent = username;
-                    document.getElementById('avatar').textContent = username.substring(0, 2).toUpperCase();
-                } else {
-                    document.getElementById('no-results-section').style.display = 'block';
-                }
-            }, 1500);
-        });
-        
-        // In a real application, you would call the R6 Stats API here
-        // For demonstration purposes, we're using hardcoded data
-        // Example API implementation might look like:
-        /*
-        async function fetchPlayerStats(username) {
             try {
-                const response = await fetch(`https://api.r6stats.com/api/v1/players/${username}`, {
-                    headers: {
-                        'Authorization': 'Your-API-Key'
-                    }
-                });
+                // First, try to fetch the player profile from R6 Tracker Network via our proxy
+                const profileUrl = `${PROXY_URL}https://r6.tracker.network/profile/${platform}/${encodeURIComponent(username)}`;
+                const response = await fetch(profileUrl);
                 
                 if (!response.ok) {
-                    throw new Error('Player not found');
+                    throw new Error('Failed to fetch player data');
                 }
                 
-                const data = await response.json();
-                updatePlayerUI(data);
-            } catch (error) {
+                const htmlText = await response.text();
+                
+                // Create a DOM parser to parse the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+                
+                // Check if player not found
+                if (doc.querySelector('.trn-card__content--error')) {
+                    document.getElementById('loading-section').style.display = 'none';
+                    document.getElementById('no-results-section').style.display = 'block';
+                    return;
+                }
+                
+                // Extract player data from the parsed HTML
+                const playerData = extractPlayerData(doc);
+                
+                // Update the UI with the extracted data
+                updatePlayerUI(playerData);
+                
+                // Hide loading and show results
                 document.getElementById('loading-section').style.display = 'none';
-                document.getElementById('no-results-section').style.display = 'block';
+                document.getElementById('results-section').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error fetching player data:', error);
+                document.getElementById('loading-section').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
             }
         }
         
-        function updatePlayerUI(data) {
-            // Update all UI elements with data from API
-            document.getElementById('player-name').textContent = data.username;
-            document.getElementById('player-level').textContent = data.progression.level;
-            document.getElementById('kd-ratio').textContent = data.stats.general.kd.toFixed(2);
-            // etc...
+        // Function to extract player data from R6 Tracker Network HTML
+        function extractPlayerData(doc) {
+            const playerData = {
+                username: '',
+                avatar: '',
+                level: '0',
+                lastPlayed: 'Unknown',
+                stats: {
+                    kd: '0.00',
+                    wins: '0',
+                    losses: '0',
+                    winPercent: '0.0%',
+                    kills: '0',
+                    deaths: '0',
+                    headshotPercent: '0.0%',
+                    matchesPlayed: '0'
+                },
+                operators: [],
+                maps: [],
+                seasons: [],
+                weapons: []
+            };
+            
+            try {
+                // Extract basic profile info
+                const profileHeader = doc.querySelector('.trn-profile-header');
+                if (profileHeader) {
+                    playerData.username = profileHeader.querySelector('.trn-profile-header__name')?.textContent.trim() || 'Unknown';
+                    
+                    const avatarImg = profileHeader.querySelector('.trn-profile-header__avatar img');
+                    if (avatarImg) {
+                        playerData.avatar = avatarImg.src;
+                    }
+                    
+                    const levelElement = profileHeader.querySelector('[data-stat="PVPLevel"]');
+                    if (levelElement) {
+                        playerData.level = levelElement.textContent.trim();
+                    }
+                }
+                
+                // Try to find last played time
+                const lastPlayedElement = doc.querySelector('[data-stat="LastMatchTimestamp"]');
+                if (lastPlayedElement) {
+                    const timestamp = lastPlayedElement.getAttribute('data-timestamp');
+                    if (timestamp) {
+                        playerData.lastPlayed = getTimeDifference(parseInt(timestamp) * 1000);
+                    }
+                }
+                
+                // Extract general stats
+                const statElements = doc.querySelectorAll('.trn-card__content .trn-defstat');
+                statElements.forEach(statElement => {
+                    const statName = statElement.querySelector('.trn-defstat__name')?.textContent.trim().toLowerCase();
+                    const statValue = statElement.querySelector('.trn-defstat__value')?.textContent.trim();
+                    
+                    if (statName && statValue) {
+                        if (statName.includes('k/d')) {
+                            playerData.stats.kd = statValue;
+                        } else if (statName.includes('wins')) {
+                            playerData.stats.wins = statValue.replace(/,/g, '');
+                        } else if (statName.includes('losses')) {
+                            playerData.stats.losses = statValue.replace(/,/g, '');
+                        } else if (statName.includes('win %')) {
+                            playerData.stats.winPercent = statValue;
+                        } else if (statName.includes('kills')) {
+                            playerData.stats.kills = statValue.replace(/,/g, '');
+                        } else if (statName.includes('deaths')) {
+                            playerData.stats.deaths = statValue.replace(/,/g, '');
+                        } else if (statName.includes('headshot %')) {
+                            playerData.stats.headshotPercent = statValue;
+                        } else if (statName.includes('matches played')) {
+                            playerData.stats.matchesPlayed = statValue.replace(/,/g, '');
+                        }
+                    }
+                });
+                
+                // Extract operators data
+                const operatorElements = doc.querySelectorAll('.trn-defstat-grid__item[data-stat-category="Operators"]');
+                operatorElements.forEach(opElement => {
+                    const opName = opElement.querySelector('.trn-defstat-grid__title')?.textContent.trim();
+                    const opStats = opElement.querySelectorAll('.trn-defstat-grid__stats-lineup .trn-defstat');
+                    
+                    const operator = {
+                        name: opName || 'Unknown',
+                        icon: '',
+                        kd: '0.00',
+                        winPercent: '0.0%',
+                        pickRate: '0.0%'
+                    };
+                    
+                    // Try to find operator icon
+                    const opIcon = opElement.querySelector('.trn-defstat-grid__avatar img');
+                    if (opIcon) {
+                        operator.icon = opIcon.src;
+                    }
+                    
+                    // Extract operator stats
+                    opStats.forEach(stat => {
+                        const statName = stat.querySelector('.trn-defstat__name')?.textContent.trim().toLowerCase();
+                        const statValue = stat.querySelector('.trn-defstat__value')?.textContent.trim();
+                        
+                        if (statName && statValue) {
+                            if (statName.includes('k/d')) {
+                                operator.kd = statValue;
+                            } else if (statName.includes('win %')) {
+                                operator.winPercent = statValue;
+                            } else if (statName.includes('pick %')) {
+                                operator.pickRate = statValue;
+                            }
+                        }
+                    });
+                    
+                    playerData.operators.push(operator);
+                });
+                
+                // Extract maps data
+                const mapElements = doc.querySelectorAll('.trn-defstat-grid__item[data-stat-category="Maps"]');
+                mapElements.forEach(mapElement => {
+                    const mapName = mapElement.querySelector('.trn-defstat-grid__title')?.textContent.trim();
+                    const mapStats = mapElement.querySelectorAll('.trn-defstat-grid__stats-lineup .trn-defstat');
+                    
+                    const map = {
+                        name: mapName || 'Unknown',
+                        winRate: '0%',
+                        matches: '0',
+                        kd: '0.00'
+                    };
+                    
+                    // Extract map stats
+                    mapStats.forEach(stat => {
+                        const statName = stat.querySelector('.trn-defstat__name')?.textContent.trim().toLowerCase();
+                        const statValue = stat.querySelector('.trn-defstat__value')?.textContent.trim();
+                        
+                        if (statName && statValue) {
+                            if (statName.includes('win %')) {
+                                map.winRate = statValue;
+                            } else if (statName.includes('matches played')) {
+                                map.matches = statValue;
+                            } else if (statName.includes('k/d')) {
+                                map.kd = statValue;
+                            }
+                        }
+                    });
+                    
+                    playerData.maps.push(map);
+                });
+                
+                // Extract seasons data
+                const seasonElements = doc.querySelectorAll('.trn-table__row[data-type="season"]');
+                seasonElements.forEach(seasonElement => {
+                    const cells = seasonElement.querySelectorAll('.trn-table__column');
+                    
+                    if (cells.length >= 6) {
+                        const season = {
+                            name: cells[0]?.textContent.trim() || 'Unknown',
+                            rank: cells[1]?.textContent.trim() || 'Unranked',
+                            rankIcon: '',
+                            mmr: cells[2]?.textContent.trim() || '0',
+                            kd: cells[3]?.textContent.trim() || '0.00',
+                            winPercent: cells[4]?.textContent.trim() || '0%',
+                            matches: cells[5]?.textContent.trim() || '0'
+                        };
+                        
+                        // Try to find rank icon
+                        const rankImg = cells[1]?.querySelector('img');
+                        if (rankImg) {
+                            season.rankIcon = rankImg.src;
+                        }
+                        
+                        playerData.seasons.push(season);
+                    }
+                });
+                
+                // Extract weapons data
+                const weaponElements = doc.querySelectorAll('.trn-defstat-grid__item[data-stat-category="Weapons"]');
+                weaponElements.forEach(weapElement => {
+                    const weapName = weapElement.querySelector('.trn-defstat-grid__title')?.textContent.trim();
+                    const weapStats = weapElement.querySelectorAll('.trn-defstat-grid__stats-lineup .trn-defstat');
+                    
+                    const weapon = {
+                        name: weapName || 'Unknown',
+                        icon: '',
+                        kills: '0',
+                        headshotPercent: '0.0%'
+                    };
+                    
+                    // Try to find weapon icon
+                    const weapIcon = weapElement.querySelector('.trn-defstat-grid__avatar img');
+                    if (weapIcon) {
+                        weapon.icon = weapIcon.src;
+                    }
+                    
+                    // Extract weapon stats
+                    weapStats.forEach(stat => {
+                        const statName = stat.querySelector('.trn-defstat__name')?.textContent.trim().toLowerCase();
+                        const statValue = stat.querySelector('.trn-defstat__value')?.textContent.trim();
+                        
+                        if (statName && statValue) {
+                            if (statName.includes('kills')) {
+                                weapon.kills = statValue;
+                            } else if (statName.includes('headshot %')) {
+                                weapon.headshotPercent = statValue;
+                            }
+                        }
+                    });
+                    
+                    playerData.weapons.push(weapon);
+                });
+                
+            } catch (error) {
+                console.error('Error extracting player data:', error);
+            }
+            
+            return playerData;
         }
-        */
+        
+        // Function to update the UI with player data
+        function updatePlayerUI(playerData) {
+            // Update basic info
+            document.getElementById('player-name').textContent = playerData.username;
+            document.getElementById('player-level').textContent = playerData.level;
+            document.getElementById('last-played').textContent = playerData.lastPlayed;
+            
+            // Update avatar
+            const avatarElement = document.getElementById('avatar');
+            if (playerData.avatar) {
+                avatarElement.innerHTML = `<img src="${playerData.avatar}" alt="${playerData.username}">`;
+            } else {
+                avatarElement.textContent = playerData.username.substring(0, 2).toUpperCase();
+            }
+            
+            // Update stats
+            document.getElementById('kd-ratio').textContent = playerData.stats.kd;
+            document.getElementById('wins').textContent = formatNumber(playerData.stats.wins);
+            document.getElementById('losses').textContent = formatNumber(playerData.stats.losses);
+            document.getElementById('win-percent').textContent = playerData.stats.winPercent;
+            document.getElementById('kills').textContent = formatNumber(playerData.stats.kills);
+            document.getElementById('deaths').textContent = formatNumber(playerData.stats.deaths);
+            document.getElementById('headshot-percent').textContent = playerData.stats.headshotPercent;
+            document.getElementById('matches').textContent = formatNumber(playerData.stats.matchesPlayed);
+            
+            // Update operators tab
+            const operatorsGrid = document.getElementById('operators-grid');
+            operatorsGrid.innerHTML = '';
+            
+            playerData.operators.slice(0, 8).forEach(op => {
+                const opCard = createOperatorCard(op);
+                operatorsGrid.appendChild(opCard);
+            });
+            
+            // Update maps tab
+            const mapsGrid = document.getElementById('maps-grid');
+            mapsGrid.innerHTML = '';
+            
+            playerData.maps.slice(0, 6).forEach(map => {
+                const mapCard = createMapCard(map);
+                mapsGrid.appendChild(mapCard);
+            });
+            
+            // Update seasons tab
+            const seasonsBody = document.getElementById('seasons-tbody');
+            seasonsBody.innerHTML = '';
+            
+            playerData.seasons.slice(0, 5).forEach(season => {
+                const seasonRow = createSeasonRow(season);
+                seasonsBody.appendChild(seasonRow);
+            });
+            
+            // Update weapons tab
+            const weaponsGrid = document.getElementById('weapons-grid');
+            weaponsGrid.innerHTML = '';
+            
+            playerData.weapons.slice(0, 8).forEach(weapon => {
+                const weapCard = createWeaponCard(weapon);
+                weaponsGrid.appendChild(weapCard);
+            });
+        }
+        
+        // Helper function to create operator card
+        function createOperatorCard(operator) {
+            const card = document.createElement('div');
+            card.className = 'operator-card';
+            
+            let iconHtml = '';
+            if (operator.icon) {
+                iconHtml = `<img src="${operator.icon}" alt="${operator.name}">`;
+            } else {
+                iconHtml = operator.name.substring(0, 1).toUpperCase();
+            }
+            
+            card.innerHTML = `
+                <div class="operator-icon">${iconHtml}</div>
+                <h4>${operator.name}</h4>
+                <p>K/D: ${operator.kd}</p>
+                <p>Win %: ${operator.winPercent}</p>
+                <p>Pick Rate: ${operator.pickRate}</p>
+            `;
+            
+            return card;
+        }
+        
+        // Helper function to create map card
+        function createMapCard(map) {
+            const winRateNum = parseInt(map.winRate) || 0;
+            
+            const card = document.createElement('div');
+            card.className = 'map-card';
+            
+            card.innerHTML = `
+                <h4>${map.name}</h4>
+                <div class="map-stats">
+                    <span>Win Rate</span>
+                    <span>${map.winRate}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${winRateNum}%"></div>
+                </div>
+                <div class="map-stats">
+                    <span>${map.matches} Matches</span>
+                    <span>${map.kd} K/D</span>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Helper function to create season row
+        function createSeasonRow(season) {
+            const row = document.createElement('tr');
+            
+            let rankIconHtml = '';
+            if (season.rankIcon) {
+                rankIconHtml = `<img src="${season.rankIcon}" alt="${season.rank}">`;
+            }
+            
+            row.innerHTML = `
+                <td>${season.name}</td>
+                <td>
+                    <div class="rank-badge">
+                        <div class="badge-icon">${rankIconHtml}</div>
+                        ${season.rank}
+                    </div>
+                </td>
+                <td>${season.mmr}</td>
+                <td>${season.kd}</td>
+                <td>${season.winPercent}</td>
+                <td>${season.matches}</td>
+            `;
+            
+            return row;
+        }
+        
+        // Helper function to create weapon card
+        function createWeaponCard(weapon) {
+            const card = document.createElement('div');
+            card.className = 'operator-card';
+            
+            let iconHtml = '';
+            if (weapon.icon) {
+                iconHtml = `<img src="${weapon.icon}" alt="${weapon.name}">`;
+            } else {
+                const acronym = weapon.name
+                    .split(' ')
+                    .map(word => word[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+                    
+                iconHtml = acronym;
+            }
+            
+            card.innerHTML = `
+                <div class="operator-icon">${iconHtml}</div>
+                <h4>${weapon.name}</h4>
+                <p>Kills: ${weapon.kills}</p>
+                <p>Headshot %: ${weapon.headshotPercent}</p>
+            `;
+            
+            return card;
+        }
+        
+        // Initialize search button event listener
+        document.getElementById('search-button').addEventListener('click', () => {
+            const username = document.getElementById('player-search').value.trim();
+            const platform = document.getElementById('platform-select').value;
+            
+            if (username) {
+                searchPlayer(username, platform);
+            }
+        });
+        
+        // Allow searching by pressing Enter in the search field
+        document.getElementById('player-search').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const username = document.getElementById('player-search').value.trim();
+                const platform = document.getElementById('platform-select').value;
+                
+                if (username) {
+                    searchPlayer(username, platform);
+                }
+            }
+        });
+        
+        // Load a default player or run a demo search automatically when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Either load a demo player or show instructions
+            const defaultPlayers = {
+                'pc': 'Beaulo.TSM',
+                'psn': 'Pengu.G2',
+                'xbl': 'KingGeorge'
+            };
+            
+            // Get the default platform
+            const platform = document.getElementById('platform-select').value;
+            
+            // Auto-search with a default player
+            document.getElementById('player-search').value = defaultPlayers[platform];
+            searchPlayer(defaultPlayers[platform], platform);
+        });
     </script>
 </body>
 </html>
