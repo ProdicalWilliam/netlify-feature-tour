@@ -900,29 +900,29 @@
                                 conversationDetails.className = 'conversation-details';
                                 
                                 // When creating conversation item
-conversationName.className = 'conversation-name';
-conversationName.textContent = otherUser.username;
+                                conversationName.className = 'conversation-name';
+                                conversationName.textContent = otherUser.username;
 
-// Create last message preview
-const lastMessage = document.createElement('div');
-lastMessage.className = 'last-message';
-if (chat.lastMessage) {
-    lastMessage.textContent = chat.lastMessage.text;
-} else {
-    lastMessage.textContent = 'Start a conversation';
-}
+                                // Create last message preview
+                                const lastMessage = document.createElement('div');
+                                lastMessage.className = 'last-message';
+                                if (chat.lastMessage) {
+                                lastMessage.textContent = chat.lastMessage.text;
+                                } else {
+                                    lastMessage.textContent = 'Start a conversation';
+                                }
 
-// Add elements to conversation item
-conversationDetails.appendChild(conversationName);
-conversationDetails.appendChild(lastMessage);
-conversationItem.appendChild(contactAvatar);
-conversationItem.appendChild(conversationDetails);
-conversationList.appendChild(conversationItem);
+                                // Add elements to conversation item
+                                conversationDetails.appendChild(conversationName);
+                                conversationDetails.appendChild(lastMessage);
+                                conversationItem.appendChild(contactAvatar);
+                                conversationItem.appendChild(conversationDetails);
+                                conversationList.appendChild(conversationItem);
 
-// Add click handler
-conversationItem.addEventListener('click', () => {
-    openConversation(chatId, otherUserId, otherUser.username);
-});
+                                // Add click handler
+                                conversationItem.addEventListener('click', () => {
+                                    openConversation(chatId, otherUserId, otherUser.username);
+                                });
                             });
                     });
                 });
