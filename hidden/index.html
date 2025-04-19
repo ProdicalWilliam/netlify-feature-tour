@@ -1,703 +1,1037 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Messenger</title>
-  <!-- Firebase SDK via CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-app-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-auth-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-database-compat.min.js"></script>
-  
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<link rel="icon" href="https://cdn-icons-png.freepik.com/256/8414/8414412.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ming's Libaries</title>
+<style>
+:root {
+--primary-color: #4a6cf7;
+--secondary-color: #f7934a;
+--dark-bg: #1a1a2e;
+--card-bg: #242438;
+--text-color: #e6e6e6;
+--text-muted: #9999a8;
+--transition: all 0.3s ease;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+background-color: var(--dark-bg);
+color: var(--text-color);
+line-height: 1.6;
+}
+
+header {
+background-color: var(--card-bg);
+padding: 1.5rem 0;
+text-align: center;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+h1 {
+font-size: 2.2rem;
+margin-bottom: 0.5rem;
+color: var(--primary-color);
+}
+
+.subtitle {
+color: var(--text-muted);
+font-size: 1.1rem;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 2rem 1rem;
+}
+
+.search-filter {
+display: flex;
+justify-content: space-between;
+margin-bottom: 2rem;
+flex-wrap: wrap;
+gap: 1rem;
+}
+
+.search-box {
+flex: 1;
+min-width: 300px;
+padding: 0.75rem 1rem;
+border-radius: 5px;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+font-size: 1rem;
+}
+
+.filter-dropdown {
+padding: 0.75rem 1rem;
+border-radius: 5px;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+font-size: 1rem;
+cursor: pointer;
+}
+
+.game-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 1.5rem;
+}
+
+.game-card {
+background-color: var(--card-bg);
+border-radius: 8px;
+overflow: hidden;
+transition: var(--transition);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.game-image {
+position: relative;
+height: 180px;
+overflow: hidden;
+}
+
+.game-image img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: var(--transition);
+}
+
+.game-card:hover .game-image img {
+transform: scale(1.05);
+}
+
+.game-icon {
+position: absolute;
+bottom: -20px;
+left: 20px;
+width: 60px;
+height: 60px;
+border-radius: 12px;
+background-color: var(--card-bg);
+padding: 5px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+
+.game-icon img {
+width: 100%;
+height: 100%;
+object-fit: contain;
+}
+
+.game-content {
+padding: 1.5rem 1rem 1rem;
+}
+
+.game-tags {
+display: flex;
+gap: 0.5rem;
+margin-bottom: 0.5rem;
+flex-wrap: wrap;
+}
+
+.game-tag {
+font-size: 0.7rem;
+padding: 0.2rem 0.5rem;
+border-radius: 3px;
+background-color: rgba(74, 108, 247, 0.2);
+color: var(--primary-color);
+}
+
+.game-title {
+font-size: 1.3rem;
+margin-top: 0.5rem;
+margin-bottom: 0.5rem;
+font-weight: 600;
+}
+
+.game-description {
+color: var(--text-muted);
+font-size: 0.9rem;
+margin-bottom: 1rem;
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.game-actions {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-top: 1px solid rgba(255, 255, 255, 0.1);
+padding-top: 1rem;
+}
+
+.play-button {
+padding: 0.5rem 1.2rem;
+background-color: var(--primary-color);
+color: white;
+border-radius: 5px;
+text-decoration: none;
+font-weight: 500;
+transition: var(--transition);
+display: inline-block;
+}
+
+.play-button:hover {
+background-color: #3450cc;
+}
+
+.game-info {
+display: flex;
+gap: 1rem;
+color: var(--text-muted);
+font-size: 0.8rem;
+}
+
+.game-info span {
+display: flex;
+align-items: center;
+gap: 0.3rem;
+}
+
+.pagination {
+display: flex;
+justify-content: center;
+margin-top: 3rem;
+gap: 0.5rem;
+}
+
+.pagination-button {
+padding: 0.5rem 1rem;
+border: 1px solid #444;
+background-color: var(--card-bg);
+color: var(--text-color);
+border-radius: 5px;
+cursor: pointer;
+transition: var(--transition);
+}
+
+.pagination-button.active {
+background-color: var(--primary-color);
+border-color: var(--primary-color);
+}
+
+.pagination-button:hover:not(.active) {
+background-color: #32324a;
+}
+
+footer {
+text-align: center;
+padding: 2rem 0;
+background-color: var(--card-bg);
+margin-top: 3rem;
+}
+
+footer p {
+color: var(--text-muted);
+}
+
+footer a {
+color: var(--primary-color);
+text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+h1 {
+font-size: 1.8rem;
+}
+.search-filter {
+flex-direction: column;
+}
+.game-grid {
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+}
+
+/* Hover effects for accessibility */
+@media (hover: hover) {
+.play-button:focus, .search-box:focus, .filter-dropdown:focus, .pagination-button:focus {
+outline: 2px solid var(--secondary-color);
+}
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div id="auth-container" class="card">
-      <h2>Simple Messenger</h2>
-      <div id="login-form">
-        <h3>Login</h3>
-        <input type="email" id="login-email" placeholder="Email" class="input-field">
-        <input type="password" id="login-password" placeholder="Password" class="input-field">
-        <button id="login-button" class="btn-primary">Login</button>
-        <p class="text-center mt-2">Don't have an account? <a href="#" id="switch-to-register" class="text-accent">Register</a></p>
-      </div>
-      <div id="register-form" class="hidden">
-        <h3>Register</h3>
-        <input type="text" id="register-username" placeholder="Username" class="input-field">
-        <input type="email" id="register-email" placeholder="Email" class="input-field">
-        <input type="password" id="register-password" placeholder="Password" class="input-field">
-        <button id="register-button" class="btn-primary">Register</button>
-        <p class="text-center mt-2">Already have an account? <a href="#" id="switch-to-login" class="text-accent">Login</a></p>
-      </div>
-    </div>
+<header>
+<h1>Ming's Unblocked Libaries</h1>
+<p class="subtitle">All of this is unblocked mostly if something is patched or you want something ask me.</p>
+</header>
 
-    <div id="app-container" class="hidden">
-      <div class="flex mb-4">
-        <div class="flex-1">
-          <h2 id="username-display"></h2>
-        </div>
-        <div>
-          <button id="logout-button" class="btn-secondary">Logout</button>
-        </div>
-      </div>
+<div class="container">
+<div class="search-filter">
+<input type="text" class="search-box" placeholder="Search games..." id="searchInput">
+<select class="filter-dropdown" id="categoryFilter">
+<option value="all">All Categories</option>
+<option value="3d">3D Games</option>
+<option value="puzzle">Puzzle</option>
+<option value="action">Action</option>
+<option value="platformer">Platformer</option>
+<option value="adventure">Adventure</option>
+<option value="strategy">Strategy</option>
+<option value="simulation">Simulation</option>
+<option value="racing">Racing</option>
+</select>
+</div>
 
-      <div id="session-id" class="session-id hidden"></div>
+<div class="game-grid" id="gameGrid">
+<!-- Game cards will be generated by JavaScript -->
+</div>
 
-      <div class="tabs">
-        <div id="tab-chats" class="tab-button active">Chats</div>
-        <div id="tab-friends" class="tab-button">Friends</div>
-      </div>
+<div class="pagination" id="pagination">
+<!-- Pagination will be generated by JavaScript -->
+</div>
+</div>
 
-      <div id="chats-container" class="card">
-        <div id="chat-list"></div>
-      </div>
+<footer>
+<p>Created by <a href="https://github.com/ProdicalWilliam" target="_blank">Ming's Forrbiden Libary</a> &copy; <span id="currentYear"></span></p>
+</footer>
 
-      <div id="friends-container" class="card hidden">
-        <div class="mb-4">
-          <input type="text" id="friend-username" placeholder="Find friend by username" class="input-field">
-          <button id="add-friend-button" class="btn-primary">Add Friend</button>
-        </div>
-        <h3>Friends</h3>
-        <div id="friends-list"></div>
-      </div>
-    </div>
+<script>
+// Game data - EDIT THIS SECTION TO CUSTOMIZE YOUR GAMES
+// For each game, update the following properties:
+// - id: A unique identifier for the game
+// - title: The name of your game
+// - description: A short description of the game
+// - image: Path to the game's screenshot/banner image
+// - icon: Path to the game's icon
+// - link: URL where the game can be played
+// - category: The game's primary category (used for filtering)
+// - tags: Array of tags for additional categorization
+// - dateAdded: When the game was added to the showcase
+// - featured: Whether to highlight this game (not currently used)
 
-    <div id="chat-view" class="hidden">
-      <div class="flex mb-4 items-center">
-        <button id="back-button" class="btn-secondary mr-2">←</button>
-        <div class="flex-1">
-          <h3 id="chat-recipient"></h3>
-        </div>
-      </div>
-      <div class="card messages-container" id="messages-container">
-        <div id="messages-list"></div>
-      </div>
-      <div class="message-input-container">
-        <input type="text" id="message-input" placeholder="Type a message" class="input-field flex-1">
-        <button id="send-button" class="btn-primary" style="width: auto;">Send</button>
-      </div>
-    </div>
-  </div>
+const gamesData = [
+{
+id: 1,
+                title: "Simple Messenger",
+                description: "A No Trace Chat System Made by Ming",
+                image: "https://media.idownloadblog.com/wp-content/uploads/2016/01/12-messenger-app-icon-android.jpg",
+                icon: "https://cdn4.iconfinder.com/data/icons/social-media-2285/1024/logo-512.png",
+                link: "/hidden/simple/",
+                category: "Tool",
+                tags: ["Chat", "Social", "Texting"],
+                dateAdded: "2025-04-18",
+                featured: true
+},
+{
+id: 2,
+title: "Ming AI Humanizer",
+description: "A Premium AI Humanizer made by Ming.",
+image: "https://i.ibb.co/67csGPXg/DALL-E-2025-04-18-18-37-27-A-sleek-modern-banner-design-featuring-the-name-Ming-Humanizer-with-the-l.webp",
+icon: "https://i.ibb.co/VWx5v6Ht/DALL-E-2025-04-18-18-38-06-A-simple-modern-icon-design-for-Ming-Humanizer-The-icon-should-be-minimal.webp",
+link: "/hidden/minghuman/",
+category: "Humanizer",
+tags: ["AI Humanizer", "Supports 6+ AI's", "Logic"],
+dateAdded: "2025-04-18",
+featured: false
+},
+{
+id: 3,
+title: "IXL Algebra & Pre-Algebra Calculator",
+description: "One of the most advanced IXL Calculator for Algebra & Pre-Algebra.",
+image: "https://www.ixl.com/dv3/jYg5YEjxG5lJfNjwW0r4Kw8lo5g/yui3/opengraph/assets/square_og_ixl.png",
+icon: "https://img.icons8.com/plasticine/512/ixl.png",
+link: "/hidden/ixl/",
+category: "Math",
+tags: ["Calculator", "Logic", "Math"],
+dateAdded: "2025-04-18",
+featured: true
+},
+{
+id: 4,
+                title: "Rainbow Six Siege Tracker",
+                description: "A Rainbow Six Siege Stat tracker.",
+                image: "https://i.redd.it/gzmkpd7b2p441.jpg",
+                icon: "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/05100836-b28d-4395-a29d-2f17b751c23f/dcenrbz-667b492e-2ff6-4433-8308-873fd3adba67.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzA1MTAwODM2LWIyOGQtNDM5NS1hMjlkLTJmMTdiNzUxYzIzZlwvZGNlbnJiei02NjdiNDkyZS0yZmY2LTQ0MzMtODMwOC04NzNmZDNhZGJhNjcucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XIUJyFHUlKj59cIGEeTOmKwTdhKF1Ws810F4Bq4ff30",
+                link: "/hidden/r6/index.html",
+                category: "Tool",
+                tags: ["Exclusive", "Rainbow Six Siege", "Stat Tracker"],
+                title: "Simple Messenger",
+                description: "A Free No Trace Messenger App made by Ming.",
+                image: "https://jatheon.com/wp-content/uploads/2025/01/2-iMessage-archiving-680x360-banner.png",
+                icon: "https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Messages-512.png",
+                link: "/hidden/snapchat/",
+                category: "Texting",
+                tags: ["Social", "Messanger", "Web"],
+                dateAdded: "2025-04-18",
+                featured: true
+},
+{
+id: 5,
+title: "Dungeon Crawler",
+description: "Explore procedurally generated dungeons and fight monsters to find treasure.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Dungeon+Crawler",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=DC",
+link: "/games/dungeon-crawler/",
+category: "adventure",
+tags: ["RPG", "Dungeon", "Adventure"],
+dateAdded: "2023-03-28",
+featured: true
+},
+{
+id: 6,
+title: "Strategic Command",
+description: "Build armies and conquer territories in this turn-based strategy game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Strategic+Command",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=SC",
+link: "/games/strategic-command/",
+category: "strategy",
+tags: ["Strategy", "Turn-based", "War"],
+dateAdded: "2023-03-20",
+featured: false
+},
+{
+id: 7,
+title: "City Builder",
+description: "Plan and develop your own city, manage resources and keep citizens happy.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=City+Builder",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=CB",
+link: "/games/city-builder/",
+category: "simulation",
+tags: ["Simulation", "Management", "Building"],
+dateAdded: "2023-03-15",
+featured: true
+},
+{
+id: 8,
+title: "Speed Racer",
+description: "Race against time and opponents on challenging tracks all around the world.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Speed+Racer",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=SR",
+link: "/games/speed-racer/",
+category: "racing",
+tags: ["Racing", "Cars", "Speed"],
+dateAdded: "2023-03-10",
+featured: false
+},
+{
+id: 9,
+title: "Match Three",
+description: "Match colorful gems in this addictive puzzle game with hundreds of levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Match+Three",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=M3",
+link: "/games/match-three/",
+category: "puzzle",
+tags: ["Puzzle", "Matching", "Casual"],
+dateAdded: "2023-03-05",
+featured: false
+},
+{
+id: 10,
+title: "Zombie Survival",
+description: "Survive waves of zombies in this intense action game. How long can you last?",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Zombie+Survival",
+icon: "https://placehold.co/200x200/4af74a/000000?text=ZS",
+link: "/games/zombie-survival/",
+category: "action",
+tags: ["Action", "Zombie", "Survival"],
+dateAdded: "2023-02-28",
+featured: true
+},
+{
+id: 11,
+title: "Memory Challenge",
+description: "Test and improve your memory with this classic card-matching game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Memory+Challenge",
+icon: "https://placehold.co/200x200/f793f7/000000?text=MC",
+link: "/games/memory-challenge/",
+category: "puzzle",
+tags: ["Memory", "Cards", "Brain Training"],
+dateAdded: "2023-02-25",
+featured: false
+},
+{
+id: 12,
+title: "Galaxy Explorer",
+description: "Explore an infinite procedurally generated galaxy with unique planets.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Galaxy+Explorer",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=GE",
+link: "/games/galaxy-explorer/",
+category: "3d",
+tags: ["Space", "Exploration", "3D"],
+dateAdded: "2023-02-20",
+featured: true
+},
+{
+id: 13,
+title: "Word Puzzler",
+description: "Find words in a grid of letters. Test your vocabulary and word-finding skills.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Word+Puzzler",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=WP",
+link: "/games/word-puzzler/",
+category: "puzzle",
+tags: ["Word", "Puzzle", "Educational"],
+dateAdded: "2023-02-15",
+featured: false
+},
+{
+id: 14,
+title: "Tower Defense",
+description: "Build defensive towers to protect your base from waves of enemies.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tower+Defense",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=TD",
+link: "/games/tower-defense/",
+category: "strategy",
+tags: ["Strategy", "Defense", "Tower"],
+dateAdded: "2023-02-10",
+featured: false
+},
+{
+id: 15,
+title: "Snake Game",
+description: "Classic snake game with modern graphics and multiple game modes.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Snake+Game",
+icon: "https://placehold.co/200x200/4af793/000000?text=SG",
+link: "/games/snake-game/",
+category: "action",
+tags: ["Classic", "Snake", "Arcade"],
+dateAdded: "2023-02-05",
+featured: false
+},
+{
+id: 16,
+title: "Chess Master",
+description: "Play chess against an AI opponent with adjustable difficulty levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Chess+Master",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=CM",
+link: "/games/chess-master/",
+category: "strategy",
+tags: ["Chess", "Board Game", "Strategy"],
+dateAdded: "2023-01-30",
+featured: true
+},
+{
+id: 17,
+title: "Farm Simulator",
+description: "Build and manage your own farm. Grow crops and raise animals.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Farm+Simulator",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=FS",
+link: "/games/farm-simulator/",
+category: "simulation",
+tags: ["Farming", "Simulation", "Management"],
+dateAdded: "2023-01-25",
+featured: false
+},
+{
+id: 18,
+title: "2048 Puzzle",
+description: "Combine numbers and reach 2048 in this addictive mathematical puzzle.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=2048+Puzzle",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=2048",
+link: "/games/2048-puzzle/",
+category: "puzzle",
+tags: ["Numbers", "Puzzle", "Logic"],
+dateAdded: "2023-01-20",
+featured: true
+},
+{
+id: 19,
+title: "Flight Simulator",
+description: "Experience realistic flight physics in various aircraft around the world.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Flight+Simulator",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=FS",
+link: "/games/flight-simulator/",
+category: "simulation",
+tags: ["Flight", "Simulation", "3D"],
+dateAdded: "2023-01-15",
+featured: false
+},
+{
+id: 20,
+title: "Tetris Clone",
+description: "The classic block-stacking puzzle game with a modern twist.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Tetris+Clone",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=TC",
+link: "/games/tetris-clone/",
+category: "puzzle",
+tags: ["Tetris", "Classic", "Blocks"],
+dateAdded: "2023-01-10",
+featured: true
+},
+{
+id: 21,
+title: "Virtual Pet",
+description: "Adopt a virtual pet, feed it, play with it, and watch it grow.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Virtual+Pet",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=VP",
+link: "/games/virtual-pet/",
+category: "simulation",
+tags: ["Pet", "Simulation", "Casual"],
+dateAdded: "2023-01-05",
+featured: false
+},
+{
+id: 22,
+title: "Cooking Dash",
+description: "Prepare and serve dishes in this fast-paced cooking simulation.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Cooking+Dash",
+icon: "https://placehold.co/200x200/f793f7/000000?text=CD",
+link: "/games/cooking-dash/",
+category: "simulation",
+tags: ["Cooking", "Time Management", "Simulation"],
+dateAdded: "2022-12-30",
+featured: false
+},
+{
+id: 23,
+title: "Endless Runner",
+description: "Run, jump, and slide to avoid obstacles in this infinite runner game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Endless+Runner",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=ER",
+link: "/games/endless-runner/",
+category: "action",
+tags: ["Runner", "Endless", "Action"],
+dateAdded: "2022-12-25",
+featured: true
+},
+{
+id: 24,
+title: "Block Puzzle",
+description: "Fit blocks of different shapes into the grid to clear lines.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Block+Puzzle",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=BP",
+link: "/games/block-puzzle/",
+category: "puzzle",
+tags: ["Blocks", "Puzzle", "Casual"],
+dateAdded: "2022-12-20",
+featured: false
+},
+{
+id: 25,
+title: "Pirate Adventure",
+description: "Set sail, explore islands, and search for treasure in this pirate game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Pirate+Adventure",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=PA",
+link: "/games/pirate-adventure/",
+category: "adventure",
+tags: ["Pirates", "Adventure", "Exploration"],
+dateAdded: "2022-12-15",
+featured: true
+},
+{
+id: 26,
+title: "Car Racing",
+description: "Race against AI opponents on various tracks with different car models.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Car+Racing",
+icon: "https://placehold.co/200x200/4af793/000000?text=CR",
+link: "/games/car-racing/",
+category: "racing",
+tags: ["Cars", "Racing", "Speed"],
+dateAdded: "2022-12-10",
+featured: false
+},
+{
+id: 27,
+title: "Sudoku Challenge",
+description: "Classic Sudoku puzzles with multiple difficulty levels.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Sudoku+Challenge",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=SC",
+link: "/games/sudoku-challenge/",
+category: "puzzle",
+tags: ["Sudoku", "Numbers", "Logic"],
+dateAdded: "2022-12-05",
+featured: false
+},
+{
+id: 28,
+title: "Magic Quest",
+description: "Embark on an epic quest to become the most powerful wizard in the realm.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Magic+Quest",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=MQ",
+link: "/games/magic-quest/",
+category: "adventure",
+tags: ["Fantasy", "Magic", "RPG"],
+dateAdded: "2022-11-30",
+featured: true
+},
+{
+id: 29,
+title: "Football Manager",
+description: "Manage your own football team, buy players, and win championships.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Football+Manager",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=FM",
+link: "/games/football-manager/",
+category: "simulation",
+tags: ["Sports", "Management", "Football"],
+dateAdded: "2022-11-25",
+featured: false
+},
+{
+id: 30,
+title: "VR Museum",
+description: "Explore a virtual museum with interactive exhibits in VR or on screen.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=VR+Museum",
+icon: "https://placehold.co/200x200/4af7d5/000000?text=VR",
+link: "/games/vr-museum/",
+category: "3d",
+tags: ["VR", "Museum", "Educational"],
+dateAdded: "2022-11-20",
+featured: true
+},
+{
+id: 31,
+title: "Crossword Puzzle",
+description: "Test your vocabulary with daily crossword puzzles of varying difficulty.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Crossword+Puzzle",
+icon: "https://placehold.co/200x200/f74a4a/ffffff?text=CP",
+link: "/games/crossword-puzzle/",
+category: "puzzle",
+tags: ["Words", "Crossword", "Educational"],
+dateAdded: "2022-11-15",
+featured: false
+},
+{
+id: 32,
+title: "Ninja Runner",
+description: "Test your reflexes in this fast-paced ninja platformer game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Ninja+Runner",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=NR",
+link: "/games/ninja-runner/",
+category: "platformer",
+tags: ["Ninja", "Platformer", "Action"],
+dateAdded: "2022-11-10",
+featured: true
+},
+{
+id: 33,
+title: "Mahjong Solitaire",
+description: "Classic tile-matching puzzle game with beautiful tile sets.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Mahjong+Solitaire",
+icon: "https://placehold.co/200x200/f793f7/000000?text=MS",
+link: "/games/mahjong-solitaire/",
+category: "puzzle",
+tags: ["Mahjong", "Tiles", "Matching"],
+dateAdded: "2022-11-05",
+featured: false
+},
+{
+id: 34,
+title: "Western Shooter",
+description: "Test your aim in this western-themed shooting gallery game.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Western+Shooter",
+icon: "https://placehold.co/200x200/93f7f7/000000?text=WS",
+link: "/games/western-shooter/",
+category: "action",
+tags: ["Western", "Shooter", "Aim"],
+dateAdded: "2022-11-05",
+featured: false
+},
+{
+id: 35,
+title: "Space Station Sim",
+description: "Build and manage your own space station. Keep your crew alive and happy.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Space+Station+Sim",
+icon: "https://placehold.co/200x200/f7934a/ffffff?text=SS",
+link: "/games/space-station-sim/",
+category: "simulation",
+tags: ["Space", "Simulation", "Management"],
+dateAdded: "2022-10-30",
+featured: true
+},
+{
+id: 36,
+title: "Castle Defense",
+description: "Defend your castle from waves of enemies with various weapons and traps.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Castle+Defense",
+icon: "https://placehold.co/200x200/4a6cf7/ffffff?text=CD",
+link: "/games/castle-defense/",
+category: "strategy",
+tags: ["Defense", "Medieval", "Strategy"],
+dateAdded: "2022-10-25",
+featured: false
+},
+{
+id: 37,
+title: "Fishing Simulator",
+description: "Relax and catch fish in different locations with various equipment.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Fishing+Simulator",
+icon: "https://placehold.co/200x200/4af793/000000?text=FS",
+link: "/games/fishing-simulator/",
+category: "simulation",
+tags: ["Fishing", "Relaxing", "Simulation"],
+dateAdded: "2022-10-20",
+featured: false
+},
+{
+id: 38,
+title: "Jungle Adventure",
+description: "Explore the jungle, solve puzzles, and find ancient treasures.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Jungle+Adventure",
+icon: "https://placehold.co/200x200/f74a6c/ffffff?text=JA",
+link: "/games/jungle-adventure/",
+category: "adventure",
+tags: ["Jungle", "Adventure", "Exploration"],
+dateAdded: "2022-10-15",
+featured: true
+},
+{
+id: 39,
+title: "Retro Arcade",
+description: "Collection of classic arcade games with a retro pixel art style.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Retro+Arcade",
+icon: "https://placehold.co/200x200/9f4af7/ffffff?text=RA",
+link: "/games/retro-arcade/",
+category: "action",
+tags: ["Retro", "Arcade", "Collection"],
+dateAdded: "2022-10-10",
+featured: false
+},
+{
+id: 40,
+title: "Robot Factory",
+description: "Build and program robots to complete various tasks and challenges.",
+image: "https://placehold.co/600x400/1a1a2e/cccccc?text=Robot+Factory",
+icon: "https://placehold.co/200x200/f7d54a/000000?text=RF",
+link: "/games/robot-factory/",
+category: "puzzle",
+tags: ["Robots", "Programming", "Logic"],
+dateAdded: "2022-10-05",
+featured: true
+}
+];
 
-  <script>
-    // Initialize Firebase at the top of the script
-    const firebaseConfig = {
-      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-      authDomain: "spotify-795ab.firebaseapp.com",
-      databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
-      projectId: "spotify-795ab",
-      storageBucket: "spotify-795ab.firebasestorage.app",
-      messagingSenderId: "907464366407",
-      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
-    };
+// Constants
+const GAMES_PER_PAGE = 12;
+let currentPage = 1;
+let filteredGames = [...gamesData];
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+// DOM elements
+const gameGrid = document.getElementById('gameGrid');
+const pagination = document.getElementById('pagination');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const currentYearSpan = document.getElementById('currentYear');
 
-    // DOM Elements
-    const authContainer = document.getElementById('auth-container');
-    const appContainer = document.getElementById('app-container');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const chatsContainer = document.getElementById('chats-container');
-    const friendsContainer = document.getElementById('friends-container');
-    const chatView = document.getElementById('chat-view');
-    const usernameDisplay = document.getElementById('username-display');
-    const chatRecipient = document.getElementById('chat-recipient');
-    const messagesList = document.getElementById('messages-list');
-    const messagesContainer = document.getElementById('messages-container');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const chatList = document.getElementById('chat-list');
-    const friendsList = document.getElementById('friends-list');
-    const backButton = document.getElementById('back-button');
-    const tabChats = document.getElementById('tab-chats');
-    const tabFriends = document.getElementById('tab-friends');
-    const addFriendButton = document.getElementById('add-friend-button');
-    const friendUsernameInput = document.getElementById('friend-username');
-    const sessionIdElement = document.getElementById('session-id');
+// Set current year in footer
+currentYearSpan.textContent = new Date().getFullYear();
 
-    // State variables
-    let currentUser = null;
-    let currentChat = null;
-    let currentChatId = null;
-    let userProfile = null;
-    let sessionId = null;
+// Initialize the page
+function initPage() {
+renderGames();
+setupEventListeners();
+}
 
-    // Generate a random session ID similar to Snapchat's format
-    function generateSessionId() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-      let result = '';
-      for (let i = 0; i < 24; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    }
+// Render games based on current filters and pagination
+function renderGames() {
+// Clear the grid
+gameGrid.innerHTML = '';
 
-    // Toggle session ID visibility
-    function toggleSessionId() {
-      sessionIdElement.classList.toggle('hidden');
-    }
+// Calculate start and end indices
+const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
+const endIndex = startIndex + GAMES_PER_PAGE;
 
-    // Auth listeners
-    document.getElementById('switch-to-register').addEventListener('click', (e) => {
-      e.preventDefault();
-      loginForm.classList.add('hidden');
-      registerForm.classList.remove('hidden');
-    });
+// Get current page games
+const currentGames = filteredGames.slice(startIndex, endIndex);
 
-    document.getElementById('switch-to-login').addEventListener('click', (e) => {
-      e.preventDefault();
-      registerForm.classList.add('hidden');
-      loginForm.classList.remove('hidden');
-    });
+// If no games match the filter
+if (currentGames.length === 0) {
+gameGrid.innerHTML = `
+                   <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;">
+                       <h2>No games found</h2>
+                       <p>Try changing your search or filter criteria</p>
+                   </div>
+               `;
+return;
+}
 
-    document.getElementById('login-button').addEventListener('click', () => {
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      
-      if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-      }
-      
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => {
-          alert(`Login failed: ${error.message}`);
-        });
-    });
+// Create and append game cards
+currentGames.forEach(game => {
+const gameCard = createGameCard(game);
+gameGrid.appendChild(gameCard);
+});
 
-    document.getElementById('register-button').addEventListener('click', () => {
-      const username = document.getElementById('register-username').value;
-      const email = document.getElementById('register-email').value;
-      const password = document.getElementById('register-password').value;
-      
-      if (!username || !email || !password) {
-        alert('Please fill in all fields');
-        return;
-      }
-      
-      // Check if username already exists
-      db.ref('usernames').child(username).once('value')
-        .then(snapshot => {
-          if (snapshot.exists()) {
-            alert('Username already taken');
-            return;
-          }
-          
-          // Create user
-          return auth.createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-              const user = userCredential.user;
-              
-              // Create user profile
-              return db.ref('users/' + user.uid).set({
-                username: username,
-                email: email,
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-              }).then(() => {
-                // Create username mapping
-                return db.ref('usernames/' + username).set(user.uid);
-              });
-            });
-        })
-        .catch(error => {
-          alert(`Registration failed: ${error.message}`);
-        });
-    });
+// Update pagination
+renderPagination();
+}
 
-    document.getElementById('logout-button').addEventListener('click', () => {
-      auth.signOut();
-    });
+// Create a game card element
+function createGameCard(game) {
+const card = document.createElement('div');
+card.className = 'game-card';
 
-    // Tab navigation
-    tabChats.addEventListener('click', () => {
-      tabChats.classList.add('active');
-      tabFriends.classList.remove('active');
-      chatsContainer.classList.remove('hidden');
-      friendsContainer.classList.add('hidden');
-    });
+// Create tags HTML
+const tagsHTML = game.tags.map(tag => `
+               <span class="game-tag">${tag}</span>
+           `).join('');
 
-    tabFriends.addEventListener('click', () => {
-      tabFriends.classList.add('active');
-      tabChats.classList.remove('active');
-      friendsContainer.classList.remove('hidden');
-      chatsContainer.classList.add('hidden');
-    });
+card.innerHTML = `
+               <div class="game-image">
+                   <img src="${game.image}" alt="${game.title}">
+                   <div class="game-icon">
+                       <img src="${game.icon}" alt="${game.title} icon">
+                   </div>
+               </div>
+               <div class="game-content">
+                   <div class="game-tags">
+                       ${tagsHTML}
+                   </div>
+                   <h3 class="game-title">${game.title}</h3>
+                   <p class="game-description">${game.description}</p>
+                   <div class="game-actions">
+                       <a href="${game.link}" class="play-button">Use Now</a>
+                       <div class="game-info">
+                           <span>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                   <line x1="16" y1="2" x2="16" y2="6"></line>
+                                   <line x1="8" y1="2" x2="8" y2="6"></line>
+                                   <line x1="3" y1="10" x2="21" y2="10"></line>
+                               </svg>
+                               ${formatDate(game.dateAdded)}
+                           </span>
+                       </div>
+                   </div>
+               </div>
+           `;
 
-    // Back button
-    backButton.addEventListener('click', () => {
-      chatView.classList.add('hidden');
-      appContainer.classList.remove('hidden');
-      currentChat = null;
-      currentChatId = null;
-    });
+return card;
+}
 
-    // Add friend
-    addFriendButton.addEventListener('click', () => {
-      const friendUsername = friendUsernameInput.value.trim();
-      
-      if (!friendUsername) {
-        alert('Please enter a username');
-        return;
-      }
-      
-      if (friendUsername === userProfile.username) {
-        alert('You cannot add yourself as a friend');
-        return;
-      }
-      
-      // Find user by username
-      db.ref('usernames').child(friendUsername).once('value')
-        .then(snapshot => {
-          if (!snapshot.exists()) {
-            alert('User not found');
-            return;
-          }
-          
-          const friendId = snapshot.val();
-          
-          // Check if already friends
-          return db.ref(`users/${currentUser.uid}/friends/${friendId}`).once('value')
-            .then(snapshot => {
-              if (snapshot.exists()) {
-                alert('Already friends with this user');
-                return;
-              }
-              
-              // Add friend for current user
-              return db.ref(`users/${currentUser.uid}/friends/${friendId}`).set(true)
-                .then(() => {
-                  // Add current user as friend for friend
-                  return db.ref(`users/${friendId}/friends/${currentUser.uid}`).set(true);
-                })
-                .then(() => {
-                  friendUsernameInput.value = '';
-                  alert('Friend added successfully');
-                });
-            });
-        })
-        .catch(error => {
-          alert(`Error adding friend: ${error.message}`);
-        });
-    });
+// Render pagination controls
+function renderPagination() {
+pagination.innerHTML = '';
 
-    // Send message
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', event => {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    });
+const totalPages = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
 
-    function sendMessage() {
-      const messageText = messageInput.value.trim();
-      if (!messageText || !currentChat) return;
-      
-      const message = {
-        senderId: currentUser.uid,
-        text: messageText,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        read: false
-      };
-      
-      db.ref(`chats/${currentChatId}/messages`).push(message)
-        .then(() => {
-          // Update last message
-          return db.ref(`chats/${currentChatId}/lastMessage`).set({
-            text: messageText,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            senderId: currentUser.uid
-          });
-        })
-        .then(() => {
-          messageInput.value = '';
-        })
-        .catch(error => {
-          console.error('Error sending message:', error);
-        });
-    }
+// Previous button
+const prevButton = document.createElement('button');
+prevButton.className = 'pagination-button';
+prevButton.textContent = '← Prev';
+prevButton.disabled = currentPage === 1;
+if (currentPage > 1) {
+prevButton.addEventListener('click', () => {
+currentPage--;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+}
+pagination.appendChild(prevButton);
 
-    // Create or open chat
-    function openChat(userId, username) {
-      // Find existing chat between users
-      const chatParticipants = [currentUser.uid, userId].sort();
-      const chatId = chatParticipants.join('_');
-      
-      db.ref(`chats/${chatId}`).once('value')
-        .then(snapshot => {
-          if (!snapshot.exists()) {
-            // Create new chat
-            return db.ref(`chats/${chatId}`).set({
-              participants: {
-                [currentUser.uid]: true,
-                [userId]: true
-              },
-              createdAt: firebase.database.ServerValue.TIMESTAMP,
-              lastMessage: {
-                text: '',
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                senderId: ''
-              }
-            });
-          }
-        })
-        .then(() => {
-          // Open chat
-          currentChat = userId;
-          currentChatId = chatId;
-          chatRecipient.textContent = username;
-          
-          appContainer.classList.add('hidden');
-          chatView.classList.remove('hidden');
-          
-          // Load messages
-          loadMessages(chatId);
-          
-          // Mark messages as read
-          markMessagesAsRead(chatId);
-        })
-        .catch(error => {
-          console.error('Error opening chat:', error);
-        });
-    }
+// Page buttons
+const maxButtons = 5; // Maximum number of page buttons to show
+let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+let endPage = Math.min(totalPages, startPage + maxButtons - 1);
 
-    // Load messages for a chat
-    function loadMessages(chatId) {
-      messagesList.innerHTML = '';
-      
-      const messagesRef = db.ref(`chats/${chatId}/messages`);
-      messagesRef.off(); // Remove previous listeners
-      
-      messagesRef.on('child_added', snapshot => {
-        const message = snapshot.val();
-        addMessageToUI(message, snapshot.key);
-        
-        // Scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        // Mark message as read if received
-        if (message.senderId !== currentUser.uid && !message.read) {
-          markMessageAsRead(chatId, snapshot.key);
-        }
-      });
-    }
+// Adjust start page if we're near the end
+if (endPage - startPage + 1 < maxButtons) {
+startPage = Math.max(1, endPage - maxButtons + 1);
+}
 
-    // Add message to UI
-    function addMessageToUI(message, messageId) {
-      const messageElement = document.createElement('div');
-      const isCurrentUser = message.senderId === currentUser.uid;
-      messageElement.classList.add('message', isCurrentUser ? 'message-sent' : 'message-received');
-      
-      const messageText = document.createElement('div');
-      messageText.textContent = message.text;
-      messageElement.appendChild(messageText);
-      
-      const messageTime = document.createElement('div');
-      messageTime.classList.add('message-time');
-      messageTime.textContent = formatTime(message.timestamp);
-      messageElement.appendChild(messageTime);
-      
-      if (isCurrentUser) {
-        const readStatus = document.createElement('div');
-        readStatus.classList.add('read-status');
-        readStatus.textContent = message.read ? 'Read' : 'Delivered';
-        readStatus.dataset.messageId = messageId;
-        messageElement.appendChild(readStatus);
-      }
-      
-      messagesList.appendChild(messageElement);
-    }
+for (let i = startPage; i <= endPage; i++) {
+const pageButton = document.createElement('button');
+pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
+pageButton.textContent = i;
+pageButton.addEventListener('click', () => {
+currentPage = i;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+pagination.appendChild(pageButton);
+}
 
-    // Mark messages as read
-    function markMessagesAsRead(chatId) {
-      db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentChat).once('value')
-        .then(snapshot => {
-          const updates = {};
-          
-          snapshot.forEach(childSnapshot => {
-            const message = childSnapshot.val();
-            if (!message.read) {
-              updates[`${childSnapshot.key}/read`] = true;
-            }
-          });
-          
-          if (Object.keys(updates).length > 0) {
-            return db.ref(`chats/${chatId}/messages`).update(updates);
-          }
-        })
-        .catch(error => {
-          console.error('Error marking messages as read:', error);
-        });
-    }
+// Next button
+const nextButton = document.createElement('button');
+nextButton.className = 'pagination-button';
+nextButton.textContent = 'Next →';
+nextButton.disabled = currentPage === totalPages;
+if (currentPage < totalPages) {
+nextButton.addEventListener('click', () => {
+currentPage++;
+renderGames();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+}
+pagination.appendChild(nextButton);
+}
 
-    // Mark single message as read
-    function markMessageAsRead(chatId, messageId) {
-      db.ref(`chats/${chatId}/messages/${messageId}`).update({ read: true });
-    }
+// Set up event listeners
+function setupEventListeners() {
+// Search input
+searchInput.addEventListener('input', debounce(function() {
+filterGames();
+}, 300));
 
-    // Listen for read status changes
-    function listenForReadStatusChanges(chatId) {
-      db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentUser.uid).on('child_changed', snapshot => {
-        const message = snapshot.val();
-        const messageId = snapshot.key;
-        
-        if (message.read) {
-          const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
-          if (readStatusElement) {
-            readStatusElement.textContent = 'Read';
-          }
-        }
-      });
-    }
+// Category filter
+categoryFilter.addEventListener('change', function() {
+filterGames();
+});
 
-    // Format timestamp
-    function formatTime(timestamp) {
-      if (!timestamp) return '';
-      
-      const date = new Date(timestamp);
-      const now = new Date();
-      
-      const isSameDay = date.getDate() === now.getDate() && 
-                        date.getMonth() === now.getMonth() && 
-                        date.getFullYear() === now.getFullYear();
-      
-      if (isSameDay) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else {
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + 
-               ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
-    }
+// Window resize
+window.addEventListener('resize', debounce(function() {
+renderGames();
+}, 200));
+}
 
-    // Load user chats
-    function loadChats() {
-      chatList.innerHTML = '';
-      
-      db.ref(`chats`).orderByChild(`participants/${currentUser.uid}`).equalTo(true).on('value', snapshot => {
-        if (!snapshot.exists()) {
-          chatList.innerHTML = '<p class="text-center">No chats yet</p>';
-          return;
-        }
-        
-        const chats = [];
-        snapshot.forEach(childSnapshot => {
-          const chat = childSnapshot.val();
-          chat.id = childSnapshot.key;
-          
-          // Get other participant id
-          const participants = Object.keys(chat.participants);
-          const otherUserId = participants.find(id => id !== currentUser.uid);
-          
-          if (otherUserId) {
-            chat.otherUserId = otherUserId;
-            chats.push(chat);
-          }
-        });
-        
-        // Sort by last message timestamp
-        chats.sort((a, b) => {
-          return (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0);
-        });
-        
-        if (chats.length === 0) {
-          chatList.innerHTML = '<p class="text-center">No chats yet</p>';
-          return;
-        }
-        
-        // Clear existing chats
-        chatList.innerHTML = '';
-        
-        // Create chat items
-        chats.forEach(chat => {
-          loadChatItem(chat);
-        });
-      });
-    }
+// Filter games based on search and category
+function filterGames() {
+const searchTerm = searchInput.value.toLowerCase().trim();
+const category = categoryFilter.value;
 
-    // Load chat item
-    function loadChatItem(chat) {
-      db.ref(`users/${chat.otherUserId}`).once('value')
-        .then(snapshot => {
-          const user = snapshot.val();
-          if (!user) return;
-          
-          const chatItem = document.createElement('div');
-          chatItem.classList.add('chat-item');
-          chatItem.addEventListener('click', () => {
-            openChat(chat.otherUserId, user.username);
-          });
-          
-          const avatar = document.createElement('div');
-          avatar.classList.add('chat-avatar');
-          avatar.textContent = user.username.charAt(0).toUpperCase();
-          chatItem.appendChild(avatar);
-          
-          const details = document.createElement('div');
-          details.classList.add('chat-details');
-          
-          const name = document.createElement('div');
-          name.classList.add('chat-name');
-          name.textContent = user.username;
-          details.appendChild(name);
-          
-          if (chat.lastMessage && chat.lastMessage.text) {
-            const preview = document.createElement('div');
-            preview.classList.add('chat-preview');
-            
-            const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
-            preview.textContent = (isCurrentUserSender ? 'You: ' : '') + chat.lastMessage.text;
-            
-            details.appendChild(preview);
-          }
-          
-          chatItem.appendChild(details);
-          
-          const time = document.createElement('div');
-          time.style.fontSize = '12px';
-          time.style.color = '#9ca3af';
-          time.textContent = chat.lastMessage && chat.lastMessage.timestamp ? 
-                          formatTime(chat.lastMessage.timestamp) : '';
-          chatItem.appendChild(time);
-          
-          chatList.appendChild(chatItem);
-        });
-    }
+filteredGames = gamesData.filter(game => {
+// Check if game matches search term
+const matchesSearch = searchTerm === '' || 
+game.title.toLowerCase().includes(searchTerm) || 
+game.description.toLowerCase().includes(searchTerm) ||
+game.tags.some(tag => tag.toLowerCase().includes(searchTerm));
 
-    // Load friends
-    function loadFriends() {
-      friendsList.innerHTML = '';
-      
-      db.ref(`users/${currentUser.uid}/friends`).on('value', snapshot => {
-        if (!snapshot.exists()) {
-          friendsList.innerHTML = '<p class="text-center">No friends yet</p>';
-          return;
-        }
-        
-        const friendIds = Object.keys(snapshot.val());
-        if (friendIds.length === 0) {
-          friendsList.innerHTML = '<p class="text-center">No friends yet</p>';
-          return;
-        }
-        
-        // Clear existing friends
-        friendsList.innerHTML = '';
-        
-        // Load each friend
-        friendIds.forEach(friendId => {
-          db.ref(`users/${friendId}`).once('value')
-            .then(snapshot => {
-              const friend = snapshot.val();
-              if (!friend) return;
-              
-              const friendItem = document.createElement('div');
-              friendItem.classList.add('friend-item');
-              
-              const avatar = document.createElement('div');
-              avatar.classList.add('chat-avatar');
-              avatar.textContent = friend.username.charAt(0).toUpperCase();
-              friendItem.appendChild(avatar);
-              
-              const name = document.createElement('div');
-              name.classList.add('flex-1');
-              name.textContent = friend.username;
-              friendItem.appendChild(name);
-              
-              const messageBtn = document.createElement('button');
-              messageBtn.classList.add('btn-secondary');
-              messageBtn.textContent = 'Message';
-              messageBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openChat(friendId, friend.username);
-              });
-              friendItem.appendChild(messageBtn);
-              
-              const removeBtn = document.createElement('button');
-              removeBtn.classList.add('btn-secondary');
-              removeBtn.textContent = 'Remove';
-              removeBtn.style.marginLeft = '8px';
-              removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (confirm(`Remove ${friend.username} from friends?`)) {
-                  removeFriend(friendId);
-                }
-              });
-              friendItem.appendChild(removeBtn);
-              
-              friendsList.appendChild(friendItem);
-            });
-        });
-      });
-    }
+// Check if game matches category
+const matchesCategory = category === 'all' || game.category === category;
 
-    // Remove friend
-    function removeFriend(friendId) {
-      // Remove friend for current user
-      db.ref(`users/${currentUser.uid}/friends/${friendId}`).remove()
-        .then(() => {
-          // Remove current user as friend for friend
-          return db.ref(`users/${friendId}/friends/${currentUser.uid}`).remove();
-        })
-        .catch(error => {
-          console.error('Error removing friend:', error);
-        });
-    }
+return matchesSearch && matchesCategory;
+});
 
-    // Double click on username to show session ID
-    usernameDisplay.addEventListener('click', () => {
-      toggleSessionId();
-    });
+// Reset to first page when filtering
+currentPage = 1;
+renderGames();
+}
 
-    // Auth state change
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        
-        // Generate a new session ID
-        sessionId = `hidden/snapchat=${generateSessionId()}`;
-        sessionIdElement.textContent = sessionId;
-        
-        // Get user profile
-        db.ref(`users/${user.uid}`).once('value')
-          .then(snapshot => {
-            userProfile = snapshot.val();
-            
-            usernameDisplay.textContent = userProfile.username;
-            
-            authContainer.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            chatView.classList.add('hidden');
-            
-            // Load chats and friends
-            loadChats();
-            loadFriends();
-          })
-          .catch(error => {
-            console.error('Error loading user profile:', error);
-          });
-      } else {
-        currentUser = null;
-        userProfile = null;
-        sessionId = null;
-        
-        // Clear forms
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-password').value = '';
-        document.getElementById('register-username').value = '';
-        document.getElementById('register-email').value = '';
-        document.getElementById('register-password').value = '';
-        
-        // Show auth container
-        authContainer.classList.remove('hidden');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        appContainer.classList.add('hidden');
-        chatView.classList.add('hidden');
-      }
-    });
-  </script>
+// Helper function for debouncing
+function debounce(func, delay) {
+let timeout;
+return function() {
+const context = this;
+const args = arguments;
+clearTimeout(timeout);
+timeout = setTimeout(() => func.apply(context, args), delay);
+};
+}
+
+// Format date to readable format
+function formatDate(dateString) {
+const options = { year: 'numeric', month: 'short', day: 'numeric' };
+return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Initialize the page when DOM is loaded
+document.addEventListener('DOMContentLoaded', initPage);
+</script>
 </body>
 </html>
