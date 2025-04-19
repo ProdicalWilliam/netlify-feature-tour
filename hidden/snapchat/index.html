@@ -899,8 +899,7 @@
                                 const conversationDetails = document.createElement('div');
                                 conversationDetails.className = 'conversation-details';
                                 
-                                // Create conversation name
-const conversationName = document.createElement('div');
+                                // When creating conversation item
 conversationName.className = 'conversation-name';
 conversationName.textContent = otherUser.username;
 
@@ -923,306 +922,133 @@ conversationList.appendChild(conversationItem);
 // Add click handler
 conversationItem.addEventListener('click', () => {
     openConversation(chatId, otherUserId, otherUser.username);
-};
-
-// Open a conversation
-function openConversation(chatId, userId, username) {
-// Update active chat
-activeChatId = chatId;
-activeChatUser = {
-    id: userId,
-    username: username
-};
-
-// Update UI state
-emptyState.classList.add('hidden');
-chatArea.classList.remove('hidden');
-
-// Highlight active conversation
-const allConversations = document.querySelectorAll('.conversation-item');
-allConversations.forEach(item => {
-    item.classList.remove('active');
-    if (item.dataset.chatId === chatId) {
-        item.classList.add('active');
-    }
-};
-
-// Load messages
-loadMessages(chatId);
-}
-
-// Load messages for a conversation
-function loadMessages(chatId) {
-const messagesRef = ref(db, `messages/${chatId}`);
-
-// Clear messages container
-messagesContainer.innerHTML = '';
-
-onValue(messagesRef, (snapshot) => {
-    if (!snapshot.exists()) {
-        return;
-    }
-    
-    const messages = snapshot.val();
-    const messagesList = Object.entries(messages);
-    
-    // Sort messages by timestamp
-    messagesList.sort((a, b) => a[1].timestamp - b[1].timestamp);
-    
-    let lastDate = null;
-    
-    // Display messages
-    messagesList.forEach(([messageId, message]) => {
-        // Check if we need a date separator
-        const messageDate = new Date(message.timestamp);
-        const messageDay = messageDate.toLocaleDateString();
-        
-        if (messageDay !== lastDate) {
-            const dateSeparator = document.createElement('div');
-            dateSeparator.className = 'date-separator';
-            dateSeparator.textContent = messageDay;
-            messagesContainer.appendChild(dateSeparator);
-            lastDate = messageDay;
-        }
-        
-        // Create message element
-        const messageElement = document.createElement('div');
-        messageElement.className = 'message';
-        
-        if (message.senderId === currentUser.uid) {
-            messageElement.classList.add('message-sent');
-        } else {
-            messageElement.classList.add('message-received');
-        }
-        
-        // Message text
-        messageElement.textContent = message.text;
-        
-        // Message time
-        const messageTime = document.createElement('span');
-        messageTime.className = 'message-time';
-        messageTime.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        messageElement.appendChild(messageTime);
-        
-        messagesContainer.appendChild(messageElement);
-    });
-    
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 });
-}
-
-// Send a message
-function sendMessage() {
-const text = messageInput.value.trim();
-if (!text || !activeChatId) return;
-
-// Create message
-const messageRef = push(ref(db, `messages/${activeChatId}`));
-const messageData = {
-    text: text,
-    senderId: currentUser.uid,
-    senderName: currentUser.displayName || currentUser.email,
-    timestamp: Date.now(),
-    sessionId: currentSessionId
-};
-
-// Update last message in chat
-const chatRef = ref(db, `chats/${activeChatId}/lastMessage`);
-const lastMessageData = {
-    text: text,
-    senderId: currentUser.uid,
-    timestamp: Date.now()
-};
-
-// Update both nodes atomically
-const updates = {};
-updates[`messages/${activeChatId}/${messageRef.key}`] = messageData;
-updates[`chats/${activeChatId}/lastMessage`] = lastMessageData;
-
-update(ref(db), updates)
-    .then(() => {
-        // Clear input field
-        messageInput.value = '';
-    })
-    .catch(error => {
-        console.error('Error sending message:', error);
-        alert('Error sending message: ' + error.message);
-    });
-}
-
-// Handle send button click
-sendButton.addEventListener('click', sendMessage);
-
-// Handle enter key press
-messageInput.addEventListener('keypress', (e) => {
-if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-}
-});
-
-// New chat dialog
-newChatButton.addEventListener('click', () => {
-// Show dialog
-newChatDialog.classList.remove('hidden');
-
-// Load users
-loadUsers();
-});
-
-// Cancel dialog
-cancelDialog.addEventListener('click', () => {
-newChatDialog.classList.add('hidden');
-});
-
-// Load users for new chat
-function loadUsers() {
-const usersRef = ref(db, 'users');
-
-get(usersRef)
-    .then((snapshot) => {
-        if (!snapshot.exists()) return;
-        
-        // Clear user list
-        userList.innerHTML = '';
-        
-        const users = snapshot.val();
-        Object.entries(users).forEach(([userId, user]) => {
-            // Skip current user
-            if (userId === currentUser.uid) return;
+                            });
+                    });
+                });
             
-            // Create user item
-            const userItem = document.createElement('div');
-            userItem.className = 'user-item';
-            
-            // Create user avatar
-            const userAvatar = document.createElement('div');
-            userAvatar.className = 'contact-avatar';
-            userAvatar.textContent = user.username.charAt(0).toUpperCase();
-            
-            // Create user name
-            const userName = document.createElement('div');
-            userName.textContent = user.username;
-            
-            userItem.appendChild(userAvatar);
-            userItem.appendChild(userName);
-            userList.appendChild(userItem);
-            
-            // Add click handler
-            userItem.addEventListener('click', () => {
-                startConversation(userId, user.username);
-            });
-        });
-    })
-    .catch(error => {
-        console.error('Error loading users:', error);
-    });
-}
-
-// Filter users in search
-userSearchInput.addEventListener('input', () => {
-const searchTerm = userSearchInput.value.toLowerCase();
-const userItems = userList.querySelectorAll('.user-item');
-
-userItems.forEach(item => {
-    const username = item.querySelector('div:nth-child(2)').textContent.toLowerCase();
-    if (username.includes(searchTerm)) {
-        item.style.display = 'flex';
-    } else {
-        item.style.display = 'none';
-    }
-});
-});
-
-// Start a conversation with a user
-function startConversation(userId, username) {
-// First check if a conversation already exists
-const userChatsRef = query(ref(db, 'chats'), orderByChild(`participants/${currentUser.uid}`), equalTo(true));
-
-get(userChatsRef)
-    .then((snapshot) => {
-        if (snapshot.exists()) {
-            const chats = snapshot.val();
-            
-            // Check if there's already a chat with this user
-            let existingChatId = null;
-            
-            Object.entries(chats).forEach(([chatId, chat]) => {
-                if (chat.participants && chat.participants[userId]) {
-                    existingChatId = chatId;
-                }
-            });
-            
-            if (existingChatId) {
-                // Use existing chat
-                openConversation(existingChatId, userId, username);
-                newChatDialog.classList.add('hidden');
-                return;
+            // Open a conversation
+            function openConversation(chatId, userId, username) {
+                // Update active chat
+                activeChatId = chatId;
+                activeChatUser = {
+                    id: userId,
+                    username: username
+                };
+                
+                // Update UI state
+                emptyState.classList.add('hidden');
+                chatArea.classList.remove('hidden');
+                
+                // Highlight active conversation
+                const allConversations = document.querySelectorAll('.conversation-item');
+                allConversations.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.chatId === chatId) {
+                        item.classList.add('active');
+                    }
+                });
+                
+                // Load messages
+                loadMessages(chatId);
             }
-        }
-        
-        // Create new chat
-        const newChatRef = push(ref(db, 'chats'));
-        const chatId = newChatRef.key;
-        
-        const participants = {};
-        participants[currentUser.uid] = true;
-        participants[userId] = true;
-        
-        const chatData = {
-            createdAt: Date.now(),
-            createdBy: currentUser.uid,
-            participants: participants
-        };
-        
-        set(newChatRef, chatData)
-            .then(() => {
-                // Open the new conversation
-                openConversation(chatId, userId, username);
-                newChatDialog.classList.add('hidden');
-            })
-            .catch(error => {
-                console.error('Error creating chat:', error);
-                alert('Error creating chat: ' + error.message);
-            });
-    })
-    .catch(error => {
-        console.error('Error checking existing chats:', error);
-    });
-}
-
-// Auto-resize message input
-messageInput.addEventListener('input', () => {
-// Reset height to auto to get correct scrollHeight
-messageInput.style.height = 'auto';
-// Set height to scrollHeight
-messageInput.style.height = messageInput.scrollHeight + 'px';
-// Cap the height to prevent it from growing too large
-if (messageInput.scrollHeight > 150) {
-    messageInput.style.height = '150px';
-    messageInput.style.overflowY = 'auto';
-} else {
-    messageInput.style.overflowY = 'hidden';
-}
-});
-
-// Check if there's a saved email to auto-fill
-const savedEmail = localStorage.getItem('simpleChat_userEmail');
-if (savedEmail) {
-document.getElementById('login-email').value = savedEmail;
-}
-
-} catch (error) {
-console.error('Error initializing app:', error);
-document.body.innerHTML = `
-<div style="padding: 20px; text-align: center; margin-top: 50px;">
-    <h2>Unable to load SimpleChat</h2>
-    <p>There was an error initializing the application: ${error.message}</p>
-    <p>Please check your internet connection and try again.</p>
-</div>
-`;
-}
-</script>
-</body>
-</html>
+            
+            // Load messages for a conversation
+            function loadMessages(chatId) {
+                const messagesRef = ref(db, `messages/${chatId}`);
+                
+                // Clear messages container
+                messagesContainer.innerHTML = '';
+                
+                onValue(messagesRef, (snapshot) => {
+                    if (!snapshot.exists()) {
+                        return;
+                    }
+                    
+                    const messages = snapshot.val();
+                    const messagesList = Object.entries(messages);
+                    
+                    // Sort messages by timestamp
+                    messagesList.sort((a, b) => a[1].timestamp - b[1].timestamp);
+                    
+                    let lastDate = null;
+                    
+                    // Display messages
+                    messagesList.forEach(([messageId, message]) => {
+                        // Check if we need a date separator
+                        const messageDate = new Date(message.timestamp);
+                        const messageDay = messageDate.toLocaleDateString();
+                        
+                        if (messageDay !== lastDate) {
+                            const dateSeparator = document.createElement('div');
+                            dateSeparator.className = 'date-separator';
+                            dateSeparator.textContent = messageDay;
+                            messagesContainer.appendChild(dateSeparator);
+                            lastDate = messageDay;
+                        }
+                        
+                        // Create message element
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message';
+                        
+                        if (message.senderId === currentUser.uid) {
+                            messageElement.classList.add('message-sent');
+                        } else {
+                            messageElement.classList.add('message-received');
+                        }
+                        
+                        // Message text
+                        messageElement.textContent = message.text;
+                        
+                        // Message time
+                        const messageTime = document.createElement('span');
+                        messageTime.className = 'message-time';
+                        messageTime.textContent = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        messageElement.appendChild(messageTime);
+                        
+                        messagesContainer.appendChild(messageElement);
+                    });
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            }
+            
+            // Send a message
+            function sendMessage() {
+                const text = messageInput.value.trim();
+                if (!text || !activeChatId) return;
+                
+                // Create message
+                const messageRef = push(ref(db, `messages/${activeChatId}`));
+                const messageData = {
+                    text: text,
+                    senderId: currentUser.uid,
+                    senderName: currentUser.displayName || currentUser.email,
+                    timestamp: Date.now(),
+                    sessionId: currentSessionId
+                };
+                
+                // Update last message in chat
+                const chatRef = ref(db, `chats/${activeChatId}/lastMessage`);
+                const lastMessageData = {
+                    text: text,
+                    senderId: currentUser.uid,
+                    timestamp: Date.now()
+                };
+                
+                // Update both nodes atomically
+                const updates = {};
+                updates[`messages/${activeChatId}/${messageRef.key}`] = messageData;
+                updates[`chats/${activeChatId}/lastMessage`] = lastMessageData;
+                
+                update(ref(db), updates)
+                    .then(() => {
+                        // Clear input field
+                        messageInput.value = '';
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        alert('Error sending message: ' + error.message);
+                    });
+            }
