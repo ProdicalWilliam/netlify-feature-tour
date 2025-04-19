@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Pit - Multiplayer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="menu-screen" class="screen">
+            <h1>Snake Pit</h1>
+            <div id="player-setup">
+                <input type="text" id="player-name" placeholder="Enter your name" maxlength="15">
+                <div class="color-picker">
+                    <label>Choose color:</label>
+                    <div class="color-options">
+                        <div class="color-option" data-color="#FF5252" style="background-color: #FF5252"></div>
+                        <div class="color-option" data-color="#4CAF50" style="background-color: #4CAF50"></div>
+                        <div class="color-option" data-color="#2196F3" style="background-color: #2196F3"></div>
+                        <div class="color-option" data-color="#FFEB3B" style="background-color: #FFEB3B"></div>
+                        <div class="color-option" data-color="#9C27B0" style="background-color: #9C27B0"></div>
+                        <div class="color-option" data-color="#FF9800" style="background-color: #FF9800"></div>
+                    </div>
+                </div>
+                <button id="join-game-btn">Join Game</button>
+            </div>
+            <div id="room-status">
+                <div id="player-count">Players: 0/12</div>
+                <div id="waiting-players"></div>
+            </div>
+            <div id="game-controls">
+                <p>How to play: Use arrow keys or WASD to move</p>
+                <button id="start-game-btn" disabled>Start Game</button>
+            </div>
+        </div>
+        
+        <div id="game-screen" class="screen hidden">
+            <canvas id="game-canvas"></canvas>
+            <div id="game-stats">
+                <div id="player-score">Score: 0</div>
+                <div id="players-alive">Players: 0/0</div>
+                <div id="shrink-timer">Arena shrinks in: 60s</div>
+            </div>
+        </div>
+        
+        <div id="game-over-screen" class="screen hidden">
+            <h2>Game Over</h2>
+            <div id="final-score">Your score: 0</div>
+            <div id="winner-display"></div>
+            <div id="leaderboard">
+                <h3>Top Players</h3>
+                <ul id="leaderboard-list"></ul>
+            </div>
+            <button id="back-to-menu-btn">Back to Menu</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
