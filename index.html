@@ -1,1 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Mastery</title>
+  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG4mVueUJNC47tyj9-2tbg0bCQg8_0t6RDxg&s" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #1865f2;
+      --primary-dark: #0d47a1;
+      --secondary: #28ae60;
+      --dark: #333;
+      --light: #f9f9f9;
+      --gray: #777;
+      --light-gray: #eee;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    header {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .logo img {
+      height: 40px;
+      border-radius: 50%;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 25px;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    .btn-outline {
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(24, 101, 242, 0.1);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #1865f2 0%, #0d47a1 100%);
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+    
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    
+    .search-bar {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 50px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-bar input {
+      flex: 1;
+      padding: 15px 20px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+    
+    .search-bar button {
+      padding: 0 25px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .features {
+      padding: 80px 0;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 2rem;
+      color: var(--dark);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    
+    .feature-card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(24, 101, 242, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+    
+    .feature-card h3 {
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+    
+    .courses {
+      padding: 80px 0;
+      background-color: var(--light-gray);
+    }
+    
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    
+    .course-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .course-img {
+      height: 180px;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      font-size: 3rem;
+    }
+    
+    .course-content {
+      padding: 20px;
+    }
+    
+    .course-tag {
+      background-color: rgba(24, 101, 242, 0.1);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    
+    .course-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+    
+    .course-info {
+      display: flex;
+      justify-content: space-between;
+      color: var(--gray);
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+    
+    .testimonials {
+      padding: 80px 0;
+    }
+    
+    .testimonial-card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin: 0 15px;
+    }
+    
+    .testimonial-content {
+      font-style: italic;
+      margin-bottom: 20px;
+      color: var(--gray);
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .testimonial-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .testimonial-info h4 {
+      margin-bottom: 5px;
+    }
+    
+    .testimonial-info p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .cta {
+      background: linear-gradient(135deg, #28ae60 0%, #1d8348 100%);
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+    
+    .cta h2 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+    }
+    
+    .cta p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    
+    .btn-white {
+      background-color: white;
+      color: var(--secondary);
+      padding: 12px 30px;
+      font-size: 1.1rem;
+    }
+    
+    .btn-white:hover {
+      background-color: #f1f1f1;
+    }
+    
+    footer {
+      background-color: var(--dark);
+      color: white;
+      padding: 60px 0 20px;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .footer-column h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: white;
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-links a {
+      color: #bbb;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #444;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links, .auth-buttons {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+        font-size: 1.5rem;
+        background: none;
+        border: none;
+        color: var(--dark);
+        cursor: pointer;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .hero p {
+        font-size: 1rem;
+      }
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+    }
 
+    /* Animation effects */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animated {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+    .delay-4 { animation-delay: 0.8s; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG4mVueUJNC47tyj9-2tbg0bCQg8_0t6RDxg&s" alt="Math Mastery Logo">
+          <span>Math Mastery</span>
+        </a>
+        
+        <div class="nav-links">
+          <a href="#">Courses</a>
+          <a href="#">Practice</a>
+          <a href="#">Resources</a>
+          <a href="#">Teachers</a>
+          <a href="#">Parents</a>
+        </div>
+        
+        <div class="auth-buttons">
+          <a href="#" class="btn btn-outline">Log In</a>
+          <a href="#" class="btn btn-primary">Sign Up</a>
+        </div>
+        
+        <button class="mobile-menu-btn">☰</button>
+      </nav>
+    </div>
+  </header>
+  
+  <section class="hero">
+    <div class="container">
+      <h1 class="animated">Master Mathematics at Your Own Pace</h1>
+      <p class="animated delay-1">Free world-class education in mathematics for anyone, anywhere. Interactive lessons, practice exercises, and personalized learning.</p>
+      
+      <div class="search-bar animated delay-2">
+        <input type="text" placeholder="Search for topics, lessons, or exercises...">
+        <button>Search</button>
+      </div>
+    </div>
+  </section>
+  
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Why Choose Math Mastery?</h2>
+      
+      <div class="features-grid">
+        <div class="feature-card animated delay-1">
+          <div class="feature-icon">📚</div>
+          <h3>Comprehensive Curriculum</h3>
+          <p>Our curriculum covers mathematics from elementary to advanced levels, aligned with educational standards.</p>
+        </div>
+        
+        <div class="feature-card animated delay-2">
+          <div class="feature-icon">🎯</div>
+          <h3>Personalized Learning</h3>
+          <p>Adaptive technology identifies strengths and learning gaps to create a personalized learning path.</p>
+        </div>
+        
+        <div class="feature-card animated delay-3">
+          <div class="feature-icon">🏆</div>
+          <h3>Mastery-Based Progress</h3>
+          <p>Move forward only when you've mastered the concepts, building strong foundations for advanced topics.</p>
+        </div>
+        
+        <div class="feature-card animated delay-4">
+          <div class="feature-icon">🔄</div>
+          <h3>Instant Feedback</h3>
+          <p>Get immediate feedback on practice problems and detailed explanations for deeper understanding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="courses">
+    <div class="container">
+      <h2 class="section-title">Featured Courses</h2>
+      
+      <div class="courses-grid">
+        <div class="course-card animated">
+          <div class="course-img">∫</div>
+          <div class="course-content">
+            <span class="course-tag">High School</span>
+            <h3>Calculus Fundamentals</h3>
+            <p>Master derivatives, integrals, and their applications with interactive lessons.</p>
+            <div class="course-info">
+              <span>42 lessons</span>
+              <span>Beginner</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="course-card animated delay-1">
+          <div class="course-img">π</div>
+          <div class="course-content">
+            <span class="course-tag">Middle School</span>
+            <h3>Algebra I</h3>
+            <p>Learn equations, inequalities, functions, and graphing with step-by-step guidance.</p>
+            <div class="course-info">
+              <span>36 lessons</span>
+              <span>Beginner</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="course-card animated delay-2">
+          <div class="course-img">△</div>
+          <div class="course-content">
+            <span class="course-tag">High School</span>
+            <h3>Geometry Essentials</h3>
+            <p>Explore shapes, theorems, proofs, and coordinate geometry through interactive examples.</p>
+            <div class="course-info">
+              <span>38 lessons</span>
+              <span>Intermediate</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="course-card animated delay-3">
+          <div class="course-img">σ</div>
+          <div class="course-content">
+            <span class="course-tag">High School</span>
+            <h3>Statistics and Probability</h3>
+            <p>Understand data analysis, distributions, and statistical methods with real-world applications.</p>
+            <div class="course-info">
+              <span>32 lessons</span>
+              <span>Intermediate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="testimonials">
+    <div class="container">
+      <h2 class="section-title">What Our Students Say</h2>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card animated">
+          <p class="testimonial-content">"Math Mastery helped me improve my grades from a C to an A in just one semester. The step-by-step explanations really helped me understand concepts I struggled with for years."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background-color: #1865f2;">JD</div>
+            <div class="testimonial-info">
+              <h4>Jason D.</h4>
+              <p>High School Student</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Master Mathematics?</h2>
+      <p>Join thousands of students who have transformed their understanding of math through our platform.</p>
+      <a href="#" class="btn btn-white">Get Started For Free</a>
+    </div>
+  </section>
+  
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>Math Mastery</h3>
+          <p>Free world-class mathematics education for anyone, anywhere.</p>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Learn</h3>
+          <ul class="footer-links">
+            <li><a href="#">Courses</a></li>
+            <li><a href="#">Practice</a></li>
+            <li><a href="#">Textbooks</a></li>
+            <li><a href="#">Articles</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#">Teachers</a></li>
+            <li><a href="#">Parents</a></li>
+            <li><a href="#">Tutors</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>About</h3>
+          <ul class="footer-links">
+            <li><a href="#">Our Mission</a></li>
+            <li><a href="#">Team</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 Math Mastery. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // Simple script to add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mobile menu toggle
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const navLinks = document.querySelector('.nav-links');
+      const authButtons = document.querySelector('.auth-buttons');
+      
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function() {
+          navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+          authButtons.style.display = authButtons.style.display === 'flex' ? 'none' : 'flex';
+        });
+      }
+      
+      // Add smooth scrolling for internal links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
