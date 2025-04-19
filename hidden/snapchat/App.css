@@ -1,0 +1,591 @@
+/* Snapchat Clone CSS */
+:root {
+  --snapchat-yellow: #FFFC00;
+  --snapchat-yellow-light: #FFF76B;
+  --snapchat-blue: #0EADFF;
+  --snapchat-gray: #f2f2f2;
+  --snapchat-dark-gray: #8c8c8c;
+  --snapchat-red: #FF5454;
+  --snapchat-green: #25D366;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Avenir Next', 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: #fff;
+  color: #333;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+}
+
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Login/Register Styles */
+.login-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--snapchat-yellow);
+  padding: 20px;
+}
+
+.login-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #555;
+}
+
+.primary-button {
+  background-color: var(--snapchat-yellow);
+  color: black;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+  background-color: var(--snapchat-yellow-light);
+}
+
+.text-button {
+  background: none;
+  color: var(--snapchat-blue);
+  padding: 0;
+  font-weight: bold;
+}
+
+.toggle-auth {
+  margin-top: 20px;
+  color: #555;
+}
+
+.error-message {
+  color: var(--snapchat-red);
+  margin: 10px 0;
+}
+
+/* Navigation */
+.navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #eee;
+  max-width: 480px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.camera-icon {
+  color: var(--snapchat-yellow);
+}
+
+/* Friends Styles */
+.friends-container {
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+.search-container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.search-container button {
+  background-color: var(--snapchat-blue);
+  color: white;
+}
+
+.search-results, .friends-list {
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.search-results h3, .friends-list h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.user-item, .friend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.user-item:last-child, .friend-item:last-child {
+  border-bottom: none;
+}
+
+.user-info, .friend-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--snapchat-gray);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.add-friend-btn {
+  background-color: var(--snapchat-yellow);
+  color: black;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.friend-actions {
+  display: flex;
+}
+
+.chat-btn, .remove-friend-btn, .block-btn {
+  margin-left: 5px;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.chat-btn {
+  background-color: var(--snapchat-blue);
+  color: white;
+}
+
+.remove-friend-btn {
+  background-color: var(--snapchat-gray);
+  color: #333;
+}
+
+.block-btn {
+  background-color: var(--snapchat-red);
+  color: white;
+}
+
+.no-friends {
+  color: var(--snapchat-dark-gray);
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Chat Styles */
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+}
+
+.back-btn {
+  background: none;
+  font-size: 20px;
+  padding: 5px 10px;
+  margin-right: 10px;
+}
+
+.friend-details {
+  display: flex;
+  align-items: center;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: var(--snapchat-gray);
+}
+
+.message {
+  max-width: 70%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 18px;
+  position: relative;
+}
+
+.sent {
+  background-color: var(--snapchat-blue);
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.received {
+  background-color: white;
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+.message-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}
+
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.message-status {
+  opacity: 0.8;
+}
+
+.delete-btn {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.message-input-container {
+  display: flex;
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid #eee;
+}
+
+.image-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--snapchat-gray);
+  border-radius: 50%;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.message-input-container input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.send-btn {
+  background-color: var(--snapchat-yellow);
+  color: black;
+}
+
+.image-preview-container {
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+}
+
+.cancel-image-btn {
+  margin-top: 10px;
+  background-color: var(--snapchat-red);
+  color: white;
+}
+
+/* Chats List Styles */
+.chats-container {
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+.chats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chats-header h2 {
+  color: #333;
+}
+
+.new-chat-btn {
+  background-color: var(--snapchat-yellow);
+  color: black;
+}
+
+.chats-list {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chat-item {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+}
+
+.chat-item:last-child {
+  border-bottom: none;
+}
+
+.chat-item:hover {
+  background-color: #f9f9f9;
+}
+
+.chat-avatar {
+  width: 50px;
+  height: 50px;
+  background-color: var(--snapchat-gray);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 24px;
+}
+
+.chat-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.chat-username {
+  font-weight: bold;
+}
+
+.chat-time {
+  color: var(--snapchat-dark-gray);
+  font-size: 12px;
+}
+
+.chat-preview {
+  display: flex;
+  justify-content: space-between;
+}
+
+.last-message {
+  color: var(--snapchat-dark-gray);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.unread-count {
+  background-color: var(--snapchat-red);
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.no-chats {
+  padding: 30px 15px;
+  text-align: center;
+  color: var(--snapchat-dark-gray);
+}
+
+/* Profile Styles */
+.profile-container {
+  padding: 20px;
+  padding-bottom: 80px;
+}
+
+.profile-header {
+  margin-bottom: 20px;
+}
+
+.profile-header h2 {
+  color: #333;
+}
+
+.profile-content {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  background-color: var(--snapchat-gray);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.profile-form {
+  margin-bottom: 30px;
+}
+
+.update-profile-btn {
+  background-color: var(--snapchat-blue);
+  color: white;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.sign-out-btn {
+  background-color: var(--snapchat-red);
+  color: white;
+  width: 100%;
+}
+
+/* Camera Styles (Placeholder) */
+.camera-container, .stories-container, .map-container {
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.camera-placeholder, .stories-placeholder, .map-placeholder {
+  width: 150px;
+  height: 150px;
+  background-color: var(--snapchat-gray);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  margin: 30px 0;
+}
+
+/* Media Queries for responsiveness */
+@media (max-width: 480px) {
+  .app-container {
+    height: 100%;
+    width: 100%;
+    box-shadow: none;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+}
