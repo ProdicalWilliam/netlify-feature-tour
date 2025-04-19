@@ -588,4 +588,176 @@ function render() {
     
     // Draw name above snake if it's not you
     if (id !== playerId) {
-      const head =
+      const head = player.snake[0];
+      ctx.fillStyle = "#fff";
+      ctx.font = "10px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        player.name, 
+        head.x * CELL_SIZE + offsetX + CELL_SIZE / 2,
+        head.y * CELL_SIZE + offsetY - 5
+      );
+    }
+  }
+}
+
+function drawRoundedRect(x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function handleKeydown(e) {
+  if (!gameActive) return;
+  
+  switch (e.key) {
+    case "ArrowUp":
+    case "w":
+    case "W":
+      nextDirection = "up";
+      break;
+    case "ArrowDown":
+    case "s":
+    case "S":
+      nextDirection = "down";
+      break;
+    case "ArrowLeft":
+    case "a":
+    case "A":
+      nextDirection = "left";
+      break;
+    case "ArrowRight":
+    case "d":
+    case "D":
+      nextDirection = "right";
+      break;
+  }
+}
+
+function showGameScreen() {
+  menuScreen.classList.add("hidden");
+  gameOverScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  
+  // Reset score display
+  playerScoreDisplay.textContent = "Score: 0";
+}
+
+function showGameOverScreen() {
+  gameScreen.classList.add("hidden");
+  gameOverScreen.classList.remove("hidden");
+  
+  const myPlayer = currentPlayers[playerId];
+  finalScoreDisplay.textContent = `Your score: ${myPlayer ? myPlayer.score : 0}`;
+  
+  // Find winner
+  const players = Object.values(currentPlayers);
+  players.sort((a, b) => b.score - a.score);
+  
+  if (players.length > 0) {
+    const winner = players[0];
+    winnerDisplay.textContent = `Winner: ${winner.name} (${winner.score} points)`;
+    
+    // Build leaderboard
+    leaderboardList.innerHTML = "";
+    for (let i = 0; i < Math.min(5, players.length); i++) {
+      const player = players[i];
+      const li = document.createElement("li");
+      
+      const colorDot = document.createElement("span");
+      colorDot.className = "player-color";
+      colorDot.style.backgroundColor = player.color;
+      
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = `${i + 1}. ${player.name}`;
+      
+      const scoreSpan = document.createElement("span");
+      scoreSpan.textContent = player.score;
+      
+      li.appendChild(colorDot);
+      li.appendChild(nameSpan);
+      li.appendChild(scoreSpan);
+      leaderboardList.appendChild(li);
+    }
+  }
+}
+
+function resetGame() {
+  // Reset game state
+  gameActive = false;
+  currentGridSize = GRID_SIZE;
+  boundary = { top: 0, right: GRID_SIZE - 1, bottom: GRID_SIZE - 1, left: 0 };
+  
+  // Clear intervals
+  if (gameInterval) clearInterval(gameInterval);
+  if (shrinkInterval) clearInterval(shrinkInterval);
+  
+  // Remove player from game
+  if (playerRef) {
+    remove(playerRef);
+    playerRef = null;
+    playerId = null;
+  }
+  
+  // Reset UI
+  joinGameBtn.disabled = false;
+  playerNameInput.disabled = false;
+  colorOptions.forEach(opt => opt.style.pointerEvents = "auto");
+  
+  // Show menu screen
+  gameScreen.classList.add("hidden");
+  gameOverScreen.classList.add("hidden");
+  menuScreen.classList.remove("hidden");
+  
+  // Reset canvas size
+  canvas.width = GRID_SIZE * CELL_SIZE;
+  canvas.height = GRID_SIZE * CELL_SIZE;
+}
+
+// Set up ping to keep connection alive
+function setupPing() {
+  setInterval(() => {
+    if (playerId) {
+      const pingRef = ref(database, `games/snakepit/players/${playerId}/lastUpdate`);
+      set(pingRef, Date.now());
+    }
+  }, 30000); // Ping every 30 seconds
+}
+
+// Cleanup dead players if they haven't updated in a while
+function setupDeadPlayerCleanup() {
+  setInterval(() => {
+    const currentTime = Date.now();
+    const maxIdleTime = 60000; // 60 seconds
+    
+    // Check for idle players
+    const playersToRemove = [];
+    
+    for (const [id, player] of Object.entries(currentPlayers)) {
+      if (currentTime - player.lastUpdate > maxIdleTime) {
+        playersToRemove.push(id);
+      }
+    }
+    
+    // Remove idle players
+    for (const id of playersToRemove) {
+      remove(ref(database, `games/snakepit/players/${id}`));
+    }
+  }, 30000); // Check every 30 seconds
+}
+
+// Initialize the game when page loads
+window.addEventListener("load", () => {
+  init();
+  setupPing();
+  setupDeadPlayerCleanup();
+});
