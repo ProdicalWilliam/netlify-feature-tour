@@ -223,7 +223,9 @@
             border-radius: 0.25rem;
         }
         
-        #graph-container {
+        #graph-container,
+        #domain-graph-container,
+        #char-graph-container {
             width: 100%;
             height: 300px;
             margin-top: 1rem;
@@ -706,160 +708,61 @@
         }
         
         // Function to display quadratic transformation
-        function showTransformation() {
-            const a = parseFloat(document.getElementById('param-a').value);
-            const h = parseFloat(document.getElementById('param-h').value);
-            const k = parseFloat(document.getElementById('param-k').value);
-            
-            if (isNaN(a) || isNaN(h) || isNaN(k)) {
-                alert("Please enter valid values for a, h, and k.");
-                return;
-            }
-            
-            // Generate equation in vertex form
-            const equation = `f(x) = ${a}(x ${h >= 0 ? '- ' + h : '+ ' + Math.abs(h)})² ${k >= 0 ? '+ ' + k : '- ' + Math.abs(k)}`;
-            
-            // Expand to standard form
-            const expandedA = a;
-            const expandedB = -2 * a * h;
-            const expandedC = a * h * h + k;
-            
-            const standardForm = `f(x) = ${expandedA}x² ${expandedB >= 0 ? '+ ' + expandedB : '- ' + Math.abs(expandedB)}x ${expandedC >= 0 ? '+ ' + expandedC : '- ' + Math.abs(expandedC)}`;
-            
-            // Describe transformations
-            let effects = "";
-            
-            if (a > 0) {
-                effects += `<p>The parabola opens upward.</p>`;
-            } else {
-                effects += `<p>The parabola opens downward (reflection across x-axis).</p>`;
-            }
-            
-            if (Math.abs(a) !== 1) {
-                if (Math.abs(a) > 1) {
-                    effects += `<p>The parabola is vertically stretched by a factor of ${Math.abs(a)}.</p>`;
-                } else {
-                    effects += `<p>The parabola is vertically compressed by a factor of ${1/Math.abs(a)}.</p>`;
-                }
-            }
-            
-            // Continuing from where the code was cut off
-if (h !== 0) {
-    effects += `<p>The parabola is shifted ${h > 0 ? 'right' : 'left'} by ${Math.abs(h)} units.</p>`;
-}
-
-if (k !== 0) {
-    effects += `<p>The parabola is shifted ${k > 0 ? 'up' : 'down'} by ${Math.abs(k)} units.</p>`;
-}
-
-// Display results
-document.getElementById('transform-equation').innerHTML = `Vertex Form: ${equation}<br>Standard Form: ${standardForm}`;
-document.getElementById('vertex-point').textContent = `Vertex: (${h}, ${k})`;
-document.getElementById('transform-effects').innerHTML = effects;
-document.getElementById('transform-results').classList.remove('hidden');
-
-// Simple graph drawing for demonstration
-const graphContainer = document.getElementById('graph-container');
-graphContainer.innerHTML = ''; // Clear previous content
-
-// Create canvas for graph
-const canvas = document.createElement('canvas');
-canvas.width = graphContainer.clientWidth;
-canvas.height = graphContainer.clientHeight;
-graphContainer.appendChild(canvas);
-
-const ctx = canvas.getContext('2d');
-const width = canvas.width;
-const height = canvas.height;
-
-// Draw coordinate axes
-ctx.strokeStyle = '#ccc';
-ctx.lineWidth = 1;
-
-// Draw grid
-const gridSize = 30;
-const xAxisPos = height / 2;
-const yAxisPos = width / 2;
-
-// Determine suitable range for x-axis based on vertex and shape
-const xMin = h - 6;
-const xMax = h + 6;
-const xRange = xMax - xMin;
-
-// Draw vertical grid lines
-for (let x = 0; x <= width; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-    ctx.stroke();
-}
-
-// Draw horizontal grid lines
-for (let y = 0; y <= height; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
-}
-
-// Draw axes
-ctx.strokeStyle = '#000';
-ctx.lineWidth = 2;
-
-// x-axis
-ctx.beginPath();
-ctx.moveTo(0, height / 2);
-ctx.lineTo(width, height / 2);
-ctx.stroke();
-
-// y-axis
-ctx.beginPath();
-ctx.moveTo(width / 2, 0);
-ctx.lineTo(width / 2, height);
-ctx.stroke();
-
-// Function to convert x coordinate to canvas x
-function toCanvasX(x) {
-    return ((x - xMin) / xRange) * width;
-}
-
-// Function to convert y coordinate to canvas y
-function toCanvasY(y) {
-    // Scale y values to fit the chart
-    // For quadratic functions, we'll adjust based on a and k
-    const yScale = 30 / Math.max(1, Math.abs(a));
-    return height / 2 - y * yScale;
-}
-
-// Draw the quadratic function
-ctx.strokeStyle = '#3b82f6';
-ctx.lineWidth = 3;
-ctx.beginPath();
-
-for (let canvasX = 0; canvasX < width; canvasX++) {
-    const x = xMin + (canvasX / width) * xRange;
-    const y = a * Math.pow(x - h, 2) + k;
-    const canvasY = toCanvasY(y);
+        // Complete the showTransformation function
+function showTransformation() {
+    const a = parseFloat(document.getElementById('param-a').value);
+    const h = parseFloat(document.getElementById('param-h').value);
+    const k = parseFloat(document.getElementById('param-k').value);
     
-    if (canvasX === 0) {
-        ctx.moveTo(canvasX, canvasY);
-    } else {
-        ctx.lineTo(canvasX, canvasY);
+    if (isNaN(a) || isNaN(h) || isNaN(k)) {
+        alert("Please enter valid values for a, h, and k.");
+        return;
     }
-}
-
-ctx.stroke();
-
-// Draw vertex point
-ctx.fillStyle = '#ef4444';
-ctx.beginPath();
-ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
-ctx.fill();
-
-// Label the vertex
-ctx.fillStyle = '#000';
-ctx.font = '12px sans-serif';
-ctx.fillText(`(${h}, ${k})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
+    
+    // Generate equation in vertex form
+    const equation = `f(x) = ${a}(x ${h >= 0 ? '- ' + h : '+ ' + Math.abs(h)})² ${k >= 0 ? '+ ' + k : '- ' + Math.abs(k)}`;
+    
+    // Expand to standard form
+    const expandedA = a;
+    const expandedB = -2 * a * h;
+    const expandedC = a * h * h + k;
+    
+    const standardForm = `f(x) = ${expandedA}x² ${expandedB >= 0 ? '+ ' + expandedB : '- ' + Math.abs(expandedB)}x ${expandedC >= 0 ? '+ ' + expandedC : '- ' + Math.abs(expandedC)}`;
+    
+    // Describe transformations
+    let effects = "";
+    
+    if (a > 0) {
+        effects += `<p>The parabola opens upward.</p>`;
+    } else {
+        effects += `<p>The parabola opens downward (reflection across x-axis).</p>`;
+    }
+    
+    if (Math.abs(a) !== 1) {
+        if (Math.abs(a) > 1) {
+            effects += `<p>The parabola is vertically stretched by a factor of ${Math.abs(a)}.</p>`;
+        } else {
+            effects += `<p>The parabola is vertically compressed by a factor of ${1/Math.abs(a)}.</p>`;
+        }
+    }
+    
+    if (h !== 0) {
+        effects += `<p>The parabola is shifted horizontally ${h > 0 ? 'right' : 'left'} by ${Math.abs(h)} units.</p>`;
+    }
+    
+    if (k !== 0) {
+        effects += `<p>The parabola is shifted vertically ${k > 0 ? 'up' : 'down'} by ${Math.abs(k)} units.</p>`;
+    }
+    
+    // Display results
+    document.getElementById('transform-equation').innerHTML = `<p>Vertex form: ${equation}</p><p>Standard form: ${standardForm}</p>`;
+    document.getElementById('vertex-point').textContent = `Vertex: (${h}, ${k})`;
+    document.getElementById('transform-effects').innerHTML = effects;
+    
+    // Draw the graph
+    drawQuadraticGraph('graph-container', a, h, k);
+    
+    document.getElementById('transform-results').classList.remove('hidden');
 }
 
 // Function to calculate domain and range
@@ -869,183 +772,47 @@ function calculateDomainRange() {
     const c = parseFloat(document.getElementById('domain-c').value);
     
     if (isNaN(a) || isNaN(b) || isNaN(c)) {
-        alert("Please enter valid coefficients for a, b, and c.");
+        alert("Please enter valid coefficients a, b, and c.");
         return;
     }
     
-    if (a === 0) {
-        alert("The coefficient 'a' cannot be zero for a quadratic function.");
-        return;
-    }
-    
-    // Calculate vertex using completed square form
+    // Calculate vertex
     const h = -b / (2 * a);
-    const k = c - (b * b) / (4 * a);
+    const k = c - b * b / (4 * a);
     
-    // Domain is all real numbers for quadratic functions
-    const domainStr = "Domain: All real numbers (ℝ)";
+    // Determine domain and range
+    const domain = "ℝ (all real numbers)";
+    let range;
     
-    // Range depends on direction of opening
-    let rangeStr;
     if (a > 0) {
-        rangeStr = `Range: [${k.toFixed(2)}, ∞)`;
+        range = `[${k}, ∞)`;
     } else {
-        rangeStr = `Range: (-∞, ${k.toFixed(2)}]`;
+        range = `(-∞, ${k}]`;
     }
-    
-    // Axis of symmetry
-    const axisSymmetry = `x = ${h.toFixed(2)}`;
     
     // Display results
-    document.getElementById('domain-equation').textContent = `Function: f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`;
-    document.getElementById('domain-value').textContent = domainStr;
-    document.getElementById('range-value').textContent = rangeStr;
+    document.getElementById('domain-equation').textContent = `f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`;
+    document.getElementById('domain-value').textContent = `Domain: ${domain}`;
+    document.getElementById('range-value').textContent = `Range: ${range}`;
     document.getElementById('vertex-value').textContent = `Vertex: (${h.toFixed(2)}, ${k.toFixed(2)})`;
-    document.getElementById('axis-symmetry').textContent = `Axis of Symmetry: ${axisSymmetry}`;
+    document.getElementById('axis-symmetry').textContent = `Axis of Symmetry: x = ${h.toFixed(2)}`;
+    
+    // Draw the graph
+    drawQuadraticGraph('domain-graph-container', a, h, k);
+    
     document.getElementById('domain-results').classList.remove('hidden');
-    
-    // Draw graph for domain and range
-    const graphContainer = document.getElementById('domain-graph-container');
-    graphContainer.innerHTML = ''; // Clear previous content
-    
-    // Create canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = graphContainer.clientWidth;
-    canvas.height = graphContainer.clientHeight;
-    graphContainer.appendChild(canvas);
-    
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    
-    // Draw coordinate axes and grid (similar to transformation function)
-    // Draw grid
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    const gridSize = 30;
-    
-    // Draw vertical grid lines
-    for (let x = 0; x <= width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-    }
-    
-    // Draw horizontal grid lines
-    for (let y = 0; y <= height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-    }
-    
-    // Draw axes
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    
-    // x-axis
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2);
-    ctx.lineTo(width, height / 2);
-    ctx.stroke();
-    
-    // y-axis
-    ctx.beginPath();
-    ctx.moveTo(width / 2, 0);
-    ctx.lineTo(width / 2, height);
-    ctx.stroke();
-    
-    // Determine suitable range for x-axis based on vertex
-    const xMin = h - 5;
-    const xMax = h + 5;
-    const xRange = xMax - xMin;
-    
-    // Function to convert x coordinate to canvas x
-    function toCanvasX(x) {
-        return ((x - xMin) / xRange) * width;
-    }
-    
-    // Function to convert y coordinate to canvas y
-    function toCanvasY(y) {
-        // Scale y values to fit the chart
-        const yScale = 20 / Math.max(1, Math.abs(a));
-        return height / 2 - y * yScale;
-    }
-    
-    // Draw the quadratic function
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    
-    for (let canvasX = 0; canvasX < width; canvasX++) {
-        const x = xMin + (canvasX / width) * xRange;
-        const y = a * x * x + b * x + c;
-        const canvasY = toCanvasY(y);
-        
-        if (canvasX === 0) {
-            ctx.moveTo(canvasX, canvasY);
-        } else {
-            ctx.lineTo(canvasX, canvasY);
-        }
-    }
-    
-    ctx.stroke();
-    
-    // Draw vertex point
-    ctx.fillStyle = '#ef4444';
-    ctx.beginPath();
-    ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Label the vertex
-    ctx.fillStyle = '#000';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(`(${h.toFixed(2)}, ${k.toFixed(2)})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
-    
-    // Highlight domain and range
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
-    
-    // Domain (x-axis)
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2 + 5);
-    ctx.lineTo(width, height / 2 + 5);
-    ctx.stroke();
-    
-    // Range (vertical line to the side)
-    ctx.beginPath();
-    if (a > 0) {
-        // y >= k
-        ctx.moveTo(width - 15, toCanvasY(k));
-        ctx.lineTo(width - 15, 0);
-    } else {
-        // y <= k
-        ctx.moveTo(width - 15, toCanvasY(k));
-        ctx.lineTo(width - 15, height);
-    }
-    ctx.stroke();
-    
-    // Axis of symmetry
-    ctx.strokeStyle = '#f59e0b';
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(toCanvasX(h), 0);
-    ctx.lineTo(toCanvasX(h), height);
-    ctx.stroke();
-    ctx.setLineDash([]);
 }
 
 // Function to generate a matching problem
 function generateMatchingProblem() {
-    // Generate 4 different quadratic functions for matching
+    // Generate 4 different quadratic functions
     const functions = [];
+    const graphs = [];
     
-    // Generate random coefficients for variety
     for (let i = 0; i < 4; i++) {
-        const a = Math.random() > 0.5 ? 1 : -1; // Either 1 or -1 for simplicity
-        const h = Math.floor(Math.random() * 7) - 3; // h between -3 and 3
-        const k = Math.floor(Math.random() * 7) - 3; // k between -3 and 3
+        const a = Math.random() > 0.5 ? 1 : -1;
+        const h = Math.floor(Math.random() * 5) - 2;
+        const k = Math.floor(Math.random() * 5) - 2;
         
         functions.push({
             a: a,
@@ -1055,7 +822,7 @@ function generateMatchingProblem() {
         });
     }
     
-    // Choose one randomly to be the answer
+    // Select a random function to match
     const correctIndex = Math.floor(Math.random() * 4);
     const correctFunction = functions[correctIndex];
     
@@ -1066,365 +833,234 @@ function generateMatchingProblem() {
     functions.forEach((func, index) => {
         const option = document.createElement('div');
         option.className = 'function-choice';
-        option.textContent = `Option ${index + 1}: ${func.equation}`;
-        option.setAttribute('data-index', index);
-        option.addEventListener('click', () => {
-            // Clear previous selections
+        option.dataset.index = index;
+        option.textContent = func.equation;
+        option.addEventListener('click', function() {
             document.querySelectorAll('.function-choice').forEach(el => el.classList.remove('selected'));
-            // Mark this as selected
-            option.classList.add('selected');
+            this.classList.add('selected');
         });
         optionsContainer.appendChild(option);
     });
     
-    // Draw the graph of the correct function
+    // Draw the graph to match
     const graphContainer = document.getElementById('graph-to-match');
-    graphContainer.innerHTML = '<h3>Match with one of the options above:</h3>';
+    graphContainer.innerHTML = '<div style="width: 100%; height: 300px; border: 1px solid #e2e8f0; border-radius: 0.5rem; margin-top: 1rem;"></div>';
+    drawQuadraticGraph(graphContainer.querySelector('div'), correctFunction.a, correctFunction.h, correctFunction.k);
     
-    const canvas = document.createElement('canvas');
-    canvas.width = graphContainer.clientWidth || 400;
-    canvas.height = 300;
-    graphContainer.appendChild(canvas);
+    // Store the correct answer
+    graphContainer.dataset.correctIndex = correctIndex;
     
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    
-    // Draw grid and axes
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    const gridSize = 30;
-    
-    // Draw vertical grid lines
-    for (let x = 0; x <= width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-    }
-    
-    // Draw horizontal grid lines
-    for (let y = 0; y <= height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-    }
-    
-    // Draw axes
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    
-    // x-axis
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2);
-    ctx.lineTo(width, height / 2);
-    ctx.stroke();
-    
-    // y-axis
-    ctx.beginPath();
-    ctx.moveTo(width / 2, 0);
-    ctx.lineTo(width / 2, height);
-    ctx.stroke();
-    
-    // Calculate reasonable viewing window
-    const xMin = correctFunction.h - 5;
-    const xMax = correctFunction.h + 5;
-    const xRange = xMax - xMin;
-    
-    // Function to convert x coordinate to canvas x
-    function toCanvasX(x) {
-        return ((x - xMin) / xRange) * width;
-    }
-    
-    // Function to convert y coordinate to canvas y
-    function toCanvasY(y) {
-        // Scale y values to fit the chart
-        const yScale = 20;
-        return height / 2 - y * yScale;
-    }
-    
-    // Plot the correct function
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    
-    for (let canvasX = 0; canvasX < width; canvasX++) {
-        const x = xMin + (canvasX / width) * xRange;
-        const y = correctFunction.a * Math.pow(x - correctFunction.h, 2) + correctFunction.k;
-        const canvasY = toCanvasY(y);
-        
-        if (canvasX === 0) {
-            ctx.moveTo(canvasX, canvasY);
-        } else {
-            ctx.lineTo(canvasX, canvasY);
-        }
-    }
-    
-    ctx.stroke();
-    
-    // Store correct answer for checking
-    graphContainer.setAttribute('data-correct', correctIndex);
-    
-    // Show results
-    document.getElementById('match-results').classList.remove('hidden');
     document.getElementById('match-feedback').textContent = '';
+    document.getElementById('match-results').classList.remove('hidden');
 }
 
 // Function to check matching answer
 function checkMatchAnswer() {
-    const selectedOption = document.querySelector('.function-choice.selected');
-    
-    if (!selectedOption) {
-        document.getElementById('match-feedback').textContent = 'Please select an option first.';
+    const selectedElement = document.querySelector('.function-choice.selected');
+    if (!selectedElement) {
+        document.getElementById('match-feedback').textContent = 'Please select a function first.';
         return;
     }
     
-    const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
-    const correctIndex = parseInt(document.getElementById('graph-to-match').getAttribute('data-correct'));
+    const selectedIndex = parseInt(selectedElement.dataset.index);
+    const correctIndex = parseInt(document.getElementById('graph-to-match').dataset.correctIndex);
     
     if (selectedIndex === correctIndex) {
-        document.getElementById('match-feedback').innerHTML = '<span style="color: var(--success);">Correct! You matched the function to its graph.</span>';
+        document.getElementById('match-feedback').textContent = 'Correct! You matched the function to its graph.';
+        document.getElementById('match-feedback').style.color = 'var(--success)';
     } else {
-        document.getElementById('match-feedback').innerHTML = `<span style="color: var(--error);">Incorrect. The correct answer was Option ${correctIndex + 1}. Try again!</span>`;
+        document.getElementById('match-feedback').textContent = 'Incorrect. Try again.';
+        document.getElementById('match-feedback').style.color = 'var(--error)';
     }
 }
 
-// Function to analyze characteristics of quadratic function
+// Function to analyze function characteristics
 function analyzeCharacteristics() {
     const a = parseFloat(document.getElementById('char-a').value);
     const b = parseFloat(document.getElementById('char-b').value);
     const c = parseFloat(document.getElementById('char-c').value);
     
     if (isNaN(a) || isNaN(b) || isNaN(c)) {
-        alert("Please enter valid coefficients for a, b, and c.");
-        return;
-    }
-    
-    if (a === 0) {
-        alert("The coefficient 'a' cannot be zero for a quadratic function.");
+        alert("Please enter valid coefficients a, b, and c.");
         return;
     }
     
     // Calculate vertex
     const h = -b / (2 * a);
-    const k = c - (b * b) / (4 * a);
+    const k = c - b * b / (4 * a);
     
-    // Calculate y-intercept
-    const yIntercept = c;
-    
-    // Calculate discriminant for x-intercepts
+    // Calculate x-intercepts
     const discriminant = b * b - 4 * a * c;
     let xIntercepts;
     
     if (discriminant > 0) {
         const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
         const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-        xIntercepts = `Two x-intercepts: (${x1.toFixed(2)}, 0) and (${x2.toFixed(2)}, 0)`;
+        xIntercepts = `(${x1.toFixed(2)}, 0) and (${x2.toFixed(2)}, 0)`;
     } else if (discriminant === 0) {
         const x = -b / (2 * a);
-        xIntercepts = `One x-intercept: (${x.toFixed(2)}, 0)`;
+        xIntercepts = `(${x.toFixed(2)}, 0) (repeated root)`;
     } else {
-        xIntercepts = "No x-intercepts";
+        xIntercepts = "No x-intercepts (no real roots)";
     }
     
-    // Determine increasing/decreasing intervals
-    let increasingInterval, decreasingInterval;
+    // Determine y-intercept
+    const yIntercept = c;
+    
+    // Determine domain and range
+    const domain = "ℝ (all real numbers)";
+    let range;
     
     if (a > 0) {
-        // Opens upward
-        increasingInterval = `Increasing on (${h.toFixed(2)}, ∞)`;
-        decreasingInterval = `Decreasing on (-∞, ${h.toFixed(2)})`;
+        range = `[${k.toFixed(2)}, ∞)`;
     } else {
-        // Opens downward
-        increasingInterval = `Increasing on (-∞, ${h.toFixed(2)})`;
-        decreasingInterval = `Decreasing on (${h.toFixed(2)}, ∞)`;
+        range = `(-∞, ${k.toFixed(2)}]`;
     }
     
-    // Update DOM with characteristics
-    document.getElementById('char-equation').innerHTML = `Equation: f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}`;
-    document.getElementById('char-vertex').innerHTML = `Vertex: (${h.toFixed(2)}, ${k.toFixed(2)})`;
-    document.getElementById('char-direction').innerHTML = `Direction: Parabola opens ${a > 0 ? 'upward' : 'downward'}`;
-    document.getElementById('char-axis').innerHTML = `Axis of Symmetry: x = ${h.toFixed(2)}`;
-    document.getElementById('char-y-intercept').innerHTML = `y-intercept: ${yIntercept.toFixed(2)}`;
-    document.getElementById('char-x-intercepts').innerHTML = xIntercepts;
-    document.getElementById('char-domain').innerHTML = `Domain: All real numbers (ℝ)`;
-    document.getElementById('char-range').innerHTML = `Range: ${a > 0 ? `[${k.toFixed(2)}, ∞)` : `(-∞, ${k.toFixed(2)}]`}`;
-    document.getElementById('char-increasing').innerHTML = increasingInterval;
-    document.getElementById('char-decreasing').innerHTML = decreasingInterval;
-    document.getElementById('char-symmetry').innerHTML = `Symmetry: Symmetric about the line x = ${h.toFixed(2)}`;
+    // Determine intervals
+    let increasing, decreasing;
     
-    document.getElementById('char-results').classList.remove('hidden');
+    if (a > 0) {
+        increasing = `(${h.toFixed(2)}, ∞)`;
+        decreasing = `(-∞, ${h.toFixed(2)})`;
+    } else {
+        increasing = `(-∞, ${h.toFixed(2)})`;
+        decreasing = `(${h.toFixed(2)}, ∞)`;
+    }
+    
+    // Display results
+    document.getElementById('char-equation').innerHTML = `<p><strong>Equation:</strong> f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}</p>`;
+    document.getElementById('char-vertex').innerHTML = `<p><strong>Vertex:</strong> (${h.toFixed(2)}, ${k.toFixed(2)})</p>`;
+    document.getElementById('char-direction').innerHTML = `<p><strong>Direction:</strong> Opens ${a > 0 ? 'upward' : 'downward'}</p>`;
+    document.getElementById('char-axis').innerHTML = `<p><strong>Axis of Symmetry:</strong> x = ${h.toFixed(2)}</p>`;
+    
+    document.getElementById('char-y-intercept').innerHTML = `<p><strong>Y-intercept:</strong> (0, ${yIntercept})</p>`;
+    document.getElementById('char-x-intercepts').innerHTML = `<p><strong>X-intercepts:</strong> ${xIntercepts}</p>`;
+    
+    document.getElementById('char-domain').innerHTML = `<p><strong>Domain:</strong> ${domain}</p>`;
+    document.getElementById('char-range').innerHTML = `<p><strong>Range:</strong> ${range}</p>`;
+    
+    document.getElementById('char-increasing').innerHTML = `<p><strong>Increasing on:</strong> ${increasing}</p>`;
+    document.getElementById('char-decreasing').innerHTML = `<p><strong>Decreasing on:</strong> ${decreasing}</p>`;
+    document.getElementById('char-symmetry').innerHTML = `<p><strong>Symmetric about:</strong> The line x = ${h.toFixed(2)}</p>`;
     
     // Draw the graph
-    const graphContainer = document.getElementById('char-graph-container');
-    graphContainer.innerHTML = '';
+    drawQuadraticGraph('char-graph-container', a, h, k);
     
-    const canvas = document.createElement('canvas');
-    canvas.width = graphContainer.clientWidth;
-    canvas.height = graphContainer.clientHeight;
-    graphContainer.appendChild(canvas);
-    
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    
-    // Draw grid and axes (similar to previous implementations)
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    const gridSize = 30;
-    
-    // Draw vertical grid lines
-    for (let x = 0; x <= width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-    }
-    
-    // Draw horizontal grid lines
-    for (let y = 0; y <= height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-    }
-    
-    // Draw axes
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    
-    // x-axis
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2);
-    ctx.lineTo(width, height / 2);
-    ctx.stroke();
-    
-    // y-axis
-    ctx.beginPath();
-    ctx.moveTo(width / 2, 0);
-    ctx.lineTo(width / 2, height);
-    ctx.stroke();
-    
-    // Determine suitable range for x-axis based on vertex and intercepts
-    let xMin = Math.min(h - 3, -2);
-    let xMax = Math.max(h + 3, 2);
-    
-    // Include x-intercepts in the view if they exist
-    if (discriminant > 0) {
-        const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-        const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-        xMin = Math.min(xMin, x1 - 1, x2 - 1);
-        xMax = Math.max(xMax, x1 + 1, x2 + 1);
-    }
-    
-    const xRange = xMax - xMin;
-    
-    // Function to convert x coordinate to canvas x
-    function toCanvasX(x) {
-        return ((x - xMin) / xRange) * width;
-    }
-    
-    // Function to convert y coordinate to canvas y
-    function toCanvasY(y) {
-        // Scale y values to fit the chart
-        const yRange = Math.max(Math.abs(k) * 2, 6);
-        return height / 2 - (y * height / yRange / 2);
-    }
-    
-    // Draw the quadratic function
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    
-    for (let canvasX = 0; canvasX < width; canvasX++) {
-        const x = xMin + (canvasX / width) * xRange;
-        const y = a * x * x + b * x + c;
-        const canvasY = toCanvasY(y);
-        
-        if (canvasX === 0) {
-            ctx.moveTo(canvasX, canvasY);
-        } else {
-            ctx.lineTo(canvasX, canvasY);
-        }
-    }
-    
-    ctx.stroke();
-    
-    // Draw key points
-    
-    // Vertex
-    ctx.fillStyle = '#ef4444';
-    ctx.beginPath();
-    ctx.arc(toCanvasX(h), toCanvasY(k), 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(`(${h.toFixed(2)}, ${k.toFixed(2)})`, toCanvasX(h) + 8, toCanvasY(k) - 8);
-    
-    // y-intercept
-    ctx.fillStyle = '#10b981';
-    ctx.beginPath();
-    ctx.arc(toCanvasX(0), toCanvasY(c), 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.fillText(`(0, ${c.toFixed(2)})`, toCanvasX(0) + 8, toCanvasY(c) - 8);
-    
-    // x-intercepts if they exist
-    if (discriminant >= 0) {
-        ctx.fillStyle = '#f59e0b';
-        
-        if (discriminant > 0) {
-            const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-            const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-            
-            ctx.beginPath();
-            ctx.arc(toCanvasX(x1), toCanvasY(0), 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#000';
-            ctx.fillText(`(${x1.toFixed(2)}, 0)`, toCanvasX(x1) + 8, toCanvasY(0) - 8);
-            
-            ctx.fillStyle = '#f59e0b';
-            ctx.beginPath();
-            ctx.arc(toCanvasX(x2), toCanvasY(0), 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#000';
-            ctx.fillText(`(${x2.toFixed(2)}, 0)`, toCanvasX(x2) + 8, toCanvasY(0) - 8);
-        } else {
-            const x = -b / (2 * a);
-            
-            ctx.beginPath();
-            ctx.arc(toCanvasX(x), toCanvasY(0), 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#000';
-            ctx.fillText(`(${x.toFixed(2)}, 0)`, toCanvasX(x) + 8, toCanvasY(0) - 8);
-        }
-    }
-    
-    // Draw axis of symmetry
-    ctx.strokeStyle = '#9333ea';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(toCanvasX(h), 0);
-    ctx.lineTo(toCanvasX(h), height);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    document.getElementById('char-results').classList.remove('hidden');
 }
 
-// Initialize the page when DOM content is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up tab navigation
+// Function to draw a quadratic graph
+function drawQuadraticGraph(containerId, a, h, k) {
+    const container = document.getElementById(containerId);
+    
+    // Clear previous content
+    container.innerHTML = '';
+    
+    // Set up SVG
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.setAttribute('viewBox', `-10 -10 20 20`);
+    container.appendChild(svg);
+    
+    // Add grid lines
+    for (let i = -10; i <= 10; i++) {
+        if (i === 0) continue;
+        
+        // Vertical grid lines
+        const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vLine.setAttribute('x1', i);
+        vLine.setAttribute('y1', -10);
+        vLine.setAttribute('x2', i);
+        vLine.setAttribute('y2', 10);
+        vLine.setAttribute('stroke', '#e2e8f0');
+        vLine.setAttribute('stroke-width', '0.05');
+        svg.appendChild(vLine);
+        
+        // Horizontal grid lines
+        const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        hLine.setAttribute('x1', -10);
+        hLine.setAttribute('y1', i);
+        hLine.setAttribute('x2', 10);
+        hLine.setAttribute('y2', i);
+        hLine.setAttribute('stroke', '#e2e8f0');
+        hLine.setAttribute('stroke-width', '0.05');
+        svg.appendChild(hLine);
+    }
+    
+    // Add axes
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', -10);
+    xAxis.setAttribute('y1', 0);
+    xAxis.setAttribute('x2', 10);
+    xAxis.setAttribute('y2', 0);
+    xAxis.setAttribute('stroke', '#334155');
+    xAxis.setAttribute('stroke-width', '0.1');
+    svg.appendChild(xAxis);
+    
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', 0);
+    yAxis.setAttribute('y1', -10);
+    yAxis.setAttribute('x2', 0);
+    yAxis.setAttribute('y2', 10);
+    yAxis.setAttribute('stroke', '#334155');
+    yAxis.setAttribute('stroke-width', '0.1');
+    svg.appendChild(yAxis);
+    
+    // Draw quadratic function
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    let d = 'M';
+    
+    for (let x = -10; x <= 10; x += 0.1) {
+        const y = a * Math.pow(x - h, 2) + k;
+        
+        // Only draw points within the visible range
+        if (y >= -10 && y <= 10) {
+            if (d === 'M') {
+                d += `${x},${-y} L`;
+            } else {
+                d += `${x},${-y} `;
+            }
+        }
+    }
+    
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', '#3b82f6');
+    path.setAttribute('stroke-width', '0.2');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
+    
+    // Mark the vertex
+    if (h >= -10 && h <= 10 && k >= -10 && k <= 10) {
+        const vertex = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        vertex.setAttribute('cx', h);
+        vertex.setAttribute('cy', -k);
+        vertex.setAttribute('r', '0.2');
+        vertex.setAttribute('fill', '#ef4444');
+        svg.appendChild(vertex);
+    }
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     
-    // Add event listeners for buttons
+    // Identify function tab
     document.getElementById('identify-btn').addEventListener('click', identifyFunction);
+    
+    // Transformation tab
     document.getElementById('transform-btn').addEventListener('click', showTransformation);
+    
+    // Domain and Range tab
     document.getElementById('domain-btn').addEventListener('click', calculateDomainRange);
+    
+    // Match tab
     document.getElementById('generate-match-btn').addEventListener('click', generateMatchingProblem);
     document.getElementById('check-match-btn').addEventListener('click', checkMatchAnswer);
-    document.getElementById('char-btn').addEventListener('click', analyzeCharacteristics);
     
-    // Initialize with sample data
-    identifyFunction();
+    // Characteristics tab
+    document.getElementById('char-btn').addEventListener('click', analyzeCharacteristics);
 });
