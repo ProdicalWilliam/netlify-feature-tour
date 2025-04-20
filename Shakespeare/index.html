@@ -4,249 +4,634 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>William Shakespeare Author Study</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
     <style>
-        body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&display=swap');
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #8e44ad;
+            --accent: #f1c40f;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --text: #333;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f0f8ff;
-            color: #333;
+            box-sizing: border-box;
         }
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
+        
         header {
-            background-color: #4b2e83;
+            height: 100vh;
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)), url('https://research.arizona.edu/sites/default/files/shakespeare_header.png') center/cover no-repeat;
             color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 5px solid #gold;
-        }
-        h1 {
-            margin: 0;
-            font-size: 36px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .author-name {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            font-style: italic;
-            margin-top: 5px;
-        }
-        .section {
-            background-color: white;
-            margin: 20px 0;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #4b2e83;
-            border-bottom: 2px solid #ffb300;
-            padding-bottom: 5px;
-        }
-        .quote {
-            background-color: #fffae6;
-            border-left: 5px solid #ffb300;
-            padding: 15px;
-            margin: 20px 0;
-            font-style: italic;
-        }
-        .quote-author {
-            font-weight: bold;
-            text-align: right;
-        }
-        .works-list {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
         }
-        .work-item {
-            width: 48%;
+        
+        .header-content {
+            max-width: 800px;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        
+        section {
+            padding: 80px 0;
+        }
+        
+        section:nth-child(even) {
+            background-color: white;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            color: var(--primary);
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .card.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--secondary);
             margin-bottom: 15px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 5px;
+            font-size: 1.5rem;
         }
+        
+        .portrait {
+            width: 250px;
+            height: 300px;
+            object-fit: cover;
+            float: right;
+            margin: 0 0 20px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .work-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            transition: var(--transition);
+        }
+        
+        .work-card:hover {
+            transform: scale(1.03);
+        }
+        
         .work-title {
             font-weight: bold;
-            color: #4b2e83;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--primary);
         }
+        
         .work-year {
             font-style: italic;
-            color: #666;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
         }
-        .fun-fact {
-            background-color: #e6f7ff;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px dashed #4b2e83;
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 10px;
-            background-color: #4b2e83;
+        
+        .quote-container {
+            background: linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%);
             color: white;
-            font-size: 12px;
+            padding: 50px 0;
+            text-align: center;
         }
-        .portrait {
-            float: right;
-            margin: 0 0 15px 15px;
-            border: 3px solid #ffb300;
-            border-radius: 5px;
+        
+        .quote {
+            max-width: 800px;
+            margin: 0 auto;
+            font-style: italic;
+            font-size: 1.5rem;
+            line-height: 1.4;
+            position: relative;
+            padding: 0 40px;
         }
+        
+        .quote::before, .quote::after {
+            content: """;
+            font-size: 4rem;
+            position: absolute;
+            opacity: 0.3;
+        }
+        
+        .quote::before {
+            top: -20px;
+            left: 0;
+        }
+        
+        .quote::after {
+            bottom: -60px;
+            right: 0;
+            content: """;
+        }
+        
+        .quote-author {
+            margin-top: 20px;
+            font-size: 1rem;
+            font-style: normal;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--accent);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid var(--accent);
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+            text-align: right;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .left::after {
+            right: -13px;
+        }
+        
+        .right::after {
+            left: -13px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-year {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .fun-fact {
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            position: relative;
+            color: var(--dark);
+        }
+        
+        .fun-fact::before {
+            content: "!";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--accent);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .sources {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+        
+        /* Animations */
+        @keyframes slideFromLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideFromRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .animate-left {
+            animation: slideFromLeft 0.5s ease forwards;
+        }
+        
+        .animate-right {
+            animation: slideFromRight 0.5s ease forwards;
+        }
+        
+        ul {
+            list-style-position: inside;
+            margin-bottom: 20px;
+        }
+        
         ul li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        ul li::before {
+            content: "➤";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1 class="author-name">William Shakespeare</h1>
-        <p class="subtitle">English Honors 1 Author Study Project</p>
+        <div class="header-content">
+            <h1>William Shakespeare</h1>
+            <p class="subtitle">English Honors 1 Author Study Project</p>
+        </div>
+        <div class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </header>
 
-    <div class="container">
-        <div class="section">
-            <h2>Early Life & Background</h2>
-            <img class="portrait" src="/api/placeholder/250/300" alt="William Shakespeare Portrait">
-            <p>William Shakespeare was born on April 23, 1564, in Stratford-upon-Avon, England. He was one of eight children born to John Shakespeare, a successful glove-maker and local politician, and Mary Arden, who came from a wealthy farming family.</p>
-            <p>Shakespeare attended the local grammar school where he learned Latin, Greek, and classical literature. He didn't go to university like some writers of his time. When he was 18, he married Anne Hathaway, who was 8 years older than him. They had three children: Susanna and twins Hamnet and Judith.</p>
-            <p>Not much is known about Shakespeare's early career, but by the early 1590s, he had moved to London and was working as an actor and playwright. This period is sometimes called the "lost years" because we don't have many records about what he was doing.</p>
+    <section id="early-life">
+        <div class="container">
+            <h2 class="section-title">Early Life & Background</h2>
+            <div class="card">
+                <img class="portrait" src="https://upload.wikimedia.org/wikipedia/commons/2/21/William_Shakespeare_by_John_Taylor%2C_edited.jpg" alt="William Shakespeare Portrait">
+                <p>William Shakespeare was born on April 23, 1564, in Stratford-upon-Avon, England. He grew up in a pretty normal family. His dad, John Shakespeare, was a glove-maker and also worked in local government. His mom, Mary Arden, came from a farming family that had some money.</p>
+                
+                <p>Shakespeare went to the local grammar school where he learned Latin and Greek and read a lot of old stories. Unlike other famous writers, he didn't go to college. When he was 18, he married Anne Hathaway, who was 26 (which is kinda weird because she was way older than him). They had three kids together: a daughter named Susanna and twins named Hamnet and Judith.</p>
+                
+                <p>No one really knows what Shakespeare did for a few years after he got married. These years are called the "lost years" by historians because there aren't many records about him. But by the early 1590s, he had moved to London and was working as an actor and writing plays.</p>
+            </div>
             
             <div class="fun-fact">
-                <strong>Fun Fact:</strong> Shakespeare's name was spelled many different ways during his lifetime - even by himself! Some variations include "Shakspere," "Shaxpere," and "Shakspeare."
+                <strong>Fun Fact:</strong> People spelled Shakespeare's name differently ALL THE TIME - even he spelled it different ways in different documents! Some versions were "Shakspere," "Shaxpere," and "Shakspeare." Imagine if people couldn't decide how to spell your name!
             </div>
         </div>
+    </section>
 
-        <div class="section">
-            <h2>Most Important Works</h2>
-            <p>Shakespeare wrote approximately 37 plays and 154 sonnets during his lifetime. His works are typically divided into comedies, tragedies, histories, and romances.</p>
+    <section id="important-works">
+        <div class="container">
+            <h2 class="section-title">Most Important Works</h2>
+            <p>Shakespeare wrote about 37 plays and 154 sonnets (which are like poems). His plays are usually grouped into different types: comedies (funny ones), tragedies (sad ones where people die), histories (about kings and stuff), and romances (mix of happy and sad with magical elements).</p>
             
-            <div class="works-list">
-                <div class="work-item">
+            <div class="works-grid">
+                <div class="work-card">
                     <div class="work-title">Romeo and Juliet</div>
-                    <div class="work-year">(c. 1595)</div>
-                    <p>A tragic love story about two young lovers from feuding families.</p>
+                    <div class="work-year">(around 1595)</div>
+                    <p>This is the super famous one about two teenagers who fall in love even though their families hate each other. Everyone knows the balcony scene! It ends with both of them dying which is pretty sad. My English teacher says it's not really a love story but a warning about rushing into things.</p>
                 </div>
-                <div class="work-item">
+                
+                <div class="work-card">
                     <div class="work-title">Hamlet</div>
-                    <div class="work-year">(c. 1600)</div>
-                    <p>Psychological tragedy about a prince seeking revenge for his father's murder.</p>
+                    <div class="work-year">(around 1600)</div>
+                    <p>This one's about a prince whose dad was murdered by his uncle, who then married Hamlet's mom (gross!). Hamlet sees his dad's ghost who tells him to get revenge. He spends most of the play thinking about what to do and talking to himself. The "To be or not to be" speech is from this play.</p>
                 </div>
-                <div class="work-item">
+                
+                <div class="work-card">
                     <div class="work-title">Macbeth</div>
-                    <div class="work-year">(c. 1606)</div>
-                    <p>Tragedy about ambition, murder, and the supernatural.</p>
+                    <div class="work-year">(around 1606)</div>
+                    <p>This play is about a guy who wants to be king so badly that he murders the current king after some witches tell him he'll be king someday. Then he goes crazy with guilt and power. It has witches and ghosts and a lady who can't wash imaginary blood off her hands.</p>
                 </div>
-                <div class="work-item">
+                
+                <div class="work-card">
                     <div class="work-title">A Midsummer Night's Dream</div>
-                    <div class="work-year">(c. 1595)</div>
-                    <p>Comedy involving fairies, love potions, and confused lovers.</p>
+                    <div class="work-year">(around 1595)</div>
+                    <p>This is one of the funny plays with fairies and magic. There are these couples who get lost in a forest, and a fairy king and queen who are fighting, and some amateur actors putting on a play. One guy even gets turned into a donkey! It's pretty wild.</p>
                 </div>
-                <div class="work-item">
-                    <div class="work-title">Sonnets</div>
+                
+                <div class="work-card">
+                    <div class="work-title">The Sonnets</div>
                     <div class="work-year">(published 1609)</div>
-                    <p>Collection of 154 poems dealing with love, beauty, mortality, and time.</p>
+                    <p>Shakespeare wrote 154 of these poems that all follow the same pattern (14 lines with a specific rhyme scheme). They're about love, beauty, time passing, and death. Some are to a "fair youth" (maybe a guy Shakespeare admired?) and some to a "dark lady."</p>
                 </div>
-                <div class="work-item">
+                
+                <div class="work-card">
                     <div class="work-title">The Tempest</div>
-                    <div class="work-year">(c. 1611)</div>
-                    <p>Romance about a magician stranded on an island seeking justice.</p>
+                    <div class="work-year">(around 1611)</div>
+                    <p>This was one of Shakespeare's last plays. It's about a magician named Prospero who lives on an island with his daughter Miranda and controls spirits and a monster. He creates a storm to bring his enemies to the island so he can get revenge, but then decides to forgive them instead.</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="section">
-            <h2>Themes, Writing Style & Genre</h2>
-            
-            <h3>Common Themes</h3>
-            <ul>
-                <li><strong>Love and Relationships</strong> - Shakespeare explores different types of love: romantic, familial, friendship</li>
-                <li><strong>Power and Ambition</strong> - Many characters struggle with desires for power and its corrupting influence</li>
-                <li><strong>Fate vs. Free Will</strong> - Characters often question whether they control their destiny</li>
-                <li><strong>Appearance vs. Reality</strong> - Things are not always what they seem in Shakespeare's worlds</li>
-                <li><strong>Order and Chaos</strong> - The natural order being disrupted and eventually restored</li>
-            </ul>
-            
-            <h3>Writing Style</h3>
-            <p>Shakespeare's writing is known for:</p>
-            <ul>
-                <li>Masterful use of <strong>blank verse</strong> (unrhymed iambic pentameter)</li>
-                <li>Rich <strong>wordplay</strong>, including puns and double meanings</li>
-                <li>Creation of <strong>new words and phrases</strong> that we still use today</li>
-                <li><strong>Soliloquies</strong> that reveal characters' inner thoughts</li>
-                <li>Blending <strong>high and low language</strong> - from poetic to crude</li>
-            </ul>
-            
-            <h3>Genres</h3>
-            <p>Shakespeare wrote across multiple genres:</p>
-            <ul>
-                <li><strong>Comedies</strong>: End happily, often with marriages</li>
-                <li><strong>Tragedies</strong>: End with death of the protagonist and others</li>
-                <li><strong>Histories</strong>: Based on English kings and historical events</li>
-                <li><strong>Romances/Problem Plays</strong>: Mix elements of comedy and tragedy</li>
-                <li><strong>Poetry</strong>: Sonnets following a specific 14-line structure</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Awards, Accomplishments & Influence</h2>
-            
-            <p>While formal literary awards didn't exist during Shakespeare's time, his accomplishments and influence are unparalleled:</p>
-            
-            <ul>
-                <li>Became a <strong>shareholder in the Lord Chamberlain's Men</strong> (later the King's Men), one of the most popular acting companies</li>
-                <li>Co-owned the <strong>Globe Theatre</strong> in London</li>
-                <li>Performed for <strong>Queen Elizabeth I</strong> and <strong>King James I</strong></li>
-                <li>Achieved financial success that allowed him to retire to Stratford as a wealthy man</li>
-                <li>Created characters and stories that have been <strong>performed continuously for over 400 years</strong></li>
-                <li>His works have been <strong>translated into every major language</strong> on Earth</li>
-                <li>Added over <strong>1,700 words to the English language</strong> including "bedroom," "generous," "lonely," and "critic"</li>
-                <li>His phrases like "break the ice," "heart of gold," and "wild goose chase" are still used today</li>
-            </ul>
-            
-            <div class="fun-fact">
-                <strong>Legacy Fact:</strong> Shakespeare's works have been adapted into operas, ballets, paintings, films, musicals, and even video games. His plays are performed somewhere in the world every single day!
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Quotes From & About Shakespeare</h2>
-            
-            <div class="quote">
-                "All the world's a stage, and all the men and women merely players. They have their exits and their entrances; And one man in his time plays many parts."
-                <div class="quote-author">- William Shakespeare, "As You Like It"</div>
-            </div>
-            
-            <div class="quote">
-                "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles And by opposing end them."
-                <div class="quote-author">- William Shakespeare, "Hamlet"</div>
-            </div>
-            
-            <div class="quote">
-                "He was not of an age, but for all time!"
-                <div class="quote-author">- Ben Jonson (fellow playwright), 1623</div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2>Why Shakespeare Matters Today</h2>
-            <p>Shakespeare's works continue to be relevant because they explore universal human experiences and emotions that people still relate to today. His plays are constantly reimagined in modern settings, proving how adaptable and timeless his stories are.</p>
-            <p>In schools, Shakespeare helps students learn about literary devices, language evolution, historical contexts, and human psychology. His influence extends beyond literature into psychology, philosophy, politics, and countless other fields.</p>
-            <p>Even if we don't realize it, Shakespeare's language and stories are deeply embedded in our culture. We reference his works daily without even knowing it!</p>
+    <div class="quote-container">
+        <div class="quote">
+            "All the world's a stage, and all the men and women merely players. They have their exits and their entrances; And one man in his time plays many parts."
+            <div class="quote-author">- William Shakespeare, "As You Like It"</div>
         </div>
     </div>
 
+    <section id="themes-style">
+        <div class="container">
+            <h2 class="section-title">Themes, Writing Style & Genre</h2>
+            
+            <div class="card">
+                <h3 class="card-title">Common Themes</h3>
+                <ul>
+                    <li><strong>Love and Relationships</strong> - Shakespeare wrote A LOT about different kinds of love. Not just boyfriend/girlfriend love, but family love, friendship, and unrequited love (when someone doesn't love you back).</li>
+                    <li><strong>Power and Ambition</strong> - Like in Macbeth, characters who want power too much usually end up destroying themselves and others.</li>
+                    <li><strong>Fate vs. Free Will</strong> - Shakespeare was always asking if we control our own destiny or if some things are just meant to happen (like Romeo and Juliet being "star-crossed lovers").</li>
+                    <li><strong>Appearance vs. Reality</strong> - Shakespeare LOVES disguises and mistaken identity. Characters are always pretending to be someone else or things aren't what they seem.</li>
+                    <li><strong>Order and Chaos</strong> - Usually his plays start with everything normal, then everything gets crazy and mixed up, and by the end things are back to normal (in comedies) or everyone's dead (in tragedies).</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Writing Style</h3>
+                <p>Shakespeare's writing is known for:</p>
+                <ul>
+                    <li>Using <strong>blank verse</strong> which is like poetry without rhymes that goes da-DUM da-DUM da-DUM da-DUM da-DUM (that's iambic pentameter)</li>
+                    <li>Tons of <strong>wordplay</strong> and puns - he loved making jokes with words that have double meanings</li>
+                    <li>Making up <strong>new words</strong> when he couldn't find the right one - he invented over 1,700 words we still use!</li>
+                    <li><strong>Soliloquies</strong> where characters talk to themselves/the audience about their feelings (like Hamlet's "To be or not to be")</li>
+                    <li>Using both fancy poetic language AND crude jokes - sometimes in the same scene!</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Genres</h3>
+                <p>Shakespeare didn't stick to just one type of writing:</p>
+                <ul>
+                    <li><strong>Comedies</strong>: These usually end with weddings and everyone happy. They have funny mix-ups, disguises, and clever wordplay. Examples: Much Ado About Nothing, Twelfth Night</li>
+                    <li><strong>Tragedies</strong>: These end with the main character and usually lots of others dying. They're about big emotions like jealousy, revenge, and ambition. Examples: Hamlet, King Lear, Othello</li>
+                    <li><strong>Histories</strong>: These are based on real English kings and historical events. Examples: Henry V, Richard III</li>
+                    <li><strong>Romances/Problem Plays</strong>: These are weird ones that mix happy and sad elements and often have magic or supernatural stuff. Examples: The Tempest, The Winter's Tale</li>
+                    <li><strong>Poetry</strong>: His sonnets follow a specific pattern of 14 lines with a rhyme scheme of ABABCDCDEFEFGG (which I had to memorize for class)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="accomplishments">
+        <div class="container">
+            <h2 class="section-title">Awards, Accomplishments & Influence</h2>
+            
+            <p>Shakespeare didn't win Grammys or Oscars because those didn't exist back then, but he was still super successful:</p>
+            
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-year">1590s</div>
+                        <p>Became part of the Lord Chamberlain's Men acting company (later renamed the King's Men) - this was like being in a super popular Broadway company</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">1599</div>
+                        <p>Became part-owner of the Globe Theatre in London - imagine owning part of Madison Square Garden!</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="timeline-year">Early 1600s</div>
+                        <p>Performed for Queen Elizabeth I and King James I - basically like performing at the White House</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">1613</div>
+                        <p>Retired to Stratford-upon-Avon as a rich and respected man - he made enough money from writing plays to buy one of the biggest houses in his hometown!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Why Shakespeare Is Still Important</h3>
+                <ul>
+                    <li>His plays have been performed continuously for over 400 years - no other writer can say that!</li>
+                    <li>His works have been translated into EVERY major language on Earth</li>
+                    <li>He added over 1,700 words to English like "bedroom," "generous," "lonely," and "critic" - imagine inventing words that everyone uses!</li>
+                    <li>We use his phrases all the time without knowing it: "break the ice," "heart of gold," "wild goose chase" - these are all Shakespeare!</li>
+                    <li>His stories are constantly being remade into movies and TV shows - "The Lion King" is basically "Hamlet" with lions, and "10 Things I Hate About You" is based on "The Taming of the Shrew"</li>
+                </ul>
+            </div>
+            
+            <div class="fun-fact">
+                <strong>Legacy Fact:</strong> Shakespeare's works are performed somewhere in the world EVERY SINGLE DAY. That's over 400 years of non-stop performances! Even TikTok trends don't last that long!
+            </div>
+        </div>
+    </section>
+
+    <div class="quote-container">
+        <div class="quote">
+            "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles And by opposing end them."
+            <div class="quote-author">- William Shakespeare, "Hamlet"</div>
+        </div>
+    </div>
+
+    <section id="relevance">
+        <div class="container">
+            <h2 class="section-title">Why Shakespeare Matters Today</h2>
+            
+            <div class="card">
+                <p>Shakespeare's stories are still super relevant because they're about things all humans deal with - love, jealousy, ambition, family drama, etc. That's why his plays keep getting updated into modern settings (like "Romeo + Juliet" with Leonardo DiCaprio).</p>
+                
+                <p>In school, we study Shakespeare to learn about literary devices (like metaphors and stuff), how language has changed over time, what life was like in Elizabethan England, and to understand references in modern culture. Plus, colleges want you to know this stuff.</p>
+                
+                <p>Shakespeare's impact goes WAY beyond just literature - his work has influenced psychology (like understanding human motives), philosophy, politics, and pretty much everything else. He basically helped shape how we think about what it means to be human.</p>
+                
+                <p>Even if you think Shakespeare is boring, you're probably quoting him without knowing it. His language is everywhere in our everyday speech. And every time you watch a story about star-crossed lovers or a character driven mad by ambition or someone getting revenge, you're seeing Shakespeare's influence!</p>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <p>Author Study Project by Student Name | English Honors 1 | Spring 2025</p>
-        <p>Sources: Folger Shakespeare Library, Royal Shakespeare Company, Encyclopedia Britannica</p>
+        <p class="sources">Sources: Folger Shakespeare Library, Royal Shakespeare Company, Encyclopedia Britannica</p>
     </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelector('.scroll-down').addEventListener('click', function() {
+            document.querySelector('#early-life').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        });
+        
+        // Scroll animation for cards
+        const cards = document.querySelectorAll('.card');
+        const workCards = document.querySelectorAll('.work-card');
+        
+        function checkScroll() {
+            cards.forEach(card => {
+                const cardTop = card.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (cardTop < windowHeight - 100) {
+                    card.classList.add('animated');
+                }
+            });
+            
+            workCards.forEach((card, index) => {
+                const cardTop = card.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (cardTop < windowHeight - 50) {
+                    setTimeout(() => {
+                        card.style.opacity = '0';
+                        card.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
+                    }, index * 100);
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', checkScroll);
+        window.addEventListener('load', checkScroll);
+        
+        // Animation for timeline items
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        
+        function animateTimeline() {
+            timelineItems.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (itemTop < windowHeight - 100) {
+                    if (item.classList.contains('left')) {
+                        item.classList.add('animate-left');
+                    } else {
+                        item.classList.add('animate-right');
+                    }
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', animateTimeline);
+        window.addEventListener('load', animateTimeline);
+    </script>
 </body>
 </html>
