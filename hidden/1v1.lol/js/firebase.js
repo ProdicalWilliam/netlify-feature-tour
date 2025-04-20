@@ -1,29 +1,28 @@
 function initializeFireBase(){
 	// Your web app's Firebase configuration
 	var firebaseConfig = {
-	apiKey: "AIzaSyBPrAfspM9RFxuNuDtSyaOZ5YRjDBNiq5I",
-	authDomain: "1v1.lol",
-	databaseURL: "https://justbuild-cdb86.firebaseio.com",
-	projectId: "justbuild-cdb86",
-	storageBucket: "justbuild-cdb86.appspot.com",
-	messagingSenderId: "93158914000",
-	appId: "1:93158914000:web:e73a8b453338ab7c"
-	};
-	// Initialize Firebase
-	firebase.initializeApp(firebaseConfig);
-}
+	apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+  authDomain: "spotify-795ab.firebaseapp.com",
+  databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+  projectId: "spotify-795ab",
+  storageBucket: "spotify-795ab.firebasestorage.app",
+  messagingSenderId: "907464366407",
+  appId: "1:907464366407:web:e8915a98e9a3719bdb1462",
+  measurementId: "G-TT6RD9XYR6"
+};
 
 function initializeFireBaseDev(){
 	// Your web app's Firebase configuration
 	var firebaseConfig = {
-	apiKey: "AIzaSyANZ0SDhqoc62msSooQFs3SEb4XbC7gvk4",
-	authDomain: "dev.1v1.lol",
-	databaseURL: "https://dev1v1.firebaseio.com",
-	projectId: "dev1v1",
-	storageBucket: "dev1v1.appspot.com",
-	messagingSenderId: "90097883404",
-	appId: "1:90097883404:android:0931a7bbf3e74f2b9a5129"
-	};
+	apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+  authDomain: "spotify-795ab.firebaseapp.com",
+  databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+  projectId: "spotify-795ab",
+  storageBucket: "spotify-795ab.firebasestorage.app",
+  messagingSenderId: "907464366407",
+  appId: "1:907464366407:web:e8915a98e9a3719bdb1462",
+  measurementId: "G-TT6RD9XYR6"
+};
 	// Initialize Firebase
 	firebase.initializeApp(firebaseConfig);
 }
