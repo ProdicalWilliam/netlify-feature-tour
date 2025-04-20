@@ -1,29 +1,27 @@
-# Williams
+# Prodigal William Inc.
 
-[Visit Dazes.org](https://dazes.org)
+![Prodigal William Inc.](https://i.ibb.co/npVxVH7/github-header-image.png)
 
 ## Overview
 
-Williams is an innovative project by [ProdicalWilliam](https://github.com/ProdicalWilliam) designed to deliver creative web experiences. This repository contains the source code, assets, and detailed documentation to help you understand and contribute to the project.
+This public repository contains resources developed and maintained by Prodigal William Inc.
 
-## Features
+## License
 
-- **Modern Design:** Enjoy a clean, responsive layout that works seamlessly on all devices.
-- **User-Friendly Interface:** Navigate intuitively with engaging UI components.
-- **Open Source:** Contributions are welcome! See the [Contributing Guidelines](#contributing) for more details.
-- **Live Demo:** Experience the project live at [Dazes.org](https://dazes.org).
+**Copyright © 2025 Prodigal William Inc. All Rights Reserved.**
 
-## Installation
+Permission to use, copy, modify, or distribute any content from this repository must be obtained through explicit written authorization from Prodigal William Inc.
 
-To set up the project locally, follow these steps:
+### Important Notice
 
-1. **Download the Repository:**  
-   Obtain the project files via a ZIP download or your preferred method.
+- Viewing this repository's contents is permitted
+- Any usage without prior written permission is strictly prohibited
+- Unauthorized use may result in legal action
 
-2. **Navigate to the Project Directory:**  
-   Open your terminal and move to the project directory.
+## Legal Status
 
-3. **Install Dependencies:**  
-   Ensure you have [Node.js](https://nodejs.org/) installed, then run:
-   ```bash
-   npm install
+The materials in this repository are protected by copyright and intellectual property laws. Access to this repository does not constitute a transfer of any rights to its contents.
+
+---
+
+**Prodigal William Inc.** | 2025
