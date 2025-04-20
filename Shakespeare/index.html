@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>William Shakespeare Author Study</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4b2e83;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid #gold;
+        }
+        h1 {
+            margin: 0;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .author-name {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .section {
+            background-color: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #4b2e83;
+            border-bottom: 2px solid #ffb300;
+            padding-bottom: 5px;
+        }
+        .quote {
+            background-color: #fffae6;
+            border-left: 5px solid #ffb300;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        .quote-author {
+            font-weight: bold;
+            text-align: right;
+        }
+        .works-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .work-item {
+            width: 48%;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .work-title {
+            font-weight: bold;
+            color: #4b2e83;
+        }
+        .work-year {
+            font-style: italic;
+            color: #666;
+        }
+        .fun-fact {
+            background-color: #e6f7ff;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px dashed #4b2e83;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #4b2e83;
+            color: white;
+            font-size: 12px;
+        }
+        .portrait {
+            float: right;
+            margin: 0 0 15px 15px;
+            border: 3px solid #ffb300;
+            border-radius: 5px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="author-name">William Shakespeare</h1>
+        <p class="subtitle">English Honors 1 Author Study Project</p>
+    </header>
+
+    <div class="container">
+        <div class="section">
+            <h2>Early Life & Background</h2>
+            <img class="portrait" src="/api/placeholder/250/300" alt="William Shakespeare Portrait">
+            <p>William Shakespeare was born on April 23, 1564, in Stratford-upon-Avon, England. He was one of eight children born to John Shakespeare, a successful glove-maker and local politician, and Mary Arden, who came from a wealthy farming family.</p>
+            <p>Shakespeare attended the local grammar school where he learned Latin, Greek, and classical literature. He didn't go to university like some writers of his time. When he was 18, he married Anne Hathaway, who was 8 years older than him. They had three children: Susanna and twins Hamnet and Judith.</p>
+            <p>Not much is known about Shakespeare's early career, but by the early 1590s, he had moved to London and was working as an actor and playwright. This period is sometimes called the "lost years" because we don't have many records about what he was doing.</p>
+            
+            <div class="fun-fact">
+                <strong>Fun Fact:</strong> Shakespeare's name was spelled many different ways during his lifetime - even by himself! Some variations include "Shakspere," "Shaxpere," and "Shakspeare."
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Most Important Works</h2>
+            <p>Shakespeare wrote approximately 37 plays and 154 sonnets during his lifetime. His works are typically divided into comedies, tragedies, histories, and romances.</p>
+            
+            <div class="works-list">
+                <div class="work-item">
+                    <div class="work-title">Romeo and Juliet</div>
+                    <div class="work-year">(c. 1595)</div>
+                    <p>A tragic love story about two young lovers from feuding families.</p>
+                </div>
+                <div class="work-item">
+                    <div class="work-title">Hamlet</div>
+                    <div class="work-year">(c. 1600)</div>
+                    <p>Psychological tragedy about a prince seeking revenge for his father's murder.</p>
+                </div>
+                <div class="work-item">
+                    <div class="work-title">Macbeth</div>
+                    <div class="work-year">(c. 1606)</div>
+                    <p>Tragedy about ambition, murder, and the supernatural.</p>
+                </div>
+                <div class="work-item">
+                    <div class="work-title">A Midsummer Night's Dream</div>
+                    <div class="work-year">(c. 1595)</div>
+                    <p>Comedy involving fairies, love potions, and confused lovers.</p>
+                </div>
+                <div class="work-item">
+                    <div class="work-title">Sonnets</div>
+                    <div class="work-year">(published 1609)</div>
+                    <p>Collection of 154 poems dealing with love, beauty, mortality, and time.</p>
+                </div>
+                <div class="work-item">
+                    <div class="work-title">The Tempest</div>
+                    <div class="work-year">(c. 1611)</div>
+                    <p>Romance about a magician stranded on an island seeking justice.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Themes, Writing Style & Genre</h2>
+            
+            <h3>Common Themes</h3>
+            <ul>
+                <li><strong>Love and Relationships</strong> - Shakespeare explores different types of love: romantic, familial, friendship</li>
+                <li><strong>Power and Ambition</strong> - Many characters struggle with desires for power and its corrupting influence</li>
+                <li><strong>Fate vs. Free Will</strong> - Characters often question whether they control their destiny</li>
+                <li><strong>Appearance vs. Reality</strong> - Things are not always what they seem in Shakespeare's worlds</li>
+                <li><strong>Order and Chaos</strong> - The natural order being disrupted and eventually restored</li>
+            </ul>
+            
+            <h3>Writing Style</h3>
+            <p>Shakespeare's writing is known for:</p>
+            <ul>
+                <li>Masterful use of <strong>blank verse</strong> (unrhymed iambic pentameter)</li>
+                <li>Rich <strong>wordplay</strong>, including puns and double meanings</li>
+                <li>Creation of <strong>new words and phrases</strong> that we still use today</li>
+                <li><strong>Soliloquies</strong> that reveal characters' inner thoughts</li>
+                <li>Blending <strong>high and low language</strong> - from poetic to crude</li>
+            </ul>
+            
+            <h3>Genres</h3>
+            <p>Shakespeare wrote across multiple genres:</p>
+            <ul>
+                <li><strong>Comedies</strong>: End happily, often with marriages</li>
+                <li><strong>Tragedies</strong>: End with death of the protagonist and others</li>
+                <li><strong>Histories</strong>: Based on English kings and historical events</li>
+                <li><strong>Romances/Problem Plays</strong>: Mix elements of comedy and tragedy</li>
+                <li><strong>Poetry</strong>: Sonnets following a specific 14-line structure</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Awards, Accomplishments & Influence</h2>
+            
+            <p>While formal literary awards didn't exist during Shakespeare's time, his accomplishments and influence are unparalleled:</p>
+            
+            <ul>
+                <li>Became a <strong>shareholder in the Lord Chamberlain's Men</strong> (later the King's Men), one of the most popular acting companies</li>
+                <li>Co-owned the <strong>Globe Theatre</strong> in London</li>
+                <li>Performed for <strong>Queen Elizabeth I</strong> and <strong>King James I</strong></li>
+                <li>Achieved financial success that allowed him to retire to Stratford as a wealthy man</li>
+                <li>Created characters and stories that have been <strong>performed continuously for over 400 years</strong></li>
+                <li>His works have been <strong>translated into every major language</strong> on Earth</li>
+                <li>Added over <strong>1,700 words to the English language</strong> including "bedroom," "generous," "lonely," and "critic"</li>
+                <li>His phrases like "break the ice," "heart of gold," and "wild goose chase" are still used today</li>
+            </ul>
+            
+            <div class="fun-fact">
+                <strong>Legacy Fact:</strong> Shakespeare's works have been adapted into operas, ballets, paintings, films, musicals, and even video games. His plays are performed somewhere in the world every single day!
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Quotes From & About Shakespeare</h2>
+            
+            <div class="quote">
+                "All the world's a stage, and all the men and women merely players. They have their exits and their entrances; And one man in his time plays many parts."
+                <div class="quote-author">- William Shakespeare, "As You Like It"</div>
+            </div>
+            
+            <div class="quote">
+                "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles And by opposing end them."
+                <div class="quote-author">- William Shakespeare, "Hamlet"</div>
+            </div>
+            
+            <div class="quote">
+                "He was not of an age, but for all time!"
+                <div class="quote-author">- Ben Jonson (fellow playwright), 1623</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Why Shakespeare Matters Today</h2>
+            <p>Shakespeare's works continue to be relevant because they explore universal human experiences and emotions that people still relate to today. His plays are constantly reimagined in modern settings, proving how adaptable and timeless his stories are.</p>
+            <p>In schools, Shakespeare helps students learn about literary devices, language evolution, historical contexts, and human psychology. His influence extends beyond literature into psychology, philosophy, politics, and countless other fields.</p>
+            <p>Even if we don't realize it, Shakespeare's language and stories are deeply embedded in our culture. We reference his works daily without even knowing it!</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Author Study Project by Student Name | English Honors 1 | Spring 2025</p>
+        <p>Sources: Folger Shakespeare Library, Royal Shakespeare Company, Encyclopedia Britannica</p>
+    </footer>
+</body>
+</html>
