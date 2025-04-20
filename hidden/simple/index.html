@@ -1,1221 +1,1213 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Messages-512.png" type="image/png">
-  <title>Messages</title>
-  <!--- Firebase SDK via CDN --->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-app-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-auth-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-database-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-storage-compat.min.js"></script>
-</head>
-<body>
-  <div class="phone-container">
-    <div class="phone">
-      <div class="notch">
-        <div class="speaker"></div>
-      </div>
-      <div class="phone-content">
-        <!-- Auth Container -->
-        <div id="auth-container" class="auth-container">
-          <div class="auth-header">
-            <img src="https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Messages-512.png" alt="Messages" class="auth-logo">
-            <h2>Messages</h2>
-          </div>
-          <div id="login-form" class="auth-form">
-            <h3>Sign In</h3>
-            <input type="email" id="login-email" placeholder="Email" class="auth-input">
-            <input type="password" id="login-password" placeholder="Password" class="auth-input">
-            <button id="login-button" class="auth-button">Sign In</button>
-            <p class="auth-switch">Don't have an account? <a href="#" id="switch-to-register">Sign Up</a></p>
-          </div>
-          <div id="register-form" class="auth-form hidden">
-            <h3>Sign Up</h3>
-            <input type="text" id="register-username" placeholder="Username" class="auth-input">
-            <input type="email" id="register-email" placeholder="Email" class="auth-input">
-            <input type="password" id="register-password" placeholder="Password" class="auth-input">
-            <button id="register-button" class="auth-button">Sign Up</button>
-            <p class="auth-switch">Already have an account? <a href="#" id="switch-to-login">Sign In</a></p>
-          </div>
-        </div>
-
-        <!-- App Container -->
-        <div id="app-container" class="app-container hidden">
-          <!-- Profile Header -->
-          <div class="app-header">
-            <div class="profile-action">
-              <button id="edit-profile-button" class="text-button">Edit</button>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Messages-512.png" type="image/png">
+      <title>Messages</title>
+      <!--- Firebase SDK via CDN --->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-app-compat.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-auth-compat.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-database-compat.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.19.1/firebase-storage-compat.min.js"></script>
+   </head>
+   <body>
+      <div class="phone-container">
+         <div class="phone">
+            <div class="notch">
+               <div class="speaker"></div>
             </div>
-            <h1>Messages</h1>
-            <div class="profile-action">
-              <button id="logout-button" class="text-button">Sign Out</button>
-            </div>
-          </div>
-
-          <!-- Profile Edit Modal -->
-          <div id="profile-modal" class="modal hidden">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3>Edit Profile</h3>
-                <button id="close-profile-modal" class="close-button">&times;</button>
-              </div>
-              <div class="profile-edit">
-                <div class="profile-picture-container">
-                  <div id="profile-picture-preview" class="profile-picture profile-picture-large">
-                    <span id="profile-initial">?</span>
-                    <img id="profile-image" class="hidden" alt="Profile">
+            <div class="phone-content">
+               <!-- Auth Container -->
+               <div id="auth-container" class="auth-container">
+                  <div class="auth-header">
+                     <img src="https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Messages-512.png" alt="Messages" class="auth-logo">
+                     <h2>Messages</h2>
                   </div>
-                  <button id="change-picture-button" class="text-button">Change Picture</button>
-                  <input type="file" id="profile-picture-input" accept="image/*" class="hidden">
-                </div>
-                <div class="profile-name-edit">
-                  <label for="profile-name-input">Display Name</label>
-                  <input type="text" id="profile-name-input" class="auth-input" placeholder="Your name">
-                </div>
-                <button id="save-profile-button" class="auth-button">Save Changes</button>
-              </div>
+                  <div id="login-form" class="auth-form">
+                     <h3>Sign In</h3>
+                     <input type="email" id="login-email" placeholder="Email" class="auth-input">
+                     <input type="password" id="login-password" placeholder="Password" class="auth-input">
+                     <button id="login-button" class="auth-button">Sign In</button>
+                     <p class="auth-switch">Don't have an account? <a href="#" id="switch-to-register">Sign Up</a></p>
+                  </div>
+                  <div id="register-form" class="auth-form hidden">
+                     <h3>Sign Up</h3>
+                     <input type="text" id="register-username" placeholder="Username" class="auth-input">
+                     <input type="email" id="register-email" placeholder="Email" class="auth-input">
+                     <input type="password" id="register-password" placeholder="Password" class="auth-input">
+                     <button id="register-button" class="auth-button">Sign Up</button>
+                     <p class="auth-switch">Already have an account? <a href="#" id="switch-to-login">Sign In</a></p>
+                  </div>
+               </div>
+               <!-- App Container -->
+               <div id="app-container" class="app-container hidden">
+                  <!-- Profile Header -->
+                  <div class="app-header">
+                     <div class="profile-action">
+                        <button id="edit-profile-button" class="text-button">Edit</button>
+                     </div>
+                     <h1>Messages</h1>
+                     <div class="profile-action">
+                        <button id="logout-button" class="text-button">Sign Out</button>
+                     </div>
+                  </div>
+                  <!-- Profile Edit Modal -->
+                  <div id="profile-modal" class="modal hidden">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h3>Edit Profile</h3>
+                           <button id="close-profile-modal" class="close-button">&times;</button>
+                        </div>
+                        <div class="profile-edit">
+                           <div class="profile-picture-container">
+                              <div id="profile-picture-preview" class="profile-picture profile-picture-large">
+                                 <span id="profile-initial">?</span>
+                                 <img id="profile-image" class="hidden" alt="Profile">
+                              </div>
+                              <button id="change-picture-button" class="text-button">Change Picture</button>
+                              <input type="file" id="profile-picture-input" accept="image/*" class="hidden">
+                           </div>
+                           <div class="profile-name-edit">
+                              <label for="profile-name-input">Display Name</label>
+                              <input type="text" id="profile-name-input" class="auth-input" placeholder="Your name">
+                           </div>
+                           <button id="save-profile-button" class="auth-button">Save Changes</button>
+                        </div>
+                     </div>
+                  </div>
+                  <!-- Tabs Navigation -->
+                  <div class="tabs">
+                     <div id="tab-chats" class="tab active">Chats</div>
+                     <div id="tab-friends" class="tab">Friends</div>
+                     <div id="tab-requests" class="tab">Requests <span id="request-badge" class="badge hidden">0</span></div>
+                  </div>
+                  <!-- Chats Container -->
+                  <div id="chats-container" class="tab-content">
+                     <div id="search-container" class="search-container">
+                        <div class="search-bar">
+                           <span class="search-icon">🔍</span>
+                           <input type="text" id="search-chats" placeholder="Search">
+                        </div>
+                     </div>
+                     <div id="chat-list" class="chat-list">
+                        <!-- Chat items will be added here -->
+                     </div>
+                  </div>
+                  <!-- Friends Container -->
+                  <div id="friends-container" class="tab-content hidden">
+                     <div class="search-container">
+                        <div class="search-bar">
+                           <span class="search-icon">🔍</span>
+                           <input type="text" id="friend-username" placeholder="Find friends by username">
+                        </div>
+                        <button id="add-friend-button" class="action-button">
+                        <span class="add-icon">+</span> Add Friend
+                        </button>
+                     </div>
+                     <div id="friends-list" class="friends-list">
+                        <!-- Friend items will be added here -->
+                     </div>
+                  </div>
+                  <!-- Friend Requests Container -->
+                  <div id="requests-container" class="tab-content hidden">
+                     <h3 class="section-header">Friend Requests</h3>
+                     <div id="friend-requests-list" class="friends-list">
+                        <!-- Friend request items will be added here -->
+                     </div>
+                  </div>
+               </div>
+               <!-- Chat View -->
+               <div id="chat-view" class="chat-view hidden">
+                  <div class="chat-header">
+                     <button id="back-button" class="back-button">
+                     <span class="back-arrow">←</span>
+                     <span>Messages</span>
+                     </button>
+                     <div class="chat-header-info">
+                        <div id="chat-recipient-picture" class="profile-picture profile-picture-small">
+                           <span id="chat-recipient-initial">?</span>
+                           <img id="chat-recipient-image" class="hidden" alt="Recipient">
+                        </div>
+                        <h3 id="chat-recipient">Recipient</h3>
+                     </div>
+                     <div class="chat-options">
+                        <button id="chat-info-button" class="text-button">Info</button>
+                     </div>
+                  </div>
+                  <div id="messages-container" class="messages-container">
+                     <div id="messages-list" class="messages-list">
+                        <!-- Messages will be added here -->
+                     </div>
+                  </div>
+                  <div class="message-input-container">
+                     <button id="plus-button" class="circle-button">+</button>
+                     <div class="message-input-wrapper">
+                        <input type="text" id="message-input" placeholder="iMessage" class="message-input">
+                     </div>
+                     <button id="send-button" class="circle-button send-button hidden">↑</button>
+                     <button id="mic-button" class="circle-button">🎤</button>
+                  </div>
+               </div>
             </div>
-          </div>
-
-          <!-- Tabs Navigation -->
-          <div class="tabs">
-            <div id="tab-chats" class="tab active">Chats</div>
-            <div id="tab-friends" class="tab">Friends</div>
-            <div id="tab-requests" class="tab">Requests <span id="request-badge" class="badge hidden">0</span></div>
-          </div>
-
-          <!-- Chats Container -->
-          <div id="chats-container" class="tab-content">
-            <div id="search-container" class="search-container">
-              <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="search-chats" placeholder="Search">
-              </div>
-            </div>
-            <div id="chat-list" class="chat-list">
-              <!-- Chat items will be added here -->
-            </div>
-          </div>
-
-          <!-- Friends Container -->
-          <div id="friends-container" class="tab-content hidden">
-            <div class="search-container">
-              <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="friend-username" placeholder="Find friends by username">
-              </div>
-              <button id="add-friend-button" class="action-button">
-                <span class="add-icon">+</span> Add Friend
-              </button>
-            </div>
-            <div id="friends-list" class="friends-list">
-              <!-- Friend items will be added here -->
-            </div>
-          </div>
-
-          <!-- Friend Requests Container -->
-          <div id="requests-container" class="tab-content hidden">
-            <h3 class="section-header">Friend Requests</h3>
-            <div id="friend-requests-list" class="friends-list">
-              <!-- Friend request items will be added here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat View -->
-        <div id="chat-view" class="chat-view hidden">
-          <div class="chat-header">
-            <button id="back-button" class="back-button">
-              <span class="back-arrow">←</span>
-              <span>Messages</span>
-            </button>
-            <div class="chat-header-info">
-              <div id="chat-recipient-picture" class="profile-picture profile-picture-small">
-                <span id="chat-recipient-initial">?</span>
-                <img id="chat-recipient-image" class="hidden" alt="Recipient">
-              </div>
-              <h3 id="chat-recipient">Recipient</h3>
-            </div>
-            <div class="chat-options">
-              <button id="chat-info-button" class="text-button">Info</button>
-            </div>
-          </div>
-          <div id="messages-container" class="messages-container">
-            <div id="messages-list" class="messages-list">
-              <!-- Messages will be added here -->
-            </div>
-          </div>
-          <div class="message-input-container">
-            <button id="plus-button" class="circle-button">+</button>
-            <div class="message-input-wrapper">
-              <input type="text" id="message-input" placeholder="iMessage" class="message-input">
-            </div>
-            <button id="send-button" class="circle-button send-button hidden">↑</button>
-            <button id="mic-button" class="circle-button">🎤</button>
-          </div>
-        </div>
+            <div class="home-button"></div>
+         </div>
       </div>
-      <div class="home-button"></div>
-    </div>
-  </div>
-
-  <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
-      authDomain: "spotify-795ab.firebaseapp.com",
-      databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
-      projectId: "spotify-795ab",
-      storageBucket: "spotify-795ab.firebasestorage.app",
-      messagingSenderId: "907464366407",
-      appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-    const storage = firebase.storage();
-
-    // DOM Elements
-    const authContainer = document.getElementById('auth-container');
-    const appContainer = document.getElementById('app-container');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const chatsContainer = document.getElementById('chats-container');
-    const friendsContainer = document.getElementById('friends-container');
-    const requestsContainer = document.getElementById('requests-container');
-    const chatView = document.getElementById('chat-view');
-    const chatRecipient = document.getElementById('chat-recipient');
-    const chatRecipientInitial = document.getElementById('chat-recipient-initial');
-    const chatRecipientImage = document.getElementById('chat-recipient-image');
-    const messagesList = document.getElementById('messages-list');
-    const messagesContainer = document.getElementById('messages-container');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const micButton = document.getElementById('mic-button');
-    const chatList = document.getElementById('chat-list');
-    const friendsList = document.getElementById('friends-list');
-    const friendRequestsList = document.getElementById('friend-requests-list');
-    const requestBadge = document.getElementById('request-badge');
-    const backButton = document.getElementById('back-button');
-    const tabChats = document.getElementById('tab-chats');
-    const tabFriends = document.getElementById('tab-friends');
-    const tabRequests = document.getElementById('tab-requests');
-    const addFriendButton = document.getElementById('add-friend-button');
-    const friendUsernameInput = document.getElementById('friend-username');
-    const searchChatsInput = document.getElementById('search-chats');
-    const profileModal = document.getElementById('profile-modal');
-    const editProfileButton = document.getElementById('edit-profile-button');
-    const closeProfileModal = document.getElementById('close-profile-modal');
-    const profileNameInput = document.getElementById('profile-name-input');
-    const saveProfileButton = document.getElementById('save-profile-button');
-    const profilePictureInput = document.getElementById('profile-picture-input');
-    const changePictureButton = document.getElementById('change-picture-button');
-    const profilePicturePreview = document.getElementById('profile-picture-preview');
-    const profileInitial = document.getElementById('profile-initial');
-    const profileImage = document.getElementById('profile-image');
-
-    // State variables
-    let currentUser = null;
-    let currentChat = null;
-    let currentChatId = null;
-    let userProfile = null;
-    let chatListeners = [];
-    
-    // Auth listeners
-    document.getElementById('switch-to-register').addEventListener('click', (e) => {
-      e.preventDefault();
-      loginForm.classList.add('hidden');
-      registerForm.classList.remove('hidden');
-    });
-
-    document.getElementById('switch-to-login').addEventListener('click', (e) => {
-      e.preventDefault();
-      registerForm.classList.add('hidden');
-      loginForm.classList.remove('hidden');
-    });
-
-    document.getElementById('login-button').addEventListener('click', () => {
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      
-      if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-      }
-      
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => {
-          alert(`Login failed: ${error.message}`);
-        });
-    });
-
-    document.getElementById('register-button').addEventListener('click', () => {
-      const username = document.getElementById('register-username').value;
-      const email = document.getElementById('register-email').value;
-      const password = document.getElementById('register-password').value;
-      
-      if (!username || !email || !password) {
-        alert('Please fill in all fields');
-        return;
-      }
-      
-      // Check if username already exists
-      db.ref('usernames').child(username).once('value')
-        .then(snapshot => {
-          if (snapshot.exists()) {
-            alert('Username already taken');
-            return;
-          }
-          
-          // Create user
-          return auth.createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-              const user = userCredential.user;
-              
-              // Create user profile
-              return db.ref('users/' + user.uid).set({
-                username: username,
-                displayName: username,
-                email: email,
-                createdAt: firebase.database.ServerValue.TIMESTAMP,
-                profilePicture: null
-              }).then(() => {
-                // Create username mapping
-                return db.ref('usernames/' + username).set(user.uid);
-              });
-            });
-        })
-        .catch(error => {
-          alert(`Registration failed: ${error.message}`);
-        });
-    });
-
-    document.getElementById('logout-button').addEventListener('click', () => {
-      auth.signOut();
-    });
-
-    // Tab navigation
-    tabChats.addEventListener('click', () => {
-      tabChats.classList.add('active');
-      tabFriends.classList.remove('active');
-      tabRequests.classList.remove('active');
-      chatsContainer.classList.remove('hidden');
-      friendsContainer.classList.add('hidden');
-      requestsContainer.classList.add('hidden');
-    });
-
-    tabFriends.addEventListener('click', () => {
-      tabFriends.classList.add('active');
-      tabChats.classList.remove('active');
-      tabRequests.classList.remove('active');
-      friendsContainer.classList.remove('hidden');
-      chatsContainer.classList.add('hidden');
-      requestsContainer.classList.add('hidden');
-    });
-
-    tabRequests.addEventListener('click', () => {
-      tabRequests.classList.add('active');
-      tabChats.classList.remove('active');
-      tabFriends.classList.remove('active');
-      requestsContainer.classList.remove('hidden');
-      chatsContainer.classList.add('hidden');
-      friendsContainer.classList.add('hidden');
-      
-      // Clear badge when viewing requests
-      requestBadge.classList.add('hidden');
-      requestBadge.textContent = '0';
-    });
-
-    // Back button
-    backButton.addEventListener('click', () => {
-      chatView.classList.add('hidden');
-      appContainer.classList.remove('hidden');
-      
-      // Remove any existing chat listeners
-      chatListeners.forEach(listener => {
-        if (listener.ref) {
-          listener.ref.off(listener.event);
-        }
-      });
-      
-      chatListeners = [];
-      currentChat = null;
-      currentChatId = null;
-    });
-
-    // Profile editing
-    editProfileButton.addEventListener('click', () => {
-      profileModal.classList.remove('hidden');
-      
-      // Set current values
-      profileNameInput.value = userProfile.displayName || userProfile.username;
-      
-      // Show profile picture or initial
-      updateProfilePictureDisplay(profilePicturePreview, profileImage, profileInitial, userProfile);
-    });
-
-    closeProfileModal.addEventListener('click', () => {
-      profileModal.classList.add('hidden');
-    });
-
-    saveProfileButton.addEventListener('click', () => {
-      const displayName = profileNameInput.value.trim();
-      
-      if (!displayName) {
-        alert('Please enter a display name');
-        return;
-      }
-      
-      const updates = {
-        displayName: displayName
-      };
-      
-      db.ref(`users/${currentUser.uid}`).update(updates)
-        .then(() => {
-          userProfile.displayName = displayName;
-          alert('Profile updated successfully');
-          profileModal.classList.add('hidden');
-        })
-        .catch(error => {
-          alert(`Error updating profile: ${error.message}`);
-        });
-    });
-
-    changePictureButton.addEventListener('click', () => {
-      profilePictureInput.click();
-    });
-
-    profilePictureInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      // Validate file type
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file');
-        return;
-      }
-      
-      // Validate file size (max 1MB)
-      if (file.size > 1024 * 1024) {
-        alert('Please select an image smaller than 1MB');
-        return;
-      }
-      
-      // Read file as data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        
-        // Update preview
-        profileImage.src = dataUrl;
-        profileImage.classList.remove('hidden');
-        profileInitial.classList.add('hidden');
-        
-        // Save to Firebase
-        db.ref(`users/${currentUser.uid}`).update({
-          profilePicture: dataUrl
-        })
-        .then(() => {
-          userProfile.profilePicture = dataUrl;
-          alert('Profile picture updated successfully');
-        })
-        .catch(error => {
-          alert(`Error updating profile picture: ${error.message}`);
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Show/hide send button based on input
-    messageInput.addEventListener('input', () => {
-      if (messageInput.value.trim()) {
-        sendButton.classList.remove('hidden');
-        micButton.classList.add('hidden');
-      } else {
-        sendButton.classList.add('hidden');
-        micButton.classList.remove('hidden');
-      }
-    });
-
-    // Add friend
-    addFriendButton.addEventListener('click', () => {
-      const friendUsername = friendUsernameInput.value.trim();
-      
-      if (!friendUsername) {
-        alert('Please enter a username');
-        return;
-      }
-      
-      if (friendUsername === userProfile.username) {
-        alert('You cannot add yourself as a friend');
-        return;
-      }
-      
-      // Find user by username
-      db.ref('usernames').child(friendUsername).once('value')
-        .then(snapshot => {
-          if (!snapshot.exists()) {
-            alert('User not found');
-            return;
-          }
-          
-          const friendId = snapshot.val();
-          
-          // Check if already friends or request pending
-          return Promise.all([
-            db.ref(`users/${currentUser.uid}/friends/${friendId}`).once('value'),
-            db.ref(`users/${currentUser.uid}/sentRequests/${friendId}`).once('value'),
-            db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).once('value')
-          ]).then(([friendsSnap, sentSnap, receivedSnap]) => {
-            if (friendsSnap.exists()) {
-              alert('Already friends with this user');
-              return;
-            }
-            
-            if (sentSnap.exists()) {
-              alert('Friend request already sent to this user');
-              return;
-            }
-            
-            if (receivedSnap.exists()) {
-              // Accept request if received
-              return acceptFriendRequest(friendId);
-            }
-            
-            // Send friend request
-            return Promise.all([
-              db.ref(`users/${currentUser.uid}/sentRequests/${friendId}`).set({
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-              }),
-              db.ref(`users/${friendId}/receivedRequests/${currentUser.uid}`).set({
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-              })
-            ]).then(() => {
-              friendUsernameInput.value = '';
-              alert('Friend request sent');
-            });
-          });
-        })
-        .catch(error => {
-          alert(`Error adding friend: ${error.message}`);
-        });
-    });
-
-    // Accept friend request
-    function acceptFriendRequest(friendId) {
-      return Promise.all([
-        // Add to friends list for both users
-        db.ref(`users/${currentUser.uid}/friends/${friendId}`).set(true),
-        db.ref(`users/${friendId}/friends/${currentUser.uid}`).set(true),
-        
-        // Remove request
-        db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).remove(),
-        db.ref(`users/${friendId}/sentRequests/${currentUser.uid}`).remove()
-      ]).then(() => {
-        alert('Friend request accepted');
-      }).catch(error => {
-        alert(`Error accepting friend request: ${error.message}`);
-      });
-    }
-
-    // Reject friend request
-    function rejectFriendRequest(friendId) {
-      return Promise.all([
-        db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).remove(),
-        db.ref(`users/${friendId}/sentRequests/${currentUser.uid}`).remove()
-      ]).then(() => {
-        alert('Friend request rejected');
-      }).catch(error => {
-        alert(`Error rejecting friend request: ${error.message}`);
-      });
-    }
-
-    // Send message
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', event => {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    function sendMessage() {
-      const messageText = messageInput.value.trim();
-      if (!messageText || !currentChat) return;
-      
-      const message = {
-        senderId: currentUser.uid,
-        text: messageText,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        read: false
-      };
-      
-      db.ref(`chats/${currentChatId}/messages`).push(message)
-        .then(() => {
-          // Update last message
-          return db.ref(`chats/${currentChatId}`).update({
-            lastMessage: {
-              text: messageText,
-              timestamp: firebase.database.ServerValue.TIMESTAMP,
-              senderId: currentUser.uid
-            }
-          });
-        })
-        .then(() => {
-          messageInput.value = '';
-          sendButton.classList.add('hidden');
-          micButton.classList.remove('hidden');
-        })
-        .catch(error => {
-          console.error('Error sending message:', error);
-        });
-    }
-
-    // Create or open chat
-    function openChat(userId, userData) {
-      // Find existing chat between users
-      const chatParticipants = [currentUser.uid, userId].sort();
-      const chatId = chatParticipants.join('_');
-      
-      db.ref(`chats/${chatId}`).once('value')
-        .then(snapshot => {
-          if (!snapshot.exists()) {
-            // Create new chat
-            return db.ref(`chats/${chatId}`).set({
-              participants: {
-                [currentUser.uid]: true,
-                [userId]: true
-              },
-              createdAt: firebase.database.ServerValue.TIMESTAMP,
-              lastMessage: {
-                text: '',
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                senderId: ''
-              }
-            });
-          }
-        })
-        .then(() => {
-          // Open chat
-          currentChat = userId;
-          currentChatId = chatId;
-          chatRecipient.textContent = userData.displayName || userData.username;
-          
-          // Set recipient profile picture or initial
-          updateProfilePictureDisplay(
-            document.getElementById('chat-recipient-picture'),
-            chatRecipientImage,
-            chatRecipientInitial,
-            userData
-          );
-          
-          appContainer.classList.add('hidden');
-          chatView.classList.remove('hidden');
-          
-          // Load messages
-          loadMessages(chatId);
-          
-          // Listen for read status changes
-          listenForReadStatusChanges(chatId);
-        })
-        .catch(error => {
-          console.error('Error opening chat:', error);
-        });
-    }
-
-    // Load messages for a chat
-    function loadMessages(chatId) {
-      messagesList.innerHTML = '';
-      
-      const messagesRef = db.ref(`chats/${chatId}/messages`).orderByChild('timestamp');
-      
-      // Remove previous listeners
-      chatListeners.forEach(listener => {
-        if (listener.ref) {
-          listener.ref.off(listener.event);
-        }
-      });
-      
-      // Add new listener
-      chatListeners.push({
-        ref: messagesRef,
-        event: 'child_added'
-      });
-      
-      messagesRef.on('child_added', snapshot => {
-        const message = snapshot.val();
-        addMessageToUI(message, snapshot.key);
-        
-        // Scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        // Mark message as read if received
-        if (message.senderId !== currentUser.uid && !message.read) {
-          markMessageAsRead(chatId, snapshot.key);
-        }
-      });
-      
-      // Also listen for changes in read status
-      const readChangesRef = db.ref(`chats/${chatId}/messages`);
-      chatListeners.push({
-        ref: readChangesRef,
-        event: 'child_changed'
-      });
-      
-      readChangesRef.on('child_changed', snapshot => {
-        const message = snapshot.val();
-        const messageId = snapshot.key;
-        
-        // Update read status in UI
-        if (message.senderId === currentUser.uid && message.read) {
-          const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
-          if (readStatusElement) {
-            readStatusElement.textContent = 'Read';
-            readStatusElement.classList.add('read');
-          }
-        }
-      });
-    }
-
-    // Add message to UI
-    function addMessageToUI(message, messageId) {
-      const isCurrentUser = message.senderId === currentUser.uid;
-      
-      const messageGroup = document.createElement('div');
-      messageGroup.classList.add('message-group', isCurrentUser ? 'message-group-sent' : 'message-group-received');
-      
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message', isCurrentUser ? 'message-sent' : 'message-received');
-      
-      const messageText = document.createElement('div');
-      messageText.classList.add('message-text');
-      messageText.textContent = message.text;
-      messageElement.appendChild(messageText);
-      
-      messageGroup.appendChild(messageElement);
-      
-      const messageTime = document.createElement('div');
-      messageTime.classList.add('message-time');
-      messageTime.textContent = formatTime(message.timestamp);
-      messageGroup.appendChild(messageTime);
-      
-      if (isCurrentUser) {
-        const readStatus = document.createElement('div');
-        readStatus.classList.add('read-status');
-        readStatus.dataset.messageId = messageId;
-        readStatus.textContent = message.read ? 'Read' : 'Delivered';
-        if (message.read) {
-          readStatus.classList.add('read');
-        }
-        messageGroup.appendChild(readStatus);
-      }
-      
-      messagesList.appendChild(messageGroup);
-    }
-
-    // Mark messages as read
-    function markMessagesAsRead(chatId) {
-      db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentChat).once('value')
-        .then(snapshot => {
-          const updates = {};
-          
-          snapshot.forEach(childSnapshot => {
-            const message = childSnapshot.val();
-            if (!message.read) {
-              updates[`${childSnapshot.key}/read`] = true;
-            }
-          });
-          
-          if (Object.keys(updates).length > 0) {
-            return db.ref(`chats/${chatId}/messages`).update(updates);
-          }
-        })
-        .catch(error => {
-          console.error('Error marking messages as read:', error);
-        });
-    }
-
-    // Mark single message as read
-    function markMessageAsRead(chatId, messageId) {
-      db.ref(`chats/${chatId}/messages/${messageId}`).update({ read: true });
-    }
-
-    // Listen for read status changes
-    function listenForReadStatusChanges(chatId) {
-      const readStatusRef = db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentUser.uid);
-      
-      // Add to listeners array
-      chatListeners.push({
-        ref: readStatusRef,
-        event: 'child_changed'
-      });
-      
-      readStatusRef.on('child_changed', snapshot => {
-        const message = snapshot.val();
-        const messageId = snapshot.key;
-        
-        if (message.read) {
-          const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
-          if (readStatusElement) {
-            readStatusElement.textContent = 'Read';
-            readStatusElement.classList.add('read');
-          }
-        }
-      });
-    }
-
-    // Format timestamp
-    function formatTime(timestamp) {
-      if (!timestamp) return '';
-      
-      const date = new Date(timestamp);
-      const now = new Date();
-      
-      const isSameDay = date.getDate() === now.getDate() && 
-                        date.getMonth() === now.getMonth() && 
-                        date.getFullYear() === now.getFullYear();
-      
-      if (isSameDay) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else {
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + 
-               ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
-    }
-
-    // Search chats
-    searchChatsInput.addEventListener('input', () => {
-      const searchTerm = searchChatsInput.value.toLowerCase().trim();
-      const chatItems = document.querySelectorAll('.chat-item');
-      
-      chatItems.forEach(item => {
-        const nameElement = item.querySelector('.chat-name');
-        const previewElement = item.querySelector('.chat-preview');
-        
-        if (!nameElement) return;
-        
-        const name = nameElement.textContent.toLowerCase();
-        const preview = previewElement ? previewElement.textContent.toLowerCase() : '';
-        
-        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
-          item.style.display = '';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    });
-
-    // Load user chats
-    function loadChats() {
-      chatList.innerHTML = '';
-      
-      db.ref(`chats`).orderByChild(`participants/${currentUser.uid}`).equalTo(true).on('value', snapshot => {
-        if (!snapshot.exists()) {
-          chatList.innerHTML = '<p class="empty-list">No conversations yet</p>';
-          return;
-        }
-        
-        const chats = [];
-        snapshot.forEach(childSnapshot => {
-          const chat = childSnapshot.val();
-          chat.id = childSnapshot.key;
-          
-          // Get other participant id
-          const participants = Object.keys(chat.participants);
-          const otherUserId = participants.find(id => id !== currentUser.uid);
-          
-          if (otherUserId) {
-              chat.otherUserId = otherUserId;
-              chats.push(chat);
-            }
-          });
-          
-          // Sort by last message timestamp
-          chats.sort((a, b) => {
-            return (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0);
-          });
-          
-          if (chats.length === 0) {
-            chatList.innerHTML = '<p class="empty-list">No conversations yet</p>';
-            return;
-          }
-          
-          // Clear existing chats
-          chatList.innerHTML = '';
-          
-          // Create chat items - load each only once
-          const processedIds = new Set();
-          chats.forEach(chat => {
-            if (!processedIds.has(chat.id)) {
-              processedIds.add(chat.id);
-              loadChatItem(chat);
-            }
-          });
-        });
-      });
-    }
-
-    // Load chat item
-    function loadChatItem(chat) {
-      db.ref(`users/${chat.otherUserId}`).once('value')
-        .then(snapshot => {
-          const user = snapshot.val();
-          if (!user) return;
-          
-          // Check if this chat already exists in the list
-          const existingChat = document.getElementById(`chat-${chat.id}`);
-          if (existingChat) {
-            // Update the existing chat item
-            const previewElement = existingChat.querySelector('.chat-preview');
-            const timeElement = existingChat.querySelector('.chat-time');
-            
-            if (chat.lastMessage && chat.lastMessage.text) {
-              const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
-              // Truncate message preview if too long
-              let previewText = chat.lastMessage.text;
-              if (previewText.length > 30) {
-                previewText = previewText.substring(0, 27) + '...';
-              }
-              previewElement.textContent = (isCurrentUserSender ? 'You: ' : '') + previewText;
-              timeElement.textContent = formatTime(chat.lastMessage.timestamp);
-            }
-            
-            return;
-          }
-          
-          const chatItem = document.createElement('div');
-          chatItem.classList.add('chat-item');
-          chatItem.id = `chat-${chat.id}`;
-          chatItem.addEventListener('click', () => {
-            openChat(chat.otherUserId, user);
-          });
-          
-          const avatarContainer = document.createElement('div');
-          avatarContainer.classList.add('profile-picture');
-          
-          const avatarInitial = document.createElement('span');
-          avatarInitial.textContent = (user.displayName || user.username).charAt(0).toUpperCase();
-          avatarContainer.appendChild(avatarInitial);
-          
-          const avatarImage = document.createElement('img');
-          avatarImage.classList.add('hidden');
-          avatarImage.alt = 'Avatar';
-          avatarContainer.appendChild(avatarImage);
-          
-          // Update avatar if there's a profile picture
-          if (user.profilePicture) {
-            avatarImage.src = user.profilePicture;
-            avatarImage.classList.remove('hidden');
-            avatarInitial.classList.add('hidden');
-          }
-          
-          chatItem.appendChild(avatarContainer);
-          
-          const details = document.createElement('div');
-          details.classList.add('chat-details');
-          
-          const name = document.createElement('div');
-          name.classList.add('chat-name');
-          name.textContent = user.displayName || user.username;
-          details.appendChild(name);
-          
-          const preview = document.createElement('div');
-          preview.classList.add('chat-preview');
-          
-          if (chat.lastMessage && chat.lastMessage.text) {
-            const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
-            // Truncate message preview if too long
-            let previewText = chat.lastMessage.text;
-            if (previewText.length > 30) {
-              previewText = previewText.substring(0, 27) + '...';
-            }
-            preview.textContent = (isCurrentUserSender ? 'You: ' : '') + previewText;
-          } else {
-            preview.textContent = 'No messages yet';
-          }
-          
-          details.appendChild(preview);
-          chatItem.appendChild(details);
-          
-          const rightSide = document.createElement('div');
-          rightSide.classList.add('chat-right');
-          
-          const time = document.createElement('div');
-          time.classList.add('chat-time');
-          time.textContent = chat.lastMessage && chat.lastMessage.timestamp ? 
-                          formatTime(chat.lastMessage.timestamp) : '';
-          rightSide.appendChild(time);
-          
-          // Unread indicator
-          if (chat.lastMessage && chat.lastMessage.senderId !== currentUser.uid && !chat.lastMessage.read) {
-            const unreadIndicator = document.createElement('div');
-            unreadIndicator.classList.add('unread-indicator');
-            rightSide.appendChild(unreadIndicator);
-          }
-          
-          chatItem.appendChild(rightSide);
-          
-          chatList.appendChild(chatItem);
-        });
-    }
-
-    // Load friends
-    function loadFriends() {
-      friendsList.innerHTML = '';
-      
-      db.ref(`users/${currentUser.uid}/friends`).on('value', snapshot => {
-        if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
-          friendsList.innerHTML = '<p class="empty-list">No friends yet</p>';
-          return;
-        }
-        
-        const friendIds = Object.keys(snapshot.val());
-        
-        // Clear existing friends
-        friendsList.innerHTML = '';
-        
-        // Load each friend
-        friendIds.forEach(friendId => {
-          db.ref(`users/${friendId}`).once('value')
-            .then(snapshot => {
-              const friend = snapshot.val();
-              if (!friend) return;
-              
-              const friendItem = document.createElement('div');
-              friendItem.classList.add('friend-item');
-              
-              const avatarContainer = document.createElement('div');
-              avatarContainer.classList.add('profile-picture');
-              
-              const avatarInitial = document.createElement('span');
-              avatarInitial.textContent = (friend.displayName || friend.username).charAt(0).toUpperCase();
-              avatarContainer.appendChild(avatarInitial);
-              
-              const avatarImage = document.createElement('img');
-              avatarImage.classList.add('hidden');
-              avatarImage.alt = 'Avatar';
-              avatarContainer.appendChild(avatarImage);
-              
-              // Update avatar if there's a profile picture
-              if (friend.profilePicture) {
-                avatarImage.src = friend.profilePicture;
-                avatarImage.classList.remove('hidden');
-                avatarInitial.classList.add('hidden');
-              }
-              
-              friendItem.appendChild(avatarContainer);
-              
-              const name = document.createElement('div');
-              name.classList.add('friend-name');
-              name.textContent = friend.displayName || friend.username;
-              friendItem.appendChild(name);
-              
-              const actionsContainer = document.createElement('div');
-              actionsContainer.classList.add('friend-actions');
-              
-              const messageBtn = document.createElement('button');
-              messageBtn.classList.add('action-button');
-              messageBtn.textContent = 'Message';
-              messageBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openChat(friendId, friend);
-              });
-              actionsContainer.appendChild(messageBtn);
-              
-              const removeBtn = document.createElement('button');
-              removeBtn.classList.add('action-button', 'remove-button');
-              removeBtn.textContent = 'Remove';
-              removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (confirm(`Remove ${friend.displayName || friend.username} from friends?`)) {
-                  removeFriend(friendId);
-                }
-              });
-              actionsContainer.appendChild(removeBtn);
-              
-              friendItem.appendChild(actionsContainer);
-              friendsList.appendChild(friendItem);
-            });
-        });
-      });
-    }
-
-    // Load friend requests
-    function loadFriendRequests() {
-      friendRequestsList.innerHTML = '';
-      let requestCount = 0;
-      
-      db.ref(`users/${currentUser.uid}/receivedRequests`).on('value', snapshot => {
-        if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
-          friendRequestsList.innerHTML = '<p class="empty-list">No friend requests</p>';
-          requestBadge.classList.add('hidden');
-          return;
-        }
-        
-        const requestIds = Object.keys(snapshot.val());
-        requestCount = requestIds.length;
-        
-        // Update badge
-        if (requestCount > 0) {
-          requestBadge.textContent = requestCount;
-          requestBadge.classList.remove('hidden');
-        } else {
-          requestBadge.classList.add('hidden');
-        }
-        
-        // Clear existing requests
-        friendRequestsList.innerHTML = '';
-        
-        // Load each request
-        requestIds.forEach(senderId => {
-          db.ref(`users/${senderId}`).once('value')
-            .then(snapshot => {
-              const sender = snapshot.val();
-              if (!sender) return;
-              
-              const requestItem = document.createElement('div');
-              requestItem.classList.add('friend-request-item');
-              
-              const avatarContainer = document.createElement('div');
-              avatarContainer.classList.add('profile-picture');
-              
-              const avatarInitial = document.createElement('span');
-              avatarInitial.textContent = (sender.displayName || sender.username).charAt(0).toUpperCase();
-              avatarContainer.appendChild(avatarInitial);
-              
-              const avatarImage = document.createElement('img');
-              avatarImage.classList.add('hidden');
-              avatarImage.alt = 'Avatar';
-              avatarContainer.appendChild(avatarImage);
-              
-              // Update avatar if there's a profile picture
-              if (sender.profilePicture) {
-                avatarImage.src = sender.profilePicture;
-                avatarImage.classList.remove('hidden');
-                avatarInitial.classList.add('hidden');
-              }
-              
-              requestItem.appendChild(avatarContainer);
-              
-              const requestInfo = document.createElement('div');
-              requestInfo.classList.add('request-info');
-              
-              const name = document.createElement('div');
-              name.classList.add('friend-name');
-              name.textContent = sender.displayName || sender.username;
-              requestInfo.appendChild(name);
-              
-              requestItem.appendChild(requestInfo);
-              
-              const actionsContainer = document.createElement('div');
-              actionsContainer.classList.add('request-actions');
-              
-              const acceptBtn = document.createElement('button');
-              acceptBtn.classList.add('action-button');
-              acceptBtn.textContent = 'Accept';
-              acceptBtn.addEventListener('click', () => {
-                acceptFriendRequest(senderId);
-              });
-              actionsContainer.appendChild(acceptBtn);
-              
-              const rejectBtn = document.createElement('button');
-              rejectBtn.classList.add('action-button', 'remove-button');
-              rejectBtn.textContent = 'Reject';
-              rejectBtn.addEventListener('click', () => {
-                rejectFriendRequest(senderId);
-              });
-              actionsContainer.appendChild(rejectBtn);
-              
-              requestItem.appendChild(actionsContainer);
-              friendRequestsList.appendChild(requestItem);
-            });
-        });
-      });
-    }
-
-    // Remove friend
-    function removeFriend(friendId) {
-      // Remove friend for current user
-      db.ref(`users/${currentUser.uid}/friends/${friendId}`).remove()
-        .then(() => {
-          // Remove current user as friend for friend
-          return db.ref(`users/${friendId}/friends/${currentUser.uid}`).remove();
-        })
-        .catch(error => {
-          console.error('Error removing friend:', error);
-        });
-    }
-
-    // Update profile picture display
-    function updateProfilePictureDisplay(container, imageEl, initialEl, userData) {
-      if (userData.profilePicture) {
-        imageEl.src = userData.profilePicture;
-        imageEl.classList.remove('hidden');
-        initialEl.classList.add('hidden');
-      } else {
-        initialEl.textContent = (userData.displayName || userData.username).charAt(0).toUpperCase();
-        initialEl.classList.remove('hidden');
-        imageEl.classList.add('hidden');
-      }
-    }
-
-    // Auth state change
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        
-        // Get user profile
-        db.ref(`users/${user.uid}`).once('value')
-          .then(snapshot => {
-            userProfile = snapshot.val();
-            
-            authContainer.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            chatView.classList.add('hidden');
-            
-            // Load chats, friends and requests
-            loadChats();
-            loadFriends();
-            loadFriendRequests();
-          })
-          .catch(error => {
-            console.error('Error loading user profile:', error);
-          });
-      } else {
-        currentUser = null;
-        userProfile = null;
-        
-        // Remove listeners
-        chatListeners.forEach(listener => {
-          if (listener.ref) {
-            listener.ref.off(listener.event);
-          }
-        });
-        
-        chatListeners = [];
-        
-        // Clear forms
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-password').value = '';
-        document.getElementById('register-username').value = '';
-        document.getElementById('register-email').value = '';
-        document.getElementById('register-password').value = '';
-        
-        // Show auth container
-        authContainer.classList.remove('hidden');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        appContainer.classList.add('hidden');
-        chatView.classList.add('hidden');
-        profileModal.classList.add('hidden');
-      }
-    });
-  </script>
-  <style>
-    :root {
+      <script>
+         // Initialize Firebase
+         const firebaseConfig = {
+           apiKey: "AIzaSyDTATBOCPb_uGYt5Trmx1EZu7doCR0WWvw",
+           authDomain: "spotify-795ab.firebaseapp.com",
+           databaseURL: "https://spotify-795ab-default-rtdb.firebaseio.com",
+           projectId: "spotify-795ab",
+           storageBucket: "spotify-795ab.firebasestorage.app",
+           messagingSenderId: "907464366407",
+           appId: "1:907464366407:web:1c736b0a36c792ffdb1462"
+         };
+         
+         // Initialize Firebase
+         firebase.initializeApp(firebaseConfig);
+         const auth = firebase.auth();
+         const db = firebase.database();
+         const storage = firebase.storage();
+         
+         // DOM Elements
+         const authContainer = document.getElementById('auth-container');
+         const appContainer = document.getElementById('app-container');
+         const loginForm = document.getElementById('login-form');
+         const registerForm = document.getElementById('register-form');
+         const chatsContainer = document.getElementById('chats-container');
+         const friendsContainer = document.getElementById('friends-container');
+         const requestsContainer = document.getElementById('requests-container');
+         const chatView = document.getElementById('chat-view');
+         const chatRecipient = document.getElementById('chat-recipient');
+         const chatRecipientInitial = document.getElementById('chat-recipient-initial');
+         const chatRecipientImage = document.getElementById('chat-recipient-image');
+         const messagesList = document.getElementById('messages-list');
+         const messagesContainer = document.getElementById('messages-container');
+         const messageInput = document.getElementById('message-input');
+         const sendButton = document.getElementById('send-button');
+         const micButton = document.getElementById('mic-button');
+         const chatList = document.getElementById('chat-list');
+         const friendsList = document.getElementById('friends-list');
+         const friendRequestsList = document.getElementById('friend-requests-list');
+         const requestBadge = document.getElementById('request-badge');
+         const backButton = document.getElementById('back-button');
+         const tabChats = document.getElementById('tab-chats');
+         const tabFriends = document.getElementById('tab-friends');
+         const tabRequests = document.getElementById('tab-requests');
+         const addFriendButton = document.getElementById('add-friend-button');
+         const friendUsernameInput = document.getElementById('friend-username');
+         const searchChatsInput = document.getElementById('search-chats');
+         const profileModal = document.getElementById('profile-modal');
+         const editProfileButton = document.getElementById('edit-profile-button');
+         const closeProfileModal = document.getElementById('close-profile-modal');
+         const profileNameInput = document.getElementById('profile-name-input');
+         const saveProfileButton = document.getElementById('save-profile-button');
+         const profilePictureInput = document.getElementById('profile-picture-input');
+         const changePictureButton = document.getElementById('change-picture-button');
+         const profilePicturePreview = document.getElementById('profile-picture-preview');
+         const profileInitial = document.getElementById('profile-initial');
+         const profileImage = document.getElementById('profile-image');
+         
+         // State variables
+         let currentUser = null;
+         let currentChat = null;
+         let currentChatId = null;
+         let userProfile = null;
+         let chatListeners = [];
+         
+         // Auth listeners
+         document.getElementById('switch-to-register').addEventListener('click', (e) => {
+           e.preventDefault();
+           loginForm.classList.add('hidden');
+           registerForm.classList.remove('hidden');
+         });
+         
+         document.getElementById('switch-to-login').addEventListener('click', (e) => {
+           e.preventDefault();
+           registerForm.classList.add('hidden');
+           loginForm.classList.remove('hidden');
+         });
+         
+         document.getElementById('login-button').addEventListener('click', () => {
+           const email = document.getElementById('login-email').value;
+           const password = document.getElementById('login-password').value;
+           
+           if (!email || !password) {
+             alert('Please enter both email and password');
+             return;
+           }
+           
+           auth.signInWithEmailAndPassword(email, password)
+             .catch(error => {
+               alert(`Login failed: ${error.message}`);
+             });
+         });
+         
+         document.getElementById('register-button').addEventListener('click', () => {
+           const username = document.getElementById('register-username').value;
+           const email = document.getElementById('register-email').value;
+           const password = document.getElementById('register-password').value;
+           
+           if (!username || !email || !password) {
+             alert('Please fill in all fields');
+             return;
+           }
+           
+           // Check if username already exists
+           db.ref('usernames').child(username).once('value')
+             .then(snapshot => {
+               if (snapshot.exists()) {
+                 alert('Username already taken');
+                 return;
+               }
+               
+               // Create user
+               return auth.createUserWithEmailAndPassword(email, password)
+                 .then(userCredential => {
+                   const user = userCredential.user;
+                   
+                   // Create user profile
+                   return db.ref('users/' + user.uid).set({
+                     username: username,
+                     displayName: username,
+                     email: email,
+                     createdAt: firebase.database.ServerValue.TIMESTAMP,
+                     profilePicture: null
+                   }).then(() => {
+                     // Create username mapping
+                     return db.ref('usernames/' + username).set(user.uid);
+                   });
+                 });
+             })
+             .catch(error => {
+               alert(`Registration failed: ${error.message}`);
+             });
+         });
+         
+         document.getElementById('logout-button').addEventListener('click', () => {
+           auth.signOut();
+         });
+         
+         // Tab navigation
+         tabChats.addEventListener('click', () => {
+           tabChats.classList.add('active');
+           tabFriends.classList.remove('active');
+           tabRequests.classList.remove('active');
+           chatsContainer.classList.remove('hidden');
+           friendsContainer.classList.add('hidden');
+           requestsContainer.classList.add('hidden');
+         });
+         
+         tabFriends.addEventListener('click', () => {
+           tabFriends.classList.add('active');
+           tabChats.classList.remove('active');
+           tabRequests.classList.remove('active');
+           friendsContainer.classList.remove('hidden');
+           chatsContainer.classList.add('hidden');
+           requestsContainer.classList.add('hidden');
+         });
+         
+         tabRequests.addEventListener('click', () => {
+           tabRequests.classList.add('active');
+           tabChats.classList.remove('active');
+           tabFriends.classList.remove('active');
+           requestsContainer.classList.remove('hidden');
+           chatsContainer.classList.add('hidden');
+           friendsContainer.classList.add('hidden');
+           
+           // Clear badge when viewing requests
+           requestBadge.classList.add('hidden');
+           requestBadge.textContent = '0';
+         });
+         
+         // Back button
+         backButton.addEventListener('click', () => {
+           chatView.classList.add('hidden');
+           appContainer.classList.remove('hidden');
+           
+           // Remove any existing chat listeners
+           chatListeners.forEach(listener => {
+             if (listener.ref) {
+               listener.ref.off(listener.event);
+             }
+           });
+           
+           chatListeners = [];
+           currentChat = null;
+           currentChatId = null;
+         });
+         
+         // Profile editing
+         editProfileButton.addEventListener('click', () => {
+           profileModal.classList.remove('hidden');
+           
+           // Set current values
+           profileNameInput.value = userProfile.displayName || userProfile.username;
+           
+           // Show profile picture or initial
+           updateProfilePictureDisplay(profilePicturePreview, profileImage, profileInitial, userProfile);
+         });
+         
+         closeProfileModal.addEventListener('click', () => {
+           profileModal.classList.add('hidden');
+         });
+         
+         saveProfileButton.addEventListener('click', () => {
+           const displayName = profileNameInput.value.trim();
+           
+           if (!displayName) {
+             alert('Please enter a display name');
+             return;
+           }
+           
+           const updates = {
+             displayName: displayName
+           };
+           
+           db.ref(`users/${currentUser.uid}`).update(updates)
+             .then(() => {
+               userProfile.displayName = displayName;
+               alert('Profile updated successfully');
+               profileModal.classList.add('hidden');
+             })
+             .catch(error => {
+               alert(`Error updating profile: ${error.message}`);
+             });
+         });
+         
+         changePictureButton.addEventListener('click', () => {
+           profilePictureInput.click();
+         });
+         
+         profilePictureInput.addEventListener('change', (e) => {
+           const file = e.target.files[0];
+           if (!file) return;
+           
+           // Validate file type
+           if (!file.type.match('image.*')) {
+             alert('Please select an image file');
+             return;
+           }
+           
+           // Validate file size (max 1MB)
+           if (file.size > 1024 * 1024) {
+             alert('Please select an image smaller than 1MB');
+             return;
+           }
+           
+           // Read file as data URL
+           const reader = new FileReader();
+           reader.onload = (e) => {
+             const dataUrl = e.target.result;
+             
+             // Update preview
+             profileImage.src = dataUrl;
+             profileImage.classList.remove('hidden');
+             profileInitial.classList.add('hidden');
+             
+             // Save to Firebase
+             db.ref(`users/${currentUser.uid}`).update({
+               profilePicture: dataUrl
+             })
+             .then(() => {
+               userProfile.profilePicture = dataUrl;
+               alert('Profile picture updated successfully');
+             })
+             .catch(error => {
+               alert(`Error updating profile picture: ${error.message}`);
+             });
+           };
+           reader.readAsDataURL(file);
+         });
+         
+         // Show/hide send button based on input
+         messageInput.addEventListener('input', () => {
+           if (messageInput.value.trim()) {
+             sendButton.classList.remove('hidden');
+             micButton.classList.add('hidden');
+           } else {
+             sendButton.classList.add('hidden');
+             micButton.classList.remove('hidden');
+           }
+         });
+         
+         // Add friend
+         addFriendButton.addEventListener('click', () => {
+           const friendUsername = friendUsernameInput.value.trim();
+           
+           if (!friendUsername) {
+             alert('Please enter a username');
+             return;
+           }
+           
+           if (friendUsername === userProfile.username) {
+             alert('You cannot add yourself as a friend');
+             return;
+           }
+           
+           // Find user by username
+           db.ref('usernames').child(friendUsername).once('value')
+             .then(snapshot => {
+               if (!snapshot.exists()) {
+                 alert('User not found');
+                 return;
+               }
+               
+               const friendId = snapshot.val();
+               
+               // Check if already friends or request pending
+               return Promise.all([
+                 db.ref(`users/${currentUser.uid}/friends/${friendId}`).once('value'),
+                 db.ref(`users/${currentUser.uid}/sentRequests/${friendId}`).once('value'),
+                 db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).once('value')
+               ]).then(([friendsSnap, sentSnap, receivedSnap]) => {
+                 if (friendsSnap.exists()) {
+                   alert('Already friends with this user');
+                   return;
+                 }
+                 
+                 if (sentSnap.exists()) {
+                   alert('Friend request already sent to this user');
+                   return;
+                 }
+                 
+                 if (receivedSnap.exists()) {
+                   // Accept request if received
+                   return acceptFriendRequest(friendId);
+                 }
+                 
+                 // Send friend request
+                 return Promise.all([
+                   db.ref(`users/${currentUser.uid}/sentRequests/${friendId}`).set({
+                     timestamp: firebase.database.ServerValue.TIMESTAMP
+                   }),
+                   db.ref(`users/${friendId}/receivedRequests/${currentUser.uid}`).set({
+                     timestamp: firebase.database.ServerValue.TIMESTAMP
+                   })
+                 ]).then(() => {
+                   friendUsernameInput.value = '';
+                   alert('Friend request sent');
+                 });
+               });
+             })
+             .catch(error => {
+               alert(`Error adding friend: ${error.message}`);
+             });
+         });
+         
+         // Accept friend request
+         function acceptFriendRequest(friendId) {
+           return Promise.all([
+             // Add to friends list for both users
+             db.ref(`users/${currentUser.uid}/friends/${friendId}`).set(true),
+             db.ref(`users/${friendId}/friends/${currentUser.uid}`).set(true),
+             
+             // Remove request
+             db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).remove(),
+             db.ref(`users/${friendId}/sentRequests/${currentUser.uid}`).remove()
+           ]).then(() => {
+             alert('Friend request accepted');
+           }).catch(error => {
+             alert(`Error accepting friend request: ${error.message}`);
+           });
+         }
+         
+         // Reject friend request
+         function rejectFriendRequest(friendId) {
+           return Promise.all([
+             db.ref(`users/${currentUser.uid}/receivedRequests/${friendId}`).remove(),
+             db.ref(`users/${friendId}/sentRequests/${currentUser.uid}`).remove()
+           ]).then(() => {
+             alert('Friend request rejected');
+           }).catch(error => {
+             alert(`Error rejecting friend request: ${error.message}`);
+           });
+         }
+         
+         // Send message
+         sendButton.addEventListener('click', sendMessage);
+         messageInput.addEventListener('keypress', event => {
+           if (event.key === 'Enter') {
+             sendMessage();
+           }
+         });
+         
+         function sendMessage() {
+           const messageText = messageInput.value.trim();
+           if (!messageText || !currentChat) return;
+           
+           const message = {
+             senderId: currentUser.uid,
+             text: messageText,
+             timestamp: firebase.database.ServerValue.TIMESTAMP,
+             read: false
+           };
+           
+           db.ref(`chats/${currentChatId}/messages`).push(message)
+             .then(() => {
+               // Update last message
+               return db.ref(`chats/${currentChatId}`).update({
+                 lastMessage: {
+                   text: messageText,
+                   timestamp: firebase.database.ServerValue.TIMESTAMP,
+                   senderId: currentUser.uid
+                 }
+               });
+             })
+             .then(() => {
+               messageInput.value = '';
+               sendButton.classList.add('hidden');
+               micButton.classList.remove('hidden');
+             })
+             .catch(error => {
+               console.error('Error sending message:', error);
+             });
+         }
+         
+         // Create or open chat
+         function openChat(userId, userData) {
+           // Find existing chat between users
+           const chatParticipants = [currentUser.uid, userId].sort();
+           const chatId = chatParticipants.join('_');
+           
+           db.ref(`chats/${chatId}`).once('value')
+             .then(snapshot => {
+               if (!snapshot.exists()) {
+                 // Create new chat
+                 return db.ref(`chats/${chatId}`).set({
+                   participants: {
+                     [currentUser.uid]: true,
+                     [userId]: true
+                   },
+                   createdAt: firebase.database.ServerValue.TIMESTAMP,
+                   lastMessage: {
+                     text: '',
+                     timestamp: firebase.database.ServerValue.TIMESTAMP,
+                     senderId: ''
+                   }
+                 });
+               }
+             })
+             .then(() => {
+               // Open chat
+               currentChat = userId;
+               currentChatId = chatId;
+               chatRecipient.textContent = userData.displayName || userData.username;
+               
+               // Set recipient profile picture or initial
+               updateProfilePictureDisplay(
+                 document.getElementById('chat-recipient-picture'),
+                 chatRecipientImage,
+                 chatRecipientInitial,
+                 userData
+               );
+               
+               appContainer.classList.add('hidden');
+               chatView.classList.remove('hidden');
+               
+               // Load messages
+               loadMessages(chatId);
+               
+               // Listen for read status changes
+               listenForReadStatusChanges(chatId);
+             })
+             .catch(error => {
+               console.error('Error opening chat:', error);
+             });
+         }
+         
+         // Load messages for a chat
+         function loadMessages(chatId) {
+           messagesList.innerHTML = '';
+           
+           const messagesRef = db.ref(`chats/${chatId}/messages`).orderByChild('timestamp');
+           
+           // Remove previous listeners
+           chatListeners.forEach(listener => {
+             if (listener.ref) {
+               listener.ref.off(listener.event);
+             }
+           });
+           
+           // Add new listener
+           chatListeners.push({
+             ref: messagesRef,
+             event: 'child_added'
+           });
+           
+           messagesRef.on('child_added', snapshot => {
+             const message = snapshot.val();
+             addMessageToUI(message, snapshot.key);
+             
+             // Scroll to bottom
+             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+             
+             // Mark message as read if received
+             if (message.senderId !== currentUser.uid && !message.read) {
+               markMessageAsRead(chatId, snapshot.key);
+             }
+           });
+           
+           // Also listen for changes in read status
+           const readChangesRef = db.ref(`chats/${chatId}/messages`);
+           chatListeners.push({
+             ref: readChangesRef,
+             event: 'child_changed'
+           });
+           
+           readChangesRef.on('child_changed', snapshot => {
+             const message = snapshot.val();
+             const messageId = snapshot.key;
+             
+             // Update read status in UI
+             if (message.senderId === currentUser.uid && message.read) {
+               const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
+               if (readStatusElement) {
+                 readStatusElement.textContent = 'Read';
+                 readStatusElement.classList.add('read');
+               }
+             }
+           });
+         }
+         
+         // Add message to UI
+         function addMessageToUI(message, messageId) {
+           const isCurrentUser = message.senderId === currentUser.uid;
+           
+           const messageGroup = document.createElement('div');
+           messageGroup.classList.add('message-group', isCurrentUser ? 'message-group-sent' : 'message-group-received');
+           
+           const messageElement = document.createElement('div');
+           messageElement.classList.add('message', isCurrentUser ? 'message-sent' : 'message-received');
+           
+           const messageText = document.createElement('div');
+           messageText.classList.add('message-text');
+           messageText.textContent = message.text;
+           messageElement.appendChild(messageText);
+           
+           messageGroup.appendChild(messageElement);
+           
+           const messageTime = document.createElement('div');
+           messageTime.classList.add('message-time');
+           messageTime.textContent = formatTime(message.timestamp);
+           messageGroup.appendChild(messageTime);
+           
+           if (isCurrentUser) {
+             const readStatus = document.createElement('div');
+             readStatus.classList.add('read-status');
+             readStatus.dataset.messageId = messageId;
+             readStatus.textContent = message.read ? 'Read' : 'Delivered';
+             if (message.read) {
+               readStatus.classList.add('read');
+             }
+             messageGroup.appendChild(readStatus);
+           }
+           
+           messagesList.appendChild(messageGroup);
+         }
+         
+         // Mark messages as read
+         function markMessagesAsRead(chatId) {
+           db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentChat).once('value')
+             .then(snapshot => {
+               const updates = {};
+               
+               snapshot.forEach(childSnapshot => {
+                 const message = childSnapshot.val();
+                 if (!message.read) {
+                   updates[`${childSnapshot.key}/read`] = true;
+                 }
+               });
+               
+               if (Object.keys(updates).length > 0) {
+                 return db.ref(`chats/${chatId}/messages`).update(updates);
+               }
+             })
+             .catch(error => {
+               console.error('Error marking messages as read:', error);
+             });
+         }
+         
+         // Mark single message as read
+         function markMessageAsRead(chatId, messageId) {
+           db.ref(`chats/${chatId}/messages/${messageId}`).update({ read: true });
+         }
+         
+         // Listen for read status changes
+         function listenForReadStatusChanges(chatId) {
+           const readStatusRef = db.ref(`chats/${chatId}/messages`).orderByChild('senderId').equalTo(currentUser.uid);
+           
+           // Add to listeners array
+           chatListeners.push({
+             ref: readStatusRef,
+             event: 'child_changed'
+           });
+           
+           readStatusRef.on('child_changed', snapshot => {
+             const message = snapshot.val();
+             const messageId = snapshot.key;
+             
+             if (message.read) {
+               const readStatusElement = document.querySelector(`.read-status[data-message-id="${messageId}"]`);
+               if (readStatusElement) {
+                 readStatusElement.textContent = 'Read';
+                 readStatusElement.classList.add('read');
+               }
+             }
+           });
+         }
+         
+         // Format timestamp
+         function formatTime(timestamp) {
+           if (!timestamp) return '';
+           
+           const date = new Date(timestamp);
+           const now = new Date();
+           
+           const isSameDay = date.getDate() === now.getDate() && 
+                             date.getMonth() === now.getMonth() && 
+                             date.getFullYear() === now.getFullYear();
+           
+           if (isSameDay) {
+             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+           } else {
+             return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + 
+                    ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+           }
+         }
+         
+         // Search chats
+         searchChatsInput.addEventListener('input', () => {
+           const searchTerm = searchChatsInput.value.toLowerCase().trim();
+           const chatItems = document.querySelectorAll('.chat-item');
+           
+           chatItems.forEach(item => {
+             const nameElement = item.querySelector('.chat-name');
+             const previewElement = item.querySelector('.chat-preview');
+             
+             if (!nameElement) return;
+             
+             const name = nameElement.textContent.toLowerCase();
+             const preview = previewElement ? previewElement.textContent.toLowerCase() : '';
+             
+             if (name.includes(searchTerm) || preview.includes(searchTerm)) {
+               item.style.display = '';
+             } else {
+               item.style.display = 'none';
+             }
+           });
+         });
+         
+         // Load user chats
+         function loadChats() {
+           chatList.innerHTML = '';
+           
+           db.ref(`chats`).orderByChild(`participants/${currentUser.uid}`).equalTo(true).on('value', snapshot => {
+             if (!snapshot.exists()) {
+               chatList.innerHTML = '<p class="empty-list">No conversations yet</p>';
+               return;
+             }
+             
+             const chats = [];
+             snapshot.forEach(childSnapshot => {
+               const chat = childSnapshot.val();
+               chat.id = childSnapshot.key;
+               
+               // Get other participant id
+               const participants = Object.keys(chat.participants);
+               const otherUserId = participants.find(id => id !== currentUser.uid);
+               
+               if (otherUserId) {
+                   chat.otherUserId = otherUserId;
+                   chats.push(chat);
+                 }
+               });
+               
+               // Sort by last message timestamp
+               chats.sort((a, b) => {
+                 return (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0);
+               });
+               
+               if (chats.length === 0) {
+                 chatList.innerHTML = '<p class="empty-list">No conversations yet</p>';
+                 return;
+               }
+               
+               // Clear existing chats
+               chatList.innerHTML = '';
+               
+               // Create chat items - load each only once
+               const processedIds = new Set();
+               chats.forEach(chat => {
+                 if (!processedIds.has(chat.id)) {
+                   processedIds.add(chat.id);
+                   loadChatItem(chat);
+                 }
+               });
+             });
+           });
+         }
+         
+         // Load chat item
+         function loadChatItem(chat) {
+           db.ref(`users/${chat.otherUserId}`).once('value')
+             .then(snapshot => {
+               const user = snapshot.val();
+               if (!user) return;
+               
+               // Check if this chat already exists in the list
+               const existingChat = document.getElementById(`chat-${chat.id}`);
+               if (existingChat) {
+                 // Update the existing chat item
+                 const previewElement = existingChat.querySelector('.chat-preview');
+                 const timeElement = existingChat.querySelector('.chat-time');
+                 
+                 if (chat.lastMessage && chat.lastMessage.text) {
+                   const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
+                   // Truncate message preview if too long
+                   let previewText = chat.lastMessage.text;
+                   if (previewText.length > 30) {
+                     previewText = previewText.substring(0, 27) + '...';
+                   }
+                   previewElement.textContent = (isCurrentUserSender ? 'You: ' : '') + previewText;
+                   timeElement.textContent = formatTime(chat.lastMessage.timestamp);
+                 }
+                 
+                 return;
+               }
+               
+               const chatItem = document.createElement('div');
+               chatItem.classList.add('chat-item');
+               chatItem.id = `chat-${chat.id}`;
+               chatItem.addEventListener('click', () => {
+                 openChat(chat.otherUserId, user);
+               });
+               
+               const avatarContainer = document.createElement('div');
+               avatarContainer.classList.add('profile-picture');
+               
+               const avatarInitial = document.createElement('span');
+               avatarInitial.textContent = (user.displayName || user.username).charAt(0).toUpperCase();
+               avatarContainer.appendChild(avatarInitial);
+               
+               const avatarImage = document.createElement('img');
+               avatarImage.classList.add('hidden');
+               avatarImage.alt = 'Avatar';
+               avatarContainer.appendChild(avatarImage);
+               
+               // Update avatar if there's a profile picture
+               if (user.profilePicture) {
+                 avatarImage.src = user.profilePicture;
+                 avatarImage.classList.remove('hidden');
+                 avatarInitial.classList.add('hidden');
+               }
+               
+               chatItem.appendChild(avatarContainer);
+               
+               const details = document.createElement('div');
+               details.classList.add('chat-details');
+               
+               const name = document.createElement('div');
+               name.classList.add('chat-name');
+               name.textContent = user.displayName || user.username;
+               details.appendChild(name);
+               
+               const preview = document.createElement('div');
+               preview.classList.add('chat-preview');
+               
+               if (chat.lastMessage && chat.lastMessage.text) {
+                 const isCurrentUserSender = chat.lastMessage.senderId === currentUser.uid;
+                 // Truncate message preview if too long
+                 let previewText = chat.lastMessage.text;
+                 if (previewText.length > 30) {
+                   previewText = previewText.substring(0, 27) + '...';
+                 }
+                 preview.textContent = (isCurrentUserSender ? 'You: ' : '') + previewText;
+               } else {
+                 preview.textContent = 'No messages yet';
+               }
+               
+               details.appendChild(preview);
+               chatItem.appendChild(details);
+               
+               const rightSide = document.createElement('div');
+               rightSide.classList.add('chat-right');
+               
+               const time = document.createElement('div');
+               time.classList.add('chat-time');
+               time.textContent = chat.lastMessage && chat.lastMessage.timestamp ? 
+                               formatTime(chat.lastMessage.timestamp) : '';
+               rightSide.appendChild(time);
+               
+               // Unread indicator
+               if (chat.lastMessage && chat.lastMessage.senderId !== currentUser.uid && !chat.lastMessage.read) {
+                 const unreadIndicator = document.createElement('div');
+                 unreadIndicator.classList.add('unread-indicator');
+                 rightSide.appendChild(unreadIndicator);
+               }
+               
+               chatItem.appendChild(rightSide);
+               
+               chatList.appendChild(chatItem);
+             });
+         }
+         
+         // Load friends
+         function loadFriends() {
+           friendsList.innerHTML = '';
+           
+           db.ref(`users/${currentUser.uid}/friends`).on('value', snapshot => {
+             if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
+               friendsList.innerHTML = '<p class="empty-list">No friends yet</p>';
+               return;
+             }
+             
+             const friendIds = Object.keys(snapshot.val());
+             
+             // Clear existing friends
+             friendsList.innerHTML = '';
+             
+             // Load each friend
+             friendIds.forEach(friendId => {
+               db.ref(`users/${friendId}`).once('value')
+                 .then(snapshot => {
+                   const friend = snapshot.val();
+                   if (!friend) return;
+                   
+                   const friendItem = document.createElement('div');
+                   friendItem.classList.add('friend-item');
+                   
+                   const avatarContainer = document.createElement('div');
+                   avatarContainer.classList.add('profile-picture');
+                   
+                   const avatarInitial = document.createElement('span');
+                   avatarInitial.textContent = (friend.displayName || friend.username).charAt(0).toUpperCase();
+                   avatarContainer.appendChild(avatarInitial);
+                   
+                   const avatarImage = document.createElement('img');
+                   avatarImage.classList.add('hidden');
+                   avatarImage.alt = 'Avatar';
+                   avatarContainer.appendChild(avatarImage);
+                   
+                   // Update avatar if there's a profile picture
+                   if (friend.profilePicture) {
+                     avatarImage.src = friend.profilePicture;
+                     avatarImage.classList.remove('hidden');
+                     avatarInitial.classList.add('hidden');
+                   }
+                   
+                   friendItem.appendChild(avatarContainer);
+                   
+                   const name = document.createElement('div');
+                   name.classList.add('friend-name');
+                   name.textContent = friend.displayName || friend.username;
+                   friendItem.appendChild(name);
+                   
+                   const actionsContainer = document.createElement('div');
+                   actionsContainer.classList.add('friend-actions');
+                   
+                   const messageBtn = document.createElement('button');
+                   messageBtn.classList.add('action-button');
+                   messageBtn.textContent = 'Message';
+                   messageBtn.addEventListener('click', (e) => {
+                     e.stopPropagation();
+                     openChat(friendId, friend);
+                   });
+                   actionsContainer.appendChild(messageBtn);
+                   
+                   const removeBtn = document.createElement('button');
+                   removeBtn.classList.add('action-button', 'remove-button');
+                   removeBtn.textContent = 'Remove';
+                   removeBtn.addEventListener('click', (e) => {
+                     e.stopPropagation();
+                     if (confirm(`Remove ${friend.displayName || friend.username} from friends?`)) {
+                       removeFriend(friendId);
+                     }
+                   });
+                   actionsContainer.appendChild(removeBtn);
+                   
+                   friendItem.appendChild(actionsContainer);
+                   friendsList.appendChild(friendItem);
+                 });
+             });
+           });
+         }
+         
+         // Load friend requests
+         function loadFriendRequests() {
+           friendRequestsList.innerHTML = '';
+           let requestCount = 0;
+           
+           db.ref(`users/${currentUser.uid}/receivedRequests`).on('value', snapshot => {
+             if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
+               friendRequestsList.innerHTML = '<p class="empty-list">No friend requests</p>';
+               requestBadge.classList.add('hidden');
+               return;
+             }
+             
+             const requestIds = Object.keys(snapshot.val());
+             requestCount = requestIds.length;
+             
+             // Update badge
+             if (requestCount > 0) {
+               requestBadge.textContent = requestCount;
+               requestBadge.classList.remove('hidden');
+             } else {
+               requestBadge.classList.add('hidden');
+             }
+             
+             // Clear existing requests
+             friendRequestsList.innerHTML = '';
+             
+             // Load each request
+             requestIds.forEach(senderId => {
+               db.ref(`users/${senderId}`).once('value')
+                 .then(snapshot => {
+                   const sender = snapshot.val();
+                   if (!sender) return;
+                   
+                   const requestItem = document.createElement('div');
+                   requestItem.classList.add('friend-request-item');
+                   
+                   const avatarContainer = document.createElement('div');
+                   avatarContainer.classList.add('profile-picture');
+                   
+                   const avatarInitial = document.createElement('span');
+                   avatarInitial.textContent = (sender.displayName || sender.username).charAt(0).toUpperCase();
+                   avatarContainer.appendChild(avatarInitial);
+                   
+                   const avatarImage = document.createElement('img');
+                   avatarImage.classList.add('hidden');
+                   avatarImage.alt = 'Avatar';
+                   avatarContainer.appendChild(avatarImage);
+                   
+                   // Update avatar if there's a profile picture
+                   if (sender.profilePicture) {
+                     avatarImage.src = sender.profilePicture;
+                     avatarImage.classList.remove('hidden');
+                     avatarInitial.classList.add('hidden');
+                   }
+                   
+                   requestItem.appendChild(avatarContainer);
+                   
+                   const requestInfo = document.createElement('div');
+                   requestInfo.classList.add('request-info');
+                   
+                   const name = document.createElement('div');
+                   name.classList.add('friend-name');
+                   name.textContent = sender.displayName || sender.username;
+                   requestInfo.appendChild(name);
+                   
+                   requestItem.appendChild(requestInfo);
+                   
+                   const actionsContainer = document.createElement('div');
+                   actionsContainer.classList.add('request-actions');
+                   
+                   const acceptBtn = document.createElement('button');
+                   acceptBtn.classList.add('action-button');
+                   acceptBtn.textContent = 'Accept';
+                   acceptBtn.addEventListener('click', () => {
+                     acceptFriendRequest(senderId);
+                   });
+                   actionsContainer.appendChild(acceptBtn);
+                   
+                   const rejectBtn = document.createElement('button');
+                   rejectBtn.classList.add('action-button', 'remove-button');
+                   rejectBtn.textContent = 'Reject';
+                   rejectBtn.addEventListener('click', () => {
+                     rejectFriendRequest(senderId);
+                   });
+                   actionsContainer.appendChild(rejectBtn);
+                   
+                   requestItem.appendChild(actionsContainer);
+                   friendRequestsList.appendChild(requestItem);
+                 });
+             });
+           });
+         }
+         
+         // Remove friend
+         function removeFriend(friendId) {
+           // Remove friend for current user
+           db.ref(`users/${currentUser.uid}/friends/${friendId}`).remove()
+             .then(() => {
+               // Remove current user as friend for friend
+               return db.ref(`users/${friendId}/friends/${currentUser.uid}`).remove();
+             })
+             .catch(error => {
+               console.error('Error removing friend:', error);
+             });
+         }
+         
+         // Update profile picture display
+         function updateProfilePictureDisplay(container, imageEl, initialEl, userData) {
+           if (userData.profilePicture) {
+             imageEl.src = userData.profilePicture;
+             imageEl.classList.remove('hidden');
+             initialEl.classList.add('hidden');
+           } else {
+             initialEl.textContent = (userData.displayName || userData.username).charAt(0).toUpperCase();
+             initialEl.classList.remove('hidden');
+             imageEl.classList.add('hidden');
+           }
+         }
+         
+         // Auth state change
+         auth.onAuthStateChanged(user => {
+           if (user) {
+             currentUser = user;
+             
+             // Get user profile
+             db.ref(`users/${user.uid}`).once('value')
+               .then(snapshot => {
+                 userProfile = snapshot.val();
+                 
+                 authContainer.classList.add('hidden');
+                 appContainer.classList.remove('hidden');
+                 chatView.classList.add('hidden');
+                 
+                 // Load chats, friends and requests
+                 loadChats();
+                 loadFriends();
+                 loadFriendRequests();
+               })
+               .catch(error => {
+                 console.error('Error loading user profile:', error);
+               });
+           } else {
+             currentUser = null;
+             userProfile = null;
+             
+             // Remove listeners
+             chatListeners.forEach(listener => {
+               if (listener.ref) {
+                 listener.ref.off(listener.event);
+               }
+             });
+             
+             chatListeners = [];
+             
+             // Clear forms
+             document.getElementById('login-email').value = '';
+             document.getElementById('login-password').value = '';
+             document.getElementById('register-username').value = '';
+             document.getElementById('register-email').value = '';
+             document.getElementById('register-password').value = '';
+             
+             // Show auth container
+             authContainer.classList.remove('hidden');
+             loginForm.classList.remove('hidden');
+             registerForm.classList.add('hidden');
+             appContainer.classList.add('hidden');
+             chatView.classList.add('hidden');
+             profileModal.classList.add('hidden');
+           }
+         });
+      </script>
+      <style>
+      :root {
       --primary-blue: #007aff;
       --light-blue: #e5f3ff;
       --light-gray: #f2f2f7;
@@ -1225,39 +1217,34 @@
       --message-blue: #0b93f6;
       --message-gray: #e5e5ea;
       --danger-red: #ff3b30;
-    }
-    
-    * {
+      }
+      * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-    
-    body {
+      }
+      body {
       background-color: #f5f5f5;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 20px;
-    }
-    
-    .hidden {
+      }
+      .hidden {
       display: none !important;
-    }
-    
-    /* iPhone frame */
-    .phone-container {
+      }
+      /* iPhone frame */
+      .phone-container {
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
       max-width: 375px;
       height: auto;
-    }
-    
-    .phone {
+      }
+      .phone {
       width: 100%;
       height: 700px;
       background-color: white;
@@ -1266,9 +1253,8 @@
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       border: 10px solid #111;
-    }
-    
-    .notch {
+      }
+      .notch {
       position: absolute;
       top: 0;
       left: 50%;
@@ -1279,9 +1265,8 @@
       border-bottom-left-radius: 20px;
       border-bottom-right-radius: 20px;
       z-index: 10;
-    }
-    
-    .speaker {
+      }
+      .speaker {
       position: absolute;
       top: 8px;
       left: 50%;
@@ -1290,9 +1275,8 @@
       height: 6px;
       background-color: #333;
       border-radius: 3px;
-    }
-    
-    .home-button {
+      }
+      .home-button {
       position: absolute;
       bottom: 15px;
       left: 50%;
@@ -1301,18 +1285,16 @@
       height: 5px;
       background-color: #333;
       border-radius: 3px;
-    }
-    
-    .phone-content {
+      }
+      .phone-content {
       width: 100%;
       height: 100%;
       overflow: hidden;
       position: relative;
       padding-top: 25px;
-    }
-    
-    /* Auth Styles */
-    .auth-container {
+      }
+      /* Auth Styles */
+      .auth-container {
       width: 100%;
       height: 100%;
       padding: 20px;
@@ -1320,32 +1302,27 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
-    
-    .auth-header {
+      }
+      .auth-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 40px;
-    }
-    
-    .auth-logo {
+      }
+      .auth-logo {
       width: 60px;
       height: 60px;
       margin-bottom: 10px;
-    }
-    
-    .auth-form {
+      }
+      .auth-form {
       width: 100%;
-    }
-    
-    .auth-form h3 {
+      }
+      .auth-form h3 {
       margin-bottom: 20px;
       text-align: center;
       color: #333;
-    }
-    
-    .auth-input {
+      }
+      .auth-input {
       width: 100%;
       padding: 12px 15px;
       margin-bottom: 15px;
@@ -1354,13 +1331,11 @@
       font-size: 16px;
       outline: none;
       transition: border-color 0.3s;
-    }
-    
-    .auth-input:focus {
+      }
+      .auth-input:focus {
       border-color: var(--primary-blue);
-    }
-    
-    .auth-button {
+      }
+      .auth-button {
       width: 100%;
       padding: 12px;
       background-color: var(--primary-blue);
@@ -1371,51 +1346,43 @@
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.3s;
-    }
-    
-    .auth-button:hover {
+      }
+      .auth-button:hover {
       background-color: #0056b3;
-    }
-    
-    .auth-switch {
+      }
+      .auth-switch {
       margin-top: 15px;
       text-align: center;
       color: #666;
-    }
-    
-    .auth-switch a {
+      }
+      .auth-switch a {
       color: var(--primary-blue);
       text-decoration: none;
       font-weight: 500;
-    }
-    
-    /* App Styles */
-    .app-container {
+      }
+      /* App Styles */
+      .app-container {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
-    }
-    
-    .app-header {
+      }
+      .app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 15px;
       background-color: #f9f9f9;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .app-header h1 {
+      }
+      .app-header h1 {
       font-size: 18px;
       font-weight: 700;
-    }
-    
-    .profile-action {
+      }
+      .profile-action {
       width: 60px;
-    }
-    
-    .text-button {
+      }
+      .text-button {
       background: none;
       border: none;
       color: var(--primary-blue);
@@ -1423,16 +1390,14 @@
       font-weight: 500;
       cursor: pointer;
       padding: 0;
-    }
-    
-    /* Tabs */
-    .tabs {
+      }
+      /* Tabs */
+      .tabs {
       display: flex;
       background-color: #f9f9f9;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .tab {
+      }
+      .tab {
       flex: 1;
       padding: 12px 0;
       text-align: center;
@@ -1440,14 +1405,12 @@
       color: var(--text-gray);
       position: relative;
       cursor: pointer;
-    }
-    
-    .tab.active {
+      }
+      .tab.active {
       color: var(--primary-blue);
       font-weight: 500;
-    }
-    
-    .tab.active:after {
+      }
+      .tab.active:after {
       content: '';
       position: absolute;
       bottom: -1px;
@@ -1455,9 +1418,8 @@
       width: 100%;
       height: 2px;
       background-color: var(--primary-blue);
-    }
-    
-    .badge {
+      }
+      .badge {
       position: absolute;
       top: 6px;
       right: 15px;
@@ -1471,37 +1433,32 @@
       align-items: center;
       justify-content: center;
       padding: 0 5px;
-    }
-    
-    /* Search */
-    .search-container {
+      }
+      /* Search */
+      .search-container {
       padding: 10px 15px;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .search-bar {
+      }
+      .search-bar {
       display: flex;
       align-items: center;
       background-color: var(--light-gray);
       border-radius: 10px;
       padding: 8px 12px;
-    }
-    
-    .search-icon {
+      }
+      .search-icon {
       margin-right: 8px;
       color: var(--text-gray);
-    }
-    
-    .search-bar input {
+      }
+      .search-bar input {
       flex: 1;
       border: none;
       background: none;
       outline: none;
       font-size: 15px;
-    }
-    
-    /* Action Button */
-    .action-button {
+      }
+      /* Action Button */
+      .action-button {
       display: inline-block;
       padding: 8px 15px;
       background-color: var(--primary-blue);
@@ -1513,95 +1470,80 @@
       cursor: pointer;
       margin-top: 10px;
       transition: background-color 0.3s;
-    }
-    
-    .action-button:hover {
+      }
+      .action-button:hover {
       background-color: #0056b3;
-    }
-    
-    .add-icon {
+      }
+      .add-icon {
       font-weight: bold;
       margin-right: 3px;
-    }
-    
-    .remove-button {
+      }
+      .remove-button {
       background-color: var(--danger-red);
-    }
-    
-    .remove-button:hover {
+      }
+      .remove-button:hover {
       background-color: #d91e18;
-    }
-    
-    /* Chat and Friend Lists */
-    .tab-content {
+      }
+      /* Chat and Friend Lists */
+      .tab-content {
       flex: 1;
       overflow-y: auto;
       background-color: white;
-    }
-    
-    .section-header {
+      }
+      .section-header {
       padding: 15px;
       font-size: 16px;
       color: #333;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .empty-list {
+      }
+      .empty-list {
       padding: 30px 15px;
       text-align: center;
       color: var(--text-gray);
-    }
-    
-    .chat-item {
+      }
+      .chat-item {
       display: flex;
       align-items: center;
       padding: 15px;
       border-bottom: 1px solid var(--border-gray);
       cursor: pointer;
       position: relative;
-    }
-    
-    .chat-details {
+      }
+      .chat-details {
       flex: 1;
       margin: 0 15px;
       overflow: hidden;
-    }
-    
-    .chat-name {
+      }
+      .chat-name {
       font-weight: 600;
       margin-bottom: 3px;
       color: #333;
-    }
-    
-    .chat-preview {
+      }
+      .chat-preview {
       font-size: 14px;
       color: var(--text-gray);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    
-    .chat-right {
+      }
+      .chat-right {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-    }
-    
-    .chat-time {
+      }
+      .chat-time {
       font-size: 12px;
       color: var(--text-gray);
       margin-bottom: 3px;
-    }
-    
-    .unread-indicator {
+      }
+      .unread-indicator {
       width: 10px;
       height: 10px;
       background-color: var(--primary-blue);
       border-radius: 50%;
-    }
-    
-    /* Profile Picture */
-    .profile-picture {
+      }
+      /* Profile Picture */
+      .profile-picture {
       width: 45px;
       height: 45px;
       border-radius: 50%;
@@ -1614,82 +1556,70 @@
       font-size: 18px;
       position: relative;
       overflow: hidden;
-    }
-    
-    .profile-picture img {
+      }
+      .profile-picture img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-    
-    .profile-picture-small {
+      }
+      .profile-picture-small {
       width: 30px;
       height: 30px;
       font-size: 14px;
-    }
-    
-    .profile-picture-large {
+      }
+      .profile-picture-large {
       width: 80px;
       height: 80px;
       font-size: 30px;
       margin-bottom: 15px;
-    }
-    
-    /* Friends */
-    .friend-item {
+      }
+      /* Friends */
+      .friend-item {
       display: flex;
       align-items: center;
       padding: 15px;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .friend-name {
+      }
+      .friend-name {
       flex: 1;
       margin-left: 15px;
       font-weight: 500;
-    }
-    
-    .friend-actions {
+      }
+      .friend-actions {
       display: flex;
       gap: 10px;
-    }
-    
-    /* Friend Requests */
-    .friend-request-item {
+      }
+      /* Friend Requests */
+      .friend-request-item {
       display: flex;
       align-items: center;
       padding: 15px;
       border-bottom: 1px solid var(--border-gray);
-    }
-    
-    .request-info {
+      }
+      .request-info {
       flex: 1;
       margin-left: 15px;
-    }
-    
-    .request-actions {
+      }
+      .request-actions {
       display: flex;
       gap: 10px;
-    }
-    
-    /* Chat View */
-    .chat-view {
+      }
+      /* Chat View */
+      .chat-view {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
       background-color: white;
-    }
-    
-    .chat-header {
+      }
+      .chat-header {
       display: flex;
       align-items: center;
       padding: 10px 15px;
       border-bottom: 1px solid var(--border-gray);
       background-color: #f9f9f9;
-    }
-    
-    .back-button {
+      }
+      .back-button {
       display: flex;
       align-items: center;
       background: none;
@@ -1698,119 +1628,101 @@
       font-size: 15px;
       cursor: pointer;
       margin-right: 15px;
-    }
-    
-    .back-arrow {
+      }
+      .back-arrow {
       font-size: 18px;
       margin-right: 3px;
-    }
-    
-    .chat-header-info {
+      }
+      .chat-header-info {
       flex: 1;
       display: flex;
       align-items: center;
-    }
-    
-    .chat-header-info h3 {
+      }
+      .chat-header-info h3 {
       margin-left: 10px;
       font-size: 16px;
       font-weight: 500;
-    }
-    
-    /* Messages */
-    .messages-container {
+      }
+      /* Messages */
+      .messages-container {
       flex: 1;
       overflow-y: auto;
       padding: 15px;
       background-color: #fff;
-    }
-    
-    .messages-list {
+      }
+      .messages-list {
       display: flex;
       flex-direction: column;
-    }
-    
-    .message-group {
+      }
+      .message-group {
       margin-bottom: 10px;
       max-width: 80%;
       display: flex;
       flex-direction: column;
-    }
-    
-    .message-group-sent {
+      }
+      .message-group-sent {
       align-self: flex-end;
       align-items: flex-end;
-    }
-    
-    .message-group-received {
+      }
+      .message-group-received {
       align-self: flex-start;
       align-items: flex-start;
-    }
-    
-    .message {
+      }
+      .message {
       padding: 10px 15px;
       border-radius: 18px;
       font-size: 15px;
       margin-bottom: 2px;
       max-width: 100%;
       word-wrap: break-word;
-    }
-    
-    .message-sent {
+      }
+      .message-sent {
       background-color: var(--message-blue);
       color: white;
       border-top-right-radius: 4px;
-    }
-    
-    .message-received {
+      }
+      .message-received {
       background-color: var(--message-gray);
       color: black;
       border-top-left-radius: 4px;
-    }
-    
-    .message-time {
+      }
+      .message-time {
       font-size: 12px;
       color: var(--text-gray);
       margin-top: 2px;
-    }
-    
-    .read-status {
+      }
+      .read-status {
       font-size: 11px;
       color: var(--text-gray);
       margin-top: 2px;
-    }
-    
-    .read-status.read {
+      }
+      .read-status.read {
       color: var(--primary-blue);
-    }
-    
-    /* Message Input */
-    .message-input-container {
+      }
+      /* Message Input */
+      .message-input-container {
       display: flex;
       align-items: center;
       padding: 10px 15px;
       border-top: 1px solid var(--border-gray);
       background-color: #f9f9f9;
-    }
-    
-    .message-input-wrapper {
+      }
+      .message-input-wrapper {
       flex: 1;
       margin: 0 10px;
       background-color: white;
       border-radius: 20px;
       border: 1px solid var(--border-gray);
-    }
-    
-    .message-input {
+      }
+      .message-input {
       width: 100%;
       padding: 10px 15px;
       border: none;
       border-radius: 20px;
       font-size: 15px;
       outline: none;
-    }
-    
-    .circle-button {
+      }
+      .circle-button {
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -1821,15 +1733,13 @@
       align-items: center;
       cursor: pointer;
       font-size: 16px;
-    }
-    
-    .send-button {
+      }
+      .send-button {
       background-color: var(--primary-blue);
       color: white;
-    }
-    
-    /* Modal */
-    .modal {
+      }
+      /* Modal */
+      .modal {
       position: absolute;
       top: 0;
       left: 0;
@@ -1840,192 +1750,163 @@
       justify-content: center;
       align-items: center;
       z-index: 100;
-    }
-    
-    .modal-content {
+      }
+      .modal-content {
       width: 90%;
       max-height: 90%;
       background-color: white;
       border-radius: 15px;
       padding: 20px;
       overflow-y: auto;
-    }
-    
-    .modal-header {
+      }
+      .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-    }
-    
-    .modal-header h3 {
+      }
+      .modal-header h3 {
       font-size: 18px;
       font-weight: 600;
-    }
-
-    .close-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text-gray);
-}
-
-.profile-edit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.profile-picture-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.profile-name-edit {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.profile-name-edit label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: var(--text-gray);
-}
-
-/* Modal animation */
-.modal {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.modal:not(.hidden) {
-  opacity: 1;
-}
-
-/* Chat animations */
-.message {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsive adjustments */
-@media (max-height: 700px) {
-  .phone {
-    height: 600px;
-  }
-  
-  .profile-picture-large {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-  }
-  
-  .auth-header {
-    margin-bottom: 20px;
-  }
-  
-  .auth-logo {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-/* Message typing indicator */
-.typing-indicator {
-  display: flex;
-  padding: 8px 12px;
-  background-color: var(--message-gray);
-  border-radius: 18px;
-  border-top-left-radius: 4px;
-  width: fit-content;
-  margin-bottom: 10px;
-}
-
-.typing-indicator span {
-  width: 8px;
-  height: 8px;
-  background-color: #999;
-  border-radius: 50%;
-  margin: 0 2px;
-  animation: typingAnimation 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes typingAnimation {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-4px); }
-}
-
-/* Image attachment styles */
-.image-attachment {
-  max-width: 200px;
-  border-radius: 10px;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
-
-.message-sent .image-attachment {
-  border-top-right-radius: 4px;
-}
-
-.message-received .image-attachment {
-  border-top-left-radius: 4px;
-}
-
-/* Plus menu */
-.plus-menu {
-  position: absolute;
-  bottom: 70px;
-  left: 15px;
-  background-color: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-}
-
-.plus-menu-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.plus-menu-item:hover {
-  background-color: var(--light-gray);
-}
-
-.plus-menu-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: var(--primary-blue);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 10px;
-}
-
-.plus-menu-text {
-  font-size: 14px;
-  font-weight: 500;
-}
+      }
+      .close-button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-gray);
+      }
+      .profile-edit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      }
+      .profile-picture-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      }
+      .profile-name-edit {
+      width: 100%;
+      margin-bottom: 20px;
+      }
+      .profile-name-edit label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-gray);
+      }
+      /* Modal animation */
+      .modal {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      }
+      .modal:not(.hidden) {
+      opacity: 1;
+      }
+      /* Chat animations */
+      .message {
+      animation: fadeIn 0.3s ease;
+      }
+      @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+      }
+      /* Responsive adjustments */
+      @media (max-height: 700px) {
+      .phone {
+      height: 600px;
+      }
+      .profile-picture-large {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      }
+      .auth-header {
+      margin-bottom: 20px;
+      }
+      .auth-logo {
+      width: 50px;
+      height: 50px;
+      }
+      }
+      /* Message typing indicator */
+      .typing-indicator {
+      display: flex;
+      padding: 8px 12px;
+      background-color: var(--message-gray);
+      border-radius: 18px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+      margin-bottom: 10px;
+      }
+      .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background-color: #999;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+      }
+      .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+      }
+      .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+      }
+      @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+      }
+      /* Image attachment styles */
+      .image-attachment {
+      max-width: 200px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      }
+      .message-sent .image-attachment {
+      border-top-right-radius: 4px;
+      }
+      .message-received .image-attachment {
+      border-top-left-radius: 4px;
+      }
+      /* Plus menu */
+      .plus-menu {
+      position: absolute;
+      bottom: 70px;
+      left: 15px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      }
+      .plus-menu-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      }
+      .plus-menu-item:hover {
+      background-color: var(--light-gray);
+      }
+      .plus-menu-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--primary-blue);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      }
+      .plus-menu-text {
+      font-size: 14px;
+      font-weight: 500;
+      }
