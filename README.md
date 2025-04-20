@@ -1,16 +1,16 @@
-# Prodigal William Inc.
+# Prodical William Inc.
 
-![Prodigal William Inc.](https://i.ibb.co/npVxVH7/github-header-image.png)
+![Prodical William Inc.](https://i.ibb.co/npVxVH7/github-header-image.png)
 
 ## Overview
 
-This public repository contains resources developed and maintained by Prodigal William Inc.
+This public repository contains resources developed and maintained by Prodical William Inc.
 
 ## License
 
-**Copyright © 2025 Prodigal William Inc. All Rights Reserved.**
+**Copyright © 2025 Prodical William Inc. All Rights Reserved.**
 
-Permission to use, copy, modify, or distribute any content from this repository must be obtained through explicit written authorization from Prodigal William Inc.
+Permission to use, copy, modify, or distribute any content from this repository must be obtained through explicit written authorization from Prodical William Inc.
 
 ### Important Notice
 
@@ -24,4 +24,4 @@ The materials in this repository are protected by copyright and intellectual pro
 
 ---
 
-**Prodigal William Inc.** | 2025
+**Prodical William Inc.** | 2025
