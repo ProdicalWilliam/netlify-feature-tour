@@ -1,232 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page Not Found</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f8f9fa;
-      overflow: hidden;
-      color: #333;
-    }
-    
-    .container {
-      text-align: center;
-      max-width: 600px;
-      padding: 2rem;
-      position: relative;
-    }
-    
-    .title {
-      font-size: 8rem;
-      margin: 0;
-      color: #2d3748;
-      position: relative;
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    .subtitle {
-      font-size: 1.5rem;
-      margin-top: 0.5rem;
-      margin-bottom: 2rem;
-      color: #4a5568;
-    }
-    
-    .message {
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-    
-    .button {
-      background-color: #4299e1;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .button:hover {
-      background-color: #3182ce;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-    
-    .button:after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 5px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.5);
-      opacity: 0;
-      border-radius: 100%;
-      transform: scale(1, 1) translate(-50%);
-      transform-origin: 50% 50%;
-    }
-    
-    .button:focus:not(:active)::after {
-      animation: ripple 1s ease-out;
-    }
-    
-    .particles {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    
-    .particle {
-      position: absolute;
-      background-color: #4299e1;
-      border-radius: 50%;
-      opacity: 0.5;
-    }
-    
-    @keyframes float {
-      0% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-20px);
-      }
-      100% {
-        transform: translateY(0px);
-      }
-    }
-    
-    @keyframes ripple {
-      0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-      }
-      20% {
-        transform: scale(25, 25);
-        opacity: 0.5;
-      }
-      100% {
-        opacity: 0;
-        transform: scale(40, 40);
-      }
-    }
-    
-    .emoji {
-      font-size: 2rem;
-      display: inline-block;
-      margin-left: 8px;
-      animation: wave 2.5s infinite;
-      transform-origin: 70% 70%;
-    }
-    
-    @keyframes wave {
-      0% { transform: rotate(0deg); }
-      10% { transform: rotate(14deg); }
-      20% { transform: rotate(-8deg); }
-      30% { transform: rotate(14deg); }
-      40% { transform: rotate(-4deg); }
-      50% { transform: rotate(10deg); }
-      60% { transform: rotate(0deg); }
-      100% { transform: rotate(0deg); }
-    }
-    
-    .background-grid {
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      top: -50%;
-      left: -50%;
-      background-image: 
-        linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-        linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-      background-size: 30px 30px;
-      transform: perspective(500px) rotateX(60deg);
-      animation: grid-move 15s linear infinite;
-    }
-    
-    @keyframes grid-move {
-      0% {
-        transform: perspective(500px) rotateX(60deg) translateY(0);
-      }
-      100% {
-        transform: perspective(500px) rotateX(60deg) translateY(30px);
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            color: #4a6cf7;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .error-title {
+            font-size: 2rem;
+            color: #333;
+            margin: 1rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards 0.2s;
+        }
+        
+        .error-description {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards 0.4s;
+        }
+        
+        .home-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4a6cf7;
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards 0.6s;
+            box-shadow: 0 4px 6px rgba(74, 108, 247, 0.2);
+        }
+        
+        .home-button:hover {
+            background-color: #3a5cd8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(74, 108, 247, 0.3);
+        }
+        
+        .astronaut {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0;
+            transform: translateY(20px);
+            animation-name: fadeInUp, float;
+            animation-duration: 0.8s, 6s;
+            animation-delay: 0.5s, 1.3s;
+            animation-iteration-count: 1, infinite;
+            animation-fill-mode: forwards, none;
+            animation-timing-function: ease, ease-in-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        .shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(74, 108, 247, 0.1);
+            animation: moveAround 15s linear infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 2s;
+            animation-duration: 17s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 50px;
+            height: 50px;
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 4s;
+            animation-duration: 13s;
+        }
+        
+        .shape:nth-child(4) {
+            width: 70px;
+            height: 70px;
+            bottom: 10%;
+            right: 15%;
+            animation-delay: 6s;
+            animation-duration: 19s;
+        }
+        
+        @keyframes moveAround {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(100px, -50px);
+            }
+            50% {
+                transform: translate(50px, 100px);
+            }
+            75% {
+                transform: translate(-50px, 50px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+            }
+            
+            .error-title {
+                font-size: 1.5rem;
+            }
+            
+            .astronaut {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="background-grid"></div>
-  <div class="particles" id="particles"></div>
-  
-  <div class="container">
-    <h1 class="title">404</h1>
-    <h2 class="subtitle">Page Not Found</h2>
-    <p class="message">Oops! The page you're looking for seems to have gone exploring. It might be lost in the digital wilderness or taking a well-deserved break.</p>
-    <a href="/" class="button">Return Home <span class="emoji">👋</span></a>
-  </div>
-
-  <script>
-    // Create floating particles
-    const particlesContainer = document.getElementById('particles');
-    const particleCount = 20;
+    <div class="shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
     
-    for (let i = 0; i < particleCount; i++) {
-      createParticle();
-    }
+    <div class="container">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-description">The page you were looking for doesn't exist or has been moved to another URL.</p>
+        
+        <div class="astronaut">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#4a6cf7">
+                <path d="M256,0C114.84,0,0,114.84,0,256S114.84,512,256,512,512,397.16,512,256,397.16,0,256,0Zm0,475.43c-120.92,0-219.43-98.51-219.43-219.43S135.08,36.57,256,36.57,475.43,135.08,475.43,256,376.92,475.43,256,475.43Z"/>
+                <path d="M256,73.14A182.86,182.86,0,1,0,438.86,256,182.86,182.86,0,0,0,256,73.14ZM365.71,292.57H146.29v-73.14H365.71Z"/>
+                <path d="M256,36.57V73.14A182.86,182.86,0,0,1,438.86,256h36.57A219.43,219.43,0,0,0,256,36.57Z" opacity="0.4"/>
+            </svg>
+        </div>
+        
+        <a href="https://dazes.org" class="home-button">Go Back Home</a>
+    </div>
     
-    function createParticle() {
-      const particle = document.createElement('div');
-      particle.classList.add('particle');
-      
-      // Random size between 5px and 15px
-      const size = Math.random() * 10 + 5;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      
-      // Random position
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      
-      // Random color
-      const colors = ['#4299e1', '#63b3ed', '#90cdf4', '#bee3f8'];
-      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      
-      // Random opacity
-      particle.style.opacity = Math.random() * 0.5 + 0.1;
-      
-      // Animation
-      const duration = Math.random() * 10 + 10;
-      const delay = Math.random() * 5;
-      
-      particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
-      
-      particlesContainer.appendChild(particle);
-    }
-    
-    // Add hover effect to the 404 title
-    const title = document.querySelector('.title');
-    title.addEventListener('mouseover', () => {
-      title.style.animation = 'none';
-      setTimeout(() => {
-        title.style.animation = 'float 6s ease-in-out infinite';
-      }, 100);
-    });
-  </script>
+    <script>
+        // Add some animation to astronaut on hover
+        const astronaut = document.querySelector('.astronaut');
+        astronaut.addEventListener('mouseover', () => {
+            astronaut.style.animationDuration = '0.8s, 3s';
+        });
+        astronaut.addEventListener('mouseout', () => {
+            astronaut.style.animationDuration = '0.8s, 6s';
+        });
+    </script>
 </body>
 </html>
