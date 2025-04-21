@@ -1,128 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Anime Episode Links</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #eee;
-      margin: 0;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #ff4655;
-    }
-    .links {
-      margin-top: 20px;
-    }
-    .anime-link {
-      display: block;
-      padding: 8px 0;
-      text-decoration: none;
-      color: #eee;
-      border-bottom: 1px solid #333;
-    }
-    .anime-link:hover {
-      background: #1e1e1e;
-    }
-    .error {
-      color: #ff4655;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Viewer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            margin: 0;
+            color: #f5f5f5;
+        }
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        #searchInput {
+            padding: 10px;
+            width: 60%;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #searchButton:hover {
+            background-color: #45a049;
+        }
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .anime-card {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .anime-card:hover {
+            transform: translateY(-5px);
+        }
+        .anime-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+        }
+        .anime-info {
+            padding: 15px;
+        }
+        .anime-title {
+            font-size: 18px;
+            margin: 0 0 10px 0;
+            color: #f5f5f5;
+        }
+        .anime-episode {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .view-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .view-link:hover {
+            background-color: #45a049;
+        }
+        .status-message {
+            text-align: center;
+            margin: 20px 0;
+            color: #aaa;
+        }
+        .loading {
+            text-align: center;
+            margin: 50px 0;
+            font-size: 18px;
+            color: #aaa;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 8px 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pagination button:hover {
+            background-color: #444;
+        }
+        .pagination button:disabled {
+            background-color: #222;
+            color: #666;
+            cursor: not-allowed;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Anime Episode Links</h1>
-    <p>Automatically fetched from HiAnime</p>
-  </header>
+    <header>
+        <h1>Anime Viewer</h1>
+    </header>
+    
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for anime...">
+            <button id="searchButton">Search</button>
+        </div>
+        
+        <div id="animeContent">
+            <p class="status-message">Welcome! Loading recent anime updates...</p>
+            <div class="anime-grid" id="animeGrid"></div>
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <button id="prevPage" disabled>Previous Page</button>
+            <button id="nextPage">Next Page</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>This is a demo interface using CORS Proxy to fetch anime data.</p>
+    </footer>
 
-  <section class="links" id="linksContainer">
-    <p>Loading anime episode links...</p>
-  </section>
-
-  <script>
-    // Using AllOrigins as a free CORS proxy.
-    const CORS_PROXY = 'https://api.allorigins.hexocode.repl.co/get?disableCache=true&url=';
-    const TARGET_URL = encodeURIComponent('https://hianime.to/home');
-
-    /**
-     * Fetch and parse HTML from the given URL using the proxy.
-     */
-    async function fetchAndParse(url) {
-      try {
-        const response = await fetch(CORS_PROXY + url);
-        if (!response.ok) {
-          throw new Error('Network response was not ok.');
+    <script>
+        // Current page and anime data storage
+        let currentPage = 1;
+        let animeData = [];
+        const corsProxy = 'https://corsproxy.io/?';
+        const baseUrl = 'https://gogoanime.by';
+        
+        // Function to create a DOM parser from HTML text
+        function parseHTML(html) {
+            const parser = new DOMParser();
+            return parser.parseFromString(html, 'text/html');
         }
-        const data = await response.json();
-        const htmlText = data.contents;
-        const parser = new DOMParser();
-        return parser.parseFromString(htmlText, 'text/html');
-      } catch (error) {
-        console.error('Error fetching or parsing data:', error);
-        return null;
-      }
-    }
-
-    /**
-     * Extract links that look like anime episode links.
-     * Here we filter links that include "watch" or "episode" in their href.
-     */
-    function extractEpisodeLinks(doc) {
-      const links = [];
-      const regex = /\/(watch|episode)\//i;
-      // Grab all anchor elements
-      doc.querySelectorAll('a').forEach(a => {
-        const href = a.getAttribute('href') || "";
-        const text = a.textContent.trim();
-        // Filter links that match the regex and have non-empty text.
-        if (regex.test(href) && text.length > 0) {
-          // Some href values might be relative, so build a full URL if needed.
-          const fullUrl = href.startsWith('http') ? href : new URL(href, 'https://hianime.to').href;
-          links.push({ text, href: fullUrl });
+        
+        // Function to extract anime data from page
+        function extractAnimeData(doc) {
+            const animeList = [];
+            const animeItems = doc.querySelectorAll('div.last_episodes ul.items li');
+            
+            animeItems.forEach(item => {
+                try {
+                    const imageElement = item.querySelector('div.img a img');
+                    const titleElement = item.querySelector('p.name a');
+                    const episodeElement = item.querySelector('p.episode');
+                    
+                    if (imageElement && titleElement) {
+                        const image = imageElement.getAttribute('src');
+                        const title = titleElement.textContent.trim();
+                        const link = baseUrl + titleElement.getAttribute('href');
+                        const episode = episodeElement ? episodeElement.textContent.trim() : '';
+                        
+                        animeList.push({
+                            title,
+                            episode,
+                            image,
+                            link
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error extracting anime data:', err);
+                }
+            });
+            
+            return animeList;
         }
-      });
-      return links;
-    }
+        
+        // Function to render anime cards
+        function renderAnimeGrid(animeList) {
+            const animeGrid = document.getElementById('animeGrid');
+            animeGrid.innerHTML = '';
+            
+            if (animeList.length === 0) {
+                document.getElementById('animeContent').innerHTML = '<p class="status-message">No results found. Try another search term or page.</p>';
+                return;
+            }
+            
+            animeList.forEach(anime => {
+                const animeCard = document.createElement('div');
+                animeCard.className = 'anime-card';
+                
+                // Use placeholder if image is not available
+                const imageUrl = anime.image && anime.image.startsWith('http') 
+                    ? anime.image 
+                    : '/api/placeholder/250/350';
+                
+                animeCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${anime.title}" class="anime-img" onerror="this.src='/api/placeholder/250/350'">
+                    <div class="anime-info">
+                        <h3 class="anime-title">${anime.title}</h3>
+                        <p class="anime-episode">${anime.episode}</p>
+                        <a href="${anime.link}" class="view-link" target="_blank">Watch Now</a>
+                    </div>
+                `;
+                
+                animeGrid.appendChild(animeCard);
+            });
+        }
 
-    /**
-     * Load episode links and display them.
-     */
-    async function loadAnimeEpisodeLinks() {
-      const container = document.getElementById('linksContainer');
-      container.innerHTML = '<p>Loading anime episode links...</p>';
-      const doc = await fetchAndParse(TARGET_URL);
-      if (!doc) {
-        container.innerHTML = '<p class="error">Error fetching data.</p>';
-        return;
-      }
-      const episodeLinks = extractEpisodeLinks(doc);
-      if (episodeLinks.length === 0) {
-        container.innerHTML = '<p>No episode links found.</p>';
-        return;
-      }
-      // Clear the container and add the links.
-      container.innerHTML = '';
-      episodeLinks.forEach(link => {
-        const a = document.createElement('a');
-        a.href = link.href;
-        a.textContent = link.text;
-        a.target = '_blank';
-        a.className = 'anime-link';
-        container.appendChild(a);
-      });
-    }
+        // Function to fetch anime data from GoGoAnime
+        async function fetchAnimeData(page = 1, searchTerm = '') {
+            const animeContent = document.getElementById('animeContent');
+            animeContent.innerHTML = '<p class="loading">Loading anime data...</p>';
+            
+            try {
+                let url;
+                if (searchTerm) {
+                    url = `${corsProxy}${encodeURIComponent(`${baseUrl}/search.html?keyword=${searchTerm}&page=${page}`)}`;
+                } else {
+                    url = `${corsProxy}${encodeURIComponent(`${baseUrl}/?page=${page}`)}`;
+                }
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const html = await response.text();
+                const doc = parseHTML(html);
+                const extractedData = extractAnimeData(doc);
+                
+                animeContent.innerHTML = '<div class="anime-grid" id="animeGrid"></div>';
+                renderAnimeGrid(extractedData);
+                return extractedData;
+                
+            } catch (error) {
+                console.error("Error fetching anime data:", error);
+                animeContent.innerHTML = 
+                    `<p class="status-message">Failed to load anime data. Please try again later.<br>Error: ${error.message}</p>`;
+                return [];
+            }
+        }
 
-    // Automatically load the links on page load.
-    window.addEventListener('load', loadAnimeEpisodeLinks);
-  </script>
+        // Handle search
+        document.getElementById('searchButton').addEventListener('click', async function() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            currentPage = 1;
+            animeData = await fetchAnimeData(currentPage, searchTerm);
+            updatePaginationButtons();
+        });
+        
+        // Handle Enter key in search input
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('searchButton').click();
+            }
+        });
+
+        // Handle pagination
+        document.getElementById('prevPage').addEventListener('click', async function() {
+            if (currentPage > 1) {
+                currentPage--;
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                animeData = await fetchAnimeData(currentPage, searchTerm);
+                updatePaginationButtons();
+            }
+        });
+        
+        document.getElementById('nextPage').addEventListener('click', async function() {
+            currentPage++;
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            animeData = await fetchAnimeData(currentPage, searchTerm);
+            updatePaginationButtons();
+        });
+        
+        // Update pagination buttons state
+        function updatePaginationButtons() {
+            const prevButton = document.getElementById('prevPage');
+            prevButton.disabled = currentPage <= 1;
+        }
+
+        // Initialize the page
+        async function initializePage() {
+            try {
+                animeData = await fetchAnimeData(currentPage);
+                updatePaginationButtons();
+            } catch (error) {
+                console.error("Error initializing page:", error);
+            }
+        }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
 </body>
 </html>
