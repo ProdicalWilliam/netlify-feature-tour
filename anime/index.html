@@ -137,6 +137,17 @@
             background-color: #1a1a1a;
             color: #aaa;
         }
+        .proxy-selector {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #proxySelector {
+            padding: 8px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -145,6 +156,14 @@
     </header>
     
     <div class="container">
+        <div class="proxy-selector">
+            <select id="proxySelector">
+                <option value="allorigins">AllOrigins</option>
+                <option value="corsproxy">CORS Proxy.io</option>
+                <option value="corsanywhere">CORS Anywhere</option>
+            </select>
+        </div>
+        
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search for anime...">
             <button id="searchButton">Search</button>
@@ -162,15 +181,27 @@
     </div>
     
     <footer>
-        <p>This is a demo interface using CORS Proxy to fetch anime data.</p>
+        <p>This is a demo interface using proxy services to fetch anime data.</p>
     </footer>
 
     <script>
         // Current page and anime data storage
         let currentPage = 1;
         let animeData = [];
-        const corsProxy = 'https://corsproxy.io/?';
         const baseUrl = 'https://gogoanime.by';
+        
+        // Proxy services
+        const proxyServices = {
+            allorigins: (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            corsproxy: (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            corsanywhere: (url) => `https://cors-anywhere.herokuapp.com/${url}`
+        };
+        
+        // Get current proxy service
+        function getCurrentProxy() {
+            const selector = document.getElementById('proxySelector');
+            return proxyServices[selector.value];
+        }
         
         // Function to create a DOM parser from HTML text
         function parseHTML(html) {
@@ -178,28 +209,71 @@
             return parser.parseFromString(html, 'text/html');
         }
         
-        // Function to extract anime data from page
+        // Function to extract anime data from page - adjusted for GoGoAnime's structure
         function extractAnimeData(doc) {
             const animeList = [];
-            const animeItems = doc.querySelectorAll('div.last_episodes ul.items li');
+            
+            // Try different selectors since site structure might change
+            const selectors = [
+                'div.last_episodes ul.items li', 
+                'div.items li',
+                '.items li',
+                '.anime-card',
+                '.film-list .film'
+            ];
+            
+            let animeItems = null;
+            
+            // Try different selectors until we find elements
+            for (const selector of selectors) {
+                const items = doc.querySelectorAll(selector);
+                if (items && items.length > 0) {
+                    animeItems = items;
+                    console.log(`Found anime items with selector: ${selector}`);
+                    break;
+                }
+            }
+            
+            // If we couldn't find any anime items
+            if (!animeItems || animeItems.length === 0) {
+                console.log("HTML structure received:", doc.body.innerHTML.substring(0, 500) + "...");
+                console.error("Couldn't find anime items in the page");
+                return animeList;
+            }
             
             animeItems.forEach(item => {
                 try {
-                    const imageElement = item.querySelector('div.img a img');
-                    const titleElement = item.querySelector('p.name a');
-                    const episodeElement = item.querySelector('p.episode');
+                    // Try different possible selectors for elements
+                    const imageElement = 
+                        item.querySelector('div.img a img') || 
+                        item.querySelector('img') ||
+                        item.querySelector('.poster img');
+                        
+                    const titleElement = 
+                        item.querySelector('p.name a') || 
+                        item.querySelector('.name a') ||
+                        item.querySelector('a.name') ||
+                        item.querySelector('.title a');
+                        
+                    const episodeElement = 
+                        item.querySelector('p.episode') || 
+                        item.querySelector('.episode') ||
+                        item.querySelector('.ep');
                     
-                    if (imageElement && titleElement) {
-                        const image = imageElement.getAttribute('src');
+                    if (titleElement) {
                         const title = titleElement.textContent.trim();
-                        const link = baseUrl + titleElement.getAttribute('href');
+                        const link = titleElement.getAttribute('href');
+                        const fullLink = link && link.startsWith('http') ? link : 
+                                         link ? `${baseUrl}${link.startsWith('/') ? '' : '/'}${link}` : '#';
+                        
+                        const image = imageElement ? imageElement.getAttribute('src') || imageElement.getAttribute('data-src') : null;
                         const episode = episodeElement ? episodeElement.textContent.trim() : '';
                         
                         animeList.push({
                             title,
                             episode,
                             image,
-                            link
+                            link: fullLink
                         });
                     }
                 } catch (err) {
@@ -216,7 +290,7 @@
             animeGrid.innerHTML = '';
             
             if (animeList.length === 0) {
-                document.getElementById('animeContent').innerHTML = '<p class="status-message">No results found. Try another search term or page.</p>';
+                document.getElementById('animeContent').innerHTML = '<p class="status-message">No results found. Try another search term, page, or proxy service.</p>';
                 return;
             }
             
@@ -248,14 +322,17 @@
             animeContent.innerHTML = '<p class="loading">Loading anime data...</p>';
             
             try {
-                let url;
+                let targetUrl;
                 if (searchTerm) {
-                    url = `${corsProxy}${encodeURIComponent(`${baseUrl}/search.html?keyword=${searchTerm}&page=${page}`)}`;
+                    targetUrl = `${baseUrl}/search.html?keyword=${encodeURIComponent(searchTerm)}&page=${page}`;
                 } else {
-                    url = `${corsProxy}${encodeURIComponent(`${baseUrl}/?page=${page}`)}`;
+                    targetUrl = `${baseUrl}/?page=${page}`;
                 }
                 
-                const response = await fetch(url);
+                const proxyUrl = getCurrentProxy()(targetUrl);
+                console.log(`Fetching from: ${proxyUrl}`);
+                
+                const response = await fetch(proxyUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -265,6 +342,10 @@
                 const doc = parseHTML(html);
                 const extractedData = extractAnimeData(doc);
                 
+                if (extractedData.length === 0) {
+                    throw new Error("No anime data found in the response. The site structure may have changed or the proxy may be blocked.");
+                }
+                
                 animeContent.innerHTML = '<div class="anime-grid" id="animeGrid"></div>';
                 renderAnimeGrid(extractedData);
                 return extractedData;
@@ -272,7 +353,7 @@
             } catch (error) {
                 console.error("Error fetching anime data:", error);
                 animeContent.innerHTML = 
-                    `<p class="status-message">Failed to load anime data. Please try again later.<br>Error: ${error.message}</p>`;
+                    `<p class="status-message">Failed to load anime data. Please try a different proxy service.<br>Error: ${error.message}</p>`;
                 return [];
             }
         }
@@ -314,6 +395,15 @@
             const prevButton = document.getElementById('prevPage');
             prevButton.disabled = currentPage <= 1;
         }
+        
+        // Handle proxy service change
+        document.getElementById('proxySelector').addEventListener('change', async function() {
+            // Reset to first page when changing proxy
+            currentPage = 1;
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            animeData = await fetchAnimeData(currentPage, searchTerm);
+            updatePaginationButtons();
+        });
 
         // Initialize the page
         async function initializePage() {
