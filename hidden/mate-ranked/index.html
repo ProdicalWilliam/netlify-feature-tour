@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flap Master</title>
+    <style>
+        :root {
+            --primary-color: #ff3366;
+            --secondary-color: #2a2a2a;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --bg-dark: #1a1a1a;
+            --bg-light: #f5f5f5;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --emerald: #50c878;
+            --platinum: #e5e4e2;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        header {
+            background-color: rgba(0,0,0,0.8);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .game-area {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            background-color: var(--secondary-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .click-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--primary-color), #ff6699);
+            border: none;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+        
+        .click-button:active {
+            transform: scale(0.95);
+        }
+        
+        .click-button:before {
+            content: "FLAP!";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .stats {
+            margin-top: 30px;
+            background-color: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+        }
+        
+        .stats h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .rank-display {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .rank-title {
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .unranked { color: #aaaaaa; }
+        .bronze { color: var(--bronze); }
+        .silver { color: var(--silver); }
+        .golden { color: var(--gold); }
+        .emerald { color: var(--emerald); }
+        .platinum { color: var(--platinum); }
+        .grandmaster { 
+            background: linear-gradient(to right, #ff3366, #ffcc00, #33ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .rank-progress {
+            width: 100%;
+            height: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), #ff6699);
+            width: 35%;
+            transition: width 0.5s;
+        }
+        
+        .leaderboard {
+            margin-top: 20px;
+        }
+        
+        .leaderboard h3 {
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        
+        .leaderboard-item .rank {
+            width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .leaderboard-item .name {
+            flex: 1;
+            padding-left: 10px;
+        }
+        
+        .leaderboard-item .score {
+            width: 80px;
+            text-align: right;
+        }
+        
+        .upgrades {
+            margin-top: 30px;
+        }
+        
+        .upgrades h3 {
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .upgrade-item {
+            background-color: rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .upgrade-item:hover {
+            background-color: rgba(255,51,102,0.2);
+        }
+        
+        .upgrade-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .upgrade-desc {
+            font-size: 12px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .upgrade-cost {
+            text-align: right;
+            color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">FLAP MASTER</div>
+        <nav>
+            <ul style="list-style: none; display: flex;">
+                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Home</a></li>
+                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Rankings</a></li>
+                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Shop</a></li>
+                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <div class="game-area">
+            <div class="rank-display">
+                <div class="rank-title silver">Silver Stroker</div>
+                <div class="rank-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 12px;">35% to Golden Gooner</div>
+            </div>
+            
+            <button class="click-button" id="flapButton"></button>
+            
+            <div class="stats">
+                <h2>Your Stats</h2>
+                <div class="stat-item">
+                    <div>Flaps per second:</div>
+                    <div>4.5</div>
+                </div>
+                <div class="stat-item">
+                    <div>Total flaps:</div>
+                    <div>12,486</div>
+                </div>
+                <div class="stat-item">
+                    <div>Flap multiplier:</div>
+                    <div>x2.5</div>
+                </div>
+                <div class="stat-item">
+                    <div>Auto-flaps:</div>
+                    <div>2/sec</div>
+                </div>
+                <div class="stat-item">
+                    <div>Current rank:</div>
+                    <div class="silver">Silver Stroker</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="leaderboard">
+                <h3>Top Flappers</h3>
+                <div class="leaderboard-item">
+                    <div class="rank">1</div>
+                    <div class="name">FlapMaster69</div>
+                    <div class="score grandmaster">249,582</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">2</div>
+                    <div class="name">ClickKing</div>
+                    <div class="score platinum">183,921</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">3</div>
+                    <div class="name">FlapGod</div>
+                    <div class="score emerald">156,304</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">4</div>
+                    <div class="name">SpeedyHands</div>
+                    <div class="score golden">124,765</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">5</div>
+                    <div class="name">ClickerPro</div>
+                    <div class="score silver">89,432</div>
+                </div>
+            </div>
+            
+            <div class="upgrades">
+                <h3>Upgrades</h3>
+                <div class="upgrade-item">
+                    <div class="upgrade-title">Faster Fingers</div>
+                    <div class="upgrade-desc">Increase manual flap rate by 15%</div>
+                    <div class="upgrade-cost">500 flaps</div>
+                </div>
+                <div class="upgrade-item">
+                    <div class="upgrade-title">Auto-Flapper</div>
+                    <div class="upgrade-desc">Adds +1 flap per second automatically</div>
+                    <div class="upgrade-cost">1,200 flaps</div>
+                </div>
+                <div class="upgrade-item">
+                    <div class="upgrade-title">Flap Multiplier</div>
+                    <div class="upgrade-desc">Each click counts as 2 flaps</div>
+                    <div class="upgrade-cost">2,500 flaps</div>
+                </div>
+                <div class="upgrade-item">
+                    <div class="upgrade-title">Golden Touch</div>
+                    <div class="upgrade-desc">5% chance of critical flaps (x5)</div>
+                    <div class="upgrade-cost">5,000 flaps</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic game functionality
+        let flaps = 12486;
+        let flapsPerClick = 1;
+        let multiplier = 2.5;
+        let autoFlapsPerSecond = 2;
+        
+        const flapButton = document.getElementById('flapButton');
+        
+        flapButton.addEventListener('click', () => {
+            flaps += flapsPerClick * multiplier;
+            // Create flap effect
+            createFlapEffect();
+            updateStats();
+        });
+        
+        function createFlapEffect() {
+            const effect = document.createElement('div');
+            effect.textContent = '+' + (flapsPerClick * multiplier);
+            effect.style.position = 'absolute';
+            effect.style.color = 'white';
+            effect.style.fontSize = '20px';
+            effect.style.fontWeight = 'bold';
+            effect.style.pointerEvents = 'none';
+            
+            // Random position around button
+            const x = flapButton.offsetLeft + Math.random() * flapButton.offsetWidth;
+            const y = flapButton.offsetTop + Math.random() * flapButton.offsetHeight;
+            
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            effect.style.opacity = 1;
+            effect.style.transition = 'all 1s ease-out';
+            
+            document.querySelector('.game-area').appendChild(effect);
+            
+            // Animation
+            setTimeout(() => {
+                effect.style.transform = 'translateY(-50px)';
+                effect.style.opacity = 0;
+            }, 50);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+        
+        function updateStats() {
+            // This would update the stats display
+            // For demo purposes, we'll just console log
+            console.log('Flaps updated:', flaps);
+        }
+        
+        // Auto flap functionality
+        setInterval(() => {
+            flaps += autoFlapsPerSecond;
+            updateStats();
+        }, 1000);
+    </script>
+</body>
+</html>
