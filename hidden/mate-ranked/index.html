@@ -10,6 +10,7 @@
             --secondary: #6c2e9c;
             --dark: #222;
             --light: #f8f9fa;
+            --unranked: #888888;
             --bronze: #cd7f32;
             --silver: #c0c0c0;
             --gold: #ffd700;
@@ -120,6 +121,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+        
+        .click-button:active img {
+            transform: scale(0.95);
         }
         
         .stats {
@@ -141,11 +147,32 @@
         }
         
         .rank-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 0.7rem 1.5rem;
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.2rem;
             margin-top: 1rem;
+        }
+        
+        .rank-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .rank-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .rank-unranked {
+            background-color: var(--unranked);
+            color: white;
         }
         
         .rank-bronze {
@@ -200,6 +227,23 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .upgrade-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .upgrade-list::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        
+        .upgrade-list::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 8px;
         }
         
         .upgrade-item {
@@ -210,16 +254,21 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            border: 1px solid #333;
         }
         
         .upgrade-item:hover {
-            background-color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 77, 140, 0.2);
+            background-color: #2a2a2a;
         }
         
         .upgrade-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .upgrade-info {
@@ -241,6 +290,11 @@
             padding: 0.5rem 1rem;
             border-radius: 5px;
             font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .upgrade-item:hover:not(.disabled) .upgrade-cost {
+            background-color: #ff2d7c;
         }
         
         .rank-progression {
@@ -274,10 +328,10 @@
             top: 50%;
             left: 0;
             height: 6px;
-            background: linear-gradient(to right, var(--bronze), var(--grandmaster));
+            background: linear-gradient(to right, var(--unranked), var(--bronze), var(--silver), var(--gold), var(--emerald), var(--platinum), var(--grandmaster));
             transform: translateY(-50%);
             border-radius: 3px;
-            transition: width 0.5s ease;
+            transition: width 0.3s ease;
             z-index: 2;
         }
         
@@ -289,11 +343,26 @@
             border: 3px solid #444;
             z-index: 3;
             position: relative;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .rank-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .rank-marker.achieved img {
+            opacity: 1;
         }
         
         .rank-marker.achieved {
             border-color: var(--light);
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         
         .rank-marker::after {
@@ -304,38 +373,26 @@
             transform: translateX(-50%);
             white-space: nowrap;
             font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.3s;
         }
         
-        .rank-marker:nth-child(1).achieved {
-            background-color: var(--bronze);
-        }
-        
-        .rank-marker:nth-child(2).achieved {
-            background-color: var(--silver);
-        }
-        
-        .rank-marker:nth-child(3).achieved {
-            background-color: var(--gold);
-        }
-        
-        .rank-marker:nth-child(4).achieved {
-            background-color: var(--emerald);
-        }
-        
-        .rank-marker:nth-child(5).achieved {
-            background-color: var(--platinum);
-        }
-        
-        .rank-marker:nth-child(6).achieved {
-            background-color: var(--grandmaster);
+        .rank-marker.achieved::after {
+            opacity: 1;
+            font-weight: bold;
         }
         
         .rank-requirements {
             margin-top: 2rem;
+            background-color: rgba(34, 34, 34, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid #333;
         }
         
         .rank-requirements h3 {
             margin-bottom: 1rem;
+            text-align: center;
         }
         
         .rank-item {
@@ -345,6 +402,14 @@
             background-color: #222;
             border-radius: 5px;
             margin-bottom: 0.5rem;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .rank-item.current {
+            border-color: var(--primary);
+            background-color: rgba(255, 77, 140, 0.1);
+            transform: scale(1.02);
         }
         
         .rank-name {
@@ -357,30 +422,13 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
+            overflow: hidden;
         }
         
-        .rank-bronze-icon {
-            background-color: var(--bronze);
-        }
-        
-        .rank-silver-icon {
-            background-color: var(--silver);
-        }
-        
-        .rank-gold-icon {
-            background-color: var(--gold);
-        }
-        
-        .rank-emerald-icon {
-            background-color: var(--emerald);
-        }
-        
-        .rank-platinum-icon {
-            background-color: var(--platinum);
-        }
-        
-        .rank-grandmaster-icon {
-            background: linear-gradient(45deg, var(--grandmaster), #ff4d8c);
+        .rank-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .click-effect {
@@ -390,6 +438,7 @@
             font-weight: bold;
             animation: floatUp 1s ease-out forwards;
             z-index: 10;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
         
         @keyframes floatUp {
@@ -401,6 +450,27 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
+        }
+        
+        .upgrade-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .upgrade-notification.show {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         @media (max-width: 768px) {
@@ -433,9 +503,16 @@
                     </div>
                     
                     <div class="stats">
-                        <div id="rankDisplay" class="rank-display rank-bronze">BRONZE BEATER</div>
+                        <div id="rankDisplay" class="rank-display rank-unranked">
+                            <div class="rank-image">
+                                <img id="rankImage" src="https://lh3.googleusercontent.com/pw/AP1GczNu6On2cZ__l4jEj1z0f2Nap4e0Uum78rHq-A1n2EiPWsqH08DzjZ66xUlC4EmkrgjVMTu0JVna8kr0TMnVPIMqKFcr-lic-MjCrVBj52FoxpkvXni_u7CBa8hK3npKZszW6x_MyyADwzfo2Y1oNqA=w500-h313-s-no-gm?authuser=4" alt="Current Rank">
+                            </div>
+                            <span id="rankText">UNRANKED</span>
+                        </div>
                         <div id="counter" class="counter">0</div>
-                        <div id="rate" class="rate">0 per second</div>
+                        <div class="rate">
+                            <span id="clickValue">1</span> per click | <span id="rate">0</span> per second
+                        </div>
                     </div>
                 </div>
                 
@@ -453,55 +530,91 @@
                 <div class="rank-progression">
                     <div class="rank-track">
                         <div id="rankProgress" class="rank-progress" style="width: 0%"></div>
-                        <div class="rank-marker achieved" data-rank="BRONZE BEATER"></div>
-                        <div class="rank-marker" data-rank="SILVER STROKER"></div>
-                        <div class="rank-marker" data-rank="GOLDEN GOONER"></div>
-                        <div class="rank-marker" data-rank="EMERALD EDGER"></div>
-                        <div class="rank-marker" data-rank="PLATINUM PULLER"></div>
-                        <div class="rank-marker" data-rank="GRANDMASTER BAITER"></div>
+                        <div class="rank-marker" data-rank="UNRANKED">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczNu6On2cZ__l4jEj1z0f2Nap4e0Uum78rHq-A1n2EiPWsqH08DzjZ66xUlC4EmkrgjVMTu0JVna8kr0TMnVPIMqKFcr-lic-MjCrVBj52FoxpkvXni_u7CBa8hK3npKZszW6x_MyyADwzfo2Y1oNqA=w500-h313-s-no-gm?authuser=4" alt="Unranked">
+                        </div>
+                        <div class="rank-marker" data-rank="BRONZE BEATER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczPDKcYYUOY51BoCZokUPeczLRGTqCkLUMhuIrMB6Pulj7raMcLpvex6YNkmSG0BjtIe59Hx6csUumg9IJZlSfmn1Ifl1VpkdagELBThYMEMFljySxNnfp46X3UMbuJaV4WSKkRF9HeOou_yxW7vCug=w800-h500-s-no-gm?authuser=4" alt="Bronze Beater">
+                        </div>
+                        <div class="rank-marker" data-rank="SILVER STROKER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczP0Y1sq406Ao1KVHPERg0hH2I7Oimuie3WJxGhEM4_-FXJJSmexjo2sgmcAfYQhjH0elZkDSsORaOTV1Xvp-OGyqcEk_NfLtiwjlTiciL0sWDtQuIWo5jhKUOx21brr4rJ9IufSRZkFiQ-dHRs2_lk=w500-h313-s-no-gm?authuser=4" alt="Silver Stroker">
+                        </div>
+                        <div class="rank-marker" data-rank="GOLDEN GOONER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczMkxvfH7iN4KzofAfHRi8090v3KM1j-WDdbU_-czy-0M60i2Deyi3KjIAPp4eVW_Ony3xFpDnAXakHEEfMt0xFXgljRQRuwQYvSCavCLLutdR4bP5DyWcGAaN4veq2rOS4tuUtcs94EJYfNt1dwCTk=w500-h313-s-no-gm?authuser=4" alt="Golden Gooner">
+                        </div>
+                        <div class="rank-marker" data-rank="EMERALD EDGER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczMQmw6_KyWhZY4qMDFepjgccvu_j9i_k9rY-qu073Q985iDcoTWQAULbVYOdZgM5fa_JeJpSrkhAXRHV2k6skuIG01A3eDnbP0s6fbmCHWiO64EgsDa96GXm2pxOvV2YXDgqYRj82PNsQZnnL04a2E=w500-h313-s-no-gm?authuser=4" alt="Emerald Edger">
+                        </div>
+                        <div class="rank-marker" data-rank="PLATINUM PULLER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczPvE9j05M1x-1MJW5yjn3m7dTWYsTO915KyEp5a-fO4PHr6NRg2VuVjPLQNUlsYOFuUQmbpIgGnqS0fHITPvS8JF6PzA9Z76s8LYAO-omzvVMqjjEx0T6CfKqlUs_oO-B3d01ePGOdZ7oshWd4MnxU=w500-h313-s-no-gm?authuser=4" alt="Platinum Puller">
+                        </div>
+                        <div class="rank-marker" data-rank="GRANDMASTER BAITER">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczNjY497H5q5IDr6ufZmWc73976gsBs-ACaLkwMOAspq2LtoZRnuBAXxb30QwejQ007jeql9CkbuU55Il4Z-DCwp8I0ayjSZgZ1-a60SNPxd0N4CcbjlhUEMFkU5wJPlnxUbYeu1nb7OzbtbwV5a_og=w500-h313-s-no-gm?authuser=4" alt="Grandmaster Baiter">
+                        </div>
                     </div>
                 </div>
                 
                 <div class="rank-requirements">
                     <h3>Rank Requirements</h3>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-0">
                         <div class="rank-name">
-                            <div class="rank-icon rank-bronze-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczNu6On2cZ__l4jEj1z0f2Nap4e0Uum78rHq-A1n2EiPWsqH08DzjZ66xUlC4EmkrgjVMTu0JVna8kr0TMnVPIMqKFcr-lic-MjCrVBj52FoxpkvXni_u7CBa8hK3npKZszW6x_MyyADwzfo2Y1oNqA=w500-h313-s-no-gm?authuser=4" alt="Unranked Icon">
+                            </div>
+                            UNRANKED
+                        </div>
+                        <div class="rank-requirement">0 clicks</div>
+                    </div>
+                    <div class="rank-item" id="rank-item-1">
+                        <div class="rank-name">
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczPDKcYYUOY51BoCZokUPeczLRGTqCkLUMhuIrMB6Pulj7raMcLpvex6YNkmSG0BjtIe59Hx6csUumg9IJZlSfmn1Ifl1VpkdagELBThYMEMFljySxNnfp46X3UMbuJaV4WSKkRF9HeOou_yxW7vCug=w800-h500-s-no-gm?authuser=4" alt="Bronze Beater Icon">
+                            </div>
                             BRONZE BEATER
                         </div>
-                        <div class="rank-requirement">0+ clicks</div>
+                        <div class="rank-requirement">100+ clicks</div>
                     </div>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-2">
                         <div class="rank-name">
-                            <div class="rank-icon rank-silver-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczP0Y1sq406Ao1KVHPERg0hH2I7Oimuie3WJxGhEM4_-FXJJSmexjo2sgmcAfYQhjH0elZkDSsORaOTV1Xvp-OGyqcEk_NfLtiwjlTiciL0sWDtQuIWo5jhKUOx21brr4rJ9IufSRZkFiQ-dHRs2_lk=w500-h313-s-no-gm?authuser=4" alt="Silver Stroker Icon">
+                            </div>
                             SILVER STROKER
                         </div>
                         <div class="rank-requirement">500+ clicks</div>
                     </div>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-3">
                         <div class="rank-name">
-                            <div class="rank-icon rank-gold-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczMkxvfH7iN4KzofAfHRi8090v3KM1j-WDdbU_-czy-0M60i2Deyi3KjIAPp4eVW_Ony3xFpDnAXakHEEfMt0xFXgljRQRuwQYvSCavCLLutdR4bP5DyWcGAaN4veq2rOS4tuUtcs94EJYfNt1dwCTk=w500-h313-s-no-gm?authuser=4" alt="Golden Gooner Icon">
+                            </div>
                             GOLDEN GOONER
                         </div>
                         <div class="rank-requirement">2,000+ clicks</div>
                     </div>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-4">
                         <div class="rank-name">
-                            <div class="rank-icon rank-emerald-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczMQmw6_KyWhZY4qMDFepjgccvu_j9i_k9rY-qu073Q985iDcoTWQAULbVYOdZgM5fa_JeJpSrkhAXRHV2k6skuIG01A3eDnbP0s6fbmCHWiO64EgsDa96GXm2pxOvV2YXDgqYRj82PNsQZnnL04a2E=w500-h313-s-no-gm?authuser=4" alt="Emerald Edger Icon">
+                            </div>
                             EMERALD EDGER
                         </div>
                         <div class="rank-requirement">10,000+ clicks</div>
                     </div>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-5">
                         <div class="rank-name">
-                            <div class="rank-icon rank-platinum-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczPvE9j05M1x-1MJW5yjn3m7dTWYsTO915KyEp5a-fO4PHr6NRg2VuVjPLQNUlsYOFuUQmbpIgGnqS0fHITPvS8JF6PzA9Z76s8LYAO-omzvVMqjjEx0T6CfKqlUs_oO-B3d01ePGOdZ7oshWd4MnxU=w500-h313-s-no-gm?authuser=4" alt="Platinum Puller Icon">
+                            </div>
                             PLATINUM PULLER
                         </div>
                         <div class="rank-requirement">50,000+ clicks</div>
                     </div>
-                    <div class="rank-item">
+                    <div class="rank-item" id="rank-item-6">
                         <div class="rank-name">
-                            <div class="rank-icon rank-grandmaster-icon"></div>
+                            <div class="rank-icon">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczNjY497H5q5IDr6ufZmWc73976gsBs-ACaLkwMOAspq2LtoZRnuBAXxb30QwejQ007jeql9CkbuU55Il4Z-DCwp8I0ayjSZgZ1-a60SNPxd0N4CcbjlhUEMFkU5wJPlnxUbYeu1nb7OzbtbwV5a_og=w500-h313-s-no-gm?authuser=4" alt="Grandmaster Baiter Icon">
+                            </div>
                             GRANDMASTER BAITER
                         </div>
                         <div class="rank-requirement">200,000+ clicks</div>
@@ -511,6 +624,10 @@
         </div>
     </main>
     
+    <div id="upgradeNotification" class="upgrade-notification">
+        Upgrade purchased!
+    </div>
+    
     <script>
         // Game state
         const gameState = {
@@ -519,12 +636,13 @@
             clickValue: 1,
             autoClicksPerSecond: 0,
             ranks: [
-                { name: "BRONZE BEATER", threshold: 0, class: "rank-bronze" },
-                { name: "SILVER STROKER", threshold: 500, class: "rank-silver" },
-                { name: "GOLDEN GOONER", threshold: 2000, class: "rank-gold" },
-                { name: "EMERALD EDGER", threshold: 10000, class: "rank-emerald" },
-                { name: "PLATINUM PULLER", threshold: 50000, class: "rank-platinum" },
-                { name: "GRANDMASTER BAITER", threshold: 200000, class: "rank-grandmaster" }
+                { name: "UNRANKED", threshold: 0, class: "rank-unranked", image: "https://lh3.googleusercontent.com/pw/AP1GczNu6On2cZ__l4jEj1z0f2Nap4e0Uum78rHq-A1n2EiPWsqH08DzjZ66xUlC4EmkrgjVMTu0JVna8kr0TMnVPIMqKFcr-lic-MjCrVBj52FoxpkvXni_u7CBa8hK3npKZszW6x_MyyADwzfo2Y1oNqA=w500-h313-s-no-gm?authuser=4" },
+                { name: "BRONZE BEATER", threshold: 100, class: "rank-bronze", image: "https://lh3.googleusercontent.com/pw/AP1GczPDKcYYUOY51BoCZokUPeczLRGTqCkLUMhuIrMB6Pulj7raMcLpvex6YNkmSG0BjtIe59Hx6csUumg9IJZlSfmn1Ifl1VpkdagELBThYMEMFljySxNnfp46X3UMbuJaV4WSKkRF9HeOou_yxW7vCug=w800-h500-s-no-gm?authuser=4" },
+                { name: "SILVER STROKER", threshold: 500, class: "rank-silver", image: "https://lh3.googleusercontent.com/pw/AP1GczP0Y1sq406Ao1KVHPERg0hH2I7Oimuie3WJxGhEM4_-FXJJSmexjo2sgmcAfYQhjH0elZkDSsORaOTV1Xvp-OGyqcEk_NfLtiwjlTiciL0sWDtQuIWo5jhKUOx21brr4rJ9IufSRZkFiQ-dHRs2_lk=w500-h313-s-no-gm?authuser=4" },
+                { name: "GOLDEN GOONER", threshold: 2000, class: "rank-gold", image: "https://lh3.googleusercontent.com/pw/AP1GczMkxvfH7iN4KzofAfHRi8090v3KM1j-WDdbU_-czy-0M60i2Deyi3KjIAPp4eVW_Ony3xFpDnAXakHEEfMt0xFXgljRQRuwQYvSCavCLLutdR4bP5DyWcGAaN4veq2rOS4tuUtcs94EJYfNt1dwCTk=w500-h313-s-no-gm?authuser=4" },
+                { name: "EMERALD EDGER", threshold: 10000, class: "rank-emerald", image: "https://lh3.googleusercontent.com/pw/AP1GczMQmw6_KyWhZY4qMDFepjgccvu_j9i_k9rY-qu073Q985iDcoTWQAULbVYOdZgM5fa_JeJpSrkhAXRHV2k6skuIG01A3eDnbP0s6fbmCHWiO64EgsDa96GXm2pxOvV2YXDgqYRj82PNsQZnnL04a2E=w500-h313-s-no-gm?authuser=4" },
+                { name: "PLATINUM PULLER", threshold: 50000, class: "rank-platinum", image: "https://lh3.googleusercontent.com/pw/AP1GczPvE9j05M1x-1MJW5yjn3m7dTWYsTO915KyEp5a-fO4PHr6NRg2VuVjPLQNUlsYOFuUQmbpIgGnqS0fHITPvS8JF6PzA9Z76s8LYAO-omzvVMqjjEx0T6CfKqlUs_oO-B3d01ePGOdZ7oshWd4MnxU=w500-h313-s-no-gm?authuser=4" },
+                { name: "GRANDMASTER BAITER", threshold: 200000, class: "rank-grandmaster", image: "https://lh3.googleusercontent.com/pw/AP1GczNjY497H5q5IDr6ufZmWc73976gsBs-ACaLkwMOAspq2LtoZRnuBAXxb30QwejQ007jeql9CkbuU55Il4Z-DCwp8I0ayjSZgZ1-a60SNPxd0N4CcbjlhUEMFkU5wJPlnxUbYeu1nb7OzbtbwV5a_og=w500-h313-s-no-gm?authuser=4" }
             ],
             currentRank: 0,
             upgrades: [
@@ -544,10 +662,15 @@
         const clickButton = document.getElementById('clickButton');
         const counter = document.getElementById('counter');
         const rate = document.getElementById('rate');
+        const clickValue = document.getElementById('clickValue');
         const rankDisplay = document.getElementById('rankDisplay');
+        const rankText = document.getElementById('rankText');
+        const rankImage = document.getElementById('rankImage');
         const upgradeList = document.getElementById('upgradeList');
         const rankProgress = document.getElementById('rankProgress');
         const rankMarkers = document.querySelectorAll('.rank-marker');
+        const upgradeNotification = document.getElementById('upgradeNotification');
+        const rankItems = document.querySelectorAll('.rank-item');
         
         // Initialize game
         function initGame() {
@@ -565,12 +688,17 @@
             setInterval(() => {
                 updateDisplay();
             }, 100);
+            
+            // Mark first rank as achieved
+            rankMarkers[0].classList.add('achieved');
+            rankItems[0].classList.add('current');
         }
         
         // Handle click
         clickButton.addEventListener('click', function(e) {
             addClicks(gameState.clickValue);
             createClickEffect(e);
+            updateProgressBar(); // Update progress bar immediately on click
         });
         
         // Add clicks to the counter
@@ -584,6 +712,10 @@
             const effect = document.createElement('div');
             effect.className = 'click-effect';
             effect.textContent = `+${gameState.clickValue}`;
+            
+            // Random color for the click effect
+            const colors = ['#ff4d8c', '#6c2e9c', '#50c878', '#ffd700', '#e5e4e2', '#9932cc'];
+            effect.style.color = colors[Math.floor(Math.random() * colors.length)];
             
             // Position the effect at click position
             const rect = clickButton.getBoundingClientRect();
@@ -608,6 +740,11 @@
                     if (gameState.currentRank !== i) {
                         gameState.currentRank = i;
                         updateRankDisplay();
+                        
+                        // Show rank up notification if not the first rank
+                        if (i > 0) {
+                            showNotification(`Ranked up to ${gameState.ranks[i].name}!`);
+                        }
                     }
                     break;
                 }
@@ -617,8 +754,9 @@
         // Update rank display
         function updateRankDisplay() {
             const rank = gameState.ranks[gameState.currentRank];
-            rankDisplay.textContent = rank.name;
+            rankText.textContent = rank.name;
             rankDisplay.className = `rank-display ${rank.class}`;
+            rankImage.src = rank.image;
             
             // Update rank markers
             rankMarkers.forEach((marker, index) => {
@@ -629,14 +767,36 @@
                 }
             });
             
-            // Update progress bar
+            // Update current rank highlight in requirements list
+            rankItems.forEach((item, index) => {
+                if (index === gameState.currentRank) {
+                    item.classList.add('current');
+                } else {
+                    item.classList.remove('current');
+                }
+            });
+            
+            updateProgressBar();
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const rank = gameState.ranks[gameState.currentRank];
             const currentThreshold = rank.threshold;
             const nextThreshold = gameState.currentRank < gameState.ranks.length - 1 
                 ? gameState.ranks[gameState.currentRank + 1].threshold 
                 : rank.threshold * 2;
             
+            // Calculate progress percentage between current rank and next rank
             const progress = Math.min(100, ((gameState.clicks - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
-            rankProgress.style.width = `${(gameState.currentRank * 20) + (progress / 5)}%`;
+            
+            // Calculate the total width percentage (each segment is ~16.67% for 6 ranks)
+            const segmentWidth = 100 / (gameState.ranks.length - 1);
+            const completeSegments = gameState.currentRank * segmentWidth;
+            const partialSegment = (progress / 100) * segmentWidth;
+            
+            const totalWidth = completeSegments + partialSegment;
+            rankProgress.style.width = `${totalWidth}%`;
         }
         
         // Render upgrades
@@ -677,13 +837,25 @@
                 upgrade.effect();
                 renderUpgrades();
                 updateDisplay();
+                showNotification(`Purchased ${upgrade.name} (Level ${upgrade.level})!`);
             }
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            upgradeNotification.textContent = message;
+            upgradeNotification.classList.add('show');
+            
+            setTimeout(() => {
+                upgradeNotification.classList.remove('show');
+            }, 3000);
         }
         
         // Update display
         function updateDisplay() {
             counter.textContent = formatNumber(Math.floor(gameState.clicks));
-            rate.textContent = `${formatNumber(gameState.autoClicksPerSecond)} per second`;
+            rate.textContent = formatNumber(gameState.autoClicksPerSecond);
+            clickValue.textContent = formatNumber(gameState.clickValue);
             checkRank();
         }
         
@@ -697,3 +869,22 @@
     </script>
 </body>
 </html>
+</antArtifact>
+
+I've completed the clicker game with all the requested improvements. Here's what changed:
+
+1. **Live Progress Bar**: The progress bar now updates in real-time with each click, showing your progress toward the next rank.
+
+2. **Functioning Upgrades**: All upgrades now work properly, with notifications when you purchase them.
+
+3. **Cleaner UI Design**: 
+   - Added rank images alongside rank names
+   - Improved styling for upgrades and rank markers
+   - Added visual indicators for current rank
+   - Animated effects and transitions
+
+4. **Rank Images**: Added all the rank images you provided, with the progressive display changing as you advance.
+
+5. **Added "Unranked"**: Included an "Unranked" level before Bronze Beater at 100 clicks.
+
+The game now has a smoother, more responsive feel with immediate visual feedback for all player actions. You can see your progress clearly through the rank progression bar, and the current rank is highlighted in the requirements list.
