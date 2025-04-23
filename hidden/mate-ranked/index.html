@@ -473,6 +473,22 @@
             transform: translateY(0);
         }
         
+        .reset-save {
+            margin-top: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .reset-save:hover {
+            background-color: #ff2d7c;
+        }
+        
         @media (max-width: 768px) {
             .game-area {
                 flex-direction: column;
@@ -513,6 +529,7 @@
                         <div class="rate">
                             <span id="clickValue">1</span> per click | <span id="rate">0</span> per second
                         </div>
+                        <button id="resetSave" class="reset-save">Reset Game</button>
                     </div>
                 </div>
                 
@@ -640,233 +657,279 @@
                 { name: "BRONZE BEATER", threshold: 100, class: "rank-bronze", image: "https://lh3.googleusercontent.com/pw/AP1GczPDKcYYUOY51BoCZokUPeczLRGTqCkLUMhuIrMB6Pulj7raMcLpvex6YNkmSG0BjtIe59Hx6csUumg9IJZlSfmn1Ifl1VpkdagELBThYMEMFljySxNnfp46X3UMbuJaV4WSKkRF9HeOou_yxW7vCug=w800-h500-s-no-gm?authuser=4" },
                 { name: "SILVER STROKER", threshold: 500, class: "rank-silver", image: "https://lh3.googleusercontent.com/pw/AP1GczP0Y1sq406Ao1KVHPERg0hH2I7Oimuie3WJxGhEM4_-FXJJSmexjo2sgmcAfYQhjH0elZkDSsORaOTV1Xvp-OGyqcEk_NfLtiwjlTiciL0sWDtQuIWo5jhKUOx21brr4rJ9IufSRZkFiQ-dHRs2_lk=w500-h313-s-no-gm?authuser=4" },
                 { name: "GOLDEN GOONER", threshold: 2000, class: "rank-gold", image: "https://lh3.googleusercontent.com/pw/AP1GczMkxvfH7iN4KzofAfHRi8090v3KM1j-WDdbU_-czy-0M60i2Deyi3KjIAPp4eVW_Ony3xFpDnAXakHEEfMt0xFXgljRQRuwQYvSCavCLLutdR4bP5DyWcGAaN4veq2rOS4tuUtcs94EJYfNt1dwCTk=w500-h313-s-no-gm?authuser=4" },
-                { name: "EMERALD EDGER", threshold: 10000, class: "rank-emerald", image: "https://lh3.googleusercontent.com/pw/AP1GczMQmw6_KyWhZY4qMDFepjgccvu_j9i_k9rY-qu073Q985iDcoTWQAULbVYOdZgM5fa_JeJpSrkhAXRHV2k6skuIG01A3eDnbP0s6fbmCHWiO64EgsDa96GXm2pxOvV2YXDgqYRj82PNsQZnnL04a2E=w500-h313-s-no-gm?authuser=4" },
-                { name: "PLATINUM PULLER", threshold: 50000, class: "rank-platinum", image: "https://lh3.googleusercontent.com/pw/AP1GczPvE9j05M1x-1MJW5yjn3m7dTWYsTO915KyEp5a-fO4PHr6NRg2VuVjPLQNUlsYOFuUQmbpIgGnqS0fHITPvS8JF6PzA9Z76s8LYAO-omzvVMqjjEx0T6CfKqlUs_oO-B3d01ePGOdZ7oshWd4MnxU=w500-h313-s-no-gm?authuser=4" },
-                { name: "GRANDMASTER BAITER", threshold: 200000, class: "rank-grandmaster", image: "https://lh3.googleusercontent.com/pw/AP1GczNjY497H5q5IDr6ufZmWc73976gsBs-ACaLkwMOAspq2LtoZRnuBAXxb30QwejQ007jeql9CkbuU55Il4Z-DCwp8I0ayjSZgZ1-a60SNPxd0N4CcbjlhUEMFkU5wJPlnxUbYeu1nb7OzbtbwV5a_og=w500-h313-s-no-gm?authuser=4" }
-            ],
-            currentRank: 0,
-            upgrades: [
-                { id: 1, name: "Double Clicker", description: "Double the value of each click", baseCost: 50, costMultiplier: 1.5, level: 0, effect: () => { gameState.clickValue *= 2; } },
-                { id: 2, name: "Auto Clicker", description: "Automatically clicks once per second", baseCost: 100, costMultiplier: 1.8, level: 0, effect: () => { gameState.autoClicksPerSecond += 1; } },
-                { id: 3, name: "Speedy Fingers", description: "Increases clicking speed by 50%", baseCost: 500, costMultiplier: 2, level: 0, effect: () => { gameState.clickValue *= 1.5; } },
-                { id: 4, name: "Endurance Training", description: "Auto clickers work 2x faster", baseCost: 1000, costMultiplier: 2.2, level: 0, effect: () => { gameState.autoClicksPerSecond *= 2; } },
-                { id: 5, name: "Master Technique", description: "Each click now worth 5x more", baseCost: 5000, costMultiplier: 3, level: 0, effect: () => { gameState.clickValue *= 5; } },
-                { id: 6, name: "Legendary Power", description: "Massively increases all clicking power", baseCost: 20000, costMultiplier: 4, level: 0, effect: () => { 
-                    gameState.clickValue *= 10; 
-                    gameState.autoClicksPerSecond *= 3; 
-                } }
-            ]
-        };
-        
-        // DOM Elements
-        const clickButton = document.getElementById('clickButton');
-        const counter = document.getElementById('counter');
-        const rate = document.getElementById('rate');
-        const clickValue = document.getElementById('clickValue');
-        const rankDisplay = document.getElementById('rankDisplay');
-        const rankText = document.getElementById('rankText');
-        const rankImage = document.getElementById('rankImage');
-        const upgradeList = document.getElementById('upgradeList');
-        const rankProgress = document.getElementById('rankProgress');
-        const rankMarkers = document.querySelectorAll('.rank-marker');
-        const upgradeNotification = document.getElementById('upgradeNotification');
-        const rankItems = document.querySelectorAll('.rank-item');
-        
-        // Initialize game
-        function initGame() {
-            renderUpgrades();
-            updateDisplay();
-            
-            // Set up auto clickers interval
-            setInterval(() => {
-                if (gameState.autoClicksPerSecond > 0) {
-                    addClicks(gameState.autoClicksPerSecond);
-                }
-            }, 1000);
-            
-            // Update display every 100ms for smoother updates
-            setInterval(() => {
-                updateDisplay();
-            }, 100);
-            
-            // Mark first rank as achieved
-            rankMarkers[0].classList.add('achieved');
-            rankItems[0].classList.add('current');
-        }
-        
-        // Handle click
-        clickButton.addEventListener('click', function(e) {
-            addClicks(gameState.clickValue);
-            createClickEffect(e);
-            updateProgressBar(); // Update progress bar immediately on click
-        });
-        
-        // Add clicks to the counter
-        function addClicks(amount) {
-            gameState.clicks += amount;
-            checkRank();
-        }
-        
-        // Create click effect
-        function createClickEffect(e) {
-            const effect = document.createElement('div');
-            effect.className = 'click-effect';
-            effect.textContent = `+${gameState.clickValue}`;
-            
-            // Random color for the click effect
-            const colors = ['#ff4d8c', '#6c2e9c', '#50c878', '#ffd700', '#e5e4e2', '#9932cc'];
-            effect.style.color = colors[Math.floor(Math.random() * colors.length)];
-            
-            // Position the effect at click position
-            const rect = clickButton.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            effect.style.left = `${x}px`;
-            effect.style.top = `${y}px`;
-            
-            clickButton.appendChild(effect);
-            
-            // Remove the effect after animation completes
-            setTimeout(() => {
-                effect.remove();
-            }, 1000);
-        }
-        
-        // Check rank and update if necessary
-        function checkRank() {
-            for (let i = gameState.ranks.length - 1; i >= 0; i--) {
-                if (gameState.clicks >= gameState.ranks[i].threshold) {
-                    if (gameState.currentRank !== i) {
-                        gameState.currentRank = i;
-                        updateRankDisplay();
-                        
-                        // Show rank up notification if not the first rank
-                        if (i > 0) {
-                            showNotification(`Ranked up to ${gameState.ranks[i].name}!`);
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        
-        // Update rank display
-        function updateRankDisplay() {
-            const rank = gameState.ranks[gameState.currentRank];
-            rankText.textContent = rank.name;
-            rankDisplay.className = `rank-display ${rank.class}`;
-            rankImage.src = rank.image;
-            
-            // Update rank markers
-            rankMarkers.forEach((marker, index) => {
-                if (index <= gameState.currentRank) {
-                    marker.classList.add('achieved');
-                } else {
-                    marker.classList.remove('achieved');
-                }
-            });
-            
-            // Update current rank highlight in requirements list
-            rankItems.forEach((item, index) => {
-                if (index === gameState.currentRank) {
-                    item.classList.add('current');
-                } else {
-                    item.classList.remove('current');
-                }
-            });
-            
-            updateProgressBar();
-        }
-        
-        // Update progress bar
-        function updateProgressBar() {
-            const rank = gameState.ranks[gameState.currentRank];
-            const currentThreshold = rank.threshold;
-            const nextThreshold = gameState.currentRank < gameState.ranks.length - 1 
-                ? gameState.ranks[gameState.currentRank + 1].threshold 
-                : rank.threshold * 2;
-            
-            // Calculate progress percentage between current rank and next rank
-            const progress = Math.min(100, ((gameState.clicks - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
-            
-            // Calculate the total width percentage (each segment is ~16.67% for 6 ranks)
-            const segmentWidth = 100 / (gameState.ranks.length - 1);
-            const completeSegments = gameState.currentRank * segmentWidth;
-            const partialSegment = (progress / 100) * segmentWidth;
-            
-            const totalWidth = completeSegments + partialSegment;
-            rankProgress.style.width = `${totalWidth}%`;
-        }
-        
-        // Render upgrades
-        function renderUpgrades() {
-            upgradeList.innerHTML = '';
-            
-            gameState.upgrades.forEach(upgrade => {
-                const cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
-                const disabled = gameState.clicks < cost;
-                
-                const upgradeElement = document.createElement('div');
-                upgradeElement.className = `upgrade-item ${disabled ? 'disabled' : ''}`;
-                upgradeElement.innerHTML = `
-                    <div class="upgrade-info">
-                        <div class="upgrade-name">${upgrade.name} ${upgrade.level > 0 ? `(Level ${upgrade.level})` : ''}</div>
-                        <div class="upgrade-desc">${upgrade.description}</div>
-                    </div>
-                    <div class="upgrade-cost">${formatNumber(cost)}</div>
-                `;
-                
-                upgradeElement.addEventListener('click', () => {
-                    if (!disabled) {
-                        purchaseUpgrade(upgrade);
-                    }
-                });
-                
-                upgradeList.appendChild(upgradeElement);
-            });
-        }
-        
-        // Purchase upgrade
-        function purchaseUpgrade(upgrade) {
-            const cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
-            
-            if (gameState.clicks >= cost) {
-                gameState.clicks -= cost;
-                upgrade.level++;
-                upgrade.effect();
-                renderUpgrades();
-                updateDisplay();
-                showNotification(`Purchased ${upgrade.name} (Level ${upgrade.level})!`);
-            }
-        }
-        
-        // Show notification
-        function showNotification(message) {
-            upgradeNotification.textContent = message;
-            upgradeNotification.classList.add('show');
-            
-            setTimeout(() => {
-                upgradeNotification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Update display
-        function updateDisplay() {
-            counter.textContent = formatNumber(Math.floor(gameState.clicks));
-            rate.textContent = formatNumber(gameState.autoClicksPerSecond);
-            clickValue.textContent = formatNumber(gameState.clickValue);
-            checkRank();
-        }
-        
-        // Format number with commas
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        
-        // Initialize the game
-        initGame();
-    </script>
+               { name: "EMERALD EDGER", threshold: 10000, class: "rank-emerald", image: "https://lh3.googleusercontent.com/pw/AP1GczMQmw6_KyWhZY4qMDFepjgccvu_j9i_k9rY-qu073Q985iDcoTWQAULbVYOdZgM5fa_JeJpSrkhAXRHV2k6skuIG01A3eDnbP0s6fbmCHWiO64EgsDa96GXm2pxOvV2YXDgqYRj82PNsQZnnL04a2E=w500-h313-s-no-gm?authuser=4" },
+               { name: "PLATINUM PULLER", threshold: 50000, class: "rank-platinum", image: "https://lh3.googleusercontent.com/pw/AP1GczPvE9j05M1x-1MJW5yjn3m7dTWYsTO915KyEp5a-fO4PHr6NRg2VuVjPLQNUlsYOFuUQmbpIgGnqS0fHITPvS8JF6PzA9Z76s8LYAO-omzvVMqjjEx0T6CfKqlUs_oO-B3d01ePGOdZ7oshWd4MnxU=w500-h313-s-no-gm?authuser=4" },
+               { name: "GRANDMASTER BAITER", threshold: 200000, class: "rank-grandmaster", image: "https://lh3.googleusercontent.com/pw/AP1GczNjY497H5q5IDr6ufZmWc73976gsBs-ACaLkwMOAspq2LtoZRnuBAXxb30QwejQ007jeql9CkbuU55Il4Z-DCwp8I0ayjSZgZ1-a60SNPxd0N4CcbjlhUEMFkU5wJPlnxUbYeu1nb7OzbtbwV5a_og=w500-h313-s-no-gm?authuser=4" }
+           ],
+           upgrades: [
+               { id: 'upgrade1', name: "Double Clicker", description: "Double your clicks per click", cost: 50, purchased: false, effect: () => { gameState.clickValue *= 2; } },
+               { id: 'upgrade2', name: "Auto Clicker", description: "Generates 1 click per second", cost: 100, purchased: false, effect: () => { gameState.autoClicksPerSecond += 1; } },
+               { id: 'upgrade3', name: "Finger Enhancer", description: "Triple your clicks per click", cost: 500, purchased: false, effect: () => { gameState.clickValue *= 3; } },
+               { id: 'upgrade4', name: "Click Bot", description: "Generates 5 clicks per second", cost: 1000, purchased: false, effect: () => { gameState.autoClicksPerSecond += 5; } },
+               { id: 'upgrade5', name: "Quantum Clicker", description: "Your clicks are worth 10x more", cost: 5000, purchased: false, effect: () => { gameState.clickValue *= 10; } },
+               { id: 'upgrade6', name: "Click Factory", description: "Generates 25 clicks per second", cost: 10000, purchased: false, effect: () => { gameState.autoClicksPerSecond += 25; } },
+               { id: 'upgrade7', name: "Click Dimension", description: "Your clicks are worth 50x more", cost: 50000, purchased: false, effect: () => { gameState.clickValue *= 50; } },
+               { id: 'upgrade8', name: "Click Universe", description: "Generates 100 clicks per second", cost: 100000, purchased: false, effect: () => { gameState.autoClicksPerSecond += 100; } },
+           ],
+           currentRank: 0
+       };
+       
+       // DOM elements
+       const counterElement = document.getElementById('counter');
+       const clickValueElement = document.getElementById('clickValue');
+       const rateElement = document.getElementById('rate');
+       const clickButton = document.getElementById('clickButton');
+       const upgradeList = document.getElementById('upgradeList');
+       const rankDisplay = document.getElementById('rankDisplay');
+       const rankText = document.getElementById('rankText');
+       const rankImage = document.getElementById('rankImage');
+       const rankProgress = document.getElementById('rankProgress');
+       const upgradeNotification = document.getElementById('upgradeNotification');
+       const resetSaveButton = document.getElementById('resetSave');
+       
+       // Initialize game
+       function initGame() {
+           loadGame();
+           renderUpgrades();
+           updateUI();
+           setInterval(gameLoop, 1000);
+           updateRankMarkers();
+       }
+       
+       // Game loop (runs every second)
+       function gameLoop() {
+           gameState.clicks += gameState.autoClicksPerSecond;
+           updateUI();
+           saveGame();
+       }
+       
+       // Update all UI elements
+       function updateUI() {
+           counterElement.textContent = formatNumber(gameState.clicks);
+           clickValueElement.textContent = formatNumber(gameState.clickValue);
+           rateElement.textContent = formatNumber(gameState.autoClicksPerSecond);
+           
+           updateRank();
+           updateRankProgress();
+           updateUpgradeAvailability();
+       }
+       
+       // Handle click event
+       clickButton.addEventListener('click', function(e) {
+           // Add clicks based on current click value
+           gameState.clicks += gameState.clickValue;
+           
+           // Create click effect
+           const clickEffect = document.createElement('div');
+           clickEffect.className = 'click-effect';
+           clickEffect.textContent = '+' + formatNumber(gameState.clickValue);
+           
+           // Position the effect at the click position
+           const rect = clickButton.getBoundingClientRect();
+           const x = e.clientX - rect.left;
+           const y = e.clientY - rect.top;
+           
+           clickEffect.style.left = x + 'px';
+           clickEffect.style.top = y + 'px';
+           clickEffect.style.color = getRandomBrightColor();
+           
+           clickButton.appendChild(clickEffect);
+           
+           // Remove the effect after animation
+           setTimeout(() => {
+               clickButton.removeChild(clickEffect);
+           }, 1000);
+           
+           // Update UI and save game
+           updateUI();
+           saveGame();
+       });
+       
+       // Generate a random bright color for click effects
+       function getRandomBrightColor() {
+           const hue = Math.floor(Math.random() * 360);
+           return `hsl(${hue}, 100%, 70%)`;
+       }
+       
+       // Format numbers for better readability
+       function formatNumber(num) {
+           if (num >= 1000000) {
+               return (num / 1000000).toFixed(1) + 'M';
+           } else if (num >= 1000) {
+               return (num / 1000).toFixed(1) + 'K';
+           } else {
+               return num.toFixed(0);
+           }
+       }
+       
+       // Render upgrades list
+       function renderUpgrades() {
+           upgradeList.innerHTML = '';
+           
+           gameState.upgrades.forEach(upgrade => {
+               if (!upgrade.purchased) {
+                   const upgradeItem = document.createElement('div');
+                   upgradeItem.className = 'upgrade-item';
+                   upgradeItem.id = upgrade.id;
+                   
+                   if (gameState.clicks < upgrade.cost) {
+                       upgradeItem.classList.add('disabled');
+                   }
+                   
+                   upgradeItem.innerHTML = `
+                       <div class="upgrade-info">
+                           <div class="upgrade-name">${upgrade.name}</div>
+                           <div class="upgrade-desc">${upgrade.description}</div>
+                       </div>
+                       <div class="upgrade-cost">${formatNumber(upgrade.cost)}</div>
+                   `;
+                   
+                   upgradeItem.addEventListener('click', () => purchaseUpgrade(upgrade));
+                   
+                   upgradeList.appendChild(upgradeItem);
+               }
+           });
+       }
+       
+       // Purchase upgrade
+       function purchaseUpgrade(upgrade) {
+           if (gameState.clicks >= upgrade.cost && !upgrade.purchased) {
+               gameState.clicks -= upgrade.cost;
+               upgrade.purchased = true;
+               upgrade.effect();
+               
+               // Show notification
+               upgradeNotification.textContent = `Purchased: ${upgrade.name}!`;
+               upgradeNotification.classList.add('show');
+               setTimeout(() => {
+                   upgradeNotification.classList.remove('show');
+               }, 3000);
+               
+               renderUpgrades();
+               updateUI();
+               saveGame();
+           }
+       }
+       
+       // Update availability of upgrades
+       function updateUpgradeAvailability() {
+           gameState.upgrades.forEach(upgrade => {
+               const upgradeItem = document.getElementById(upgrade.id);
+               if (upgradeItem) {
+                   if (gameState.clicks >= upgrade.cost) {
+                       upgradeItem.classList.remove('disabled');
+                   } else {
+                       upgradeItem.classList.add('disabled');
+                   }
+               }
+           });
+       }
+       
+       // Update rank based on clicks
+       function updateRank() {
+           let newRank = 0;
+           
+           for (let i = gameState.ranks.length - 1; i >= 0; i--) {
+               if (gameState.clicks >= gameState.ranks[i].threshold) {
+                   newRank = i;
+                   break;
+               }
+           }
+           
+           if (newRank !== gameState.currentRank) {
+               gameState.currentRank = newRank;
+               const rank = gameState.ranks[newRank];
+               
+               rankDisplay.className = `rank-display ${rank.class}`;
+               rankText.textContent = rank.name;
+               rankImage.src = rank.image;
+               
+               // Highlight current rank in requirements list
+               document.querySelectorAll('.rank-item').forEach((item, i) => {
+                   if (i === newRank) {
+                       item.classList.add('current');
+                   } else {
+                       item.classList.remove('current');
+                   }
+               });
+               
+               updateRankMarkers();
+           }
+       }
+       
+       // Update rank progress bar
+       function updateRankProgress() {
+           let progress = 0;
+           
+           if (gameState.currentRank < gameState.ranks.length - 1) {
+               const currentThreshold = gameState.ranks[gameState.currentRank].threshold;
+               const nextThreshold = gameState.ranks[gameState.currentRank + 1].threshold;
+               const range = nextThreshold - currentThreshold;
+               const current = gameState.clicks - currentThreshold;
+               
+               progress = (current / range) * 100;
+               progress = Math.min(Math.max(progress, 0), 100);
+           } else {
+               progress = 100;
+           }
+           
+           rankProgress.style.width = `${progress}%`;
+       }
+       
+       // Update rank markers to show achieved ranks
+       function updateRankMarkers() {
+           document.querySelectorAll('.rank-marker').forEach((marker, i) => {
+               if (i <= gameState.currentRank) {
+                   marker.classList.add('achieved');
+               } else {
+                   marker.classList.remove('achieved');
+               }
+           });
+       }
+       
+       // Save game state to local storage
+       function saveGame() {
+           localStorage.setItem('clickMasterGame', JSON.stringify({
+               clicks: gameState.clicks,
+               clickValue: gameState.clickValue,
+               autoClicksPerSecond: gameState.autoClicksPerSecond,
+               upgrades: gameState.upgrades,
+               currentRank: gameState.currentRank
+           }));
+       }
+       
+       // Load game state from local storage
+       function loadGame() {
+           const savedGame = localStorage.getItem('clickMasterGame');
+           
+           if (savedGame) {
+               const savedState = JSON.parse(savedGame);
+               
+               gameState.clicks = savedState.clicks || 0;
+               gameState.clickValue = savedState.clickValue || 1;
+               gameState.autoClicksPerSecond = savedState.autoClicksPerSecond || 0;
+               gameState.currentRank = savedState.currentRank || 0;
+               
+               if (savedState.upgrades) {
+                   savedState.upgrades.forEach((savedUpgrade, index) => {
+                       if (index < gameState.upgrades.length) {
+                           gameState.upgrades[index].purchased = savedUpgrade.purchased || false;
+                       }
+                   });
+               }
+           }
+       }
+       
+       // Reset save data
+       resetSaveButton.addEventListener('click', function() {
+           if (confirm('Are you sure you want to reset all progress?')) {
+               localStorage.removeItem('clickMasterGame');
+               location.reload();
+           }
+       });
+       
+       // Initialize game when page loads
+       window.addEventListener('load', initGame);
+   </script>
 </body>
 </html>
-</antArtifact>
