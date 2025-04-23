@@ -3,401 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flap Master</title>
+    <title>Ultimate Clicker Challenge</title>
     <style>
         :root {
-            --primary-color: #ff3366;
-            --secondary-color: #2a2a2a;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-            --bg-dark: #1a1a1a;
-            --bg-light: #f5f5f5;
-            --gold: #ffd700;
-            --silver: #c0c0c0;
+            --primary: #ff4d8c;
+            --secondary: #6c2e9c;
+            --dark: #222;
+            --light: #f8f9fa;
             --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
             --emerald: #50c878;
             --platinum: #e5e4e2;
+            --grandmaster: #9932cc;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            overflow-x: hidden;
+            background-color: #111;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
         header {
-            background-color: rgba(0,0,0,0.8);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            z-index: 100;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
         
         .logo {
-            font-size: 24px;
+            font-size: 2rem;
             font-weight: bold;
-            color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
         
-        .main-container {
-            display: flex;
-            min-height: calc(100vh - 70px);
+        .logo span {
+            color: var(--light);
         }
         
-        .game-area {
-            flex: 3;
+        main {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 2rem;
         }
         
-        .sidebar {
-            flex: 1;
-            background-color: var(--secondary-color);
-            padding: 20px;
+        .game-container {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .game-area {
+            display: flex;
+            width: 100%;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .clicker-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .upgrades-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .ranks-section {
+            width: 100%;
+            margin-top: 2rem;
         }
         
         .click-button {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background: linear-gradient(145deg, var(--primary-color), #ff6699);
+            background: linear-gradient(145deg, #262626, #1e1e1e);
+            box-shadow: 8px 8px 16px #0d0d0d, -8px -8px 16px #313131;
             border: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             cursor: pointer;
-            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            transition: all 0.2s ease;
             overflow: hidden;
-            transition: transform 0.1s;
+            position: relative;
         }
         
         .click-button:active {
+            box-shadow: 4px 4px 8px #0d0d0d, -4px -4px 8px #313131;
             transform: scale(0.95);
         }
         
-        .click-button:before {
-            content: "FLAP!";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
+        .click-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .stats {
-            margin-top: 30px;
-            background-color: rgba(0,0,0,0.5);
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 500px;
-        }
-        
-        .stats h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-        
-        .stat-item {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .rate {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
         }
         
         .rank-display {
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .rank-title {
-            font-size: 28px;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            font-size: 1.2rem;
+            margin-top: 1rem;
         }
         
-        .unranked { color: #aaaaaa; }
-        .bronze { color: var(--bronze); }
-        .silver { color: var(--silver); }
-        .golden { color: var(--gold); }
-        .emerald { color: var(--emerald); }
-        .platinum { color: var(--platinum); }
-        .grandmaster { 
-            background: linear-gradient(to right, #ff3366, #ffcc00, #33ccff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .rank-bronze {
+            background-color: var(--bronze);
+            color: black;
         }
         
-        .rank-progress {
-            width: 100%;
-            height: 20px;
-            background-color: var(--secondary-color);
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
+        .rank-silver {
+            background-color: var(--silver);
+            color: black;
         }
         
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(to right, var(--primary-color), #ff6699);
-            width: 35%;
-            transition: width 0.5s;
+        .rank-gold {
+            background-color: var(--gold);
+            color: black;
         }
         
-        .leaderboard {
-            margin-top: 20px;
+        .rank-emerald {
+            background-color: var(--emerald);
+            color: black;
         }
         
-        .leaderboard h3 {
-            border-bottom: 1px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .rank-platinum {
+            background-color: var(--platinum);
+            color: black;
         }
         
-        .leaderboard-item {
+        .rank-grandmaster {
+            background: linear-gradient(45deg, var(--grandmaster), #ff4d8c);
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .upgrade-list {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 5px;
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 5px;
-        }
-        
-        .leaderboard-item .rank {
-            width: 30px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .leaderboard-item .name {
-            flex: 1;
-            padding-left: 10px;
-        }
-        
-        .leaderboard-item .score {
-            width: 80px;
-            text-align: right;
-        }
-        
-        .upgrades {
-            margin-top: 30px;
-        }
-        
-        .upgrades h3 {
-            border-bottom: 1px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            flex-direction: column;
+            gap: 1rem;
         }
         
         .upgrade-item {
-            background-color: rgba(0,0,0,0.3);
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #222;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         
         .upgrade-item:hover {
-            background-color: rgba(255,51,102,0.2);
+            background-color: #333;
         }
         
-        .upgrade-title {
+        .upgrade-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .upgrade-info {
+            flex: 1;
+        }
+        
+        .upgrade-name {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 0.3rem;
         }
         
         .upgrade-desc {
-            font-size: 12px;
-            margin-bottom: 5px;
-            opacity: 0.8;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
         }
         
         .upgrade-cost {
-            text-align: right;
-            color: var(--gold);
+            background-color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .rank-progression {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .rank-track {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .rank-track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background-color: #333;
+            transform: translateY(-50%);
+            border-radius: 3px;
+            z-index: 1;
+        }
+        
+        .rank-progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--bronze), var(--grandmaster));
+            transform: translateY(-50%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            z-index: 2;
+        }
+        
+        .rank-marker {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #333;
+            border: 3px solid #444;
+            z-index: 3;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        
+        .rank-marker.achieved {
+            border-color: var(--light);
+        }
+        
+        .rank-marker::after {
+            content: attr(data-rank);
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+        
+        .rank-marker:nth-child(1).achieved {
+            background-color: var(--bronze);
+        }
+        
+        .rank-marker:nth-child(2).achieved {
+            background-color: var(--silver);
+        }
+        
+        .rank-marker:nth-child(3).achieved {
+            background-color: var(--gold);
+        }
+        
+        .rank-marker:nth-child(4).achieved {
+            background-color: var(--emerald);
+        }
+        
+        .rank-marker:nth-child(5).achieved {
+            background-color: var(--platinum);
+        }
+        
+        .rank-marker:nth-child(6).achieved {
+            background-color: var(--grandmaster);
+        }
+        
+        .rank-requirements {
+            margin-top: 2rem;
+        }
+        
+        .rank-requirements h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            background-color: #222;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rank-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .rank-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        .rank-bronze-icon {
+            background-color: var(--bronze);
+        }
+        
+        .rank-silver-icon {
+            background-color: var(--silver);
+        }
+        
+        .rank-gold-icon {
+            background-color: var(--gold);
+        }
+        
+        .rank-emerald-icon {
+            background-color: var(--emerald);
+        }
+        
+        .rank-platinum-icon {
+            background-color: var(--platinum);
+        }
+        
+        .rank-grandmaster-icon {
+            background: linear-gradient(45deg, var(--grandmaster), #ff4d8c);
+        }
+        
+        .click-effect {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 10;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .rank-track {
+                margin: 3rem 1rem;
+            }
+            
+            .rank-marker::after {
+                font-size: 0.6rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">FLAP MASTER</div>
-        <nav>
-            <ul style="list-style: none; display: flex;">
-                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Home</a></li>
-                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Rankings</a></li>
-                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Shop</a></li>
-                <li style="margin-left: 20px;"><a href="#" style="color: white; text-decoration: none;">Profile</a></li>
-            </ul>
-        </nav>
+        <div class="logo">Click<span>Master</span></div>
+        <p>How fast can you click? Challenge yourself and reach the highest rank!</p>
     </header>
-
-    <div class="main-container">
-        <div class="game-area">
-            <div class="rank-display">
-                <div class="rank-title silver">Silver Stroker</div>
-                <div class="rank-progress">
-                    <div class="progress-bar"></div>
+    
+    <main>
+        <div class="game-container">
+            <div class="game-area">
+                <div class="clicker-section">
+                    <div id="clickButton" class="click-button">
+                        <img src="https://image.winudf.com/v2/image1/Y29tLmpldHBlb2xhbmd1bGVhcm5ld2FkX2ljb25fMTYwMjU4MjI1Nl8wNTI/icon.png?w=&fakeurl=1" alt="Click Button">
+                    </div>
+                    
+                    <div class="stats">
+                        <div id="rankDisplay" class="rank-display rank-bronze">BRONZE BEATER</div>
+                        <div id="counter" class="counter">0</div>
+                        <div id="rate" class="rate">0 per second</div>
+                    </div>
                 </div>
-                <div style="margin-top: 5px; font-size: 12px;">35% to Golden Gooner</div>
+                
+                <div class="upgrades-section">
+                    <h2 class="section-title">Upgrades</h2>
+                    <div id="upgradeList" class="upgrade-list">
+                        <!-- Upgrades will be generated here -->
+                    </div>
+                </div>
             </div>
             
-            <button class="click-button" id="flapButton"></button>
-            
-            <div class="stats">
-                <h2>Your Stats</h2>
-                <div class="stat-item">
-                    <div>Flaps per second:</div>
-                    <div>4.5</div>
+            <div class="ranks-section">
+                <h2 class="section-title">Rank Progression</h2>
+                
+                <div class="rank-progression">
+                    <div class="rank-track">
+                        <div id="rankProgress" class="rank-progress" style="width: 0%"></div>
+                        <div class="rank-marker achieved" data-rank="BRONZE BEATER"></div>
+                        <div class="rank-marker" data-rank="SILVER STROKER"></div>
+                        <div class="rank-marker" data-rank="GOLDEN GOONER"></div>
+                        <div class="rank-marker" data-rank="EMERALD EDGER"></div>
+                        <div class="rank-marker" data-rank="PLATINUM PULLER"></div>
+                        <div class="rank-marker" data-rank="GRANDMASTER BAITER"></div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div>Total flaps:</div>
-                    <div>12,486</div>
-                </div>
-                <div class="stat-item">
-                    <div>Flap multiplier:</div>
-                    <div>x2.5</div>
-                </div>
-                <div class="stat-item">
-                    <div>Auto-flaps:</div>
-                    <div>2/sec</div>
-                </div>
-                <div class="stat-item">
-                    <div>Current rank:</div>
-                    <div class="silver">Silver Stroker</div>
+                
+                <div class="rank-requirements">
+                    <h3>Rank Requirements</h3>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-bronze-icon"></div>
+                            BRONZE BEATER
+                        </div>
+                        <div class="rank-requirement">0+ clicks</div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-silver-icon"></div>
+                            SILVER STROKER
+                        </div>
+                        <div class="rank-requirement">500+ clicks</div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-gold-icon"></div>
+                            GOLDEN GOONER
+                        </div>
+                        <div class="rank-requirement">2,000+ clicks</div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-emerald-icon"></div>
+                            EMERALD EDGER
+                        </div>
+                        <div class="rank-requirement">10,000+ clicks</div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-platinum-icon"></div>
+                            PLATINUM PULLER
+                        </div>
+                        <div class="rank-requirement">50,000+ clicks</div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-name">
+                            <div class="rank-icon rank-grandmaster-icon"></div>
+                            GRANDMASTER BAITER
+                        </div>
+                        <div class="rank-requirement">200,000+ clicks</div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="sidebar">
-            <div class="leaderboard">
-                <h3>Top Flappers</h3>
-                <div class="leaderboard-item">
-                    <div class="rank">1</div>
-                    <div class="name">FlapMaster69</div>
-                    <div class="score grandmaster">249,582</div>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">2</div>
-                    <div class="name">ClickKing</div>
-                    <div class="score platinum">183,921</div>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">3</div>
-                    <div class="name">FlapGod</div>
-                    <div class="score emerald">156,304</div>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">4</div>
-                    <div class="name">SpeedyHands</div>
-                    <div class="score golden">124,765</div>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">5</div>
-                    <div class="name">ClickerPro</div>
-                    <div class="score silver">89,432</div>
-                </div>
-            </div>
-            
-            <div class="upgrades">
-                <h3>Upgrades</h3>
-                <div class="upgrade-item">
-                    <div class="upgrade-title">Faster Fingers</div>
-                    <div class="upgrade-desc">Increase manual flap rate by 15%</div>
-                    <div class="upgrade-cost">500 flaps</div>
-                </div>
-                <div class="upgrade-item">
-                    <div class="upgrade-title">Auto-Flapper</div>
-                    <div class="upgrade-desc">Adds +1 flap per second automatically</div>
-                    <div class="upgrade-cost">1,200 flaps</div>
-                </div>
-                <div class="upgrade-item">
-                    <div class="upgrade-title">Flap Multiplier</div>
-                    <div class="upgrade-desc">Each click counts as 2 flaps</div>
-                    <div class="upgrade-cost">2,500 flaps</div>
-                </div>
-                <div class="upgrade-item">
-                    <div class="upgrade-title">Golden Touch</div>
-                    <div class="upgrade-desc">5% chance of critical flaps (x5)</div>
-                    <div class="upgrade-cost">5,000 flaps</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    </main>
+    
     <script>
-        // Basic game functionality
-        let flaps = 12486;
-        let flapsPerClick = 1;
-        let multiplier = 2.5;
-        let autoFlapsPerSecond = 2;
+        // Game state
+        const gameState = {
+            clicks: 0,
+            clicksPerSecond: 0,
+            clickValue: 1,
+            autoClicksPerSecond: 0,
+            ranks: [
+                { name: "BRONZE BEATER", threshold: 0, class: "rank-bronze" },
+                { name: "SILVER STROKER", threshold: 500, class: "rank-silver" },
+                { name: "GOLDEN GOONER", threshold: 2000, class: "rank-gold" },
+                { name: "EMERALD EDGER", threshold: 10000, class: "rank-emerald" },
+                { name: "PLATINUM PULLER", threshold: 50000, class: "rank-platinum" },
+                { name: "GRANDMASTER BAITER", threshold: 200000, class: "rank-grandmaster" }
+            ],
+            currentRank: 0,
+            upgrades: [
+                { id: 1, name: "Double Clicker", description: "Double the value of each click", baseCost: 50, costMultiplier: 1.5, level: 0, effect: () => { gameState.clickValue *= 2; } },
+                { id: 2, name: "Auto Clicker", description: "Automatically clicks once per second", baseCost: 100, costMultiplier: 1.8, level: 0, effect: () => { gameState.autoClicksPerSecond += 1; } },
+                { id: 3, name: "Speedy Fingers", description: "Increases clicking speed by 50%", baseCost: 500, costMultiplier: 2, level: 0, effect: () => { gameState.clickValue *= 1.5; } },
+                { id: 4, name: "Endurance Training", description: "Auto clickers work 2x faster", baseCost: 1000, costMultiplier: 2.2, level: 0, effect: () => { gameState.autoClicksPerSecond *= 2; } },
+                { id: 5, name: "Master Technique", description: "Each click now worth 5x more", baseCost: 5000, costMultiplier: 3, level: 0, effect: () => { gameState.clickValue *= 5; } },
+                { id: 6, name: "Legendary Power", description: "Massively increases all clicking power", baseCost: 20000, costMultiplier: 4, level: 0, effect: () => { 
+                    gameState.clickValue *= 10; 
+                    gameState.autoClicksPerSecond *= 3; 
+                } }
+            ]
+        };
         
-        const flapButton = document.getElementById('flapButton');
+        // DOM Elements
+        const clickButton = document.getElementById('clickButton');
+        const counter = document.getElementById('counter');
+        const rate = document.getElementById('rate');
+        const rankDisplay = document.getElementById('rankDisplay');
+        const upgradeList = document.getElementById('upgradeList');
+        const rankProgress = document.getElementById('rankProgress');
+        const rankMarkers = document.querySelectorAll('.rank-marker');
         
-        flapButton.addEventListener('click', () => {
-            flaps += flapsPerClick * multiplier;
-            // Create flap effect
-            createFlapEffect();
-            updateStats();
+        // Initialize game
+        function initGame() {
+            renderUpgrades();
+            updateDisplay();
+            
+            // Set up auto clickers interval
+            setInterval(() => {
+                if (gameState.autoClicksPerSecond > 0) {
+                    addClicks(gameState.autoClicksPerSecond);
+                }
+            }, 1000);
+            
+            // Update display every 100ms for smoother updates
+            setInterval(() => {
+                updateDisplay();
+            }, 100);
+        }
+        
+        // Handle click
+        clickButton.addEventListener('click', function(e) {
+            addClicks(gameState.clickValue);
+            createClickEffect(e);
         });
         
-        function createFlapEffect() {
+        // Add clicks to the counter
+        function addClicks(amount) {
+            gameState.clicks += amount;
+            checkRank();
+        }
+        
+        // Create click effect
+        function createClickEffect(e) {
             const effect = document.createElement('div');
-            effect.textContent = '+' + (flapsPerClick * multiplier);
-            effect.style.position = 'absolute';
-            effect.style.color = 'white';
-            effect.style.fontSize = '20px';
-            effect.style.fontWeight = 'bold';
-            effect.style.pointerEvents = 'none';
+            effect.className = 'click-effect';
+            effect.textContent = `+${gameState.clickValue}`;
             
-            // Random position around button
-            const x = flapButton.offsetLeft + Math.random() * flapButton.offsetWidth;
-            const y = flapButton.offsetTop + Math.random() * flapButton.offsetHeight;
+            // Position the effect at click position
+            const rect = clickButton.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             
-            effect.style.left = x + 'px';
-            effect.style.top = y + 'px';
-            effect.style.opacity = 1;
-            effect.style.transition = 'all 1s ease-out';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
             
-            document.querySelector('.game-area').appendChild(effect);
+            clickButton.appendChild(effect);
             
-            // Animation
-            setTimeout(() => {
-                effect.style.transform = 'translateY(-50px)';
-                effect.style.opacity = 0;
-            }, 50);
-            
+            // Remove the effect after animation completes
             setTimeout(() => {
                 effect.remove();
             }, 1000);
         }
         
-        function updateStats() {
-            // This would update the stats display
-            // For demo purposes, we'll just console log
-            console.log('Flaps updated:', flaps);
+        // Check rank and update if necessary
+        function checkRank() {
+            for (let i = gameState.ranks.length - 1; i >= 0; i--) {
+                if (gameState.clicks >= gameState.ranks[i].threshold) {
+                    if (gameState.currentRank !== i) {
+                        gameState.currentRank = i;
+                        updateRankDisplay();
+                    }
+                    break;
+                }
+            }
         }
         
-        // Auto flap functionality
-        setInterval(() => {
-            flaps += autoFlapsPerSecond;
-            updateStats();
-        }, 1000);
+        // Update rank display
+        function updateRankDisplay() {
+            const rank = gameState.ranks[gameState.currentRank];
+            rankDisplay.textContent = rank.name;
+            rankDisplay.className = `rank-display ${rank.class}`;
+            
+            // Update rank markers
+            rankMarkers.forEach((marker, index) => {
+                if (index <= gameState.currentRank) {
+                    marker.classList.add('achieved');
+                } else {
+                    marker.classList.remove('achieved');
+                }
+            });
+            
+            // Update progress bar
+            const currentThreshold = rank.threshold;
+            const nextThreshold = gameState.currentRank < gameState.ranks.length - 1 
+                ? gameState.ranks[gameState.currentRank + 1].threshold 
+                : rank.threshold * 2;
+            
+            const progress = Math.min(100, ((gameState.clicks - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
+            rankProgress.style.width = `${(gameState.currentRank * 20) + (progress / 5)}%`;
+        }
+        
+        // Render upgrades
+        function renderUpgrades() {
+            upgradeList.innerHTML = '';
+            
+            gameState.upgrades.forEach(upgrade => {
+                const cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
+                const disabled = gameState.clicks < cost;
+                
+                const upgradeElement = document.createElement('div');
+                upgradeElement.className = `upgrade-item ${disabled ? 'disabled' : ''}`;
+                upgradeElement.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${upgrade.name} ${upgrade.level > 0 ? `(Level ${upgrade.level})` : ''}</div>
+                        <div class="upgrade-desc">${upgrade.description}</div>
+                    </div>
+                    <div class="upgrade-cost">${formatNumber(cost)}</div>
+                `;
+                
+                upgradeElement.addEventListener('click', () => {
+                    if (!disabled) {
+                        purchaseUpgrade(upgrade);
+                    }
+                });
+                
+                upgradeList.appendChild(upgradeElement);
+            });
+        }
+        
+        // Purchase upgrade
+        function purchaseUpgrade(upgrade) {
+            const cost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
+            
+            if (gameState.clicks >= cost) {
+                gameState.clicks -= cost;
+                upgrade.level++;
+                upgrade.effect();
+                renderUpgrades();
+                updateDisplay();
+            }
+        }
+        
+        // Update display
+        function updateDisplay() {
+            counter.textContent = formatNumber(Math.floor(gameState.clicks));
+            rate.textContent = `${formatNumber(gameState.autoClicksPerSecond)} per second`;
+            checkRank();
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // Initialize the game
+        initGame();
     </script>
 </body>
 </html>
