@@ -3,827 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R6 Siege Stats Tracker</title>
+    <title>R6 Stats Tracker</title>
     <style>
-        :root {
-            --primary: #F04E23;
-            --dark: #1E2328;
-            --light: #F2F2F2;
-            --accent: #0099FF;
-            --success: #00CC66;
-            --warning: #FFB800;
-            --danger: #FF3333;
-        }
-        
-        * {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        
-        body {
-            background-color: var(--dark);
-            color: var(--light);
-        }
-        
         .container {
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
         }
-        
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: #000000;
+            width: 100%;
             padding: 20px 0;
-            border-bottom: 2px solid var(--primary);
+            text-align: center;
             margin-bottom: 30px;
+            border-bottom: 3px solid #ff9100;
         }
-        
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
+        h1 {
+            color: #ff9100;
+            margin: 0;
+            font-size: 2.5rem;
         }
-        
-        .search-bar {
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+        .search-box {
             display: flex;
             width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
+            max-width: 600px;
+            margin-bottom: 20px;
         }
-        
-        .search-bar input {
+        .search-box input {
             flex: 1;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px 0 0 4px;
-            background-color: #2D3035;
-            color: var(--light);
-        }
-        
-        .search-bar button {
-            padding: 12px 24px;
-            background-color: var(--primary);
+            padding: 12px 15px;
+            font-size: 1rem;
+            background-color: #333;
             color: white;
+            border: 1px solid #555;
+            border-radius: 4px 0 0 4px;
+        }
+        .search-box button {
+            padding: 12px 20px;
+            background-color: #ff9100;
+            color: black;
+            font-weight: bold;
             border: none;
             border-radius: 0 4px 4px 0;
             cursor: pointer;
-            font-weight: bold;
+            transition: background-color 0.2s;
         }
-        
-        .search-bar select {
-            padding: 12px 16px;
-            background-color: #2D3035;
-            color: var(--light);
-            border: none;
-            border-right: 1px solid #444;
+        .search-box button:hover {
+            background-color: #ffb144;
         }
-        
-        .results-container {
-            margin-top: 40px;
-        }
-        
-        .result-card {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .result-card h2 {
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        
-        .result-card p {
-            margin-bottom: 20px;
-            color: #999;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            margin: 5px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn:hover {
-            background-color: #d03e15;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background-color: #444;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #555;
-        }
-        
-        .platform-buttons {
+        .platform-selector {
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
             gap: 10px;
+            margin-top: 10px;
         }
-        
         .platform-btn {
-            padding: 8px 16px;
+            padding: 8px 15px;
             background-color: #333;
-            color: var(--light);
-            border: none;
+            color: white;
+            border: 1px solid #555;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
-        
         .platform-btn.active {
-            background-color: var(--primary);
-        }
-        
-        .section-title {
-            text-align: center;
-            margin: 40px 0 20px;
-            color: var(--light);
-        }
-        
-        .popular-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 30px 0;
-        }
-        
-        .popular-link {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        
-        .popular-link:hover {
-            background-color: rgba(240, 78, 35, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .popular-link a {
-            color: var(--light);
-            text-decoration: none;
+            background-color: #ff9100;
+            color: black;
             font-weight: bold;
         }
-        
-        .popular-link p {
-            color: #999;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        
-        .platform-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #555;
-            border-radius: 50%;
-            margin-right: 5px;
-            vertical-align: middle;
-            text-align: center;
-            line-height: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .instructions {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-        
-        .instructions h3 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-            color: #ccc;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px 0;
-            border-top: 1px solid #444;
-            color: #999;
-        }
-        
-        .stats-container {
-            margin-top: 30px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            display: none;
-        }
-        
-        .stats-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .stats-header h2 {
-            color: var(--primary);
-        }
-        
-        .player-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .player-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #444;
-            margin-right: 20px;
-            overflow: hidden;
-        }
-        
-        .player-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .player-details h3 {
-            margin-bottom: 5px;
-        }
-        
-        .player-details p {
-            color: #999;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .stat-card h4 {
-            color: #999;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--light);
-        }
-        
         .loading {
-            text-align: center;
-            margin: 40px 0;
-            font-size: 18px;
-            color: var(--light);
+            display: none;
+            margin-top: 20px;
         }
-        
-        .loading::after {
-            content: "...";
-            animation: dots 1.5s infinite;
+        .loader {
+            border: 5px solid #333;
+            border-top: 5px solid #ff9100;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
-        
-        @keyframes dots {
-            0%, 20% { content: "."; }
-            40% { content: ".."; }
-            60%, 100% { content: "..."; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        .tab-nav {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #444;
-        }
-        
-        .tab-btn {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 16px;
-            position: relative;
-        }
-        
-        .tab-btn.active {
-            color: var(--primary);
-        }
-        
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: var(--primary);
-        }
-        
-        .tab-content {
+        .player-card {
+            background-color: #222;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
             display: none;
         }
-        
-        .tab-content.active {
-            display: block;
+        .player-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        
-        .operators-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
-        
-        .operator-card {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .operator-icon {
-            width: 60px;
-            height: 60px;
+        .player-avatar {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background-color: #444;
-            margin: 0 auto 10px;
-            overflow: hidden;
+            margin-right: 20px;
+            border: 3px solid #ff9100;
         }
-        
-        .error-message {
-            background-color: rgba(255, 51, 51, 0.2);
-            color: var(--danger);
+        .player-info h2 {
+            color: #ff9100;
+            margin: 0 0 5px 0;
+        }
+        .player-info p {
+            margin: 3px 0;
+            color: #aaa;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background-color: #333;
+            border-radius: 6px;
             padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border: 1px solid var(--danger);
             text-align: center;
         }
-        
-        @media (max-width: 768px) {
-            .popular-links {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
+        .stat-title {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .season-rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .rank-icon {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+        .rank-details {
+            text-align: left;
+        }
+        .rank-name {
+            color: #ff9100;
+            font-weight: bold;
+            margin: 0;
+        }
+        .rank-mmr {
+            color: #fff;
+            margin: 5px 0 0 0;
+        }
+        .error-message {
+            color: #ff4d4d;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            background-color: #000000;
+            border-top: 1px solid #333;
+        }
+        footer a {
+            color: #ff9100;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .disclaimer {
+            font-size: 0.8rem;
+            color: #888;
+            max-width: 800px;
+            margin: 10px auto;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>R6 STATS TRACKER</h1>
+    </header>
+
     <div class="container">
-        <header>
-            <div class="logo">R6 STATS TRACKER</div>
-        </header>
-        
-        <div class="search-bar">
-            <select id="platform-select">
-                <option value="pc">PC</option>
-                <option value="psn">PlayStation</option>
-                <option value="xbl">Xbox</option>
-            </select>
-            <input type="text" id="player-search" placeholder="Enter Ubisoft username...">
-            <button id="search-button">SEARCH</button>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="username" placeholder="Enter Ubisoft Username">
+                <button id="search-btn">SEARCH</button>
+            </div>
+            <div class="platform-selector">
+                <button class="platform-btn active" data-platform="pc">PC</button>
+                <button class="platform-btn" data-platform="psn">PLAYSTATION</button>
+                <button class="platform-btn" data-platform="xbl">XBOX</button>
+            </div>
         </div>
-        
-        <div id="loading" class="loading" style="display: none;">
-            Fetching player stats
+
+        <div class="loading">
+            <div class="loader"></div>
         </div>
-        
-        <div id="error-container"></div>
-        
-        <div id="stats-container" class="stats-container">
-            <div class="stats-header">
-                <h2 id="player-name">Player Stats</h2>
-                <span id="last-updated"></span>
-            </div>
-            
-            <div class="player-info">
-                <div class="player-avatar">
-                    <img id="player-avatar" src="/api/placeholder/80/80" alt="Player Avatar">
-                </div>
-                <div class="player-details">
-                    <h3 id="player-username"></h3>
-                    <p id="player-level"></p>
+
+        <div class="error-message" id="error-msg">
+            Player not found. Please check the username and platform.
+        </div>
+
+        <div class="player-card" id="player-card">
+            <div class="player-header">
+                <img class="player-avatar" id="player-avatar" src="/api/placeholder/100/100" alt="Player Avatar">
+                <div class="player-info">
+                    <h2 id="player-name">Username</h2>
+                    <p id="player-level">Level: 0</p>
+                    <p id="player-platform">Platform: PC</p>
                 </div>
             </div>
-            
-            <div class="tab-nav">
-                <button class="tab-btn active" data-tab="overview">Overview</button>
-                <button class="tab-btn" data-tab="operators">Operators</button>
-                <button class="tab-btn" data-tab="maps">Maps</button>
+
+            <div class="stats-container" id="general-stats">
+                <!-- Stats will be populated by JavaScript -->
             </div>
-            
-            <div id="overview-tab" class="tab-content active">
-                <h3>General Stats</h3>
-                <div class="stats-grid" id="general-stats">
-                    <!-- Stats will be inserted here -->
-                </div>
-                
-                <h3>Ranked Stats</h3>
-                <div class="stats-grid" id="ranked-stats">
-                    <!-- Ranked stats will be inserted here -->
-                </div>
-            </div>
-            
-            <div id="operators-tab" class="tab-content">
-                <div class="operators-grid" id="operators-grid">
-                    <!-- Operators will be inserted here -->
-                </div>
-            </div>
-            
-            <div id="maps-tab" class="tab-content">
-                <div class="stats-grid" id="maps-grid">
-                    <!-- Maps will be inserted here -->
+
+            <h3 style="color: #ff9100; margin-top: 30px;">Current Season Rank</h3>
+            <div class="season-rank">
+                <img class="rank-icon" id="rank-icon" src="/api/placeholder/50/50" alt="Rank">
+                <div class="rank-details">
+                    <p class="rank-name" id="rank-name">Unranked</p>
+                    <p class="rank-mmr" id="rank-mmr">MMR: 0</p>
                 </div>
             </div>
         </div>
-        
-        <div class="results-container" id="results-section">
-            <div class="result-card">
-                <h2>View Your Stats on dazes.org</h2>
-                <p>Search your Rainbow Six Siege username above to view your complete stats scraped directly from R6 Tracker Network.</p>
-                
-                <div class="platform-buttons">
-                    <button class="platform-btn" data-platform="pc">PC</button>
-                    <button class="platform-btn" data-platform="psn">PlayStation</button>
-                    <button class="platform-btn active" data-platform="xbl">Xbox</button>
-                </div>
-            </div>
-        </div>
-        
-        <h2 class="section-title">Popular Players</h2>
-        <div class="popular-links">
-            <div class="popular-link">
-                <a href="#" data-username="Beaulo.TSM" data-platform="pc">Beaulo.TSM</a>
-                <p><span class="platform-icon">PC</span> Pro Player</p>
-            </div>
-            <div class="popular-link">
-                <a href="#" data-username="Pengu.G2" data-platform="pc">Pengu.G2</a>
-                <p><span class="platform-icon">PC</span> Pro Player</p>
-            </div>
-            <div class="popular-link">
-                <a href="#" data-username="KingGeorge" data-platform="pc">KingGeorge</a>
-                <p><span class="platform-icon">PC</span> Content Creator</p>
-            </div>
-            <div class="popular-link">
-                <a href="#" data-username="MacieJay" data-platform="pc">MacieJay</a>
-                <p><span class="platform-icon">PC</span> Content Creator</p>
-            </div>
-            <div class="popular-link">
-                <a href="#" data-username="Shroud" data-platform="pc">Shroud</a>
-                <p><span class="platform-icon">PC</span> Content Creator</p>
-            </div>
-            <div class="popular-link">
-                <a href="#" data-username="Godly" data-platform="psn">Godly</a>
-                <p><span class="platform-icon">PS</span> Content Creator</p>
-            </div>
-        </div>
-        
-        <div class="instructions">
-            <h3>How to use this tool</h3>
-            <ol>
-                <li>Select your platform (PC, PlayStation, or Xbox)</li>
-                <li>Enter your Ubisoft username in the search box</li>
-                <li>Click "SEARCH" to fetch your R6 stats directly</li>
-                <li>View your detailed stats, operator info, and maps performance</li>
-                <li>Bookmark this page for quick access in the future</li>
-            </ol>
-        </div>
-        
-        <footer>
-            <p>This tool scrapes data from R6 Tracker Network via Cloudflare Proxy and displays it on dazes.org. We are not affiliated with Ubisoft or R6 Tracker Network.</p>
-        </footer>
     </div>
 
+    <footer>
+        <p>Data powered by <a href="https://r6.tracker.network/" target="_blank">R6 Tracker Network</a></p>
+        <p class="disclaimer">This site is not affiliated with Ubisoft or Rainbow Six Siege. This is an unofficial tracker that uses publicly available data.</p>
+    </footer>
+
     <script>
-        // API Endpoint for scraping R6 Tracker Network via Cloudflare Proxy
-        const API_ENDPOINT = 'https://dazes.org/api/r6stats';
-        
-        // Function to fetch player stats from our proxy API
-        async function fetchPlayerStats(username, platform) {
-            if (!username) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBtn = document.getElementById('search-btn');
+            const usernameInput = document.getElementById('username');
+            const loading = document.querySelector('.loading');
+            const playerCard = document.getElementById('player-card');
+            const errorMsg = document.getElementById('error-msg');
+            const platformBtns = document.querySelectorAll('.platform-btn');
             
-            // Show loading indicator and hide results
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results-section').style.display = 'none';
-            document.getElementById('stats-container').style.display = 'none';
-            document.getElementById('error-container').innerHTML = '';
+            let selectedPlatform = 'pc';
             
-            try {
-                // Call our proxy API to fetch the data
-                const response = await fetch(`${API_ENDPOINT}?username=${encodeURIComponent(username)}&platform=${platform}`);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch player stats');
+            // Platform selection
+            platformBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    platformBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedPlatform = btn.getAttribute('data-platform');
+                });
+            });
+            
+            // Search functionality
+            searchBtn.addEventListener('click', () => {
+                const username = usernameInput.value.trim();
+                if (username === '') {
+                    alert('Please enter a username');
+                    return;
                 }
                 
-                const data = await response.json();
-                
-                // Display the scraped stats
-                displayPlayerStats(data, username, platform);
-                
-                // Hide loading indicator
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('stats-container').style.display = 'block';
-                
-                // Update URL with player info for bookmarking/sharing
-                window.history.pushState({}, '', `?username=${encodeURIComponent(username)}&platform=${platform}`);
-                
-            } catch (error) {
-                // Display error message
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('results-section').style.display = 'block';
-                
-                const errorContainer = document.getElementById('error-container');
-                errorContainer.innerHTML = `
-                    <div class="error-message">
-                        Failed to fetch stats for ${username} on ${getPlatformName(platform)}.
-                        Please check the username and try again.
-                    </div>
-                `;
-                
-                console.error('Error fetching player stats:', error);
-            }
-        }
-        
-        // Function to display player stats in the UI
-        function displayPlayerStats(data, username, platform) {
-            // Set player info
-            document.getElementById('player-name').textContent = data.playerInfo.displayName || username;
-            document.getElementById('player-username').textContent = username;
-            document.getElementById('player-level').textContent = `Level ${data.playerInfo.level} • ${getPlatformName(platform)}`;
-            document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleString()}`;
-            
-            if (data.playerInfo.avatar) {
-                document.getElementById('player-avatar').src = data.playerInfo.avatar;
-            }
-            
-            // Populate general stats
-            const generalStatsContainer = document.getElementById('general-stats');
-            generalStatsContainer.innerHTML = '';
-            
-            const generalStats = [
-                { name: 'K/D Ratio', value: data.stats.kdRatio || '0.00' },
-                { name: 'Win %', value: (data.stats.winPercentage || '0') + '%' },
-                { name: 'Kills', value: data.stats.kills || '0' },
-                { name: 'Deaths', value: data.stats.deaths || '0' },
-                { name: 'Matches', value: data.stats.matches || '0' },
-                { name: 'Wins', value: data.stats.wins || '0' },
-                { name: 'Losses', value: data.stats.losses || '0' },
-                { name: 'Time Played', value: data.stats.timePlayed || '0h' }
-            ];
-            
-            generalStats.forEach(stat => {
-                const statCard = document.createElement('div');
-                statCard.className = 'stat-card';
-                statCard.innerHTML = `
-                    <h4>${stat.name}</h4>
-                    <div class="stat-value">${stat.value}</div>
-                `;
-                generalStatsContainer.appendChild(statCard);
+                fetchPlayerData(username, selectedPlatform);
             });
             
-            // Populate ranked stats
-            const rankedStatsContainer = document.getElementById('ranked-stats');
-            rankedStatsContainer.innerHTML = '';
-            
-            const rankedStats = [
-                { name: 'Rank', value: data.ranked.rank || 'Unranked' },
-                { name: 'MMR', value: data.ranked.mmr || '0' },
-                { name: 'Ranked K/D', value: data.ranked.kdRatio || '0.00' },
-                { name: 'Ranked Win %', value: (data.ranked.winPercentage || '0') + '%' },
-                { name: 'Ranked Matches', value: data.ranked.matches || '0' },
-                { name: 'Ranked Wins', value: data.ranked.wins || '0' },
-                { name: 'Ranked Losses', value: data.ranked.losses || '0' }
-            ];
-            
-            rankedStats.forEach(stat => {
-                const statCard = document.createElement('div');
-                statCard.className = 'stat-card';
-                statCard.innerHTML = `
-                    <h4>${stat.name}</h4>
-                    <div class="stat-value">${stat.value}</div>
-                `;
-                rankedStatsContainer.appendChild(statCard);
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
             });
             
-            // Populate operators
-            const operatorsContainer = document.getElementById('operators-grid');
-            operatorsContainer.innerHTML = '';
+            function fetchPlayerData(username, platform) {
+                // Show loading, hide player card and error
+                loading.style.display = 'block';
+                playerCard.style.display = 'none';
+                errorMsg.style.display = 'none';
+                
+                // In a real implementation, you would need to set up a proxy server
+                // to fetch data from R6 Tracker Network API to avoid CORS issues
+                // Here we're simulating the data fetch with a timeout
+                
+                setTimeout(() => {
+                    // For demonstration, we're using mock data
+                    // In a real implementation, this would be data from the API
+                    if (username.toLowerCase() === 'notfound') {
+                        loading.style.display = 'none';
+                        errorMsg.style.display = 'block';
+                        return;
+                    }
+                    
+                    const mockData = generateMockData(username, platform);
+                    displayPlayerData(mockData);
+                    
+                    loading.style.display = 'none';
+                    playerCard.style.display = 'block';
+                }, 1500);
+            }
             
-            if (data.operators && data.operators.length > 0) {
-                data.operators.forEach(operator => {
-                    const operatorCard = document.createElement('div');
-                    operatorCard.className = 'operator-card';
-                    operatorCard.innerHTML = `
-                        <div class="operator-icon">
-                            <img src="/api/placeholder/60/60" alt="${operator.name}">
-                        </div>
-                        <h4>${operator.name}</h4>
-                        <p>K/D: ${operator.kdRatio || '0.00'}</p>
-                        <p>Wins: ${operator.wins || '0'}</p>
-                        <p>Picks: ${operator.picks || '0'}</p>
+            function generateMockData(username, platform) {
+                // Generate some realistic mock data for demonstration
+                const platforms = {
+                    'pc': 'PC',
+                    'psn': 'PlayStation',
+                    'xbl': 'Xbox'
+                };
+                
+                return {
+                    username: username,
+                    platform: platforms[platform],
+                    level: Math.floor(Math.random() * 300) + 50,
+                    avatar: '/api/placeholder/100/100',
+                    stats: {
+                        general: {
+                            kd: (Math.random() * 2 + 0.5).toFixed(2),
+                            winRate: (Math.random() * 60 + 40).toFixed(1) + '%',
+                            kills: Math.floor(Math.random() * 20000) + 1000,
+                            deaths: Math.floor(Math.random() * 15000) + 1000,
+                            wins: Math.floor(Math.random() * 5000) + 500,
+                            losses: Math.floor(Math.random() * 3000) + 500,
+                            headshots: (Math.random() * 40 + 20).toFixed(1) + '%',
+                            playtime: Math.floor(Math.random() * 1000) + 100 + ' hrs'
+                        },
+                        ranked: {
+                            rank: getRank(),
+                            mmr: Math.floor(Math.random() * 2000) + 2000,
+                            rankIcon: '/api/placeholder/50/50'
+                        }
+                    }
+                };
+            }
+            
+            function getRank() {
+                const ranks = ['Copper', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Champion'];
+                const tiers = ['V', 'IV', 'III', 'II', 'I'];
+                
+                const randomRank = ranks[Math.floor(Math.random() * ranks.length)];
+                const randomTier = tiers[Math.floor(Math.random() * tiers.length)];
+                
+                return randomRank + ' ' + randomTier;
+            }
+            
+            function displayPlayerData(data) {
+                // Set player info
+                document.getElementById('player-name').textContent = data.username;
+                document.getElementById('player-level').textContent = `Level: ${data.level}`;
+                document.getElementById('player-platform').textContent = `Platform: ${data.platform}`;
+                document.getElementById('player-avatar').src = data.avatar;
+                
+                // Set rank info
+                document.getElementById('rank-name').textContent = data.stats.ranked.rank;
+                document.getElementById('rank-mmr').textContent = `MMR: ${data.stats.ranked.mmr}`;
+                document.getElementById('rank-icon').src = data.stats.ranked.rankIcon;
+                
+                // Generate stat cards
+                const statsContainer = document.getElementById('general-stats');
+                statsContainer.innerHTML = ''; // Clear previous stats
+                
+                const generalStats = data.stats.general;
+                const statItems = [
+                    { title: 'K/D Ratio', value: generalStats.kd },
+                    { title: 'Win Rate', value: generalStats.winRate },
+                    { title: 'Kills', value: generalStats.kills },
+                    { title: 'Deaths', value: generalStats.deaths },
+                    { title: 'Wins', value: generalStats.wins },
+                    { title: 'Losses', value: generalStats.losses },
+                    { title: 'Headshot %', value: generalStats.headshots },
+                    { title: 'Play Time', value: generalStats.playtime }
+                ];
+                
+                statItems.forEach(stat => {
+                    const statCard = document.createElement('div');
+                    statCard.className = 'stat-card';
+                    
+                    statCard.innerHTML = `
+                        <div class="stat-title">${stat.title}</div>
+                        <div class="stat-value">${stat.value}</div>
                     `;
-                    operatorsContainer.appendChild(operatorCard);
+                    
+                    statsContainer.appendChild(statCard);
                 });
-            } else {
-                operatorsContainer.innerHTML = '<p>No operator data available</p>';
-            }
-            
-            // Populate maps
-            const mapsContainer = document.getElementById('maps-grid');
-            mapsContainer.innerHTML = '';
-            
-            if (data.maps && data.maps.length > 0) {
-                data.maps.forEach(map => {
-                    const mapCard = document.createElement('div');
-                    mapCard.className = 'stat-card';
-                    mapCard.innerHTML = `
-                        <h4>${map.name}</h4>
-                        <div class="stat-value">${map.winPercentage || '0'}%</div>
-                        <p>Played: ${map.played || '0'}</p>
-                    `;
-                    mapsContainer.appendChild(mapCard);
-                });
-            } else {
-                mapsContainer.innerHTML = '<p>No map data available</p>';
-            }
-        }
-        
-        // Helper function to get platform name
-        function getPlatformName(platformCode) {
-            switch (platformCode) {
-                case 'pc': return 'PC';
-                case 'psn': return 'PlayStation';
-                case 'xbl': return 'Xbox';
-                default: return platformCode;
-            }
-        }
-        
-        // Initialize search button event listener
-        document.getElementById('search-button').addEventListener('click', () => {
-            const username = document.getElementById('player-search').value.trim();
-            const platform = document.getElementById('platform-select').value;
-            
-            if (username) {
-                fetchPlayerStats(username, platform);
-                
-                // Update platform buttons to match current selection
-                document.querySelectorAll('.platform-btn').forEach(btn => {
-                    if (btn.dataset.platform === platform) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-        });
-        
-        // Allow searching by pressing Enter in the search field
-        document.getElementById('player-search').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const username = document.getElementById('player-search').value.trim();
-                const platform = document.getElementById('platform-select').value;
-                
-                if (username) {
-                    fetchPlayerStats(username, platform);
-                }
-            }
-        });
-        
-        // Platform buttons functionality
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const platform = btn.dataset.platform;
-                const username = document.getElementById('player-search').value.trim();
-                
-                // Update platform select dropdown
-                document.getElementById('platform-select').value = platform;
-                
-                // Update active state
-                document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Generate new links if username exists
-                if (username) {
-                    fetchPlayerStats(username, platform);
-                }
-            });
-        });
-        
-        // Tab navigation functionality
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.dataset.tab;
-                
-                // Update active tab button
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Show selected tab content
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
-        
-        // Add click event listeners to popular player links
-        document.querySelectorAll('.popular-link a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const username = link.dataset.username;
-                const platform = link.dataset.platform;
-                
-                document.getElementById('player-search').value = username;
-                document.getElementById('platform-select').value = platform;
-                
-                // Update platform buttons
-                document.querySelectorAll('.platform-btn').forEach(btn => {
-                    if (btn.dataset.platform === platform) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-                
-                fetchPlayerStats(username, platform);
-            });
-        });
-        
-        // Check URL parameters on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('username');
-            const platform = urlParams.get('platform');
-            
-            if (username && platform) {
-                // Set form values
-                document.getElementById('player-search').value = username;
-                document.getElementById('platform-select').value = platform;
-                
-                // Update platform buttons
-                document.querySelectorAll('.platform-btn').forEach(btn => {
-                    if (btn.dataset.platform === platform) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-                
-                // Fetch player stats
-                fetchPlayerStats(username, platform);
-            } else {
-                // Default to Huvaboard on Xbox
-                document.getElementById('player-search').value = 'Huvaboard';
-                document.getElementById('platform-select').value = 'xbl';
-                
-                // Set Xbox button as active
-                document.querySelectorAll('.platform-btn').forEach(btn => {
-                    if (btn.dataset.platform === 'xbl') {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-                
-                // Don't auto-fetch stats for the default player
             }
         });
     </script>
